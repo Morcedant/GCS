@@ -18,7 +18,7 @@ export function check(S, target) {
 }
 
 // ---------- a new game ----------
-export function newGame({ seed, difficulty = "normal", captain = "", mode = "tour" } = {}) {
+export function newGame({ seed, difficulty = "normal", captain = "", mode = "tour", crisis = true } = {}) {
   seed = seed || String(Math.floor(Math.random() * 1e9));
   const sec = makeSector(seed);
   const sb = sec.systems[sec.starbase];
@@ -28,7 +28,8 @@ export function newGame({ seed, difficulty = "normal", captain = "", mode = "tou
     pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true,
       alloc: { shields: 1, sensors: 1, labs: 0, ops: 0 }, stores: { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 }, wear: 0, lyWeek: 0 },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
-    crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
+    crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false, succ: 0, dist: [] }])),
+    crisisOff: crisis === false,
     backlog: [],   // orders waiting their turn
     campaign: { threads: [], beats: [], finale: false, over: null },   // Watchers of the Void
     tried: {},   // actions tried this turn: each can be attempted once a turn
@@ -79,6 +80,60 @@ export function storyEvent(S, title, text, extra = null) {
   if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;   // a second scene waits for the first
   log(S, `${title}: ${text}`, "discovery", { ...(extra || {}), story: true });
 }
+// ---------- scenes with choices (events.js, voices.js, crisis.js register their own) ----------
+const CHOICES = {};
+/** A module's scenes: view(S, ev) → { title, kicker, speaker, text, options: [{ id, name, blurb }] }; choose(S, ev, id) → { title, text }. */
+export function registerChoices(src, h) { CHOICES[src] = h; }
+/** A scene that asks for a decision: shown as a dialog; the turn can't end until it's answered. */
+export function pushChoice(S, src, id, ctx = {}) {
+  const ev = { kind: "choice", src, id, ctx, turn: S.turn };
+  if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+}
+export function choiceView(S, ev = S.event) { const h = ev && ev.kind === "choice" && CHOICES[ev.src]; return h ? h.view(S, ev) : null; }
+/** Answer the scene: what came of it is shown next, as a scene of its own. */
+export function makeChoice(S, optId) {
+  const ev = S.event; if (!ev || ev.kind !== "choice" || !CHOICES[ev.src]) return { error: "Nothing to choose." };
+  S.event = null;
+  const r = CHOICES[ev.src].choose(S, ev, optId) || { title: "", text: "" };
+  if (S.event) (S.eventQueue = S.eventQueue || []).unshift(S.event);
+  S.event = { kind: "story", title: r.title, text: r.text, choice: r.choice || null, roll: r.roll || null };
+  return { ok: true, ...r };
+}
+/** A roll for a scene: the best officer free or not (it's not their turn's action), with the skills given. */
+export function sceneRoll(S, skills, extra = [], ctx = {}) {
+  const b = bestOfficer(S, skills, ctx) || { officer: "captain", skill: skills[0] };
+  const t = target(S, b.officer, b.skill, { ...ctx, extra }), r = check(S, t.total);
+  return { ...r, officer: b.officer, skill: b.skill, who: b.officer === "captain" ? "The captain" : officer(b.officer).short };
+}
+
+// ---------- the other powers: their standing with the Pelion, and what they remember ----------
+export const RIVAL_POWERS = ["klingon", "romulan", "tholian", "orion"];
+export function standingOf(S, p) { S.standing = S.standing || {}; return (S.standing[p] = S.standing[p] || { score: 0, memory: [] }); }
+/** A power remembers something the Pelion did: its standing changes by `d`, and the act is kept (the last 10). */
+export function remember(S, p, text, d) {
+  if (!RIVAL_POWERS.includes(p)) return;
+  const st = standingOf(S, p); st.score = Math.max(-40, Math.min(40, st.score + d));
+  st.memory.push({ turn: S.turn, text, d }); if (st.memory.length > 10) st.memory.shift();
+}
+/** Calm: a power holds back its raids (a bribe, a treaty, a truce) until this turn. */
+export const calm = (S, p) => !!(S.calm && S.calm[p] > S.turn);
+export function setCalm(S, p, until) { S.calm = S.calm || {}; S.calm[p] = Math.max(S.calm[p] || 0, until); }
+
+// ---------- distinctions: what the senior officers earn ----------
+export const DISTINCTIONS = {
+  fire: { name: "Cool under fire", text: "+1 to every roll in ship combat." },
+  tongue: { name: "Silver tongue", text: "+1 to diplomatic missions and hails." },
+  scholar: { name: "Scholar", text: "+1 to surveys and investigations." },
+  miracle: { name: "Miracle worker", text: "+1 to Engineering." },
+  field: { name: "Field veteran", text: "+1 to the work of orders in the field." },
+  tough: { name: "Hard to keep down", text: "Never takes the −2 for being hurt." },
+};
+const DIST_PREF = { shvari: ["fire", "tongue", "field"], sevek: ["scholar", "field", "fire"], vessik: ["tough", "tongue", "scholar"], grath: ["miracle", "fire", "tough"], reyes: ["fire", "field", "tough"], rrinn: ["tongue", "scholar", "field"] };
+/** Successes after which an officer earns a distinction. */
+export const DIST_STEPS = [4, 10, 18];
+export const distOf = (S, id) => (S.crew[id] && S.crew[id].dist) || [];
+const distApplies = (k, skill, ctx) => (k === "fire" && ctx.combat) || (k === "tongue" && (ctx.action === "envoy" || ctx.action === "hail")) || (k === "scholar" && (ctx.action === "survey" || ctx.action === "investigate")) || (k === "miracle" && skill === "Engineering") || (k === "field" && ctx.action === "mission");
+
 export const available = (S, id) => S.crew[id].inj < 3;
 /** Fit for duty and hasn't acted this turn: every officer acts once a turn, on the bridge or with the away team. */
 export const free = (S, id) => available(S, id) && !S.crew[id].acted;
@@ -115,7 +170,8 @@ export function target(S, id, skill, ctx = {}) {
   if (id !== "captain") {
     const o = officer(id);
     if (o.advWhen({ ...ctx, skill })) parts.push([o.adv, 2]);
-    if (S.crew[id].inj === 2) parts.push(["Wounded", -2]);
+    if (S.crew[id].inj === 2 && !distOf(S, id).includes("tough")) parts.push(["Wounded", -2]);
+    for (const k of distOf(S, id)) if (distApplies(k, skill, ctx)) parts.push([DISTINCTIONS[k].name, 1]);
   }
   const P = S.pelion;
   if (skill === "Sensors" && !ctx.unit) {
@@ -708,6 +764,12 @@ export function exchangeOdds(T, them) {
 }
 function gainXp(S, id, skill) {
   const c = S.crew[id]; c.xp++;
+  // Successes add up to distinctions: Starfleet notices.
+  c.succ = (c.succ || 0) + 1; c.dist = c.dist || [];
+  if (DIST_STEPS.includes(c.succ)) {
+    const k = (DIST_PREF[id] || Object.keys(DISTINCTIONS)).find((x) => !c.dist.includes(x)) || Object.keys(DISTINCTIONS).find((x) => !c.dist.includes(x));
+    if (k) { c.dist.push(k); const o = officer(id); storyEvent(S, `A commendation: ${o.rank} ${o.name}`, `The week's dispatches from Starfleet Command carry a commendation for ${o.name}, the Pelion's ${o.post.toLowerCase()}: ${c.succ} times now the ship has asked something hard of ${o.short} and been answered. The citation is short. The crew read it anyway, and someone puts a copy up in the mess hall.\n\n${DISTINCTIONS[k].name}: ${DISTINCTIONS[k].text}`); }
+  }
   if (c.xp >= 5) {
     c.xp = 0;
     const cur = skillOf(S, id, skill), cap = Math.max(17, officer(id).skills[skill]);
@@ -1289,13 +1351,14 @@ export function orionReprisal(S, why) {
   log(S, `Intelligence: after ${why}, an Orion raider has left ${b ? "the pirate base" : "the sector's edge"}, bound for ${tgt.name}. The pirates want it known that they remember.`, "war");
 }
 export const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
-export function harmWorld(S, s, n, why) {
+/** `sleepers`: the Sleepers did it. The loss still counts on the score, but Starfleet doesn't mark the captain for it. */
+export function harmWorld(S, s, n, why, sleepers = false) {
   if (!["colony", "member", "independent"].includes(s.kind)) return;
   s.harm = Math.min(3, s.harm + n);
   log(S, `${s.name} (${s.kind === "colony" ? "Federation colony" : s.kind === "member" ? "Federation member" : "independent world"}) is harmed: ${why}. Harm ${s.harm}/3${s.harm >= 3 ? "" : s.kind === "colony" ? " (at 3 it must be evacuated)" : s.kind === "member" ? " (at 3 it leaves the Federation)" : " (at 3 it loses faith in the Federation)"}.`, "bad");
   if (s.harm < 3) return;
-  if (s.kind === "colony") { s.kind = "lost"; S.lostColonies++; markCommand(S, 2, `the colony on ${s.name} had to be evacuated.`); }
-  else if (s.kind === "member") { s.kind = "independent"; s.accord = 1; s.harm = 1; S.joined--; markCommand(S, 1, `${s.name} leaves the Federation, which couldn't protect it.`); }
+  if (s.kind === "colony") { s.kind = "lost"; S.lostColonies++; if (!sleepers) markCommand(S, 2, `the colony on ${s.name} had to be evacuated.`); }
+  else if (s.kind === "member") { s.kind = "independent"; s.accord = 1; s.harm = 1; S.joined--; if (!sleepers) markCommand(S, 1, `${s.name} leaves the Federation, which couldn't protect it.`); }
   else { s.accord = Math.max(-5, s.accord - 1); s.harm = 2; }
   if (!Object.values(S.systems).some((x) => x.kind === "colony") && !S.over) S.over = { win: false, why: "Every Federation colony in the sector has been lost. Starfleet withdraws from the Corvan Sector." };
 }
@@ -1318,6 +1381,13 @@ export function requisition(S, type) {
   updateVisibility(S);
   return { ok: true, id };
 }
+/** Starfleet sends a ship, free (a scene's reward): its name, or null if three are already under the Pelion's command. */
+export function grantSupport(S, type) {
+  if (Object.keys(S.support).length >= 3) return null;
+  const used = Object.values(S.support).map((u) => u.name), name = SUPPORT_NAMES.find((n) => !used.includes(n)) || "USS " + S.nextId, id = "u" + S.nextId++;
+  S.support[id] = { id, type, name, at: S.systems[S.starbase].at, mp: 0, acted: true, shields: 0, hull: 0 };
+  log(S, `The ${name} (${SUPPORT[type].name}) joins the Pelion's command at Starbase 23.`, "good"); return name;
+}
 export function fitRefit(S, id) {
   const R = REFITS[id];
   if (!S.pelion.docked) return { error: "Refits are fitted at Starbase 23." };
@@ -1338,6 +1408,7 @@ export function score(S) {
     ["Library records", S.records.length * 6],
     ["Orders carried out", S.done * 4],
     ["Commendations", S.commendations],
+    ["The Sleeper Ark destroyed", S.crisis && S.crisis.stage === "over" && S.crisis.byPelion ? 25 : 0],
     ["Colonies safe", sys.filter((s) => s.kind === "colony").length * 5],
     ["Colonies founded", (S.founded || 0) * 5],
     ["Worlds lost to the Tholian Assembly", -(S.lostTholian || 0) * 8],

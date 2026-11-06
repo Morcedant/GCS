@@ -6,6 +6,9 @@ import { consumeStores, balancePower, storesOf, hourly, BACKLOG_MAX, campaignTic
 import { startBattle, endBattle } from "./combat.js";
 import { aiTurn, claim } from "./ai.js";
 import { arcTurn, arcTick, arcEventChoose } from "./arc.js";
+import { crisisTurn } from "./crisis.js";
+import { voicesTurn } from "./voices.js";
+import { eventsTurn } from "./events.js";
 
 export function canEndTurn(S) { return !(S.over || S.battle || S.event || S.pending); }
 
@@ -66,6 +69,10 @@ export function endTurn(S) {
   // A hostile ship sharing the Pelion's hex attacks.
   const foe = Object.values(S.enemies).find((e) => e.at === S.pelion.at && e.hostile && !e.cooldown && !ENEMIES[e.type].base && e.goal !== "home" && e.goal !== "arc");
   if (foe && !S.event) startBattle(S, foe.id, "enemy");
+  // The week's scenes: the Sleepers, a hail from one of the powers, something that happens.
+  crisisTurn(S);
+  voicesTurn(S);
+  eventsTurn(S);
   arcTick(S);
   checkEnd(S);
   return { ok: true, income };
@@ -127,5 +134,5 @@ export function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-export function dismissEvent(S) { if (S.event && ["mission-choice", "cloak-contact", "complication"].includes(S.event.kind)) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
+export function dismissEvent(S) { if (S.event && ["mission-choice", "cloak-contact", "complication", "choice"].includes(S.event.kind)) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 export function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }

@@ -3,7 +3,9 @@ import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, PROTOTYPES, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, openingScene, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType,
-  tholianSpace, weekPower, storeMax, POWER_SYSTEMS, STORES, storesOf, allocOf, setAlloc, reactorPower, powerFree, warpPower, marketAt, buyStore, requestTender, keepCommand, retire, campaignDef, defOf, dilithiumPenalty } from "./game.js";
+  tholianSpace, weekPower, storeMax, POWER_SYSTEMS, STORES, storesOf, allocOf, setAlloc, reactorPower, powerFree, warpPower, marketAt, buyStore, requestTender, keepCommand, retire, campaignDef, defOf, dilithiumPenalty, choiceView, makeChoice, pushChoice, standingOf, DISTINCTIONS, DIST_STEPS, distOf, RIVAL_POWERS } from "./game.js";
+import { VOICES, attitude } from "./voices.js";
+import { crisisState, crisisTurn } from "./crisis.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { FRONTIER } from "./campaigns.js";
 import { SHIP_SHAPES } from "./ships.js";
@@ -27,7 +29,7 @@ const U = () => (unit === "pelion" ? S.pelion : S.support[unit]) || (unit = "pel
 // ---------- start ----------
 function debugHook() {
   try { if (!/[?&]debug\b/.test(location.search)) return; } catch { return; }
-  window.__pelion = { state: () => S, render: () => renderAll(), after: () => after(), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
+  window.__pelion = { state: () => S, render: () => renderAll(), after: () => after(), push: (src, id, ctx) => pushChoice(S, src, id, ctx || {}), crisis: () => crisisTurn(S), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
 }
 function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
 function startGame(state) {
@@ -547,7 +549,7 @@ function storesHTML() {
 // ---------- Crew ----------
 const DIV = { shvari: "", sevek: "sci", vessik: "sci", grath: "ops", reyes: "ops", rrinn: "ops" };
 function crewHTML() {
-  let h = `<h2>The crew</h2><p class="small muted">Each action is a roll: 3d6 at or under the officer's skill. A success earns experience; every five, +1 to the skill used. Duty points (2 each) reroll a failure, and come back every 8 turns or at Starbase 23. Hurt crew take −2 at 2 boxes and go to sickbay at 3.</p>`;
+  let h = `<h2>The crew</h2><p class="small muted">Each action is a roll: 3d6 at or under the officer's skill. A success earns experience; every five, +1 to the skill used. Successes add up to commendations (at ${DIST_STEPS.join(", ")}), each a distinction that stays with the officer. Duty points (2 each) reroll a failure, and come back every 8 turns or at Starbase 23. Hurt crew take −2 at 2 boxes and go to sickbay at 3.</p>`;
   h += `<h3>Bridge stations (for battle)</h3><div class="kv">`;
   const SK = { helm: "Helm", tactical: "Phasers", science: "Sensors", engineering: "Engineering", comms: "Communications" };
   for (const [st, sk] of Object.entries(SK)) {
@@ -562,7 +564,8 @@ function crewHTML() {
       <div class="kv small" style="margin-bottom:8px"><span>Role</span><b>${esc(c.role)}</b><span>Position</span><b>${esc(c.post)}</b><span>Battle station</span><b class="gold">${stations.length ? esc(stations.join(", ")) : "None (on call)"}</b></div>
       <div class="small">${st.acted ? `<span class="muted">Acted this turn</span> · ` : available(S, c.id) ? `<span class="good">Free this turn</span> · ` : ""}${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}</span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5</div>
       <div class="skills">${Object.keys(c.skills).map((sk) => `<span>${esc(sk)} <b>${skillOf(S, c.id, sk)}</b></span>`).join("")}</div>
-      <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:</b> <span class="muted">${esc(c.advText)}</span></div></div>`;
+      <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:</b> <span class="muted">${esc(c.advText)}</span></div>
+      <div class="small" style="margin-top:4px">${distOf(S, c.id).map((k) => `<div><b class="gold">★ ${esc(DISTINCTIONS[k].name)}:</b> <span class="muted">${esc(DISTINCTIONS[k].text)}</span></div>`).join("")}<span class="muted">${(() => { const n = st.succ || 0, nx = DIST_STEPS.find((x) => x > n); return nx ? `${n} success${n === 1 ? "" : "es"}: a commendation at ${nx}` : `${n} successes: every commendation earned`; })()}</span></div></div>`;
   }
   return h + `</div>`;
 }
@@ -728,7 +731,7 @@ function missionHTML() {
 // ---------- Sector ----------
 function sectorHTML() {
   const sc = score(S);
-  let h = `<h2>The Corvan Sector</h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}</b>.</p>` + raceHTML();
+  let h = `<h2>The Corvan Sector</h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}</b>.</p>` + crisisHTML() + raceHTML() + voicesHTML();
   h += `<table class="tbl"><tr><th>World</th><th>What</th><th>Status</th></tr>`;
   const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, annexed: 6, tholian: 7, lost: 8 };
   for (const s of Object.values(S.systems).filter((x) => shownKind(x) && order[shownKind(x)] !== undefined).sort((a, b) => order[a.kind] - order[b.kind])) {
@@ -738,6 +741,27 @@ function sectorHTML() {
   h += `</table><h3>Score</h3><table class="tbl">${sc.parts.filter((p) => p[1]).map(([n, v]) => `<tr><td>${esc(n)}</td><td style="text-align:right">${v}</td></tr>`).join("")}</table>`;
   h += `<h3>The powers</h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:</b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion pirates:</b> raiders from a hidden base, not a power with a border: they strike convoys and worlds and run. A sensor sweep near the base hears where it is; some orders find it outright. Destroy it and the raids stop. <b style="color:${POWERS.romulan.color}">Romulans:</b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them. <b style="color:${POWERS.tholian.color}">Tholian Assembly:</b> draws its own borders in the southeast (shaded on the map), and every few weeks sends a vessel to spin a web around the nearest world it wants: three weeks of spinning and it's Tholian territory. Hail it or drive it off. Enter Tholian space without orders and a Tholian vessel comes to see you out; stay, and it fires. In battle its web closes after three exchanges: no breaking away.</p>`;
   return h;
+}
+/** The Sleepers, once they've stirred: the warning, then the Ark, its hunters and what's been burned. */
+function crisisHTML() {
+  const c = crisisState(S); if (!c) return "";
+  if (c.stage === "stirring") return `<div class="card red"><h3 style="margin-top:0">The Sleepers: stirring</h3><p class="small">A signal from the deep nebula: they wake in about ${Math.max(1, c.at - S.turn)} week${c.at - S.turn === 1 ? "" : "s"}, and will burn any world they reach, whoever's it is.</p></div>`;
+  if (c.stage === "over") return `<div class="card"><h3 style="margin-top:0">The Sleepers: ${S.crisis.slept ? "asleep again" : "gone dark"}</h3><p class="small">${S.crisis.slept ? `The Ark went back to sleep on week ${S.crisis.over}.` : `The Ark was destroyed on week ${S.crisis.over}${S.crisis.byPelion ? ", by the Pelion" : ""}.`} ${c.burned} world${c.burned === 1 ? "" : "s"} burned; the Pelion destroyed ${c.kills} hunter${c.kills === 1 ? "" : "s"}.</p></div>`;
+  return `<div class="card red"><h3 style="margin-top:0">The Sleepers: awake</h3><div class="kv small">
+    <span>The Ark</span><span>hull ${c.hull}/${c.max}, shields ${c.shields}/${ENEMIES.ark.shields}, <button class="linkish" data-hex="${c.ark}">${esc(c.place)}</button>: it never moves, mends a little each week, and can't be hailed</span>
+    <span>Hunters</span><span>${c.hunters} out; they sleep again in about ${Math.max(0, S.crisis.woke + 16 - S.turn)} weeks; ${c.wave} wave${c.wave === 1 ? "" : "s"} sent, the next in ${Math.max(0, c.next - S.turn)} week${c.next - S.turn === 1 ? "" : "s"}</span>
+    <span>Burned</span><span>${c.burned} world${c.burned === 1 ? "" : "s"} · the Pelion has destroyed ${c.kills} hunter${c.kills === 1 ? "" : "s"}</span>
+    <span>Truce</span><span>${c.truce ? "holding: the other powers hold back and fight the hunters too" : "none"}</span></div>
+    <p class="small" style="margin-top:6px">Destroy the Ark and every hunter goes dark (+25 to the score). It fires three ways an exchange: repair first, bring escorts, and break away before the hull goes.</p></div>`;
+}
+/** The other powers' voices: who speaks for them, how they feel about the Pelion, and what they remember. */
+function voicesHTML() {
+  return `<h3>Who speaks for them</h3>` + RIVAL_POWERS.map((p) => {
+    const V = VOICES[p], st = standingOf(S, p), mem = st.memory.slice(-4).reverse(), att = attitude(S, p);
+    return `<div class="card small"><b style="color:${POWERS[p].color}">${esc(POWERS[p].name)}</b> · ${esc(V.leader)} · they are <b class="${att === "friendly" || att === "cordial" ? "good" : att === "hostile" || att === "wary" ? "bad" : ""}">${att}</b> (${Math.round(st.score)})
+      <div class="muted">${esc(V.title)}: ${esc(V.text)}</div>
+      ${mem.length ? `<ul style="margin:4px 0 0 16px;padding:0">${mem.map((m) => `<li class="${m.d >= 0 ? "good" : "bad"}">They remember the Pelion ${esc(m.text)} <span class="muted">(week ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})</span></li>`).join("")}</ul>` : ""}</div>`;
+  }).join("");
 }
 /** The race for the sector: what each power holds now. */
 function raceHTML() {
@@ -806,7 +830,7 @@ function bindChrome() {
   $("panel").addEventListener("change", (e) => { if (e.target.closest("[data-assist]")) refreshCard(e.target.closest(".card")); });
   $("panel").addEventListener("change", (e) => { const w = e.target.closest("[data-warp]"); if (w) { setWarp(S, +w.value); after(); } });
   $("panel").addEventListener("change", (e) => { const s = e.target.closest("[data-station]"); if (s) { setStation(S, s.dataset.station, s.value); after(); } });
-  $("panel").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
+  $("panel").addEventListener("click", (e) => { const tr = e.target.closest("[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
   $("end-turn").onclick = doEndTurn;
   $("menu").onclick = showMenu;
   $("zoom-in").onclick = () => zoomBy(1.25); $("zoom-out").onclick = () => zoomBy(0.8);
@@ -902,13 +926,15 @@ function showStarter(canContinue) {
     <div class="brief"><h3>The frontier</h3><p>Extend the Federation: survey the uncharted systems, plant colonies on habitable worlds (Found a colony), and bring independent worlds in. The Klingons court the same worlds; the Romulans strike from behind the Neutral Zone; the Tholians enclose worlds in webs, and see intruders out of their space. The Sector tab keeps the count.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
     <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: split the Power between shields (reinforce them with a second point), phasers (overload them with a second), torpedoes and the engines (evasion), give the captain's order, and break away if it goes wrong.</p></div>
+    <div class="brief"><h3>Voices and choices</h3><p>The other powers hail the Pelion: Torgath for the Klingons, t'Rehu for the Romulans, the Tholian Speaker, the Orion pirate Kessa Vane. Each remembers how you answer, and what you do (the Sector tab). Now and then something happens that needs a decision. Late in the tour, the Sleepers wake.</p></div>
     <div class="brief"><h3>Starfleet Command</h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.</p></div>
   </div>
   <div class="ng-row"><label>Captain's name<input type="text" id="ng-name" placeholder="Captain" maxlength="30"></label>
   <label>Game<select id="ng-mode"><option value="tour" selected>A tour: fifty weeks, then your rating</option><option value="open">Open command: no end, campaign after campaign</option></select></label>
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
   <label>Sector seed (optional)<input type="text" id="ng-seed" placeholder="random" maxlength="30"></label></div>
-  <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng-guide" ${canContinue ? "" : "checked"}> Guide me through my first tour, step by step</label>
+  <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng-crisis" checked> A late-tour crisis: around week 35 the Sleepers, machines older than any power here, wake in the deep nebula and burn every world they can reach</label>
+  <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" id="ng-guide" ${canContinue ? "" : "checked"}> Guide me through my first tour, step by step</label>
   <div class="btn-row" style="margin-top:16px"><button class="btn primary" data-m="new">Take command</button>${canContinue ? `<button class="btn" data-m="continue">Continue your tour</button>` : ""}</div>
   <p class="small muted">Version: ${esc(typeof BUILD === "string" ? BUILD : "development")}.</p>
   <p class="small muted">An unofficial fan game for the USS Pelion campaign, inspired by Star Trek. Not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.</p>`);
@@ -941,6 +967,15 @@ function showEvent() {
     return;
   }
   if (ev.kind === "success") { modal(successHTML(ev)); return; }
+  if (ev.kind === "choice") {
+    const c = choiceView(S, ev);
+    if (!c) { S.event = null; after(); return; }
+    const col = c.power && POWERS[c.power] ? POWERS[c.power].color : null;
+    modal(`<p class="small muted" style="margin:0 0 4px">${col ? `<span class="dot" style="background:${col}"></span>` : ""}${esc(c.kicker || "")}</p><h2 style="margin-top:0">${esc(c.title)}</h2>${c.speaker ? `<p class="small muted" style="margin-top:-6px">${esc(c.speaker)}</p>` : ""}
+      ${c.quote ? `<blockquote class="hail" style="border-color:${col || "var(--gold)"}">${esc(c.text)}</blockquote>` : `<p style="white-space:pre-line">${esc(c.text)}</p>`}
+      <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}</h3><p>${esc(x.blurb)}</p><div class="btn-row"><button class="btn primary small" data-choice="${x.id}">${esc(x.name)}</button></div></div>`).join("")}</div>`);
+    return;
+  }
   if (ev.kind === "complication") {
     const c = complicationChoices(S, ev);
     if (!c) { S.event = null; after(); return; }
@@ -962,7 +997,7 @@ function showEvent() {
       <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}</h3><p>${esc(x.blurb)}</p><div class="btn-row"><button class="btn primary small" data-mchoice="${x.id}" data-order="${c.order.id}">${esc(x.name)}</button></div></div>`).join("")}</div>`);
     return;
   }
-  modal(`<h2>${esc(ev.title || "")}</h2><p style="white-space:pre-line">${esc(ev.text || "")}</p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`);
+  modal(`<h2>${esc(ev.title || "")}</h2>${ev.choice ? `<p class="small muted">Your choice: ${esc(ev.choice)}</p>` : ""}<p style="white-space:pre-line">${esc(ev.text || "")}</p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`);
 }
 /** The Mission Success report. */
 function successHTML(ev) {
@@ -996,7 +1031,7 @@ function showBattle() {
       <div class="small muted">Helm ${E.helm} · Gunner ${E.gunner} · Maneuver ${E.maneuver} vs your ${st.maneuver}${E.plasma ? " · Plasma torpedo: +2 to evade it" : ""}${E.relentless ? " · Relentless" : ""}${E.fast ? " · Fast: runs when its shields fall" : ""}</div></div>` : `<div class="ship-card"><h4>Gone</h4></div>`}
   </div>
   ${over ? `<div class="result ${over === "destroyed" || over === "hailed" || over === "escaped" || over === "fled" ? "ok" : "no"}"><b>${{ destroyed: "Destroyed.", fled: "They broke off.", hailed: "They stood down.", escaped: "The Pelion broke away.", lost: "The Pelion is lost." }[over]}</b></div><div class="btn-row"><button class="btn primary" data-m="battle-done">Continue</button></div>`
-  : `<h3>The captain's order</h3><div class="orders-choice">${ord("command", `Command (Leadership ${CAPTAIN.skills.Leadership}, ${pct(CAPTAIN.skills.Leadership)}): +2 to Tactical`)}${ord("read", `Read the enemy (Psychology ${CAPTAIN.skills.Psychology}): +2 evade, +1 to hit`)}${E && !E.base && e.power !== "romulan" ? ord("hail", `Hail (Diplomacy ${CAPTAIN.skills.Diplomacy} vs Will ${E.will}): they may stand down`) : ""}${ord("none", "No order")}</div>
+  : `<h3>The captain's order</h3><div class="orders-choice">${ord("command", `Command (Leadership ${CAPTAIN.skills.Leadership}, ${pct(CAPTAIN.skills.Leadership)}): +2 to Tactical`)}${ord("read", `Read the enemy (Psychology ${CAPTAIN.skills.Psychology}): +2 evade, +1 to hit`)}${E && !E.base && e.power !== "romulan" && e.power !== "sleepers" ? ord("hail", `Hail (Diplomacy ${CAPTAIN.skills.Diplomacy} vs Will ${E.will}): they may stand down`) : ""}${ord("none", "No order")}</div>
   <h3>Power: ${used} of ${st.power} spent${spare > 0 ? ` · ${spare} unassigned` : ""}</h3>
   ${step("shields", "Shields", ["Down: every hit reaches the hull", "Up", "Reinforced: the first hit to reach them is turned aside"])}
   ${step("phasers", "Phasers", ["Silent", `Firing (${st.gun}, ${pct(st.gun)})`, `Overloaded (${st.gun}): a hit does a box more, and wears the crystals`], !fire)}
@@ -1029,18 +1064,19 @@ function modalClick(e) {
     after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;
   }
   if (m === "report-ok") { report = null; closeModal(); after(); return; }
-  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value }); if ($("ng-guide") && $("ng-guide").checked) s.tutorial = { on: true, guide: true, ack: {}, seen: {}, start: s.pelion.at }; openingScene(s); startGame(s); return; }
+  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value, crisis: !$("ng-crisis") || $("ng-crisis").checked }); if ($("ng-guide") && $("ng-guide").checked) s.tutorial = { on: true, guide: true, ack: {}, seen: {}, start: s.pelion.at }; openingScene(s); startGame(s); return; }
   if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
   if (m === "close") { closeModal(); return; }
   if (m === "help") { showHelp(); return; }
   if (m === "restart") { showStarter(false); return; }
-  if (m === "replay") { const s = newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain, mode: S.mode }); openingScene(s); startGame(s); return; }
+  if (m === "replay") { const s = newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain, mode: S.mode, crisis: !S.crisisOff }); openingScene(s); startGame(s); return; }
   if (m === "guide") { closeModal(); startGuide(); return; }
   if (m === "keep") { keepCommand(S); closeModal(); after(); return; }
   if (m === "retire") { retire(S); closeModal(); after(); return; }
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (b.dataset.choice) { makeChoice(S, b.dataset.choice); save(); closeModal(); after(); return; }
   if (b.dataset.complication) { const since = mark(), title = b.textContent.trim(); chooseComplication(S, b.dataset.complication); closeModal(); report = null; reportSince(title, since); after(); return; }
   if (b.dataset.cloak) { const since = mark(), title = b.textContent.trim(); const out = chooseCloak(S, b.dataset.cloak); closeModal(); report = null; reportSince(title, since); if (out && out.text) { report = report || { title, lines: [] }; } after(); return; }
   if (b.dataset.mchoice) { const r = chooseMission(S, b.dataset.order, b.dataset.mchoice); if (r.error) toast(r.error, true); closeModal(); after(); return; }

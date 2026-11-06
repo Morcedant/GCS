@@ -7,7 +7,8 @@
 //    nearest world it wants; three weeks of spinning and the world is Tholian territory. Hail it or fight it off.
 import { distance } from "./hex.js";
 import { ENEMIES, KINDS } from "./data.js";
-import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt, cloakContact, livePosts, postAt, harmPost, annex, tholianSpace } from "./game.js";
+import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt, cloakContact, livePosts, postAt, harmPost, annex, tholianSpace, calm, standingOf } from "./game.js";
+import { sleeperStrike } from "./crisis.js";
 import { inZone } from "./sector.js";
 import { skirmish } from "./combat.js";
 
@@ -21,7 +22,8 @@ export function aiTurn(S) {
   const outposts = worlds(S, ["klingon", "claimed"]);
   if (outposts.length && S.turn % ev.k === 2 && count(S, "klingon") < 2 + Math.floor(S.turn / 15)) {
     const from = pick(S, outposts);
-    const raid = rand(S) < 0.15 + S.tension * 0.06;
+    // Fewer raids while a bargain or truce holds, and when Torgath thinks well of the Pelion.
+    const raid = rand(S) < 0.15 + S.tension * 0.06 - standingOf(S, "klingon").score * 0.004 && !calm(S, "klingon");
     const ind = worlds(S, ["independent"]).filter((s) => !Object.values(S.enemies).some((e) => e.target === s.at)).sort((a, b) => a.accord - b.accord || distance(a.at, from.at) - distance(b.at, from.at));
     const tgt = raid ? pick(S, worlds(S, ["colony", "member"]).length ? worlds(S, ["colony", "member"]) : ind) : ind[0];
     if (tgt) {
@@ -37,14 +39,14 @@ export function aiTurn(S) {
   }
   // Orions.
   const base = Object.values(S.enemies).find((e) => e.type === "orionBase");
-  if (base && S.turn % ev.o === 3 && count(S, "orion") < 2) {
+  if (base && S.turn % ev.o === 3 && count(S, "orion") < 2 && !calm(S, "orion")) {
     // Not a world raided in the last 6 turns: the Orions spread their raids around.
     const targets = worlds(S, ["colony", "member", "member", "independent"]).filter((s) => distance(s.at, S.pelion.at) >= 3 && !(s.raidedAt && S.turn - s.raidedAt < 6));
     const tgt = targets.length ? pick(S, targets) : null;
     if (tgt) spawnEnemy(S, "orion", base.at, { goal: "raid", target: tgt.at, hostile: true, home: base.at });
   }
   // Romulans.
-  if (S.turn >= 9 && S.turn % ev.r === 9 && count(S, "romulan") < 1) {
+  if (S.turn >= 9 && S.turn % ev.r === 9 && count(S, "romulan") < 1 && !calm(S, "romulan") && !(standingOf(S, "romulan").score >= 20 && rand(S) < 0.5)) {
     // The Romulans strike the listening posts that watch the Zone; only when every post is lost do they reach for worlds.
     const posts = livePosts(S), targets = posts.length ? posts : worlds(S, ["colony", "member"]);
     if (targets.length) {
@@ -55,7 +57,7 @@ export function aiTurn(S) {
   }
   // Tholians: a web-spinner goes out for the nearest world the Assembly wants.
   const tout = worlds(S, ["tholian"]);
-  if (tout.length && S.turn >= 6 && S.turn % ev.t === 5 && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "web")) {
+  if (tout.length && S.turn >= 6 && S.turn % ev.t === 5 && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "web") && !calm(S, "tholian") && !(standingOf(S, "tholian").score >= 20 && rand(S) < 0.5)) {
     const near = (s) => Math.min(...tout.map((t) => distance(t.at, s.at)));
     const cand = worlds(S, ["independent", "empty", "anomaly", "ruins", "prewarp"]).filter((s) => s.id !== S.corvan && near(s) <= 6 && (s.kind !== "independent" || s.accord < 3)).sort((a, b) => near(a) - near(b));
     if (cand.length) {
@@ -86,6 +88,14 @@ export function aiTurn(S) {
         if (s.accord <= -5) claim(S, s);
       }
       if (++e.stay >= 6 || s.kind !== "independent") sendHome(S, e, 0);
+    } else if (e.goal === "sleeper") {
+      // A Sleeper hunter at its target: an escort may hold it off; otherwise it burns the world and goes on.
+      if (S.pelion.at === e.at) continue;
+      const guard = Object.values(S.support).find((u) => u.at === e.at && u.type === "escort");
+      if (guard) { const r = skirmish(S, guard, e); if (r === "won") continue; }
+      if (!S.enemies[e.id]) continue;
+      if (s && ["colony", "member"].includes(s.kind) && rand(S) < (s.fortified ? 0.6 : 0.3)) { log(S, `${s.name}'s defenses hold off a Sleeper hunter this week.`, "good"); continue; }
+      sleeperStrike(S, e, s);
     } else if (e.goal === "raid" || e.goal === "strike") {
       const guard = Object.values(S.support).find((u) => u.at === e.at && u.type === "escort");
       if (S.pelion.at === e.at) continue;  // the Pelion is here: the fight comes at the end of the turn
@@ -104,7 +114,7 @@ export function aiTurn(S) {
         log(S, `Warned by the Pelion, ${s.name}'s defenses are waiting when the bird-of-prey decloaks: it turns for the Neutral Zone without firing a shot.`, "good");
         e.cloaked = false; e.seen = true; delete s.alerted; S.commendations += 1; sendHome(S, e, 0); continue;
       }
-      if (s && ["colony", "member"].includes(s.kind) && rand(S) < 0.3) {
+      if (s && ["colony", "member"].includes(s.kind) && rand(S) < (s.fortified ? 0.6 : 0.3)) {
         log(S, `${s.name}'s own defenses drive off the ${E.name} before it can do any harm.`, "good");
         if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
         sendHome(S, e, 0); continue;

@@ -19,6 +19,9 @@ export const SHIP_SHAPES = {
   // An Orion pirate base: a ring station on spokes.
   // A Federation listening post: a small station with a sensor dish, watching the Neutral Zone.
   post: "M-7 -2.2 L7 -2.2 L7 2.2 L-7 2.2 Z M-2.2 -6 L2.2 -6 L2.2 6 L-2.2 6 Z M-9.5 -3.5 L-7 -2.2 L-7 2.2 L-9.5 3.5 Z M9.5 -3.5 L7 -2.2 L7 2.2 L9.5 3.5 Z M0 -6 L0 -8.5 M-4 -9.5 Q0 -12.5 4 -9.5 Z",
+  // A Sleeper hunter: a barbed dart, old and wrong-looking. The Sleeper Ark: a vast cracked octagon with a burning core.
+  sleeper: "M12 0 L2 -4 L-4 -10 L-2 -3 L-10 0 L-2 3 L-4 10 L2 4 Z M2 0 L-4 0",
+  ark: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
   orionBase: "M10 0 A10 10 0 1 1 -10 0 A10 10 0 1 1 10 0 Z M7 0 A7 7 0 1 1 -7 0 A7 7 0 1 1 7 0 Z M3 0 A3 3 0 1 1 -3 0 A3 3 0 1 1 3 0 Z M3 0 L7 0 M-3 0 L-7 0 M0 3 L0 7 M0 -3 L0 -7",
 };
-export const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", tholian: "Tholian vessel", orionBase: "Orion pirate base", post: "Federation listening post" };
+export const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", tholian: "Tholian vessel", orionBase: "Orion pirate base", post: "Federation listening post", sleeper: "Sleeper hunter (the late-tour crisis)", ark: "Sleeper Ark (the late-tour crisis)" };

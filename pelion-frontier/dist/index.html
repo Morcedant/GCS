@@ -135,6 +135,9 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
   .toast { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }   /* above End turn */
 }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+.linkish { background: none; border: 0; padding: 0; color: var(--blue, #6fb4ff); font: inherit; text-decoration: underline; cursor: pointer; }
+blockquote.hail { margin: 10px 0 14px; padding: 10px 14px; border-left: 3px solid var(--gold); background: rgba(255,255,255,.04); font-style: italic; line-height: 1.5; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
 </style>
 
 <div id="app" hidden>
@@ -161,7 +164,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-03 03:44 UTC";
+const BUILD = "2026-11-06 15:09 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -273,6 +276,9 @@ const ENEMIES = {
   rbop: { name: "Romulan bird-of-prey", power: "romulan", shields: 3, hull: 3, maneuver: 5, helm: 11, gunner: 12, dmg: 2, plasma: true, will: 13, cloak: true, ambush: true, speed: 4, warp: 6 },
   orion: { name: "Orion raider", power: "orion", shields: 2, hull: 3, maneuver: 6, helm: 13, gunner: 11, dmg: 1, will: 10, fast: true, speed: 5, warp: 6.5 },
   tholian: { name: "Tholian vessel", power: "tholian", shields: 3, hull: 2, maneuver: 5, helm: 12, gunner: 12, dmg: 1, will: 13, web: true, speed: 4, warp: 6 },
+  // The Sleepers (the late-tour crisis, crisis.js): old machines, at war with everyone. No one hails them.
+  sleeper: { name: "Sleeper hunter", power: "sleepers", shields: 3, hull: 3, maneuver: 4, helm: 12, gunner: 12, dmg: 2, will: 0, speed: 4, warp: 6 },
+  ark: { name: "Sleeper Ark", power: "sleepers", shields: 10, hull: 20, maneuver: 1, helm: 9, gunner: 13, dmg: 3, will: 0, speed: 0, ark: true },
   orionBase: { name: "Orion pirate base", power: "orion", shields: 4, hull: 4, maneuver: 0, helm: 0, gunner: 11, dmg: 2, will: 11, base: true, speed: 0 },
 };
 const POWERS = {
@@ -282,6 +288,7 @@ const POWERS = {
   orion: { name: "Orion pirates", color: "#e6a640" },
   tholian: { name: "Tholian Assembly", color: "#ff8fb8" },
   independent: { name: "Independent", color: "#c9c3e8" },
+  sleepers: { name: "The Sleepers", color: "#e8e4d0" },
 };
 
 /** What a system can be. `known`: on Starfleet's charts from the start. */
@@ -434,9 +441,12 @@ const SHIP_SHAPES = {
   // An Orion pirate base: a ring station on spokes.
   // A Federation listening post: a small station with a sensor dish, watching the Neutral Zone.
   post: "M-7 -2.2 L7 -2.2 L7 2.2 L-7 2.2 Z M-2.2 -6 L2.2 -6 L2.2 6 L-2.2 6 Z M-9.5 -3.5 L-7 -2.2 L-7 2.2 L-9.5 3.5 Z M9.5 -3.5 L7 -2.2 L7 2.2 L9.5 3.5 Z M0 -6 L0 -8.5 M-4 -9.5 Q0 -12.5 4 -9.5 Z",
+  // A Sleeper hunter: a barbed dart, old and wrong-looking. The Sleeper Ark: a vast cracked octagon with a burning core.
+  sleeper: "M12 0 L2 -4 L-4 -10 L-2 -3 L-10 0 L-2 3 L-4 10 L2 4 Z M2 0 L-4 0",
+  ark: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
   orionBase: "M10 0 A10 10 0 1 1 -10 0 A10 10 0 1 1 10 0 Z M7 0 A7 7 0 1 1 -7 0 A7 7 0 1 1 7 0 Z M3 0 A3 3 0 1 1 -3 0 A3 3 0 1 1 3 0 Z M3 0 L7 0 M-3 0 L-7 0 M0 3 L0 7 M0 -3 L0 -7",
 };
-const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", tholian: "Tholian vessel", orionBase: "Orion pirate base", post: "Federation listening post" };
+const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", tholian: "Tholian vessel", orionBase: "Orion pirate base", post: "Federation listening post", sleeper: "Sleeper hunter (the late-tour crisis)", ark: "Sleeper Ark (the late-tour crisis)" };
 
 // ---- campaigns.js ----
 // The frontier, and the campaigns after the first. The whole game is one story: the Federation pushing out into the
@@ -1822,7 +1832,7 @@ function check(S, target) {
 }
 
 // ---------- a new game ----------
-function newGame({ seed, difficulty = "normal", captain = "", mode = "tour" } = {}) {
+function newGame({ seed, difficulty = "normal", captain = "", mode = "tour", crisis = true } = {}) {
   seed = seed || String(Math.floor(Math.random() * 1e9));
   const sec = makeSector(seed);
   const sb = sec.systems[sec.starbase];
@@ -1832,7 +1842,8 @@ function newGame({ seed, difficulty = "normal", captain = "", mode = "tour" } = 
     pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true,
       alloc: { shields: 1, sensors: 1, labs: 0, ops: 0 }, stores: { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 }, wear: 0, lyWeek: 0 },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
-    crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
+    crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false, succ: 0, dist: [] }])),
+    crisisOff: crisis === false,
     backlog: [],   // orders waiting their turn
     campaign: { threads: [], beats: [], finale: false, over: null },   // Watchers of the Void
     tried: {},   // actions tried this turn: each can be attempted once a turn
@@ -1883,6 +1894,60 @@ function storyEvent(S, title, text, extra = null) {
   if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;   // a second scene waits for the first
   log(S, `${title}: ${text}`, "discovery", { ...(extra || {}), story: true });
 }
+// ---------- scenes with choices (events.js, voices.js, crisis.js register their own) ----------
+const CHOICES = {};
+/** A module's scenes: view(S, ev) → { title, kicker, speaker, text, options: [{ id, name, blurb }] }; choose(S, ev, id) → { title, text }. */
+function registerChoices(src, h) { CHOICES[src] = h; }
+/** A scene that asks for a decision: shown as a dialog; the turn can't end until it's answered. */
+function pushChoice(S, src, id, ctx = {}) {
+  const ev = { kind: "choice", src, id, ctx, turn: S.turn };
+  if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+}
+function choiceView(S, ev = S.event) { const h = ev && ev.kind === "choice" && CHOICES[ev.src]; return h ? h.view(S, ev) : null; }
+/** Answer the scene: what came of it is shown next, as a scene of its own. */
+function makeChoice(S, optId) {
+  const ev = S.event; if (!ev || ev.kind !== "choice" || !CHOICES[ev.src]) return { error: "Nothing to choose." };
+  S.event = null;
+  const r = CHOICES[ev.src].choose(S, ev, optId) || { title: "", text: "" };
+  if (S.event) (S.eventQueue = S.eventQueue || []).unshift(S.event);
+  S.event = { kind: "story", title: r.title, text: r.text, choice: r.choice || null, roll: r.roll || null };
+  return { ok: true, ...r };
+}
+/** A roll for a scene: the best officer free or not (it's not their turn's action), with the skills given. */
+function sceneRoll(S, skills, extra = [], ctx = {}) {
+  const b = bestOfficer(S, skills, ctx) || { officer: "captain", skill: skills[0] };
+  const t = target(S, b.officer, b.skill, { ...ctx, extra }), r = check(S, t.total);
+  return { ...r, officer: b.officer, skill: b.skill, who: b.officer === "captain" ? "The captain" : officer(b.officer).short };
+}
+
+// ---------- the other powers: their standing with the Pelion, and what they remember ----------
+const RIVAL_POWERS = ["klingon", "romulan", "tholian", "orion"];
+function standingOf(S, p) { S.standing = S.standing || {}; return (S.standing[p] = S.standing[p] || { score: 0, memory: [] }); }
+/** A power remembers something the Pelion did: its standing changes by `d`, and the act is kept (the last 10). */
+function remember(S, p, text, d) {
+  if (!RIVAL_POWERS.includes(p)) return;
+  const st = standingOf(S, p); st.score = Math.max(-40, Math.min(40, st.score + d));
+  st.memory.push({ turn: S.turn, text, d }); if (st.memory.length > 10) st.memory.shift();
+}
+/** Calm: a power holds back its raids (a bribe, a treaty, a truce) until this turn. */
+const calm = (S, p) => !!(S.calm && S.calm[p] > S.turn);
+function setCalm(S, p, until) { S.calm = S.calm || {}; S.calm[p] = Math.max(S.calm[p] || 0, until); }
+
+// ---------- distinctions: what the senior officers earn ----------
+const DISTINCTIONS = {
+  fire: { name: "Cool under fire", text: "+1 to every roll in ship combat." },
+  tongue: { name: "Silver tongue", text: "+1 to diplomatic missions and hails." },
+  scholar: { name: "Scholar", text: "+1 to surveys and investigations." },
+  miracle: { name: "Miracle worker", text: "+1 to Engineering." },
+  field: { name: "Field veteran", text: "+1 to the work of orders in the field." },
+  tough: { name: "Hard to keep down", text: "Never takes the −2 for being hurt." },
+};
+const DIST_PREF = { shvari: ["fire", "tongue", "field"], sevek: ["scholar", "field", "fire"], vessik: ["tough", "tongue", "scholar"], grath: ["miracle", "fire", "tough"], reyes: ["fire", "field", "tough"], rrinn: ["tongue", "scholar", "field"] };
+/** Successes after which an officer earns a distinction. */
+const DIST_STEPS = [4, 10, 18];
+const distOf = (S, id) => (S.crew[id] && S.crew[id].dist) || [];
+const distApplies = (k, skill, ctx) => (k === "fire" && ctx.combat) || (k === "tongue" && (ctx.action === "envoy" || ctx.action === "hail")) || (k === "scholar" && (ctx.action === "survey" || ctx.action === "investigate")) || (k === "miracle" && skill === "Engineering") || (k === "field" && ctx.action === "mission");
+
 const available = (S, id) => S.crew[id].inj < 3;
 /** Fit for duty and hasn't acted this turn: every officer acts once a turn, on the bridge or with the away team. */
 const free = (S, id) => available(S, id) && !S.crew[id].acted;
@@ -1919,7 +1984,8 @@ function target(S, id, skill, ctx = {}) {
   if (id !== "captain") {
     const o = officer(id);
     if (o.advWhen({ ...ctx, skill })) parts.push([o.adv, 2]);
-    if (S.crew[id].inj === 2) parts.push(["Wounded", -2]);
+    if (S.crew[id].inj === 2 && !distOf(S, id).includes("tough")) parts.push(["Wounded", -2]);
+    for (const k of distOf(S, id)) if (distApplies(k, skill, ctx)) parts.push([DISTINCTIONS[k].name, 1]);
   }
   const P = S.pelion;
   if (skill === "Sensors" && !ctx.unit) {
@@ -2512,6 +2578,12 @@ function exchangeOdds(T, them) {
 }
 function gainXp(S, id, skill) {
   const c = S.crew[id]; c.xp++;
+  // Successes add up to distinctions: Starfleet notices.
+  c.succ = (c.succ || 0) + 1; c.dist = c.dist || [];
+  if (DIST_STEPS.includes(c.succ)) {
+    const k = (DIST_PREF[id] || Object.keys(DISTINCTIONS)).find((x) => !c.dist.includes(x)) || Object.keys(DISTINCTIONS).find((x) => !c.dist.includes(x));
+    if (k) { c.dist.push(k); const o = officer(id); storyEvent(S, `A commendation: ${o.rank} ${o.name}`, `The week's dispatches from Starfleet Command carry a commendation for ${o.name}, the Pelion's ${o.post.toLowerCase()}: ${c.succ} times now the ship has asked something hard of ${o.short} and been answered. The citation is short. The crew read it anyway, and someone puts a copy up in the mess hall.\n\n${DISTINCTIONS[k].name}: ${DISTINCTIONS[k].text}`); }
+  }
   if (c.xp >= 5) {
     c.xp = 0;
     const cur = skillOf(S, id, skill), cap = Math.max(17, officer(id).skills[skill]);
@@ -3093,13 +3165,14 @@ function orionReprisal(S, why) {
   log(S, `Intelligence: after ${why}, an Orion raider has left ${b ? "the pirate base" : "the sector's edge"}, bound for ${tgt.name}. The pirates want it known that they remember.`, "war");
 }
 const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
-function harmWorld(S, s, n, why) {
+/** `sleepers`: the Sleepers did it. The loss still counts on the score, but Starfleet doesn't mark the captain for it. */
+function harmWorld(S, s, n, why, sleepers = false) {
   if (!["colony", "member", "independent"].includes(s.kind)) return;
   s.harm = Math.min(3, s.harm + n);
   log(S, `${s.name} (${s.kind === "colony" ? "Federation colony" : s.kind === "member" ? "Federation member" : "independent world"}) is harmed: ${why}. Harm ${s.harm}/3${s.harm >= 3 ? "" : s.kind === "colony" ? " (at 3 it must be evacuated)" : s.kind === "member" ? " (at 3 it leaves the Federation)" : " (at 3 it loses faith in the Federation)"}.`, "bad");
   if (s.harm < 3) return;
-  if (s.kind === "colony") { s.kind = "lost"; S.lostColonies++; markCommand(S, 2, `the colony on ${s.name} had to be evacuated.`); }
-  else if (s.kind === "member") { s.kind = "independent"; s.accord = 1; s.harm = 1; S.joined--; markCommand(S, 1, `${s.name} leaves the Federation, which couldn't protect it.`); }
+  if (s.kind === "colony") { s.kind = "lost"; S.lostColonies++; if (!sleepers) markCommand(S, 2, `the colony on ${s.name} had to be evacuated.`); }
+  else if (s.kind === "member") { s.kind = "independent"; s.accord = 1; s.harm = 1; S.joined--; if (!sleepers) markCommand(S, 1, `${s.name} leaves the Federation, which couldn't protect it.`); }
   else { s.accord = Math.max(-5, s.accord - 1); s.harm = 2; }
   if (!Object.values(S.systems).some((x) => x.kind === "colony") && !S.over) S.over = { win: false, why: "Every Federation colony in the sector has been lost. Starfleet withdraws from the Corvan Sector." };
 }
@@ -3122,6 +3195,13 @@ function requisition(S, type) {
   updateVisibility(S);
   return { ok: true, id };
 }
+/** Starfleet sends a ship, free (a scene's reward): its name, or null if three are already under the Pelion's command. */
+function grantSupport(S, type) {
+  if (Object.keys(S.support).length >= 3) return null;
+  const used = Object.values(S.support).map((u) => u.name), name = SUPPORT_NAMES.find((n) => !used.includes(n)) || "USS " + S.nextId, id = "u" + S.nextId++;
+  S.support[id] = { id, type, name, at: S.systems[S.starbase].at, mp: 0, acted: true, shields: 0, hull: 0 };
+  log(S, `The ${name} (${SUPPORT[type].name}) joins the Pelion's command at Starbase 23.`, "good"); return name;
+}
 function fitRefit(S, id) {
   const R = REFITS[id];
   if (!S.pelion.docked) return { error: "Refits are fitted at Starbase 23." };
@@ -3142,6 +3222,7 @@ function score(S) {
     ["Library records", S.records.length * 6],
     ["Orders carried out", S.done * 4],
     ["Commendations", S.commendations],
+    ["The Sleeper Ark destroyed", S.crisis && S.crisis.stage === "over" && S.crisis.byPelion ? 25 : 0],
     ["Colonies safe", sys.filter((s) => s.kind === "colony").length * 5],
     ["Colonies founded", (S.founded || 0) * 5],
     ["Worlds lost to the Tholian Assembly", -(S.lostTholian || 0) * 8],
@@ -3194,6 +3275,8 @@ function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; 
 // roll for every hit that reaches the Hull; Engineering to repair mid-fight; a Helm contest to break away.
 
 
+
+
 const shieldsMax = (S) => PELION.shields + (S.pelion.refits.shields ? 1 : 0) + (hasRecord(S, "shield1") ? 1 : 0) + (S.battle && S.battle.raised ? 1 : 0);
 /** The reactor's Power: refits and records add to it, damage and failing dilithium take from it. */
 const powerOf = (S) => reactorPower(S);
@@ -3208,6 +3291,8 @@ function battleStats(S) {
 
 function startBattle(S, enemyId, initiator) {
   const e = S.enemies[enemyId], E = ENEMIES[e.type];
+  // Firing first on a ship that hadn't fired is remembered.
+  if (initiator === "pelion" && !e.hostile) remember(S, e.power, "fired first on one of our ships", -6);
   if (initiator === "pelion" && e.power === "klingon" && !e.hostile) {
     markCommand(S, 1, "the Pelion fired first on a Klingon ship. A diplomatic incident.");
     S.tension = Math.min(10, S.tension + 2); e.hostile = true;
@@ -3295,11 +3380,12 @@ function exchange(S, choice = {}) {
   } else if (choice.order === "hail") {
     const r = check(S, CAPTAIN.skills.Diplomacy), them = check(S, E.will);
     const wins = r.success && (!them.success || r.margin > them.margin);
-    if (wins && !(E.relentless && e.hull < 3) && e.power !== "romulan" && !E.base) {
+    if (wins && !(E.relentless && e.hull < 3) && e.power !== "romulan" && e.power !== "sleepers" && !E.base) {
+      remember(S, e.power, "talked our captain down instead of fighting", 2);
       L.push(`Hail (${R(r)} against their Will, ${R(them)}): they stand down and withdraw.`);
       sendHome(S, e, 4); B.over = "hailed"; return finish(S, L);
     }
-    L.push(`Hail (${R(r)} against their Will, ${R(them)}): ${e.power === "romulan" ? "silence on every channel" : E.relentless && e.hull < 3 ? "the Klingon captain laughs at you" : "they won't listen"}.`);
+    L.push(`Hail (${R(r)} against their Will, ${R(them)}): ${e.power === "sleepers" ? "nothing answers: there's no one aboard to answer" : e.power === "romulan" ? "silence on every channel" : E.relentless && e.hull < 3 ? "the Klingon captain laughs at you" : "they won't listen"}.`);
   }
   const md = st.maneuver - (E.maneuver || 0);
   // Breaking away: a Helm contest instead of firing.
@@ -3346,8 +3432,8 @@ function exchange(S, choice = {}) {
   const gun = E.gunner + (B.ambush && B.ex === 1 && !B.standby ? 2 : 0);
   const volley = (label, dmg, evadable) => {
     const r = check(S, gun + (label === "torpedo" ? 1 : 0));
-    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns", tholian: "Energy beam" }[e.type];
-    const what = label === "torpedo" ? "Photon torpedo" : name;
+    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns", tholian: "Energy beam", sleeper: "Cutting beam", ark: "The Ark's fire" }[e.type];
+    const what = label === "torpedo" ? "Photon torpedo" : label === "beam" ? "Burning beam" : name;
     if (!r.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): miss.`); return; }
     if (tgt) {
       const T = SUPPORT[tgt.type];
@@ -3366,6 +3452,8 @@ function exchange(S, choice = {}) {
   };
   volley("main", E.dmg, true);
   if (e.type === "kbc" && B.ex % 2 === 0) volley("torpedo", 2, false);
+  // The Sleeper Ark has guns all over it: another volley an exchange, and a beam too wide to dodge.
+  if (e.type === "ark") { volley("main", E.dmg, true); volley("beam", 1, false); }
   // Damage control.
   if (choice.repair && st.engId) {
     const noParts = storesOf(S).spares <= 0;
@@ -3390,11 +3478,13 @@ function finish(S, L) {
   const e = S.enemies[B.enemy], E = ENEMIES[e.type];
   if (B.over === "destroyed") {
     delete S.enemies[e.id];
-    if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
-    else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
-    else if (e.power === "tholian") { S.commendations += 1; addStore(S, "spares", 1); log(S, "The Tholian vessel shatters like glass. The Assembly will note the time.", "war"); }
-    else if (e.power === "romulan") { S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
-    else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
+    if (e.type === "ark") breakArk(S, true);
+    else if (e.type === "sleeper") { const c = sleeperKilled(S); log(S, `The Pelion destroys a Sleeper hunter. +${c} commendations.`, "good"); }
+    else if (e.type === "orionBase") { remember(S, "orion", "destroyed our base", -15); S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
+    else if (e.power === "orion") { remember(S, "orion", "destroyed one of our raiders", -4); if (rand(S) < 0.5) hail(S, "orion:grudge"); S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
+    else if (e.power === "tholian") { remember(S, "tholian", "destroyed one of our vessels", -6); S.commendations += 1; addStore(S, "spares", 1); log(S, "The Tholian vessel shatters like glass. The Assembly will note the time.", "war"); }
+    else if (e.power === "romulan") { remember(S, "romulan", "destroyed one of our birds-of-prey", -5); S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
+    else { remember(S, "klingon", "destroyed one of our ships", e.hostile && B.initiator !== "pelion" ? -3 : -8); S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
   else if (e.arcRaider && (B.over === "fled" || B.over === "hailed")) {
     // Chased off from Corvan II, the raider leaves for good: no coming back to orbit while the away team works.
@@ -3805,6 +3895,480 @@ registerHooks({ arcActions, arcStep, arcSweep, arcArrive });
 
 const raiderName = ENEMIES.orion.name;
 
+// ---- voices.js ----
+// The other powers speak. Each has someone who speaks for it in the Corvan Sector, and a character: the Klingon
+// commander respects a captain who stands their ground; the Romulan measures every word; the Tholian Speaker is exact
+// to the second about boundaries; the Orion pirate captain sells anything. Now and then one of them hails the Pelion,
+// and the captain answers. Every answer, and much of what the Pelion does (firing first, destroying a ship, letting one
+// go), is remembered (game.js remember): it moves that power's standing, and the Sector tab shows what each remembers.
+// Standing and the bargains made here change what the powers do: raids, strikes and webs held back for a while.
+
+
+
+
+const VOICES = {
+  klingon: { leader: "Commander Torgath of House Mok'tal", title: "Honour and the blade", text: "Respects a captain who stands their ground, and despises one who talks too much. Never forgets an insult, or a debt of honour." },
+  romulan: { leader: "Commander t'Rehu", title: "Patience and secrets", text: "Every word measured, every offer a test. The Romulans keep their own accounts, and always collect." },
+  tholian: { leader: "Speaker Thrann of the Assembly", title: "Precision and boundaries", text: "Exact to the second and rigid as crystal. A boundary crossed is never forgotten; a promise kept is noted." },
+  orion: { leader: "Kessa Vane, of the Corvan cell", title: "Everything has a price", text: "A pirate captain who would sell anyone, and has. She bargains, she threatens, and she remembers who paid." },
+};
+const ATT = [[20, "friendly"], [8, "cordial"], [-8, "neutral"], [-20, "wary"], [-99, "hostile"]];
+const attitude = (S, p) => ATT.find(([n]) => standingOf(S, p).score >= n)[1];
+const vRolled = (r) => `(${r.who}, ${r.skill}: ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `fails by ${-r.margin}`})`;
+const near = (S, kinds, n) => Object.values(S.systems).find((s) => kinds.includes(s.kind) && distance(s.at, S.pelion.at) <= n);
+const orionBase = (S) => Object.values(S.enemies).find((e) => ENEMIES[e.type].base);
+
+/** Each message: who sends it, when (`can`), what's said, and the answers. */
+const MESSAGES = {
+  "klingon:border": {
+    can: (S) => (near(S, ["klingon", "claimed"], 3) && !S.pelion.docked ? {} : null),
+    text: () => "\"Starfleet. You are close enough to our border to count our guns. Count them, then go.\" The channel closes, and opens again a moment later, as if Torgath wants to see what kind of captain you are.",
+    options: [
+      { id: "withdraw", name: "Withdraw, with courtesy", blurb: "Klingon tension −1, but Torgath thinks less of a captain who backs away (−2).", apply: (S) => { S.tension = Math.max(0, S.tension - 1); remember(S, "klingon", "backed away from our border", -2); return "The Pelion turns away. Torgath doesn't bother to answer. Klingon tension −1."; } },
+      { id: "hold", name: "Hold your position", blurb: "A Leadership roll: success, Torgath respects it (+6); fail, an incident (tension +1, −3).", apply: (S) => {
+        const r = sceneRoll(S, ["Leadership", "Diplomacy"]);
+        if (r.success) { remember(S, "klingon", "held its ground at our border, like a warrior", 6); return `"These are open stars," the Pelion answers, "and we'll keep to them." A long pause; then Torgath laughs ${vRolled(r)}. The Empire thinks better of you.`; }
+        S.tension = Math.min(10, S.tension + 1); remember(S, "klingon", "provoked us at our border", -3); return `It goes badly ${vRolled(r)}: words, then threats, then a disruptor shot across the bow. Klingon tension +1.`;
+      } },
+    ],
+  },
+  "klingon:tribute": {
+    can: (S) => (S.turn >= 8 && S.tension >= 4 && S.supplies >= 8 ? {} : null),
+    text: () => "\"The Empire's ships keep these lanes clear of Orion vermin, and your colonies grow fat on it. Eight crates of supplies would show your gratitude.\" Torgath's officers, behind, look as if they hope you'll refuse.",
+    options: [
+      { id: "pay", name: "Pay", blurb: "−8 supplies; Klingon tension −2. Torgath takes it, and thinks a little less of you (−1).", apply: (S) => { S.supplies -= 8; S.tension = Math.max(0, S.tension - 2); remember(S, "klingon", "paid us tribute", -1); return "The crates are beamed across. Klingon tension −2. Torgath doesn't say thank you."; } },
+      { id: "refuse", name: "Refuse", blurb: "Klingon tension +1; but a captain with a spine earns some respect (+3).", apply: (S) => { S.tension = Math.min(10, S.tension + 1); remember(S, "klingon", "refused us tribute to our faces", 3); return "\"Then we'll see whose ships keep the lanes,\" Torgath says, and seems almost pleased. Klingon tension +1."; } },
+    ],
+  },
+  "klingon:hunt": {
+    can: (S) => (S.turn >= 10 && !S.orionBaseDown && orionBase(S) && standingOf(S, "klingon").score >= -5 ? {} : null),
+    text: () => "\"Orion dogs raid my outposts as they raid your colonies. I have no love for Starfleet, Captain, but less for pirates. Tell me what you know of their nest, and I'll tell you what I know.\"",
+    options: [
+      { id: "share", name: "Trade what you know", blurb: "The pirate base goes on your charts (Torgath knows where it is); tension −1, +6 standing. Starfleet may ask why.", apply: (S) => {
+        const b = orionBase(S); S.tension = Math.max(0, S.tension - 1); remember(S, "klingon", "hunted the Orions with us", 6);
+        if (b && !b.found) { b.found = true; const sy = sysAt(S, b.at); if (sy) { sy.surveyed = true; S.seenSys[sy.id] = true; } log(S, `The Orion pirate base is found: ${sy ? `hidden at ${sy.name}` : "in the dust"}. It's on the charts now.`, "discovery"); return `Torgath sends coordinates: the pirate base, ${sy ? `hidden at ${sy.name}` : "in the dust"}. It's on the charts now. Klingon tension −1.`; }
+        return "You already know where the base is; Torgath grunts, and says the hunt is yours, then. Klingon tension −1.";
+      } },
+      { id: "decline", name: "Decline", blurb: "−3 standing.", apply: (S) => { remember(S, "klingon", "wouldn't hunt with us", -3); return "\"Then hunt alone,\" Torgath says, and closes the channel."; } },
+    ],
+  },
+  "romulan:zone": {
+    can: (S) => (Object.keys(S.hexes).some((k) => inZone(k) && distance(k, S.pelion.at) <= 2) ? {} : null),
+    text: () => "A voice on the Pelion's command frequency, from no ship the sensors can see: \"Commander t'Rehu, of the Romulan Star Empire. Your course brings you within two light-years of the Neutral Zone. That is close enough to be mistaken for intent. We are patient, Captain. Not infinitely so.\"",
+    options: [
+      { id: "withdraw", name: "Alter course away", blurb: "+4 standing.", apply: (S) => { remember(S, "romulan", "altered course away from the Zone when asked", 4); return "The Pelion turns away from the Zone. Nothing answers, but the static on that frequency goes quiet."; } },
+      { id: "hold", name: "Hold course: these are Federation stars", blurb: "−6 standing, and they may answer with a strike on a listening post.", apply: (S) => { remember(S, "romulan", "held course on the Neutral Zone", -6); if (rand(S) < 0.5) { romulanReprisal(S, "the Pelion held its course on the Neutral Zone"); return "\"Noted,\" says t'Rehu. Within the day, Romulan traffic surges along the Zone."; } return "\"Noted,\" says t'Rehu, and nothing more."; } },
+    ],
+  },
+  "romulan:exchange": {
+    can: (S) => (S.turn >= 12 && S.science >= 6 && standingOf(S, "romulan").score >= -10 ? {} : null),
+    text: () => "\"An exchange, Captain, between professionals. Your survey data of this sector, which we lack, for the positions of our ships, which you lack. For a few weeks, our birds-of-prey will keep to their side of the Zone. Consider it a gesture.\"",
+    options: [
+      { id: "trade", name: "Trade the survey data", blurb: "−6 science; the Romulans hold back their strikes for 6 weeks, +5 standing.", apply: (S) => { S.science -= 6; setCalm(S, "romulan", S.turn + 6); for (const e of Object.values(S.enemies)) if (e.power === "romulan") { e.revealed = true; e.seen = true; } remember(S, "romulan", "traded survey data with us", 5); return "The data goes across, and a list of positions comes back: every bird-of-prey this side of the Zone. For six weeks, there will be no strikes."; } },
+      { id: "refuse", name: "Refuse", blurb: "−2 standing.", apply: (S) => { remember(S, "romulan", "refused an exchange", -2); return "\"As you wish,\" says t'Rehu, as if the answer had been expected."; } },
+    ],
+  },
+  "romulan:posts": {
+    can: (S) => (S.turn >= 15 && livePosts(S).length ? {} : null),
+    text: () => "\"Your listening posts, Captain, stare into our space day and night. We find it discourteous. Dim one of them, for a time, and we will find less reason to visit them.\"",
+    options: [
+      { id: "dim", name: "Dim a post's scanners for ten weeks", blurb: "No Romulan strikes for 10 weeks, +8 standing; Starfleet Intelligence won't be pleased (the Starfleet Command track).", apply: (S) => { setCalm(S, "romulan", S.turn + 10); remember(S, "romulan", "dimmed a listening post for us", 8); markCommand(S, 1, "the Pelion had a listening post dimmed at a Romulan's request."); return "One of the posts goes quiet, officially for maintenance. For ten weeks, the Zone is quiet too."; } },
+      { id: "refuse", name: "Refuse", blurb: "−5 standing.", apply: (S) => { remember(S, "romulan", "refused to dim the listening posts", -5); return "\"Then we will go on visiting them,\" says t'Rehu."; } },
+    ],
+  },
+  "tholian:boundary": {
+    can: (S) => (tholianSpace(S, S.pelion.at) ? {} : null),
+    text: () => "Speaker Thrann's voice is a chime of crystal, translated flat: \"Federation vessel. You are 1.3 light-years inside the boundary of the Assembly. You will depart within seven days, at 0400 hours by your clocks. The Assembly is always punctual.\"",
+    options: [
+      { id: "comply", name: "Comply, to the second", blurb: "+5 standing. (You still have to leave.)", apply: (S) => { remember(S, "tholian", "promised to leave our space on time", 5); return "\"Acknowledged,\" says the Speaker. \"The time is noted.\""; } },
+      { id: "protest", name: "Protest the boundary", blurb: "A Diplomacy roll: success, +3; fail, −6 and a Tholian vessel heads for a Federation world.", apply: (S) => {
+        const r = sceneRoll(S, ["Diplomacy", "Communications"]);
+        if (r.success) { remember(S, "tholian", "argued the boundary well", 3); return `The Speaker hears the argument out, all of it ${vRolled(r)}, and says it will be entered in the record. From a Tholian, that's a great deal.`; }
+        remember(S, "tholian", "disputed our boundary", -6); tholianReprisal(S, "the Pelion disputed the Assembly's boundary"); return `The Speaker closes the channel mid-sentence ${vRolled(r)}.`;
+      } },
+    ],
+  },
+  "tholian:treaty": {
+    can: (S) => (Object.values(S.systems).some((s) => s.kind === "annexed") && standingOf(S, "tholian").score >= 8 ? {} : null),
+    text: () => "\"The Assembly proposes a demarcation, fixed to the metre and for all time. One of the worlds within our webs is released. For ten weeks the Assembly spins no new web. After that, the demarcation will be as the Assembly measures it.\"",
+    options: [
+      { id: "accept", name: "Accept the demarcation", blurb: "One world released from the webs; no new webs for 10 weeks; +4 standing.", apply: (S) => { const n = releaseWebs(S, 1); setCalm(S, "tholian", S.turn + 10); remember(S, "tholian", "agreed a demarcation with us", 4); return n ? "The web around one world dissolves, precisely on the hour. For ten weeks, no new webs." : "There's nothing left in the webs to release, but the ten weeks stand."; } },
+      { id: "decline", name: "Decline", blurb: "−2 standing.", apply: (S) => { remember(S, "tholian", "declined a demarcation", -2); return "\"Noted,\" says the Speaker."; } },
+    ],
+  },
+  "tholian:registry": {
+    can: (S) => (S.turn >= 6 ? {} : null),
+    text: () => "\"The Assembly requires your vessel's registry, mass, crew complement and purpose in this sector, to six decimal places. It is a formality. The Assembly does not regard formalities as small.\"",
+    options: [
+      { id: "answer", name: "Answer it, in full", blurb: "+4 standing.", apply: (S) => { remember(S, "tholian", "answered our questions precisely", 4); return "Rrinn sends the figures to seven decimal places, to be safe. The Speaker acknowledges, almost warmly."; } },
+      { id: "refuse", name: "Decline: Starfleet's business is its own", blurb: "−4 standing.", apply: (S) => { remember(S, "tholian", "refused to give its registry", -4); return "\"The refusal is recorded,\" says the Speaker."; } },
+    ],
+  },
+  "orion:protection": {
+    can: (S) => (S.turn >= 8 && !S.orionBaseDown && S.supplies >= 10 ? {} : null),
+    text: () => "Kessa Vane, lounging, gold at her throat and a smile that doesn't reach her eyes: \"Captain. Your colonies are so very far apart, and space is so very big. Ten crates of supplies, and my people will find other worlds to visit for a couple of months. Call it insurance.\"",
+    options: [
+      { id: "pay", name: "Pay her", blurb: "−10 supplies; no Orion raids for 8 weeks; +5 standing. Starfleet won't hear of it.", apply: (S) => { S.supplies -= 10; setCalm(S, "orion", S.turn + 8); remember(S, "orion", "paid for protection", 5); return "The crates go across. Kessa blows a kiss at the screen. For eight weeks, the raids will go somewhere else."; } },
+      { id: "refuse", name: "Refuse", blurb: "−5 standing, and a raider sets out for one of your worlds now.", apply: (S) => {
+        remember(S, "orion", "refused our offer of insurance", -5);
+        const tgt = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member").sort(() => rand(S) - 0.5)[0], b = orionBase(S);
+        if (tgt && b) spawnEnemy(S, "orion", b.at, { goal: "raid", target: tgt.at, hostile: true, home: b.at });
+        return `"Pity," says Kessa. ${tgt ? `Within the day, a raider is reported heading for ${tgt.name}.` : ""}`;
+      } },
+    ],
+  },
+  "orion:sell": {
+    can: (S) => { const b = orionBase(S); return b && !b.found && S.supplies >= 8 ? {} : null; },
+    text: () => "\"A business proposal, Captain. There's a rival cell in this sector, and I'd like them gone. Eight crates, and I'll tell you exactly where their base is. You get a pirate base; I get a smaller market. Everyone wins but them.\"",
+    options: [
+      { id: "buy", name: "Buy the coordinates", blurb: "−8 supplies: the pirate base goes on your charts.", apply: (S) => { const b = orionBase(S); S.supplies -= 8; remember(S, "orion", "bought a rival's secrets from us", 3); if (b) { b.found = true; const sy = sysAt(S, b.at); if (sy) { sy.surveyed = true; S.seenSys[sy.id] = true; } log(S, `The Orion pirate base is found: ${sy ? `hidden at ${sy.name}` : "in the dust"}. It's on the charts now.`, "discovery"); } return "The coordinates are good. The base is on the charts now."; } },
+      { id: "no", name: "No deals with pirates", blurb: "Nothing spent.", apply: () => "\"Your loss,\" says Kessa." },
+    ],
+  },
+  "orion:grudge": {
+    can: () => null,   // sent when the Pelion destroys a raider (combat.js)
+    text: () => "Kessa Vane again, and not smiling: \"That was one of mine, Captain. She had a crew of nine, and some of them owed me money. I'll remember.\"",
+    options: [{ id: "ok", name: "Close the channel", blurb: "She will.", apply: () => "The channel closes." }],
+  },
+};
+
+/** Now and then (every five weeks at most, a chance in three), one of the powers hails the Pelion. */
+function voicesTurn(S) {
+  if (S.over || S.event || S.battle || S.turn < 4 || S.turn - (S.lastVoice || 0) < 5) return;
+  if (rand(S) > 0.35) return;
+  const seen = (S.voicesSeen = S.voicesSeen || {});
+  const cands = Object.keys(MESSAGES).filter((k) => S.turn - (seen[k] || -99) >= 12).map((k) => ({ k, ctx: MESSAGES[k].can(S) })).filter((x) => x.ctx);
+  if (!cands.length) return;
+  const pick = cands[Math.floor(rand(S) * cands.length)];
+  seen[pick.k] = S.turn; S.lastVoice = S.turn;
+  pushChoice(S, "voice", pick.k, pick.ctx);
+}
+/** A message sent on an occasion (a grudge): pushed now, whatever the timer. */
+function hail(S, key, ctx = {}) { pushChoice(S, "voice", key, ctx); }
+registerChoices("voice", {
+  view: (S, ev) => { const p = ev.id.split(":")[0], V = VOICES[p], M = MESSAGES[ev.id]; return { title: V.leader, kicker: `A hail · ${{ klingon: "the Klingon Empire", romulan: "the Romulan Star Empire", tholian: "the Tholian Assembly", orion: "Orion pirates" }[p]} · ${attitude(S, p)}`, power: p, speaker: V.title, text: M.text(S, ev.ctx), quote: true, options: M.options.map((o) => ({ id: o.id, name: o.name, blurb: o.blurb })) }; },
+  choose: (S, ev, id) => {
+    const p = ev.id.split(":")[0], M = MESSAGES[ev.id], o = M.options.find((x) => x.id === id) || M.options[0];
+    const text = o.apply(S, ev.ctx); log(S, `${VOICES[p].leader}: you answered "${o.name}". ${text}`, "order");
+    return { title: VOICES[p].leader, text, choice: o.name };
+  },
+});
+
+// ---- events.js ----
+// Events: every few weeks, something happens to the Pelion that the captain has to decide about. Each is a short scene
+// and two or three choices; most choices are a roll by the best officer for the job, and each says up front what it
+// risks and what it brings. Shown as dialogs (game.js pushChoice); the week can't end until the captain decides.
+
+
+
+const evRolled = (r) => `(${r.who}, ${r.skill}: ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `fails by ${-r.margin}`})`;
+const evHurt = (S) => { const v = CREW.filter((c) => available(S, c.id)); const p = v[Math.floor(rand(S) * v.length)]; if (p) S.crew[p.id].inj = Math.min(3, S.crew[p.id].inj + 1); return p; };
+/** Days lost from this week's travel. */
+const evDays = (S, n) => { S.pelion.days = Math.max(0, (S.pelion.days || 0) - n); syncMp(S); };
+const evWorld = (S, kinds) => Object.values(S.systems).filter((s) => kinds.includes(s.kind)).sort((a, b) => distance(a.at, S.pelion.at) - distance(b.at, S.pelion.at))[0];
+
+/** Each event: when it can happen (`can` → its context or null), its scene, and its choices. */
+const PELION_EVENTS = {
+  distress: {
+    title: "A distress call",
+    can: (S) => ({}),
+    text: () => "Rrinn hears it first, under the static: an automated distress beacon, Federation pattern, from a freighter that should have made port at Starbase 23 a week ago. Its position is off the Pelion's course, in a stretch of space where the Orions like to wait. It could be real. It could be bait.",
+    options: [
+      { id: "answer", name: "Answer it", blurb: "Two days off course. +2 commendations if it's real; if it's an Orion trap, a raider is waiting.", apply: (S) => {
+        evDays(S, 2);
+        if (rand(S) < 0.7) { S.commendations += 2; return "It's real: the freighter Calloway, her reactor dead, eleven crew breathing canned air. The Pelion tows her to safety. +2 commendations."; }
+        spawnEnemy(S, "orion", S.pelion.at, { goal: "raid", target: S.pelion.at, hostile: true, home: S.pelion.at }); return "It's bait: the beacon is bolted to a hulk, and an Orion raider comes out of the dark behind it. It'll attack at the end of the week.";
+      } },
+      { id: "scan", name: "Scan it first", blurb: "A Sensors roll from here: if it's real, answer it in time (+2 commendations); if not, no harm done.", apply: (S) => {
+        const r = sceneRoll(S, ["Sensors", "Communications"], [], { listen: true });
+        if (!r.success) return `The scan can't tell ${evRolled(r)}. By the time it might have, the beacon has gone quiet. Nobody will ever know.`;
+        S.commendations += 2; evDays(S, 1); return `The scan reads eleven life signs and a dead reactor ${evRolled(r)}: real. The Pelion gets there with a day to spare. +2 commendations.`;
+      } },
+      { id: "pass", name: "Report it and hold course", blurb: "Starbase 23 sends someone. Safe; nothing gained.", apply: () => "The Pelion relays the beacon to Starbase 23 and holds course. Someone else will answer it." },
+    ],
+  },
+  storm: {
+    title: "An ion storm",
+    can: () => ({}),
+    text: () => "It comes up off the port bow faster than the sensors said it could: an ion storm, a wall of charged particles light-hours wide, crackling on every band. The Pelion could ride it out, go around, or (Sevek points out, with something close to enthusiasm) study it from the inside.",
+    options: [
+      { id: "ride", name: "Ride it out", blurb: "An Engineering roll: fail and the storm costs a crate of spares and damages the sensors.", apply: (S) => {
+        const r = sceneRoll(S, ["Engineering", "Helm"]);
+        if (r.success) return `The Pelion bucks and groans and comes out the other side intact ${evRolled(r)}.`;
+        addStore(S, "spares", -1); S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + 1); return `The storm burns out a bank of relays and a sensor array ${evRolled(r)}: a crate of spares gone, sensors damaged ${S.pelion.sys.sensors}/3.`;
+      } },
+      { id: "around", name: "Go around", blurb: "Three days lost this week. Safe.", apply: (S) => { evDays(S, 3); return "The Pelion goes the long way round: three days lost, and nothing else."; } },
+      { id: "study", name: "Study it from inside", blurb: "A Physical Sciences roll: +8 science on success; fail and the sensors are damaged.", apply: (S) => {
+        const r = sceneRoll(S, ["Physical Sciences", "Sensors"]);
+        if (r.success) { S.science += 8; return `Sevek's readings are the best anyone has taken of an ion storm from the inside ${evRolled(r)}. +8 science.`; }
+        S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + 1); return `The storm wins ${evRolled(r)}: sensors damaged ${S.pelion.sys.sensors}/3.`;
+      } },
+    ],
+  },
+  defector: {
+    title: "A defector",
+    can: (S) => (Object.values(S.systems).some((s) => s.kind === "klingon") ? {} : null),
+    text: () => "A Klingon shuttle, alone, damaged, transmitting a Federation code that went out of use ten years ago. Its pilot is a Klingon science officer, Kalvek, and asks for asylum. Kalvek says the Empire's outposts in this sector are building something Starfleet should know about. The Empire will want Kalvek back.",
+    options: [
+      { id: "grant", name: "Grant asylum", blurb: "Klingon tension +2; +3 commendations; Kalvek's intelligence shows you every Klingon ship in the sector this week.", apply: (S) => {
+        S.tension = Math.min(10, S.tension + 2); S.commendations += 3; for (const e of Object.values(S.enemies)) if (e.power === "klingon") { e.revealed = true; e.seen = true; }
+        remember(S, "klingon", "took in a Klingon defector", -8); return "Kalvek is beamed aboard and given quarters, and talks for two days straight. The Empire protests on every channel. +3 commendations; Klingon tension +2.";
+      } },
+      { id: "return", name: "Return Kalvek to the Empire", blurb: "Klingon tension −2; the Empire thinks better of you. Starfleet won't like it.", apply: (S) => {
+        S.tension = Math.max(0, S.tension - 2); remember(S, "klingon", "handed a defector back to us", 8); markCommand(S, 1, "the Pelion handed a defector back to the Klingon Empire.");
+        return "A Klingon cruiser collects Kalvek at the border. The commander thanks the Pelion, which nobody aboard has heard a Klingon do before. Klingon tension −2. Starfleet Command's note is short.";
+      } },
+      { id: "quiet", name: "Pass Kalvek on to Starfleet Intelligence, quietly", blurb: "A Diplomacy roll: success means +2 commendations and no incident; fail and the Empire finds out (tension +1).", apply: (S) => {
+        const r = sceneRoll(S, ["Diplomacy", "Psychology", "Stealth"]);
+        if (r.success) { S.commendations += 2; return `A quiet transfer at Starbase 23, logged as a shuttle recovery ${evRolled(r)}. +2 commendations.`; }
+        S.tension = Math.min(10, S.tension + 1); remember(S, "klingon", "hid a defector from us", -5); return `The Empire finds out anyway ${evRolled(r)}. Klingon tension +1.`;
+      } },
+    ],
+  },
+  trader: {
+    title: "A dilithium trader",
+    can: (S) => (S.supplies >= 6 ? {} : null),
+    text: () => "A battered independent hauler hails the Pelion with a cheerful offer: crystals, real dilithium, cut from a seam the trader won't name. Grath scans the sample and grunts, which from a Tellarite is nearly praise.",
+    options: [
+      { id: "buy", name: "Buy at their price", blurb: "−6 supplies, +3 dilithium.", apply: (S) => { S.supplies -= 6; addStore(S, "dilithium", 3); return "Six supplies' worth of trade goods for three crystals. Grath fits them personally. +3 dilithium."; } },
+      { id: "haggle", name: "Haggle", blurb: "A Diplomacy roll: success, −3 supplies for 3 dilithium; fail, the trader leaves insulted.", apply: (S) => {
+        const r = sceneRoll(S, ["Diplomacy", "Psychology"]);
+        if (r.success) { S.supplies -= 3; addStore(S, "dilithium", 3); return `The trader laughs and agrees ${evRolled(r)}: −3 supplies, +3 dilithium.`; }
+        return `The trader takes offence and the crystals with them ${evRolled(r)}.`;
+      } },
+      { id: "no", name: "Decline", blurb: "Nothing spent.", apply: () => "The trader shrugs and goes on looking for a buyer." },
+    ],
+  },
+  probe: {
+    title: "An old probe",
+    can: () => ({}),
+    text: () => "Something tumbling in the dark between systems: a probe, centuries old, of a design not in any database. Its power cells are dead, but its memory core might not be.",
+    options: [
+      { id: "study", name: "Bring it aboard and study it", blurb: "A Computers roll: +10 science on success; fail and its old defences damage the shuttle bay (a crate of spares).", apply: (S) => {
+        const r = sceneRoll(S, ["Computers", "Physical Sciences"]);
+        if (r.success) { S.science += 10; return `Rrinn coaxes the memory core awake ${evRolled(r)}: star charts of a sector as it was before the Federation. +10 science.`; }
+        addStore(S, "spares", -1); return `Its defences wake first ${evRolled(r)}: a fire in the shuttle bay, a crate of spares lost.`;
+      } },
+      { id: "salvage", name: "Salvage it for parts", blurb: "+2 crates of spares, safely.", apply: (S) => { addStore(S, "spares", 2); return "Grath's team strips it in an afternoon. +2 crates of spares."; } },
+      { id: "report", name: "Log it for the Federation's museums", blurb: "+1 commendation.", apply: (S) => { S.commendations += 1; return "The probe goes home on the next supply run, to a museum that will be very glad of it. +1 commendation."; } },
+    ],
+  },
+  shoreleave: {
+    title: "A place to rest",
+    can: (S) => (CREW.some((c) => S.crew[c.id].inj > 0 || S.crew[c.id].duty < 2) ? {} : null),
+    text: () => "The survey charts show a world nobody lives on: blue seas, warm beaches, a breathable sky. Dr. Vessik, in the ready room, makes the case that the crew have earned a few days of it, and is not subtle about it.",
+    options: [
+      { id: "rest", name: "Shore leave", blurb: "Four days this week. Everyone heals a box, and gets their duty points back.", apply: (S) => {
+        evDays(S, 4); for (const c of CREW) { const st = S.crew[c.id]; st.inj = Math.max(0, st.inj - 1); st.duty = 2; }
+        return "Four days of sand and sunlight. Grath is found asleep in a hammock. Everyone comes back better than they left. Every officer heals a box and gets their duty points back.";
+      } },
+      { id: "on", name: "Press on", blurb: "No time lost. The crew understand.", apply: () => "The captain says no, kindly. The crew understand. Vessik makes a note." },
+    ],
+  },
+  petition: {
+    title: "A colony asks for help",
+    can: (S) => { const w = evWorld(S, ["colony", "member"]); return w ? { sys: w.id } : null; },
+    text: (S, c) => `A message from ${S.systems[c.sys].name}'s governor: a bad harvest, a failing reactor, a hard winter coming. They're not in danger yet. They'd like not to be. Can the Pelion spare anything?`,
+    options: [
+      { id: "give", name: "Send supplies", blurb: "−6 supplies; +2 commendations, and the colony clears a harm box.", apply: (S, c) => { const s = S.systems[c.sys]; S.supplies -= 6; S.commendations += 2; if (s.harm) s.harm--; return `The supplies go out on the next runabout. ${s.name} gets through the winter. +2 commendations.`; } },
+      { id: "advise", name: "Send engineers' advice", blurb: "An Engineering roll: success, +1 commendation and nothing spent.", apply: (S, c) => {
+        const r = sceneRoll(S, ["Engineering", "Life Sciences"]);
+        if (r.success) { S.commendations += 1; return `Grath talks their engineers through rebuilding the reactor over subspace ${evRolled(r)}. +1 commendation.`; }
+        return `The advice doesn't help enough ${evRolled(r)}. ${S.systems[c.sys].name} has a hard winter.`;
+      } },
+      { id: "no", name: "Nothing to spare", blurb: "No cost. They'll remember.", apply: (S, c) => `The governor thanks the Pelion for its time. ${S.systems[c.sys].name} has a hard winter.` },
+    ],
+  },
+  stowaway: {
+    title: "A stowaway",
+    can: (S) => (S.pelion.docked || S.turn > 6 ? {} : null),
+    text: () => "Security finds her in a cargo pod: an Orion girl of fifteen or so, half-starved, who slipped aboard at the last port. She says she ran from a pirate crew. She also, Reyes notes, knows a great deal about Orion ships.",
+    options: [
+      { id: "listen", name: "Hear her out", blurb: "A Psychology roll: if she's telling the truth, she knows where the pirate base is.", apply: (S) => {
+        const r = sceneRoll(S, ["Psychology", "Medicine"]);
+        const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base);
+        if (r.success && b && !b.found) { b.found = true; const sy = sysAt(S, b.at); if (sy) { sy.surveyed = true; S.seenSys[sy.id] = true; } log(S, `The Orion pirate base is found: ${sy ? `hidden at ${sy.name}` : "in the dust"}. It's on the charts now.`, "discovery"); return `She's telling the truth ${evRolled(r)}. She draws the way to the pirate base on a padd, and it's on the charts now.`; }
+        if (r.success) return `She's telling the truth ${evRolled(r)}, and has nothing to tell that the Pelion doesn't already know. She's sent on to a family at Starbase 23.`;
+        return `Nobody can tell if she's lying ${evRolled(r)}. She's sent on to Starbase 23 and the authorities there.`;
+      } },
+      { id: "home", name: "Take her to Starbase 23", blurb: "+1 commendation. The kindest thing.", apply: (S) => { S.commendations += 1; return "She's handed over at the starbase with a letter from the captain. +1 commendation."; } },
+    ],
+  },
+};
+
+/** Every week: now and then (every five weeks at most, a chance in four), something happens. */
+function eventsTurn(S) {
+  if (S.over || S.event || S.battle || S.turn < 5 || S.turn - (S.lastEvent || 0) < 5) return;
+  if (rand(S) > 0.25) return;
+  const seen = (S.eventsSeen = S.eventsSeen || {});
+  const keys = Object.keys(PELION_EVENTS).sort((a, b) => (seen[a] || 0) - (seen[b] || 0) || rand(S) - 0.5);
+  for (const k of keys) {
+    const ctx = PELION_EVENTS[k].can(S);
+    if (ctx) { seen[k] = (seen[k] || 0) + 1; S.lastEvent = S.turn; pushChoice(S, "event", k, ctx); return; }
+  }
+}
+registerChoices("event", {
+  view: (S, ev) => { const E = PELION_EVENTS[ev.id]; return { title: E.title, kicker: "Something happens", text: E.text(S, ev.ctx), options: E.options.map((o) => ({ id: o.id, name: o.name, blurb: o.blurb })) }; },
+  choose: (S, ev, id) => {
+    const E = PELION_EVENTS[ev.id], o = E.options.find((x) => x.id === id) || E.options[0];
+    const text = o.apply(S, ev.ctx); log(S, `${E.title}: ${o.name}. ${text}`, "discovery", { story: true });
+    return { title: E.title, text, choice: o.name };
+  },
+});
+
+// ---- crisis.js ----
+// The late-tour crisis: the Sleepers. Somewhere in weeks 32–38 (in open command, once, at the same point), machines
+// older than any power in the sector wake in the deepest nebula. Four weeks before, a signal gives warning. Then their
+// Ark (it never moves, and mends itself) sends out hunters every four weeks, and the hunters burn the worlds nearest
+// them: Federation colonies, independents, Klingon and Tholian outposts alike. They don't answer hails. Destroy the Ark
+// and every hunter goes dark. The captain meets them in three scenes with choices: the warning, the waking, the end.
+
+
+
+const SLEEPER = { warning: 4, waveEvery: 4, earliest: 32, spread: 7, awake: 16 };
+const crList = (a) => (a.length > 1 ? `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}` : a[0] || "");
+const crArk = (S) => Object.values(S.enemies).find((e) => e.type === "ark");
+const crHunters = (S) => Object.values(S.enemies).filter((e) => e.type === "sleeper");
+const crTargets = (S) => Object.values(S.systems).filter((s) => ["colony", "member", "independent", "klingon", "claimed", "tholian"].includes(s.kind));
+
+/** Where it stands, for the panels: null before the warning. */
+function crisisState(S) {
+  const C = S.crisis; if (!C || C.stage === "quiet") return null;
+  const a = crArk(S), E = ENEMIES.ark;
+  return { stage: C.stage, at: C.at, ark: C.ark, place: C.ark ? (sysAt(S, C.ark) ? `at ${sysAt(S, C.ark).name}` : "in the deep nebula") : null, hull: a ? E.hull - a.hull : 0, max: E.hull, shields: a ? E.shields - a.shields : 0,
+    wave: C.wave || 0, next: C.next, hunters: crHunters(S).length, truce: !!C.truce, burned: C.burned || 0, kills: C.kills || 0 };
+}
+
+/** Each week, after the powers move: the warning, the waking, the hunters, the burning. */
+function crisisTurn(S) {
+  if (S.crisisOff || S.over) return;
+  const C = S.crisis || (S.crisis = { stage: "quiet", at: Math.max(S.turn + SLEEPER.warning + 2, SLEEPER.earliest + (hashString("sleepers:" + S.seed) % SLEEPER.spread)) });
+  if (C.stage === "quiet") {
+    if (S.turn >= C.at - SLEEPER.warning) { C.stage = "stirring"; pushChoice(S, "crisis", "stirring"); log(S, "A signal from the deep nebula: the same pattern, over and over, on every subspace band.", "war"); }
+    return;
+  }
+  if (C.stage === "stirring") { if (S.turn >= C.at) wake(S); return; }
+  if (C.stage !== "awake") return;
+  const ark = crArk(S);
+  if (!ark) { breakArk(S); return; }
+  // Sixteen weeks awake, and they sleep again, as the old records say they always have.
+  if (S.turn - C.woke >= SLEEPER.awake && !S.battle) {
+    C.stage = "over"; C.over = S.turn; C.slept = true;
+    for (const e of Object.values(S.enemies)) if (e.power === "sleepers") delete S.enemies[e.id];
+    for (const p of ["klingon", "romulan", "tholian"]) if (S.calm && S.calm[p] > S.turn + 3) S.calm[p] = S.turn + 3;
+    storyEvent(S, "The Sleepers sleep again", `On the ${SLEEPER.awake}th week, between one sensor sweep and the next, the Ark's heart goes dark. Every hunter stops where it is, and falls silent. The old records said they always sleep again. They didn't say for how long. ${C.burned || 0} world${C.burned === 1 ? "" : "s"} burned before they did.`);
+    return;
+  }
+  // The Ark mends: a box of shields a week, and a box of hull every other week.
+  if (ark.shields > 0) ark.shields--; else if (ark.hull > 0 && S.turn % 2 === 0) ark.hull--;
+  if (S.turn >= C.next) sendWave(S);
+  // With a truce, the other powers fight them too.
+  if (C.truce) for (const h of crHunters(S)) if (!(S.battle && S.battle.enemy === h.id) && rand(S) < 0.15) {
+    delete S.enemies[h.id]; const s = sysAt(S, h.at);
+    log(S, `${["Klingon battle cruisers", "A Romulan bird-of-prey, decloaking", "Tholian vessels"][Math.floor(rand(S) * 3)]} destroy a Sleeper hunter ${s ? `over ${s.name}` : "in deep space"}. The truce holds.`, "good");
+  }
+  S.seenSys = S.seenSys || {};
+}
+
+function wake(S) {
+  const C = S.crisis;
+  // The Ark wakes in a nebula, as far from every world as it can be (in space, if there's no nebula).
+  const worlds = Object.values(S.systems);
+  const far = (k) => Math.min(99, ...worlds.map((s) => distance(s.at, k)));
+  const free = Object.keys(S.hexes).filter((k) => !S.sysAt[k] && !Object.values(S.enemies).some((e) => e.at === k) && k !== S.pelion.at);
+  const neb = free.filter((k) => S.hexes[k].terrain === "nebula");
+  C.ark = (neb.length ? neb : free).sort((a, b) => far(b) - far(a) || (a < b ? -1 : 1))[0];
+  spawnEnemy(S, "ark", C.ark, { goal: "ark", hostile: true, found: true, revealed: true, seen: true });
+  const a = crArk(S); if (C.studied && a) a.hull = 5;   // studied: it wakes with five hull boxes already broken
+  C.stage = "awake"; C.woke = S.turn; C.wave = 0; C.next = S.turn;
+  sendWave(S);
+  log(S, `The Sleepers have woken in the deep nebula. Their Ark sends out its first hunters.`, "war");
+  pushChoice(S, "crisis", "waking");
+}
+
+function sendWave(S) {
+  const C = S.crisis; C.wave++; C.next = S.turn + SLEEPER.waveEvery;
+  const n = Math.min(3, 1 + Math.floor(C.wave / 2)), taken = new Set(crHunters(S).map((h) => h.target));
+  const list = crTargets(S).filter((s) => !taken.has(s.at)).sort((a, b) => distance(a.at, C.ark) - distance(b.at, C.ark));
+  const names = [];
+  for (let i = 0; i < n && list[i]; i++) { spawnEnemy(S, "sleeper", C.ark, { goal: "sleeper", target: list[i].at, hostile: true, home: C.ark, seen: true, revealed: true }); names.push(list[i].name); }
+  if (names.length) log(S, `Wave ${C.wave}: ${names.length} Sleeper hunter${names.length === 1 ? "" : "s"} leave the Ark, bound for ${names.join(", ")}.`, "war");
+}
+
+/** A hunter at its target: it burns the world, and goes on to the next. (ai.js calls this.) */
+function sleeperStrike(S, e, s) {
+  const C = S.crisis || {};
+  if (s) {
+    if (["colony", "member", "independent"].includes(s.kind)) { harmWorld(S, s, 1, "a Sleeper hunter burned its cities from orbit", true); if (s.kind === "lost") C.burned = (C.burned || 0) + 1; }
+    else if (["klingon", "claimed", "tholian"].includes(s.kind)) {
+      s.harm = (s.harm || 0) + 1;
+      const who = s.kind === "tholian" ? "Tholian" : "Klingon";
+      if (s.harm >= 3) { log(S, `The ${who} ${s.kind === "claimed" ? "world" : "outpost"} at ${s.name} is burned out by the Sleepers. Nothing is left there.`, "war"); s.was = s.kind; s.kind = "empty"; s.harm = 0; s.surveyed = true; C.burned = (C.burned || 0) + 1; }
+      else log(S, `A Sleeper hunter strikes the ${who} ${s.kind === "claimed" ? "world" : "outpost"} at ${s.name} (damage ${s.harm}/3).`, "war");
+    }
+  }
+  // On to the nearest world no other hunter is bound for.
+  const taken = new Set(crHunters(S).filter((h) => h.id !== e.id).map((h) => h.target));
+  const next = crTargets(S).filter((x) => x.at !== e.at && !taken.has(x.at)).sort((a, b) => distance(a.at, e.at) - distance(b.at, e.at))[0];
+  if (next && (!s || ["empty", "lost"].includes(s.kind) || (s.harm || 0) === 0 || rand(S) < 0.5)) e.target = next.at;
+}
+
+/** The Ark destroyed (combat.js): every hunter goes dark. */
+function breakArk(S, byPelion) {
+  const C = S.crisis; if (!C || C.stage !== "awake") return;
+  C.stage = "over"; C.over = S.turn; C.byPelion = !!byPelion;
+  const n = crHunters(S).length; for (const h of crHunters(S)) delete S.enemies[h.id];
+  for (const p of ["klingon", "romulan", "tholian"]) if (S.calm && S.calm[p] > S.turn + 3) S.calm[p] = S.turn + 3;   // the truce winds down
+  if (byPelion) { S.commendations += 8; S.science += 10; }
+  log(S, `The Sleeper Ark is destroyed${byPelion ? " by the Pelion" : ""}. ${n ? `The ${n} hunter${n === 1 ? "" : "s"} still out there went dark at once.` : "Every hunter went dark."}${byPelion ? " +8 commendations, +10 science." : ""}`, "victory");
+  pushChoice(S, "crisis", "broken");
+}
+/** A hunter destroyed by the Pelion (combat.js). */
+function sleeperKilled(S) { const C = S.crisis || {}; C.kills = (C.kills || 0) + 1; S.commendations += C.glory ? 4 : 2; return C.glory ? 4 : 2; }
+
+const SCENES = {
+  stirring: {
+    title: "A signal in the nebula",
+    text: () => "Every listening post in the sector reports it in the same hour: a signal from the deep nebula, one pattern repeated on every subspace band, growing stronger. Sevek finds it in the Federation's oldest records, in a file marked as legend: the Sleepers, machines built by no one anyone remembers, which wake every few thousand years and burn every world they can reach. Then sleep again. In four weeks, perhaps less, they wake. Not only Federation worlds will burn.",
+    options: [
+      { id: "study", name: "Study the signal", blurb: "+6 science, and the Ark wakes damaged (five hull boxes broken).", apply: (S) => { S.crisis.studied = true; S.science += 6; return "Sevek and Rrinn find the Ark's waking cycle in the noise: it will wake before it's finished. +6 science."; } },
+      { id: "warn", name: "Warn the other powers", blurb: "+6 standing with the Klingons, Romulans and Tholians; they'll agree to a truce when the Sleepers wake.", apply: (S) => { S.crisis.warned = true; for (const p of ["klingon", "romulan", "tholian"]) remember(S, p, "warned us the Sleepers were waking", 6); return "The Pelion sends the records to Torgath, to t'Rehu, to the Assembly. None of them answers. All of them listen."; } },
+      { id: "fortify", name: "Fortify the colonies", blurb: "Every Federation colony and member world drives off raids twice as often from now on.", apply: (S) => { let n = 0; for (const s of Object.values(S.systems)) if (s.kind === "colony" || s.kind === "member") { s.fortified = true; n++; } return `Starfleet Engineering ships phaser batteries and shield generators to ${n} worlds. They'll be ready.`; } },
+    ],
+  },
+  waking: {
+    title: "The Sleepers wake",
+    text: (S) => `It comes out of the deep nebula ${sysAt(S, S.crisis.ark) ? `at ${sysAt(S, S.crisis.ark).name}` : "where the signal was"}: the Ark, a cracked octagon kilometres across with something burning at its heart, and its first hunters with it. It doesn't answer hails, in any language. The old records say they burn for a season, about sixteen weeks, and then sleep again. Every ${SLEEPER.waveEvery} weeks it will send more, and they'll burn whatever worlds are nearest, Federation, Klingon, Tholian alike. Destroy the Ark and they go dark.`,
+    options: [
+      { id: "truce", name: "Call a truce against them", blurb: "While the Ark lives, the Klingons, Romulans and Tholians hold back their raids, strikes and webs, and fight the hunters too. Klingon tension −3. (If you didn't warn them, they may not all agree.)", apply: (S) => {
+        const C = S.crisis; C.truce = true; const yes = [], no = [];
+        for (const p of ["klingon", "romulan", "tholian"]) {
+          const ok = C.warned || standingOf(S, p).score >= -10 && !(p === "klingon" && S.tension >= 8);
+          if (ok) { setCalm(S, p, 9999); remember(S, p, "made a truce with us against the Sleepers", 5); yes.push({ klingon: "Torgath", romulan: "t'Rehu", tholian: "the Assembly" }[p]); } else no.push({ klingon: "Torgath", romulan: "t'Rehu", tholian: "the Assembly" }[p]);
+        }
+        if (!yes.length) C.truce = false;
+        S.tension = Math.max(0, S.tension - 3);
+        return `${yes.length ? `${crList(yes)} agreed: while the Ark lives, their ships stand with yours.` : "Nobody agreed."}${no.length ? ` ${crList(no)} refused.` : ""} Klingon tension −3.`;
+      } },
+      { id: "arm", name: "Ask Starfleet for an escort", blurb: "−10 supplies: an escort joins the Pelion's command at Starbase 23 (if Starfleet can spare one).", apply: (S) => { const r = grantSupport(S, "escort"); if (!r) return "Starfleet can't spare another ship."; S.supplies -= 10; return `The ${r} joins the Pelion's command at Starbase 23.`; } },
+      { id: "glory", name: "This is the Pelion's fight", blurb: "Nothing changes now, but every hunter the Pelion destroys is worth double the commendations.", apply: (S) => { S.crisis.glory = true; return "The captain tells the crew what's coming, and that the Pelion will meet it. Nobody argues."; } },
+    ],
+  },
+  broken: {
+    title: "The Ark is broken",
+    text: (S) => `${S.crisis.byPelion ? "The Pelion's last volley breaks it open." : "It breaks."} The Ark hangs dead in the nebula, its heart gone cold, and every hunter it sent out has gone silent where it was. Whatever built the Sleepers, there's a great deal of it left to study, and to salvage.`,
+    options: [
+      { id: "study", name: "Study the wreck", blurb: "+12 science.", apply: (S) => { S.science += 12; return "Sevek's teams spend a week inside the wreck, and come out with more questions than they took in. +12 science."; } },
+      { id: "salvage", name: "Salvage it", blurb: "+4 spares, +3 dilithium, +8 antimatter.", apply: (S) => { addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 8); return "Grath's crews strip the Ark's power cores. +4 spares, +3 dilithium, +8 antimatter."; } },
+      { id: "memorial", name: "A memorial for every world it burned", blurb: "+6 standing with the Klingons, Romulans and Tholians; +2 commendations.", apply: (S) => { for (const p of ["klingon", "romulan", "tholian"]) remember(S, p, "honoured the dead of every power after the Sleepers", 6); S.commendations += 2; return "A beacon at the wreck names every world the Sleepers burned, Federation, Klingon, Tholian alike. The other powers notice. +2 commendations."; } },
+    ],
+  },
+};
+registerChoices("crisis", {
+  view: (S, ev) => { const E = SCENES[ev.id]; return { title: E.title, kicker: "The Sleepers", text: E.text(S), options: E.options.map((o) => ({ id: o.id, name: o.name, blurb: o.blurb })) }; },
+  choose: (S, ev, id) => { const E = SCENES[ev.id], o = E.options.find((x) => x.id === id) || E.options[0]; const text = o.apply(S); log(S, `${E.title}: ${o.name}. ${text}`, "discovery", { story: true }); updateVisibility(S); return { title: E.title, text, choice: o.name }; },
+});
+
 // ---- ai.js ----
 // The other powers in the Corvan Sector, each turn.
 //  - The Klingon Empire: a cold war. Most of its ships court the independent worlds (lowering their accord); some
@@ -3813,6 +4377,7 @@ const raiderName = ENEMIES.orion.name;
 //  - The Romulan Star Empire: now and then a cloaked bird-of-prey crosses the Neutral Zone to strike, and goes home.
 //  - The Tholian Assembly: every few weeks a Tholian vessel goes out from its outposts and spins a web around the
 //    nearest world it wants; three weeks of spinning and the world is Tholian territory. Hail it or fight it off.
+
 
 
 
@@ -3828,7 +4393,8 @@ function aiTurn(S) {
   const outposts = worlds(S, ["klingon", "claimed"]);
   if (outposts.length && S.turn % ev.k === 2 && count(S, "klingon") < 2 + Math.floor(S.turn / 15)) {
     const from = pick(S, outposts);
-    const raid = rand(S) < 0.15 + S.tension * 0.06;
+    // Fewer raids while a bargain or truce holds, and when Torgath thinks well of the Pelion.
+    const raid = rand(S) < 0.15 + S.tension * 0.06 - standingOf(S, "klingon").score * 0.004 && !calm(S, "klingon");
     const ind = worlds(S, ["independent"]).filter((s) => !Object.values(S.enemies).some((e) => e.target === s.at)).sort((a, b) => a.accord - b.accord || distance(a.at, from.at) - distance(b.at, from.at));
     const tgt = raid ? pick(S, worlds(S, ["colony", "member"]).length ? worlds(S, ["colony", "member"]) : ind) : ind[0];
     if (tgt) {
@@ -3844,14 +4410,14 @@ function aiTurn(S) {
   }
   // Orions.
   const base = Object.values(S.enemies).find((e) => e.type === "orionBase");
-  if (base && S.turn % ev.o === 3 && count(S, "orion") < 2) {
+  if (base && S.turn % ev.o === 3 && count(S, "orion") < 2 && !calm(S, "orion")) {
     // Not a world raided in the last 6 turns: the Orions spread their raids around.
     const targets = worlds(S, ["colony", "member", "member", "independent"]).filter((s) => distance(s.at, S.pelion.at) >= 3 && !(s.raidedAt && S.turn - s.raidedAt < 6));
     const tgt = targets.length ? pick(S, targets) : null;
     if (tgt) spawnEnemy(S, "orion", base.at, { goal: "raid", target: tgt.at, hostile: true, home: base.at });
   }
   // Romulans.
-  if (S.turn >= 9 && S.turn % ev.r === 9 && count(S, "romulan") < 1) {
+  if (S.turn >= 9 && S.turn % ev.r === 9 && count(S, "romulan") < 1 && !calm(S, "romulan") && !(standingOf(S, "romulan").score >= 20 && rand(S) < 0.5)) {
     // The Romulans strike the listening posts that watch the Zone; only when every post is lost do they reach for worlds.
     const posts = livePosts(S), targets = posts.length ? posts : worlds(S, ["colony", "member"]);
     if (targets.length) {
@@ -3862,7 +4428,7 @@ function aiTurn(S) {
   }
   // Tholians: a web-spinner goes out for the nearest world the Assembly wants.
   const tout = worlds(S, ["tholian"]);
-  if (tout.length && S.turn >= 6 && S.turn % ev.t === 5 && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "web")) {
+  if (tout.length && S.turn >= 6 && S.turn % ev.t === 5 && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "web") && !calm(S, "tholian") && !(standingOf(S, "tholian").score >= 20 && rand(S) < 0.5)) {
     const near = (s) => Math.min(...tout.map((t) => distance(t.at, s.at)));
     const cand = worlds(S, ["independent", "empty", "anomaly", "ruins", "prewarp"]).filter((s) => s.id !== S.corvan && near(s) <= 6 && (s.kind !== "independent" || s.accord < 3)).sort((a, b) => near(a) - near(b));
     if (cand.length) {
@@ -3893,6 +4459,14 @@ function aiTurn(S) {
         if (s.accord <= -5) claim(S, s);
       }
       if (++e.stay >= 6 || s.kind !== "independent") sendHome(S, e, 0);
+    } else if (e.goal === "sleeper") {
+      // A Sleeper hunter at its target: an escort may hold it off; otherwise it burns the world and goes on.
+      if (S.pelion.at === e.at) continue;
+      const guard = Object.values(S.support).find((u) => u.at === e.at && u.type === "escort");
+      if (guard) { const r = skirmish(S, guard, e); if (r === "won") continue; }
+      if (!S.enemies[e.id]) continue;
+      if (s && ["colony", "member"].includes(s.kind) && rand(S) < (s.fortified ? 0.6 : 0.3)) { log(S, `${s.name}'s defenses hold off a Sleeper hunter this week.`, "good"); continue; }
+      sleeperStrike(S, e, s);
     } else if (e.goal === "raid" || e.goal === "strike") {
       const guard = Object.values(S.support).find((u) => u.at === e.at && u.type === "escort");
       if (S.pelion.at === e.at) continue;  // the Pelion is here: the fight comes at the end of the turn
@@ -3911,7 +4485,7 @@ function aiTurn(S) {
         log(S, `Warned by the Pelion, ${s.name}'s defenses are waiting when the bird-of-prey decloaks: it turns for the Neutral Zone without firing a shot.`, "good");
         e.cloaked = false; e.seen = true; delete s.alerted; S.commendations += 1; sendHome(S, e, 0); continue;
       }
-      if (s && ["colony", "member"].includes(s.kind) && rand(S) < 0.3) {
+      if (s && ["colony", "member"].includes(s.kind) && rand(S) < (s.fortified ? 0.6 : 0.3)) {
         log(S, `${s.name}'s own defenses drive off the ${E.name} before it can do any harm.`, "good");
         if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
         sendHome(S, e, 0); continue;
@@ -3965,6 +4539,9 @@ const kindName = (s) => (s.kind === "annexed" ? "Tholian territory" : s.kind ===
 // ---- turn.js ----
 // The end of a turn: the other powers move, the crew heals, supplies come in, orders fall due, new orders arrive.
 // Also the one place that ties the modules together, so the page imports this.
+
+
+
 
 
 
@@ -4030,6 +4607,10 @@ function endTurn(S) {
   // A hostile ship sharing the Pelion's hex attacks.
   const foe = Object.values(S.enemies).find((e) => e.at === S.pelion.at && e.hostile && !e.cooldown && !ENEMIES[e.type].base && e.goal !== "home" && e.goal !== "arc");
   if (foe && !S.event) startBattle(S, foe.id, "enemy");
+  // The week's scenes: the Sleepers, a hail from one of the powers, something that happens.
+  crisisTurn(S);
+  voicesTurn(S);
+  eventsTurn(S);
   arcTick(S);
   checkEnd(S);
   return { ok: true, income };
@@ -4091,11 +4672,13 @@ function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-function dismissEvent(S) { if (S.event && ["mission-choice", "cloak-contact", "complication"].includes(S.event.kind)) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
+function dismissEvent(S) { if (S.event && ["mission-choice", "cloak-contact", "complication", "choice"].includes(S.event.kind)) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }
 
 // ---- ui.js ----
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
+
+
 
 
 
@@ -4121,7 +4704,7 @@ const U = () => (unit === "pelion" ? S.pelion : S.support[unit]) || (unit = "pel
 // ---------- start ----------
 function debugHook() {
   try { if (!/[?&]debug\b/.test(location.search)) return; } catch { return; }
-  window.__pelion = { state: () => S, render: () => renderAll(), after: () => after(), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
+  window.__pelion = { state: () => S, render: () => renderAll(), after: () => after(), push: (src, id, ctx) => pushChoice(S, src, id, ctx || {}), crisis: () => crisisTurn(S), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
 }
 function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
 function startGame(state) {
@@ -4641,7 +5224,7 @@ function storesHTML() {
 // ---------- Crew ----------
 const DIV = { shvari: "", sevek: "sci", vessik: "sci", grath: "ops", reyes: "ops", rrinn: "ops" };
 function crewHTML() {
-  let h = `<h2>The crew<\/h2><p class="small muted">Each action is a roll: 3d6 at or under the officer's skill. A success earns experience; every five, +1 to the skill used. Duty points (2 each) reroll a failure, and come back every 8 turns or at Starbase 23. Hurt crew take −2 at 2 boxes and go to sickbay at 3.<\/p>`;
+  let h = `<h2>The crew<\/h2><p class="small muted">Each action is a roll: 3d6 at or under the officer's skill. A success earns experience; every five, +1 to the skill used. Successes add up to commendations (at ${DIST_STEPS.join(", ")}), each a distinction that stays with the officer. Duty points (2 each) reroll a failure, and come back every 8 turns or at Starbase 23. Hurt crew take −2 at 2 boxes and go to sickbay at 3.<\/p>`;
   h += `<h3>Bridge stations (for battle)<\/h3><div class="kv">`;
   const SK = { helm: "Helm", tactical: "Phasers", science: "Sensors", engineering: "Engineering", comms: "Communications" };
   for (const [st, sk] of Object.entries(SK)) {
@@ -4656,7 +5239,8 @@ function crewHTML() {
       <div class="kv small" style="margin-bottom:8px"><span>Role<\/span><b>${esc(c.role)}<\/b><span>Position<\/span><b>${esc(c.post)}<\/b><span>Battle station<\/span><b class="gold">${stations.length ? esc(stations.join(", ")) : "None (on call)"}<\/b><\/div>
       <div class="small">${st.acted ? `<span class="muted">Acted this turn<\/span> · ` : available(S, c.id) ? `<span class="good">Free this turn<\/span> · ` : ""}${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}<\/span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5<\/div>
       <div class="skills">${Object.keys(c.skills).map((sk) => `<span>${esc(sk)} <b>${skillOf(S, c.id, sk)}<\/b><\/span>`).join("")}<\/div>
-      <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:<\/b> <span class="muted">${esc(c.advText)}<\/span><\/div><\/div>`;
+      <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:<\/b> <span class="muted">${esc(c.advText)}<\/span><\/div>
+      <div class="small" style="margin-top:4px">${distOf(S, c.id).map((k) => `<div><b class="gold">★ ${esc(DISTINCTIONS[k].name)}:<\/b> <span class="muted">${esc(DISTINCTIONS[k].text)}<\/span><\/div>`).join("")}<span class="muted">${(() => { const n = st.succ || 0, nx = DIST_STEPS.find((x) => x > n); return nx ? `${n} success${n === 1 ? "" : "es"}: a commendation at ${nx}` : `${n} successes: every commendation earned`; })()}<\/span><\/div><\/div>`;
   }
   return h + `<\/div>`;
 }
@@ -4822,7 +5406,7 @@ function missionHTML() {
 // ---------- Sector ----------
 function sectorHTML() {
   const sc = score(S);
-  let h = `<h2>The Corvan Sector<\/h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}<\/b>.<\/p>` + raceHTML();
+  let h = `<h2>The Corvan Sector<\/h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}<\/b>.<\/p>` + crisisHTML() + raceHTML() + voicesHTML();
   h += `<table class="tbl"><tr><th>World<\/th><th>What<\/th><th>Status<\/th><\/tr>`;
   const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, annexed: 6, tholian: 7, lost: 8 };
   for (const s of Object.values(S.systems).filter((x) => shownKind(x) && order[shownKind(x)] !== undefined).sort((a, b) => order[a.kind] - order[b.kind])) {
@@ -4832,6 +5416,27 @@ function sectorHTML() {
   h += `<\/table><h3>Score<\/h3><table class="tbl">${sc.parts.filter((p) => p[1]).map(([n, v]) => `<tr><td>${esc(n)}<\/td><td style="text-align:right">${v}<\/td><\/tr>`).join("")}<\/table>`;
   h += `<h3>The powers<\/h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:<\/b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion pirates:<\/b> raiders from a hidden base, not a power with a border: they strike convoys and worlds and run. A sensor sweep near the base hears where it is; some orders find it outright. Destroy it and the raids stop. <b style="color:${POWERS.romulan.color}">Romulans:<\/b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them. <b style="color:${POWERS.tholian.color}">Tholian Assembly:<\/b> draws its own borders in the southeast (shaded on the map), and every few weeks sends a vessel to spin a web around the nearest world it wants: three weeks of spinning and it's Tholian territory. Hail it or drive it off. Enter Tholian space without orders and a Tholian vessel comes to see you out; stay, and it fires. In battle its web closes after three exchanges: no breaking away.<\/p>`;
   return h;
+}
+/** The Sleepers, once they've stirred: the warning, then the Ark, its hunters and what's been burned. */
+function crisisHTML() {
+  const c = crisisState(S); if (!c) return "";
+  if (c.stage === "stirring") return `<div class="card red"><h3 style="margin-top:0">The Sleepers: stirring<\/h3><p class="small">A signal from the deep nebula: they wake in about ${Math.max(1, c.at - S.turn)} week${c.at - S.turn === 1 ? "" : "s"}, and will burn any world they reach, whoever's it is.<\/p><\/div>`;
+  if (c.stage === "over") return `<div class="card"><h3 style="margin-top:0">The Sleepers: ${S.crisis.slept ? "asleep again" : "gone dark"}<\/h3><p class="small">${S.crisis.slept ? `The Ark went back to sleep on week ${S.crisis.over}.` : `The Ark was destroyed on week ${S.crisis.over}${S.crisis.byPelion ? ", by the Pelion" : ""}.`} ${c.burned} world${c.burned === 1 ? "" : "s"} burned; the Pelion destroyed ${c.kills} hunter${c.kills === 1 ? "" : "s"}.<\/p><\/div>`;
+  return `<div class="card red"><h3 style="margin-top:0">The Sleepers: awake<\/h3><div class="kv small">
+    <span>The Ark<\/span><span>hull ${c.hull}/${c.max}, shields ${c.shields}/${ENEMIES.ark.shields}, <button class="linkish" data-hex="${c.ark}">${esc(c.place)}<\/button>: it never moves, mends a little each week, and can't be hailed<\/span>
+    <span>Hunters<\/span><span>${c.hunters} out; they sleep again in about ${Math.max(0, S.crisis.woke + 16 - S.turn)} weeks; ${c.wave} wave${c.wave === 1 ? "" : "s"} sent, the next in ${Math.max(0, c.next - S.turn)} week${c.next - S.turn === 1 ? "" : "s"}<\/span>
+    <span>Burned<\/span><span>${c.burned} world${c.burned === 1 ? "" : "s"} · the Pelion has destroyed ${c.kills} hunter${c.kills === 1 ? "" : "s"}<\/span>
+    <span>Truce<\/span><span>${c.truce ? "holding: the other powers hold back and fight the hunters too" : "none"}<\/span><\/div>
+    <p class="small" style="margin-top:6px">Destroy the Ark and every hunter goes dark (+25 to the score). It fires three ways an exchange: repair first, bring escorts, and break away before the hull goes.<\/p><\/div>`;
+}
+/** The other powers' voices: who speaks for them, how they feel about the Pelion, and what they remember. */
+function voicesHTML() {
+  return `<h3>Who speaks for them<\/h3>` + RIVAL_POWERS.map((p) => {
+    const V = VOICES[p], st = standingOf(S, p), mem = st.memory.slice(-4).reverse(), att = attitude(S, p);
+    return `<div class="card small"><b style="color:${POWERS[p].color}">${esc(POWERS[p].name)}<\/b> · ${esc(V.leader)} · they are <b class="${att === "friendly" || att === "cordial" ? "good" : att === "hostile" || att === "wary" ? "bad" : ""}">${att}<\/b> (${Math.round(st.score)})
+      <div class="muted">${esc(V.title)}: ${esc(V.text)}<\/div>
+      ${mem.length ? `<ul style="margin:4px 0 0 16px;padding:0">${mem.map((m) => `<li class="${m.d >= 0 ? "good" : "bad"}">They remember the Pelion ${esc(m.text)} <span class="muted">(week ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})<\/span><\/li>`).join("")}<\/ul>` : ""}<\/div>`;
+  }).join("");
 }
 /** The race for the sector: what each power holds now. */
 function raceHTML() {
@@ -4900,7 +5505,7 @@ function bindChrome() {
   $("panel").addEventListener("change", (e) => { if (e.target.closest("[data-assist]")) refreshCard(e.target.closest(".card")); });
   $("panel").addEventListener("change", (e) => { const w = e.target.closest("[data-warp]"); if (w) { setWarp(S, +w.value); after(); } });
   $("panel").addEventListener("change", (e) => { const s = e.target.closest("[data-station]"); if (s) { setStation(S, s.dataset.station, s.value); after(); } });
-  $("panel").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
+  $("panel").addEventListener("click", (e) => { const tr = e.target.closest("[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
   $("end-turn").onclick = doEndTurn;
   $("menu").onclick = showMenu;
   $("zoom-in").onclick = () => zoomBy(1.25); $("zoom-out").onclick = () => zoomBy(0.8);
@@ -4996,13 +5601,15 @@ function showStarter(canContinue) {
     <div class="brief"><h3>The frontier<\/h3><p>Extend the Federation: survey the uncharted systems, plant colonies on habitable worlds (Found a colony), and bring independent worlds in. The Klingons court the same worlds; the Romulans strike from behind the Neutral Zone; the Tholians enclose worlds in webs, and see intruders out of their space. The Sector tab keeps the count.<\/p><\/div>
     <div class="brief"><h3>The worlds<\/h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.<\/p><\/div>
     <div class="brief"><h3>Battles<\/h3><p>Ship combat from the Players' Guide: split the Power between shields (reinforce them with a second point), phasers (overload them with a second), torpedoes and the engines (evasion), give the captain's order, and break away if it goes wrong.<\/p><\/div>
+    <div class="brief"><h3>Voices and choices<\/h3><p>The other powers hail the Pelion: Torgath for the Klingons, t'Rehu for the Romulans, the Tholian Speaker, the Orion pirate Kessa Vane. Each remembers how you answer, and what you do (the Sector tab). Now and then something happens that needs a decision. Late in the tour, the Sleepers wake.<\/p><\/div>
     <div class="brief"><h3>Starfleet Command<\/h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.<\/p><\/div>
   <\/div>
   <div class="ng-row"><label>Captain's name<input type="text" id="ng-name" placeholder="Captain" maxlength="30"><\/label>
   <label>Game<select id="ng-mode"><option value="tour" selected>A tour: fifty weeks, then your rating<\/option><option value="open">Open command: no end, campaign after campaign<\/option><\/select><\/label>
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>
   <label>Sector seed (optional)<input type="text" id="ng-seed" placeholder="random" maxlength="30"><\/label><\/div>
-  <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng-guide" ${canContinue ? "" : "checked"}> Guide me through my first tour, step by step<\/label>
+  <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng-crisis" checked> A late-tour crisis: around week 35 the Sleepers, machines older than any power here, wake in the deep nebula and burn every world they can reach<\/label>
+  <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" id="ng-guide" ${canContinue ? "" : "checked"}> Guide me through my first tour, step by step<\/label>
   <div class="btn-row" style="margin-top:16px"><button class="btn primary" data-m="new">Take command<\/button>${canContinue ? `<button class="btn" data-m="continue">Continue your tour<\/button>` : ""}<\/div>
   <p class="small muted">Version: ${esc(typeof BUILD === "string" ? BUILD : "development")}.<\/p>
   <p class="small muted">An unofficial fan game for the USS Pelion campaign, inspired by Star Trek. Not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.<\/p>`);
@@ -5035,6 +5642,15 @@ function showEvent() {
     return;
   }
   if (ev.kind === "success") { modal(successHTML(ev)); return; }
+  if (ev.kind === "choice") {
+    const c = choiceView(S, ev);
+    if (!c) { S.event = null; after(); return; }
+    const col = c.power && POWERS[c.power] ? POWERS[c.power].color : null;
+    modal(`<p class="small muted" style="margin:0 0 4px">${col ? `<span class="dot" style="background:${col}"><\/span>` : ""}${esc(c.kicker || "")}<\/p><h2 style="margin-top:0">${esc(c.title)}<\/h2>${c.speaker ? `<p class="small muted" style="margin-top:-6px">${esc(c.speaker)}<\/p>` : ""}
+      ${c.quote ? `<blockquote class="hail" style="border-color:${col || "var(--gold)"}">${esc(c.text)}<\/blockquote>` : `<p style="white-space:pre-line">${esc(c.text)}<\/p>`}
+      <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}<\/h3><p>${esc(x.blurb)}<\/p><div class="btn-row"><button class="btn primary small" data-choice="${x.id}">${esc(x.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
+    return;
+  }
   if (ev.kind === "complication") {
     const c = complicationChoices(S, ev);
     if (!c) { S.event = null; after(); return; }
@@ -5056,7 +5672,7 @@ function showEvent() {
       <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}<\/h3><p>${esc(x.blurb)}<\/p><div class="btn-row"><button class="btn primary small" data-mchoice="${x.id}" data-order="${c.order.id}">${esc(x.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
     return;
   }
-  modal(`<h2>${esc(ev.title || "")}<\/h2><p style="white-space:pre-line">${esc(ev.text || "")}<\/p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`);
+  modal(`<h2>${esc(ev.title || "")}<\/h2>${ev.choice ? `<p class="small muted">Your choice: ${esc(ev.choice)}<\/p>` : ""}<p style="white-space:pre-line">${esc(ev.text || "")}<\/p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`);
 }
 /** The Mission Success report. */
 function successHTML(ev) {
@@ -5090,7 +5706,7 @@ function showBattle() {
       <div class="small muted">Helm ${E.helm} · Gunner ${E.gunner} · Maneuver ${E.maneuver} vs your ${st.maneuver}${E.plasma ? " · Plasma torpedo: +2 to evade it" : ""}${E.relentless ? " · Relentless" : ""}${E.fast ? " · Fast: runs when its shields fall" : ""}<\/div><\/div>` : `<div class="ship-card"><h4>Gone<\/h4><\/div>`}
   <\/div>
   ${over ? `<div class="result ${over === "destroyed" || over === "hailed" || over === "escaped" || over === "fled" ? "ok" : "no"}"><b>${{ destroyed: "Destroyed.", fled: "They broke off.", hailed: "They stood down.", escaped: "The Pelion broke away.", lost: "The Pelion is lost." }[over]}<\/b><\/div><div class="btn-row"><button class="btn primary" data-m="battle-done">Continue<\/button><\/div>`
-  : `<h3>The captain's order<\/h3><div class="orders-choice">${ord("command", `Command (Leadership ${CAPTAIN.skills.Leadership}, ${pct(CAPTAIN.skills.Leadership)}): +2 to Tactical`)}${ord("read", `Read the enemy (Psychology ${CAPTAIN.skills.Psychology}): +2 evade, +1 to hit`)}${E && !E.base && e.power !== "romulan" ? ord("hail", `Hail (Diplomacy ${CAPTAIN.skills.Diplomacy} vs Will ${E.will}): they may stand down`) : ""}${ord("none", "No order")}<\/div>
+  : `<h3>The captain's order<\/h3><div class="orders-choice">${ord("command", `Command (Leadership ${CAPTAIN.skills.Leadership}, ${pct(CAPTAIN.skills.Leadership)}): +2 to Tactical`)}${ord("read", `Read the enemy (Psychology ${CAPTAIN.skills.Psychology}): +2 evade, +1 to hit`)}${E && !E.base && e.power !== "romulan" && e.power !== "sleepers" ? ord("hail", `Hail (Diplomacy ${CAPTAIN.skills.Diplomacy} vs Will ${E.will}): they may stand down`) : ""}${ord("none", "No order")}<\/div>
   <h3>Power: ${used} of ${st.power} spent${spare > 0 ? ` · ${spare} unassigned` : ""}<\/h3>
   ${step("shields", "Shields", ["Down: every hit reaches the hull", "Up", "Reinforced: the first hit to reach them is turned aside"])}
   ${step("phasers", "Phasers", ["Silent", `Firing (${st.gun}, ${pct(st.gun)})`, `Overloaded (${st.gun}): a hit does a box more, and wears the crystals`], !fire)}
@@ -5123,18 +5739,19 @@ function modalClick(e) {
     after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;
   }
   if (m === "report-ok") { report = null; closeModal(); after(); return; }
-  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value }); if ($("ng-guide") && $("ng-guide").checked) s.tutorial = { on: true, guide: true, ack: {}, seen: {}, start: s.pelion.at }; openingScene(s); startGame(s); return; }
+  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value, crisis: !$("ng-crisis") || $("ng-crisis").checked }); if ($("ng-guide") && $("ng-guide").checked) s.tutorial = { on: true, guide: true, ack: {}, seen: {}, start: s.pelion.at }; openingScene(s); startGame(s); return; }
   if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
   if (m === "close") { closeModal(); return; }
   if (m === "help") { showHelp(); return; }
   if (m === "restart") { showStarter(false); return; }
-  if (m === "replay") { const s = newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain, mode: S.mode }); openingScene(s); startGame(s); return; }
+  if (m === "replay") { const s = newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain, mode: S.mode, crisis: !S.crisisOff }); openingScene(s); startGame(s); return; }
   if (m === "guide") { closeModal(); startGuide(); return; }
   if (m === "keep") { keepCommand(S); closeModal(); after(); return; }
   if (m === "retire") { retire(S); closeModal(); after(); return; }
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (b.dataset.choice) { makeChoice(S, b.dataset.choice); save(); closeModal(); after(); return; }
   if (b.dataset.complication) { const since = mark(), title = b.textContent.trim(); chooseComplication(S, b.dataset.complication); closeModal(); report = null; reportSince(title, since); after(); return; }
   if (b.dataset.cloak) { const since = mark(), title = b.textContent.trim(); const out = chooseCloak(S, b.dataset.cloak); closeModal(); report = null; reportSince(title, since); if (out && out.text) { report = report || { title, lines: [] }; } after(); return; }
   if (b.dataset.mchoice) { const r = chooseMission(S, b.dataset.order, b.dataset.mchoice); if (r.error) toast(r.error, true); closeModal(); after(); return; }

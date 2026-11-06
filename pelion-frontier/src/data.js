@@ -42,6 +42,9 @@ export const ENEMIES = {
   rbop: { name: "Romulan bird-of-prey", power: "romulan", shields: 3, hull: 3, maneuver: 5, helm: 11, gunner: 12, dmg: 2, plasma: true, will: 13, cloak: true, ambush: true, speed: 4, warp: 6 },
   orion: { name: "Orion raider", power: "orion", shields: 2, hull: 3, maneuver: 6, helm: 13, gunner: 11, dmg: 1, will: 10, fast: true, speed: 5, warp: 6.5 },
   tholian: { name: "Tholian vessel", power: "tholian", shields: 3, hull: 2, maneuver: 5, helm: 12, gunner: 12, dmg: 1, will: 13, web: true, speed: 4, warp: 6 },
+  // The Sleepers (the late-tour crisis, crisis.js): old machines, at war with everyone. No one hails them.
+  sleeper: { name: "Sleeper hunter", power: "sleepers", shields: 3, hull: 3, maneuver: 4, helm: 12, gunner: 12, dmg: 2, will: 0, speed: 4, warp: 6 },
+  ark: { name: "Sleeper Ark", power: "sleepers", shields: 10, hull: 20, maneuver: 1, helm: 9, gunner: 13, dmg: 3, will: 0, speed: 0, ark: true },
   orionBase: { name: "Orion pirate base", power: "orion", shields: 4, hull: 4, maneuver: 0, helm: 0, gunner: 11, dmg: 2, will: 11, base: true, speed: 0 },
 };
 export const POWERS = {
@@ -51,6 +54,7 @@ export const POWERS = {
   orion: { name: "Orion pirates", color: "#e6a640" },
   tholian: { name: "Tholian Assembly", color: "#ff8fb8" },
   independent: { name: "Independent", color: "#c9c3e8" },
+  sleepers: { name: "The Sleepers", color: "#e8e4d0" },
 };
 
 /** What a system can be. `known`: on Starfleet's charts from the start. */

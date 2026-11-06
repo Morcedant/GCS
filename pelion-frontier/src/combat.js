@@ -2,7 +2,9 @@
 // torpedoes (and what's left over as a bonus); the captain's order; Helm to evade; Shields before Hull; a concussive
 // roll for every hit that reaches the Hull; Engineering to repair mid-fight; a Helm contest to break away.
 import { PELION, ENEMIES, SUPPORT, CAPTAIN, CREW } from "./data.js";
-import { check, target, stationOfficer, hasRecord, sysPenalty, markCommand, log, sendHome, checkEnd, rand, pick, officer, registerHooks, harmWorld, sysAt, reactorPower, addStore, storesOf } from "./game.js";
+import { check, target, stationOfficer, hasRecord, sysPenalty, markCommand, log, sendHome, checkEnd, rand, pick, officer, registerHooks, harmWorld, sysAt, reactorPower, addStore, storesOf, remember } from "./game.js";
+import { breakArk, sleeperKilled } from "./crisis.js";
+import { hail } from "./voices.js";
 
 export const shieldsMax = (S) => PELION.shields + (S.pelion.refits.shields ? 1 : 0) + (hasRecord(S, "shield1") ? 1 : 0) + (S.battle && S.battle.raised ? 1 : 0);
 /** The reactor's Power: refits and records add to it, damage and failing dilithium take from it. */
@@ -18,6 +20,8 @@ export function battleStats(S) {
 
 export function startBattle(S, enemyId, initiator) {
   const e = S.enemies[enemyId], E = ENEMIES[e.type];
+  // Firing first on a ship that hadn't fired is remembered.
+  if (initiator === "pelion" && !e.hostile) remember(S, e.power, "fired first on one of our ships", -6);
   if (initiator === "pelion" && e.power === "klingon" && !e.hostile) {
     markCommand(S, 1, "the Pelion fired first on a Klingon ship. A diplomatic incident.");
     S.tension = Math.min(10, S.tension + 2); e.hostile = true;
@@ -105,11 +109,12 @@ export function exchange(S, choice = {}) {
   } else if (choice.order === "hail") {
     const r = check(S, CAPTAIN.skills.Diplomacy), them = check(S, E.will);
     const wins = r.success && (!them.success || r.margin > them.margin);
-    if (wins && !(E.relentless && e.hull < 3) && e.power !== "romulan" && !E.base) {
+    if (wins && !(E.relentless && e.hull < 3) && e.power !== "romulan" && e.power !== "sleepers" && !E.base) {
+      remember(S, e.power, "talked our captain down instead of fighting", 2);
       L.push(`Hail (${R(r)} against their Will, ${R(them)}): they stand down and withdraw.`);
       sendHome(S, e, 4); B.over = "hailed"; return finish(S, L);
     }
-    L.push(`Hail (${R(r)} against their Will, ${R(them)}): ${e.power === "romulan" ? "silence on every channel" : E.relentless && e.hull < 3 ? "the Klingon captain laughs at you" : "they won't listen"}.`);
+    L.push(`Hail (${R(r)} against their Will, ${R(them)}): ${e.power === "sleepers" ? "nothing answers: there's no one aboard to answer" : e.power === "romulan" ? "silence on every channel" : E.relentless && e.hull < 3 ? "the Klingon captain laughs at you" : "they won't listen"}.`);
   }
   const md = st.maneuver - (E.maneuver || 0);
   // Breaking away: a Helm contest instead of firing.
@@ -156,8 +161,8 @@ export function exchange(S, choice = {}) {
   const gun = E.gunner + (B.ambush && B.ex === 1 && !B.standby ? 2 : 0);
   const volley = (label, dmg, evadable) => {
     const r = check(S, gun + (label === "torpedo" ? 1 : 0));
-    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns", tholian: "Energy beam" }[e.type];
-    const what = label === "torpedo" ? "Photon torpedo" : name;
+    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns", tholian: "Energy beam", sleeper: "Cutting beam", ark: "The Ark's fire" }[e.type];
+    const what = label === "torpedo" ? "Photon torpedo" : label === "beam" ? "Burning beam" : name;
     if (!r.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): miss.`); return; }
     if (tgt) {
       const T = SUPPORT[tgt.type];
@@ -176,6 +181,8 @@ export function exchange(S, choice = {}) {
   };
   volley("main", E.dmg, true);
   if (e.type === "kbc" && B.ex % 2 === 0) volley("torpedo", 2, false);
+  // The Sleeper Ark has guns all over it: another volley an exchange, and a beam too wide to dodge.
+  if (e.type === "ark") { volley("main", E.dmg, true); volley("beam", 1, false); }
   // Damage control.
   if (choice.repair && st.engId) {
     const noParts = storesOf(S).spares <= 0;
@@ -200,11 +207,13 @@ function finish(S, L) {
   const e = S.enemies[B.enemy], E = ENEMIES[e.type];
   if (B.over === "destroyed") {
     delete S.enemies[e.id];
-    if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
-    else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
-    else if (e.power === "tholian") { S.commendations += 1; addStore(S, "spares", 1); log(S, "The Tholian vessel shatters like glass. The Assembly will note the time.", "war"); }
-    else if (e.power === "romulan") { S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
-    else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
+    if (e.type === "ark") breakArk(S, true);
+    else if (e.type === "sleeper") { const c = sleeperKilled(S); log(S, `The Pelion destroys a Sleeper hunter. +${c} commendations.`, "good"); }
+    else if (e.type === "orionBase") { remember(S, "orion", "destroyed our base", -15); S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
+    else if (e.power === "orion") { remember(S, "orion", "destroyed one of our raiders", -4); if (rand(S) < 0.5) hail(S, "orion:grudge"); S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
+    else if (e.power === "tholian") { remember(S, "tholian", "destroyed one of our vessels", -6); S.commendations += 1; addStore(S, "spares", 1); log(S, "The Tholian vessel shatters like glass. The Assembly will note the time.", "war"); }
+    else if (e.power === "romulan") { remember(S, "romulan", "destroyed one of our birds-of-prey", -5); S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
+    else { remember(S, "klingon", "destroyed one of our ships", e.hostile && B.initiator !== "pelion" ? -3 : -8); S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
   else if (e.arcRaider && (B.over === "fled" || B.over === "hailed")) {
     // Chased off from Corvan II, the raider leaves for good: no coming back to orbit while the away team works.

@@ -50,6 +50,21 @@ It's built from the tabletop game's own books:
   and worlds, and five order types (convoys, ransoms, a leak at the starbase, a captain who wants out, a blockade)
   that join Starfleet's book with the second campaign; some of them find the pirate base. In a tour, a new campaign starts only
   with twelve weeks to go; at the tour's end, *Keep command* turns the game into open command.
+- **Voices of the other powers:** Commander Torgath (Klingon: respects a captain who stands their ground), Commander
+  t'Rehu (Romulan: patient, every offer a test), Speaker Thrann (Tholian: exact about boundaries) and Kessa Vane (Orion
+  pirates: everything has a price) hail the Pelion now and then with demands, warnings, bargains and offers, each with
+  a choice. Each power remembers the answers and what the Pelion does (firing first, destroying a ship, talking one
+  down): the Sector tab shows its mood and memory. Bargains hold raids, strikes and webs back for a while. `src/voices.js`.
+- **Events:** every five weeks or more, something happens that needs a decision (a distress call, an ion storm, a
+  Klingon defector, a dilithium trader, an old probe, shore leave, a colony's petition, a stowaway), most settled by a
+  roll from the best officer for it. `src/events.js`.
+- **The Sleepers (the late-tour crisis):** around week 32–38, after a warning four weeks before, machines older than
+  any power wake in the deep nebula. Their Ark never moves and mends itself; every four weeks it sends hunters that
+  burn the nearest worlds of every power (losses count on the score, not the Command track). Choices: study the signal,
+  warn the powers, fortify; then a truce, an escort, or glory. The Ark fights three ways an exchange; destroying it
+  (+25) makes every hunter go dark. It can be switched off on the start screen. `src/crisis.js`.
+- **Commendations:** an officer's 4th, 10th and 18th successes each bring a distinction (Cool under fire, Silver
+  tongue, Scholar, Miracle worker, Field veteran, Hard to keep down) that stays with them.
 - **Starfleet Command track:** five boxes and you're relieved. Incidents (firing first on a Klingon ship), the
   Prime Directive, the Neutral Zone, lost colonies and failed orders mark it; carried-out orders clear it.
 - **The guide:** a first tour, step by step: a coach card walks a new captain through the first turns (the status bar,

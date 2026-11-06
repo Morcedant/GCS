@@ -135,6 +135,9 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
   .toast { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }   /* above End turn */
 }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+.linkish { background: none; border: 0; padding: 0; color: var(--blue, #6fb4ff); font: inherit; text-decoration: underline; cursor: pointer; }
+blockquote.hail { margin: 10px 0 14px; padding: 10px 14px; border-left: 3px solid var(--gold); background: rgba(255,255,255,.04); font-style: italic; line-height: 1.5; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
 </style>
 
 <div id="app" hidden>

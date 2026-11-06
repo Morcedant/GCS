@@ -569,3 +569,68 @@ test("R&D's prototypes: each tech order can leave a unique upgrade aboard", asyn
   P.refits.regulator = true; P.wear = 5; P.lyWeek = 0; consumeStores(S); assert.equal(storesOf(S).dilithium, 10);   // wear 5 < 6: no crystal lost
   P.refits.transporter = true; assert.ok(target(S, "grath", "Engineering", { action: "aid" }).parts.some((p) => /Transporter/.test(p[0])));
 });
+test("scenes: every event and every hail runs every answer, and memory moves standing", async () => {
+  const G = await import("../src/game.js");
+  const { PELION_EVENTS, eventsTurn } = await import("../src/events.js");
+  const { MESSAGES } = await import("../src/voices.js");
+  for (const [k, E] of Object.entries(PELION_EVENTS)) for (const o of E.options) {
+    const S = G.newGame({ seed: "ev-" + k }); S.turn = 20; S.supplies = 40; S.event = null; S.eventQueue = [];
+    const ctx = E.can(S); if (!ctx) continue;
+    G.pushChoice(S, "event", k, ctx); const v = G.choiceView(S); assert.ok(v.title && v.options.length >= 2, k);
+    const r = G.makeChoice(S, o.id); assert.ok(r.ok && r.text, `${k}:${o.id}`); assert.equal(S.event.kind, "story");
+  }
+  for (const [k, M] of Object.entries(MESSAGES)) for (const o of M.options) {
+    const S = G.newGame({ seed: "vo-" + k }); S.turn = 20; S.supplies = 40; S.science = 20; S.event = null; S.eventQueue = [];
+    G.pushChoice(S, "voice", k, {}); const v = G.choiceView(S); assert.ok(v.title && v.text && v.options.length, k);
+    assert.ok(G.makeChoice(S, o.id).ok, `${k}:${o.id}`);
+  }
+  // Events come, now and then.
+  const S = G.newGame({ seed: "ev-come" }); S.event = null; S.eventQueue = []; let n = 0;
+  for (let t = 5; t < 60; t++) { S.turn = t; eventsTurn(S); if (S.event) { n++; G.makeChoice(S, G.choiceView(S).options[0].id); S.event = null; S.eventQueue = []; } }
+  assert.ok(n >= 3, `events: ${n}`);
+  const was = G.standingOf(S, "klingon").score; G.remember(S, "klingon", "did something honourable", 10);
+  assert.equal(G.standingOf(S, "klingon").memory.at(-1).text, "did something honourable"); assert.equal(G.standingOf(S, "klingon").score, Math.min(40, was + 10));
+});
+test("the Sleepers: warning, waking, hunters that burn, the Ark destroyed in battle", async () => {
+  const G = await import("../src/game.js");
+  const { crisisTurn, crisisState, sleeperStrike } = await import("../src/crisis.js");
+  const { startBattle, exchange } = await import("../src/combat.js");
+  const S = G.newGame({ seed: "sleepers" }); S.event = null; S.eventQueue = [];
+  crisisTurn(S); assert.equal(S.crisis.stage, "quiet"); assert.ok(S.crisis.at >= 32 && S.crisis.at < 39);
+  S.turn = S.crisis.at - 4; crisisTurn(S); assert.equal(S.crisis.stage, "stirring"); assert.equal(S.event.id, "stirring");
+  G.makeChoice(S, "warn"); S.event = null; S.eventQueue = [];
+  S.turn = S.crisis.at; crisisTurn(S); assert.equal(S.crisis.stage, "awake"); assert.equal(S.event.id, "waking");
+  const c = crisisState(S); assert.ok(c.hunters >= 1 && c.hull === 20);
+  G.makeChoice(S, "truce"); assert.ok(S.crisis.truce && G.calm(S, "klingon") && G.calm(S, "tholian"));
+  // A hunter at a colony burns it, a box at a time; the loss doesn't mark the Command track.
+  const col = Object.values(S.systems).find((s) => s.kind === "colony"); col.harm = 2; const cmd = S.command;
+  const h = Object.values(S.enemies).find((e) => e.type === "sleeper"); h.at = col.at; h.target = col.at;
+  sleeperStrike(S, h, col); assert.equal(col.kind, "lost"); assert.equal(S.command, cmd);
+  // The Ark, nearly broken, destroyed in battle: every hunter goes dark, and the last scene.
+  const ark = Object.values(S.enemies).find((e) => e.type === "ark"); ark.shields = 10; ark.hull = 19;
+  S.event = null; S.eventQueue = []; S.pelion.at = ark.at; startBattle(S, ark.id, "pelion");
+  for (let i = 0; i < 12 && !S.battle.over; i++) exchange(S, { order: "command", shields: 1, phasers: 2, torps: true, engines: 0 });
+  if (S.battle.over === "destroyed") {
+    assert.equal(S.crisis.stage, "over"); assert.ok(S.crisis.byPelion); assert.equal(Object.values(S.enemies).filter((e) => e.power === "sleepers").length, 0);
+    assert.equal((S.event || S.eventQueue.find((e) => e.kind === "choice")).id, "broken");
+    assert.ok(G.score(S).parts.some(([n, v]) => /Ark/.test(n) && v === 25));
+  }
+  const T = G.newGame({ seed: "off", crisis: false }); T.turn = 40; crisisTurn(T); assert.equal(T.crisis, undefined);
+});
+test("distinctions: successes earn an officer a commendation, and it counts on rolls", async () => {
+  const G = await import("../src/game.js");
+  const S = G.newGame({ seed: "dist" }); S.event = null; S.eventQueue = [];
+  const base = G.target(S, "sevek", "Sensors", { action: "survey" }).total, other = G.target(S, "sevek", "Sensors", { action: "sweep" }).total;
+  // Sevek's fourth success brings the first commendation: Scholar.
+  S.crew.sevek.succ = 3;
+  for (let i = 0; i < 60 && !G.distOf(S, "sevek").length; i++) {
+    S.crew.sevek.acted = false; S.tried = {}; S.pending = null; S.event = null; S.eventQueue = [];
+    G.attempt(S, "pelion", "sweep", { officer: "sevek", skill: "Sensors" });
+  }
+  assert.deepEqual(G.distOf(S, "sevek"), ["scholar"]);
+  assert.equal(G.target(S, "sevek", "Sensors", { action: "survey" }).total, base + 1);
+  assert.equal(G.target(S, "sevek", "Sensors", { action: "sweep" }).total, other);
+  assert.ok(S.log.some((l) => /A commendation: Lieutenant Sevek/.test(l.text)));
+  // Hard to keep down: no −2 for being hurt.
+  S.crew.reyes.inj = 2; S.crew.reyes.dist = ["tough"]; assert.ok(!G.target(S, "reyes", "Phasers").parts.some(([n]) => n === "Wounded"));
+});
