@@ -298,13 +298,19 @@ def downloads(links):
     return f'<div class="ld"><div class="ld-eyebrow">Downloads</div><ul class="ld-downloads">{items}</ul></div>'
 
 
+MAP_STOP = set("the and with from into over that this then they their them there where while have its it's one two three about between around along under above below behind beside each other some more most only same after before first last scene map battle overhead view".split())
+def map_words(text):
+    """The words a picture's file name might share with a scene (for matching maps uploaded without a scene number)."""
+    return " ".join(sorted({w for w in re.findall(r"[a-z]+", text.lower()) if len(w) >= 4 and w not in MAP_STOP}))
+
+
 def maps_block():
     """The playtest page's battle maps: every scene of the four first adventures, each filled in (maps.js) once its picture
     is in the bucket (battle-maps/<setting>/, named with the scene's number first)."""
     advs = []
     for a in battlemap_scenes.ADVENTURES:
         folder = SLUGS[a["id"]].strip("/")
-        cards = "".join(f'''<li class="ld-map" data-scene="{k + 1}" data-name="{e(name)}"><div class="ld-map-pic"><span class="ld-note">Map coming soon</span></div>
+        cards = "".join(f'''<li class="ld-map" data-scene="{k + 1}" data-name="{e(name)}" data-name-words="{e(map_words(name))}" data-desc-words="{e(map_words(_d))}"><div class="ld-map-pic"><span class="ld-note">Map coming soon</span></div>
 <div class="ld-map-txt"><b>{e(name)}</b><span class="ld-note">Battle map: {e(hexs)} a hex · {e(area.replace("about ", ""))}</span></div><div class="ld-map-dl"></div></li>'''
                         for k, (name, hexs, area, _d) in enumerate(a["scenes"]))
         advs.append(f'''<section class="ld-map-adv" data-map-folder="{e(folder)}"><h3>{e(a["setting"])}: <i>{e(a["title"])}</i></h3><p class="ld-note" data-map-count>Looking for maps…</p>

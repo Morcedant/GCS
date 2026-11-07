@@ -110,8 +110,9 @@ The playtest page (`/playtest/`, *Battle maps*) shows a card for every scene of 
 each one in when its picture is in the same bucket as the music. In the bucket, make a folder `battle-maps`, and in it
 one folder per setting, named as for music: `battle-maps/trails-of-blood-and-dust/`, `battle-maps/fracture-lines/`,
 `battle-maps/the-shattered-crown/`, `battle-maps/aurora/`. Upload PNG, JPEG or WebP pictures, each named with its
-scene's number first: `2 - Mercy Springs at noon.png` goes on scene 2's card. Pictures without a number are listed
-under *More maps*. The prompts for making them are in `legend-dynamics/battlemap-prompts.md`.
+scene's number first: `2 - Mercy Springs at noon.png` goes on scene 2's card. A picture without a number goes on the
+scene whose title its name matches best ("Mercy Springs by Night" goes on *Mercy Springs by night*); one that matches no
+scene is listed under *More maps*. A number is the sure way. The prompts for making them are in `legend-dynamics/battlemap-prompts.md`.
 
 ## Use it
 
