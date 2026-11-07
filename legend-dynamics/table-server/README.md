@@ -94,6 +94,11 @@ the moment you upload them: no rebuild, no new zip.
 
    Only `file` is needed. Tracks it lists come first, in its order; any others follow. `"loop": true` makes a track
    repeat by default (for ambience at the table).
+If this server was set up without GitHub (its Settings have no **Build**), a push doesn't update it. Instead:
+**Settings → Bindings → Add → R2 bucket**, variable name `MUSIC`, bucket `legend-music`; then **Edit code**, replace
+the main file with [`dist/worker.js`](dist/worker.js) (the whole server in one file, made by `npm run bundle`), and
+**Deploy**.
+
 4. **Remove** a track by deleting it from the bucket. The pages update within a minute.
 
 Listeners play tracks on the page or download them (`/music/<folder>/<file>?download=1`). Nobody can upload or

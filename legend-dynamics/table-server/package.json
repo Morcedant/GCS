@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "dev": "npx wrangler dev",
-    "deploy": "npx wrangler deploy"
+    "deploy": "npx wrangler deploy",
+    "bundle": "npx --yes esbuild@0.24.0 src/worker.js --bundle --format=esm --platform=neutral --outfile=dist/worker.js --legal-comments=none"
   }
 }
