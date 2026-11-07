@@ -118,7 +118,7 @@ TOKENS = {
   ]},
   "aurora": {"rim": "chrome", "tokens": [
     ("Lupe Herrera", "1 hex", "a frightened fifteen-year-old girl in a hoodie, wreathed in crackling electric-blue lightning", [1, 2, 3]),
-    ("Foundation retrieval agent", "1 hex", "an agent in unmarked black tactical gear and a faceless helmet, carrying a stun rifle", [3]),
+    ("Foundation retrieval agent", "1 hex", "an agent in unmarked black tactical gear and a faceless helmet, carrying a flechette rifle, a stubby neurogun holstered at the hip and stun grenades on the vest", [3]),
     ("Sergei Grachyov", "1 hex", "a calm, broad man in a long dark coat, hands in his pockets, faint distortion in the air around him", [3]),
   ]},
 }

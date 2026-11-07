@@ -3771,6 +3771,9 @@
     ]
    }
   },
+  {"id": "neurogun", "dtype": "mind", "name": "Neurogun (Class II; Will resists)", "skill": "Firearms", "band": "short", "class": 2, "mind": true, "firearm": true, "damage": {"any": {"boxes": 2}}, "traits": [], "rows": []},
+  {"id": "flechette", "name": "Flechette rifle (Class III, armor-piercing)", "skill": "Firearms", "band": "long", "class": 3, "firearm": true, "damage": {"any": {"boxes": 2}}, "traits": [], "rows": []},
+  {"id": "stungrenade", "name": "Stun grenade", "skill": "Athletics", "band": "close", "maxBand": "close", "stun": true, "damage": {"any": {"boxes": 0}}, "traits": [{"type": "area", "note": "No box. Everyone nearby rolls Body −2: on a failure they lose their next action. An Operant caught in it is −2 to Powers next round either way."}], "rows": []},
   {
    "id": "tranq",
    "name": "Tranquilizer rifle",
@@ -5610,12 +5613,10 @@
    "dodge": 9,
    "boxes": 1,
    "boxesText": "1 each",
-   "weaponText": "Tranquilizer rifles; a dampening net (Power Negation II)",
-   "weapons": [
-    "tranq"
-   ],
+   "weaponText": "Tranquilizer rifles and neuroguns (Class II, through the nerves: no Defense but Mind Defense helps) to take Operants alive; flechette rifles (Class III, armor-piercing) and stun grenades for everyone else; a dampening net (Power Negation II)",
+   "weapons": ["tranq", "neurogun", "flechette", "stungrenade"],
    "trait": "Recovery",
-   "traitText": "They want the target alive, and leave no witnesses."
+   "traitText": "They want the target alive, and leave no witnesses: anyone who saw is a target, the cameras first. They will kill to keep it quiet."
   },
   {
    "id": "aegis",
@@ -6920,7 +6921,7 @@
    [
     "1:40",
     "The retrieval",
-    "<p>The Foundation team hits: four of them, a jammer blinding the Aegis suit. They want Lupe alive and no witnesses. The big fight, and the place for a team-up. Their file on Subject 19 gives them +2 when it applies.</p>"
+    "<p>The Foundation team hits: four of them, a jammer blinding the Aegis suit, neuroguns for the Operants and flechette rifles for everyone else. They want Lupe alive and no witnesses, and they will kill for it. The big fight, and the place for a team-up. Their file on Subject 19 gives them +2 when it applies.</p>"
    ],
    [
     "2:20",

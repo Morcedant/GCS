@@ -39,7 +39,7 @@ A starter case for three to seven, for one or two sessions. A teenager wakes up 
 
 When the Identify phase is done, they know what her power is and why it's out of control. The tag is the trigger; take it out and she calms down.
 
-**4. The retrieval.** A **Foundation retrieval team** hits the bridge: four of them, in unmarked gear, with a jammer that blinds the Aegis suit's sensors. They want Lupe alive and no witnesses. This is the big fight, and a good place for a **team-up**: Bulldog's suit and Subject 19's lightning, or Daybreak and anyone. The Foundation's file on Subject 19 gives the team +2 against them when it applies: they know Subject 19's habits.
+**4. The retrieval.** A **Foundation retrieval team** hits the bridge: four of them, in unmarked gear, with a jammer that blinds the Aegis suit's sensors. They want Lupe alive and no witnesses, and they've come equipped to kill an Operant: neuroguns that go through the nerves, flechette rifles that go through Toughness II, and stun grenades for the crowd and the cameras (see *Foundation hardware*). This is the big fight, and a good place for a **team-up**: Bulldog's suit and Subject 19's lightning, or Daybreak and anyone. The Foundation's file on Subject 19 gives the team +2 against them when it applies: they know Subject 19's habits.
 
 **5. Grachyov.** When the team breaks, **Sergei Grachyov** walks out of the dark, unhurried. He isn't here to fight. He offers a trade: Subject 19 for the girl. Hand Subject 19 over and he leaves, and Lupe is free. Refuse, and he shrugs, and goes; the Foundation will try again. He's Class V: nobody should try to arrest him tonight.
 
@@ -204,7 +204,7 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | Street gang (minor) | Firearms 11 | 7 | 1 | Pistols (I) | — | **Numbers.** Three or four of them; they scatter when half are down. |
 | Morcain enforcer (Operant) | Brawling 14 | 9 | 3 | Strength I, SMG (I) | I | **Connected.** Arresting one makes the Morcain notice you (Scrutiny). |
 | White Hand soldier | Firearms 13 | 9 | 2 | Blast II | — | **Fanatic.** Never surrenders, never talks. |
-| Foundation retrieval team (minor) | Firearms 13 | 9 | 1 each | Tranquilizer rifles; a dampening net (Power Negation II) | — | **Recovery.** They want the target alive, and leave no witnesses. |
+| Foundation retrieval team (minor) | Firearms 13 | 9 | 1 each | Tranquilizer rifles, neuroguns (II), flechette rifles (III), stun grenades; a dampening net (Power Negation II) | — | **Recovery.** They want the target alive, and leave no witnesses: they will kill to keep it quiet. |
 | Rogue Aegis suit | Piloting 14 | 8 | 3 | Arm cannon (II) | II | **Pilot.** Hit the pilot (−4) or the power pack (−2) to end it fast. |
 | Lab escapee | Powers 13 | 10 | 3 | One wild power, Class II–III | II | **Unstable III.** On a natural 16–18 with Powers, the power hits everyone nearby. |
 | Shadow Earth duplicate | As the original | As the original | 3 | As the original | As the original | **Mirror.** Knows what the original knows; Mystic Sight reveals it. |
@@ -213,6 +213,18 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | Umkas soldier | Firearms 14 | 9 | 3 | Breach rifle (II) | II | **Stranded.** Left behind in 2012; desperate and dangerous. |
 | Raster Zero hunter | Firearms 14 | 10 | 3 | Rifle (I), Power Negation II | I | **Unacknowledged.** No badge and no record; if caught, they never existed. |
 | Mad Forest wildwood | Brawling 14 | — | 6 | Grasping roots (II) | II | **Rooted.** Fire hurts it, but burning it brings the forest down on you. |
+
+**Foundation hardware.** The Foundation arms its retrieval teams to take an Operant alive, and to make sure nobody else talks about it.
+
+| Weapon | Range | Class | Effect |
+|---|---|---|---|
+| Tranquilizer rifle | Medium | — | No box: the target rolls Body −2; failure, out for the scene |
+| Neurogun | Short | II | A pulse through the nerves: a Firearms roll against the target's Will, marking the Mind track. Toughness, Force Field and armor don't help; Mind Defense does |
+| Flechette rifle | Long | III | Armor-piercing darts: 2 boxes and knocked down, through Toughness II and a riot shield alike |
+| Stun grenade | Close (thrown) | — | No box: everyone nearby rolls Body −2 or loses their next action, and an Operant is −2 to Powers next round either way |
+| Dampening net | Close | — | Power Negation II on whoever it wraps, until they're cut out |
+
+A team uses the tranquilizers, neuroguns and the net on the subject, and the flechettes and grenades on everyone else. They aim at the cameras before the crowd.
 
 **Named villains** are the GM's characters, built like player characters but with powers of Class III to VI and as many boxes as the story needs:
 

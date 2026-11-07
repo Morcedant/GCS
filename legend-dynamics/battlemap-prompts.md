@@ -849,7 +849,7 @@ A frightened fifteen-year-old girl in a hoodie, wreathed in crackling electric-b
 On the map: 1 hex · 3. Under the tracks: the retrieval.
 
 ```
-An agent in unmarked black tactical gear and a faceless helmet, carrying a stun rifle. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+An agent in unmarked black tactical gear and a faceless helmet, carrying a flechette rifle, a stubby neurogun holstered at the hip and stun grenades on the vest. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
 #### Sergei Grachyov
