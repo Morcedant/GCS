@@ -208,7 +208,9 @@ function ptMaps(api, root) {
   function piecesOf(n, count) {
     return (M.tokens || []).filter((t) => t.scenes && t.scenes[n] && count(t.scenes[n]) > 0).map((t) => {
       const nm = t.name.split(",")[0], who = people.find((p) => p.name === nm), pic = who && (who.token || who.portrait);
-      return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: count(t.scenes[n]), foe: t.scenes[n].foe };
+      const n1 = count(t.scenes[n]), ex = n1 === 1 && api.extraFor ? api.extraFor(nm) : null; // someone at the table as an extra: their card and token share boxes
+      return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: n1, foe: t.scenes[n].foe,
+        ...(ex ? { ex: ex.id, boxes: ex.boxes, injury: ex.injury } : {}) };
     });
   }
   /** The threat moved on: a scene on the map that grows with it (the Lazarus mine's ghouls) gets one more for each step. */

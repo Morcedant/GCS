@@ -3059,6 +3059,9 @@ tr.lvl-U td.target { color: var(--muted); }
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
     setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun, partyName: T.party,
+    // The GM's extras: a token placed from an extra's card shares its boxes and injuries with the card.
+    extra: (id) => gmExtras.find((x) => x.id === id) || null,
+    setExtra: (id, patch) => { const x = gmExtras.find((y) => y.id === id); if (!x) return; Object.assign(x, patch); saveExtras(); renderExtras(); },
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
       attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
@@ -3176,7 +3179,7 @@ tr.lvl-U td.target { color: var(--muted); }
     dodge: x.dodge === "" || x.dodge == null ? "" : String(x.dodge).slice(0, 6), attacks: String(x.attacks || "").slice(0, 200), trait: String(x.trait || "").slice(0, 300),
     notes: String(x.notes || "").slice(0, 1000), generic: !!x.generic } : null;
   let gmExtras = (store.get(STORE_EXTRAS, []) || []).map(cleanExtra).filter(Boolean);
-  const saveExtras = () => store.set(STORE_EXTRAS, gmExtras);
+  const saveExtras = () => { store.set(STORE_EXTRAS, gmExtras); try { battleMap.refresh(); pushScene(); } catch { /* the map mounts first; nothing to follow yet */ } };
   /** An extra from a threat (by id), or a blank one: added unless someone named is already here; generic ones numbered. */
   function addExtra(threatId, quiet, asName) {
     const t = threatId ? extraThreats().find((x) => x.id === threatId) : null;
@@ -3222,8 +3225,10 @@ tr.lvl-U td.target { color: var(--muted); }
       gmExtras.splice(gmExtras.indexOf(x) + 1, 0, cleanExtra({ ...x, id: uid(), name: `${base} ${n + 1}`, injury: 0, notes: "" })); saveExtras(); renderExtras();
     } else if (b.dataset.exdo === "map") {
       const t = x.threat && extraThreats().find((y) => y.id === x.threat);
-      await battleMap.addPieces([{ name: x.name, url: "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true }]);
-      showGmTab("fight"); gmSay(`${x.name} is on the battle map.`);
+      if (!x.generic && battleMap.hasExtra(x.id)) { showGmTab("fight"); gmSay(`${x.name} is on the battle map already.`); return; }
+      const stats = [x.attacks, x.dodge !== "" ? `Dodge ${x.dodge}` : "", x.trait].filter(Boolean).join(" · ");
+      await battleMap.addPieces([{ name: x.name, url: "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true, ex: x.id, boxes: x.boxes, injury: x.injury, stats }]);
+      showGmTab("fight"); gmSay(`${x.name} is on the battle map: a box marked there marks their card, and the other way round.`);
     }
   });
   $("gm-extras").addEventListener("change", (e) => {
@@ -4074,7 +4079,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
   if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
-    server: TABLE_SERVER, map: battleMap, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
+    server: TABLE_SERVER, map: battleMap, extraFor: (name) => gmExtras.find((x) => x.name === name) || null, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
     givePictures: async (name, portraitUrl, tokenUrl) => {
       const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name)];
       if (!chars.length) return 0;

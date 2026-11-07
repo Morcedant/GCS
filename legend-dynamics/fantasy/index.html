@@ -680,7 +680,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="8339398" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 8339398</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="fe3759d" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · fe3759d</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -8892,6 +8892,8 @@ return { mountLab };
 //   crew(): [{ id, name, portrait, color, down, dying, injury, boxes, stunned, points, ptrack, stats }]: the GM's
 //     characters, for "Add the posse" (partyName: posse, party, crew, team), live token state and the tracks shown when one is selected;
 //   setCrew(id, patch) writes a change back (patch: injury, dying, stunned, points, ptrack); pointName, stunName
+//   extra(id) / setExtra(id, patch): the GM's extras (people met), for a token placed from one (token.ex): its name, boxes and
+//     injuries are the extra's card's, and a box marked on the map marks the card
 //   threats: [{ id, name, boxes, dodge, attacks, trait }], the setting's opponents; vehicles: the same for ships
 //   bands: [[name, maxYards]], the personal range bands; kmBands: [[name, maxKm]] where the setting has space
 //   rangeTracks: [{ id, title, us, bands: [[name, distance text]], note, help, startLane, vehicleTrack (a crew track, e.g. Hull; vehicleTracks lists more to show, e.g. Shields and systems) or
@@ -9207,7 +9209,18 @@ function mountBattleMap(api) {
     api.root.querySelectorAll(".bm-rangeonly").forEach((x) => (x.hidden = !isRange()));
     $(".bm-kindnote").textContent = isRange() ? `Lanes are range bands: ${RT.bands.map((b) => b[0]).join(", ")}.` : `One hex is ${scaleText()}.`;
   }
-  function draw() { viewBox(); drawWorld(); drawGrid(); drawTokens(); drawMeasure(); drawSel(); syncForm(); }
+  /** Tokens placed from an extra's card follow it: its name, boxes and injuries. A token whose extra is gone keeps
+   *  what it had, unlinked. */
+  function syncExtras() {
+    if (!api.extra) return;
+    for (const t of [...st.tokens, ...Object.values(st.rts).flatMap((r) => r.tokens)]) {
+      if (!t.ex) continue;
+      let x = null; try { x = api.extra(t.ex); } catch { return; } // the page's extras load just after the map
+      if (!x) { delete t.ex; continue; }
+      t.name = x.name; t.boxes = x.boxes; t.injury = Math.min(x.injury, x.boxes);
+    }
+  }
+  function draw() { syncExtras(); viewBox(); drawWorld(); drawGrid(); drawTokens(); drawMeasure(); drawSel(); syncForm(); }
 
   // ---- coordinates: screen → map ----
   function mapPt(ev) {
@@ -9340,7 +9353,7 @@ function mountBattleMap(api) {
     if (tb) {
       const t = toks().find((x) => x.id === sel); if (!t) return;
       const c = live(t), tr = trackOf(t), d = tb.dataset, toggle = (cur, v) => (cur === v ? v - 1 : v);
-      if (d.bmtInjury) { t.injury = toggle(t.injury || 0, +d.bmtInjury); save(); drawTokens(); drawSel(); return; }
+      if (d.bmtInjury) { t.injury = toggle(t.injury || 0, +d.bmtInjury); if (t.ex && api.setExtra) api.setExtra(t.ex, { injury: t.injury }); save(); drawTokens(); drawSel(); return; }
       if (d.bmkTrack && tr && api.setGroupTrack) {
         const g = d.bmkName ? api.groupTracks().find((x) => x.name === d.bmkName) : tr;
         if (g) api.setGroupTrack(g.name, toggle(g.value || 0, +d.bmkTrack)); drawTokens(); drawSel(); return;
@@ -9534,13 +9547,17 @@ function mountBattleMap(api) {
       for (let i = 0; i < n; i++) {
         st.tokens.push({ id: uid(), ref: null, name: n > 1 || before ? `${pc.name} ${before + i + 1}` : pc.name, color: pc.foe === false ? "#6b6b6b" : "#a33b2b", img, tsize: Math.max(1, Math.min(3, pc.tsize || 1)),
           ...freeHexNear(at(0.75, 0.5)), boxes: th ? th.boxes || 1 : 1, injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
-          stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
+          stats: pc.stats || (th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : ""),
+          ...(pc.ex ? { ex: pc.ex, boxes: pc.boxes || 1, injury: pc.injury || 0 } : {}) });
         placed++;
       }
     }
     return placed;
   }
-  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, refresh: () => {
+  /** Is an extra on the map already (a token placed from its card)? */
+  const hasExtra = (id) => [...st.tokens, ...Object.values(st.rts).flatMap((r) => r.tokens)].some((t) => t.ex === id);
+  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, hasExtra, refresh: () => {
+    syncExtras();
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();
@@ -11287,7 +11304,9 @@ function ptMaps(api, root) {
   function piecesOf(n, count) {
     return (M.tokens || []).filter((t) => t.scenes && t.scenes[n] && count(t.scenes[n]) > 0).map((t) => {
       const nm = t.name.split(",")[0], who = people.find((p) => p.name === nm), pic = who && (who.token || who.portrait);
-      return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: count(t.scenes[n]), foe: t.scenes[n].foe };
+      const n1 = count(t.scenes[n]), ex = n1 === 1 && api.extraFor ? api.extraFor(nm) : null; // someone at the table as an extra: their card and token share boxes
+      return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: n1, foe: t.scenes[n].foe,
+        ...(ex ? { ex: ex.id, boxes: ex.boxes, injury: ex.injury } : {}) };
     });
   }
   /** The threat moved on: a scene on the map that grows with it (the Lazarus mine's ghouls) gets one more for each step. */
@@ -11384,6 +11403,9 @@ function ptMaps(api, root) {
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
     setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun, partyName: T.party,
+    // The GM's extras: a token placed from an extra's card shares its boxes and injuries with the card.
+    extra: (id) => gmExtras.find((x) => x.id === id) || null,
+    setExtra: (id, patch) => { const x = gmExtras.find((y) => y.id === id); if (!x) return; Object.assign(x, patch); saveExtras(); renderExtras(); },
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
       attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
@@ -11501,7 +11523,7 @@ function ptMaps(api, root) {
     dodge: x.dodge === "" || x.dodge == null ? "" : String(x.dodge).slice(0, 6), attacks: String(x.attacks || "").slice(0, 200), trait: String(x.trait || "").slice(0, 300),
     notes: String(x.notes || "").slice(0, 1000), generic: !!x.generic } : null;
   let gmExtras = (store.get(STORE_EXTRAS, []) || []).map(cleanExtra).filter(Boolean);
-  const saveExtras = () => store.set(STORE_EXTRAS, gmExtras);
+  const saveExtras = () => { store.set(STORE_EXTRAS, gmExtras); try { battleMap.refresh(); pushScene(); } catch { /* the map mounts first; nothing to follow yet */ } };
   /** An extra from a threat (by id), or a blank one: added unless someone named is already here; generic ones numbered. */
   function addExtra(threatId, quiet, asName) {
     const t = threatId ? extraThreats().find((x) => x.id === threatId) : null;
@@ -11547,8 +11569,10 @@ function ptMaps(api, root) {
       gmExtras.splice(gmExtras.indexOf(x) + 1, 0, cleanExtra({ ...x, id: uid(), name: `${base} ${n + 1}`, injury: 0, notes: "" })); saveExtras(); renderExtras();
     } else if (b.dataset.exdo === "map") {
       const t = x.threat && extraThreats().find((y) => y.id === x.threat);
-      await battleMap.addPieces([{ name: x.name, url: "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true }]);
-      showGmTab("fight"); gmSay(`${x.name} is on the battle map.`);
+      if (!x.generic && battleMap.hasExtra(x.id)) { showGmTab("fight"); gmSay(`${x.name} is on the battle map already.`); return; }
+      const stats = [x.attacks, x.dodge !== "" ? `Dodge ${x.dodge}` : "", x.trait].filter(Boolean).join(" · ");
+      await battleMap.addPieces([{ name: x.name, url: "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true, ex: x.id, boxes: x.boxes, injury: x.injury, stats }]);
+      showGmTab("fight"); gmSay(`${x.name} is on the battle map: a box marked there marks their card, and the other way round.`);
     }
   });
   $("gm-extras").addEventListener("change", (e) => {
@@ -12399,7 +12423,7 @@ function ptMaps(api, root) {
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
   if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
-    server: TABLE_SERVER, map: battleMap, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
+    server: TABLE_SERVER, map: battleMap, extraFor: (name) => gmExtras.find((x) => x.name === name) || null, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
     givePictures: async (name, portraitUrl, tokenUrl) => {
       const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name)];
       if (!chars.length) return 0;

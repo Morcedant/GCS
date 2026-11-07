@@ -12,6 +12,8 @@
 //   crew(): [{ id, name, portrait, color, down, dying, injury, boxes, stunned, points, ptrack, stats }]: the GM's
 //     characters, for "Add the posse" (partyName: posse, party, crew, team), live token state and the tracks shown when one is selected;
 //   setCrew(id, patch) writes a change back (patch: injury, dying, stunned, points, ptrack); pointName, stunName
+//   extra(id) / setExtra(id, patch): the GM's extras (people met), for a token placed from one (token.ex): its name, boxes and
+//     injuries are the extra's card's, and a box marked on the map marks the card
 //   threats: [{ id, name, boxes, dodge, attacks, trait }], the setting's opponents; vehicles: the same for ships
 //   bands: [[name, maxYards]], the personal range bands; kmBands: [[name, maxKm]] where the setting has space
 //   rangeTracks: [{ id, title, us, bands: [[name, distance text]], note, help, startLane, vehicleTrack (a crew track, e.g. Hull; vehicleTracks lists more to show, e.g. Shields and systems) or
@@ -327,7 +329,18 @@ function mountBattleMap(api) {
     api.root.querySelectorAll(".bm-rangeonly").forEach((x) => (x.hidden = !isRange()));
     $(".bm-kindnote").textContent = isRange() ? `Lanes are range bands: ${RT.bands.map((b) => b[0]).join(", ")}.` : `One hex is ${scaleText()}.`;
   }
-  function draw() { viewBox(); drawWorld(); drawGrid(); drawTokens(); drawMeasure(); drawSel(); syncForm(); }
+  /** Tokens placed from an extra's card follow it: its name, boxes and injuries. A token whose extra is gone keeps
+   *  what it had, unlinked. */
+  function syncExtras() {
+    if (!api.extra) return;
+    for (const t of [...st.tokens, ...Object.values(st.rts).flatMap((r) => r.tokens)]) {
+      if (!t.ex) continue;
+      let x = null; try { x = api.extra(t.ex); } catch { return; } // the page's extras load just after the map
+      if (!x) { delete t.ex; continue; }
+      t.name = x.name; t.boxes = x.boxes; t.injury = Math.min(x.injury, x.boxes);
+    }
+  }
+  function draw() { syncExtras(); viewBox(); drawWorld(); drawGrid(); drawTokens(); drawMeasure(); drawSel(); syncForm(); }
 
   // ---- coordinates: screen → map ----
   function mapPt(ev) {
@@ -460,7 +473,7 @@ function mountBattleMap(api) {
     if (tb) {
       const t = toks().find((x) => x.id === sel); if (!t) return;
       const c = live(t), tr = trackOf(t), d = tb.dataset, toggle = (cur, v) => (cur === v ? v - 1 : v);
-      if (d.bmtInjury) { t.injury = toggle(t.injury || 0, +d.bmtInjury); save(); drawTokens(); drawSel(); return; }
+      if (d.bmtInjury) { t.injury = toggle(t.injury || 0, +d.bmtInjury); if (t.ex && api.setExtra) api.setExtra(t.ex, { injury: t.injury }); save(); drawTokens(); drawSel(); return; }
       if (d.bmkTrack && tr && api.setGroupTrack) {
         const g = d.bmkName ? api.groupTracks().find((x) => x.name === d.bmkName) : tr;
         if (g) api.setGroupTrack(g.name, toggle(g.value || 0, +d.bmkTrack)); drawTokens(); drawSel(); return;
@@ -654,13 +667,17 @@ function mountBattleMap(api) {
       for (let i = 0; i < n; i++) {
         st.tokens.push({ id: uid(), ref: null, name: n > 1 || before ? `${pc.name} ${before + i + 1}` : pc.name, color: pc.foe === false ? "#6b6b6b" : "#a33b2b", img, tsize: Math.max(1, Math.min(3, pc.tsize || 1)),
           ...freeHexNear(at(0.75, 0.5)), boxes: th ? th.boxes || 1 : 1, injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
-          stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
+          stats: pc.stats || (th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : ""),
+          ...(pc.ex ? { ex: pc.ex, boxes: pc.boxes || 1, injury: pc.injury || 0 } : {}) });
         placed++;
       }
     }
     return placed;
   }
-  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, refresh: () => {
+  /** Is an extra on the map already (a token placed from its card)? */
+  const hasExtra = (id) => [...st.tokens, ...Object.values(st.rts).flatMap((r) => r.tokens)].some((t) => t.ex === id);
+  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, hasExtra, refresh: () => {
+    syncExtras();
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();
