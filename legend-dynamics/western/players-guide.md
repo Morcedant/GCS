@@ -993,13 +993,13 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 - **Advantage:** Unfeeling (origin; companion: Unfinished Business). **Complication:** Code of the West; trigger: the easy shot is in someone's back.
 - **Why I face the dark:** Someone did me wrong, and I mean to settle it. **Connection:** Taught Tom Feeney to shoot straight, and still reminds him of it.
 
-## Rev. Abigail Stone
+## Rev. Josiah Stone
 
-*Circuit preacher, Preacher. Old Money (tier 0).* Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees.
+*Circuit preacher, Preacher. Old Money (tier 0).* Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across his knees.
 
 - **Attributes:** Body 9, Agility 10, Intellect 11, Presence 14, Will 12. **Dodge** 9.
 - **Skills:** Persuasion 17 (Specialty). Trained: Leadership 15, Investigation 12, Law 12, Medicine 12, Read People 12, Survival 12, Riding 11, Shooting 11, Athletics 10.
-- **Edges:** +1 attribute point, Second advantage, A friend; second advantage: Unshakable Courage; a friend: Bishop Harrow, who answers her letters and asks no questions.
+- **Edges:** +1 attribute point, Second advantage, A friend; second advantage: Unshakable Courage; a friend: Bishop Harrow, who answers his letters and asks no questions.
 - **Advantage:** Hellfire Preacher. **Complication:** Protects Others at Personal Risk; trigger: townsfolk are caught in the crossfire.
 - **Why I face the dark:** The Lord sent me here for a reason, and I believe this is it. **Connection:** Keeps Dr. Webb's secret, and his whiskey hidden.
 

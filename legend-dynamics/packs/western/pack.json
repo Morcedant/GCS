@@ -2370,13 +2370,13 @@
    }
   },
   {
-   "name": "Rev. Abigail Stone",
+   "name": "Rev. Josiah Stone",
    "rank": "Circuit preacher",
    "dept": "Preacher",
    "path": "rounded",
    "speciesId": "oldmoney",
    "species": "Old Money",
-   "role": "Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees.",
+   "role": "Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across his knees.",
    "reason": "The Lord sent me here for a reason, and I believe this is it.",
    "connection": "Keeps Dr. Webb's secret, and his whiskey hidden.",
    "attrs": {
@@ -2417,7 +2417,7 @@
    "adv2": {
     "id": "courage"
    },
-   "contact": "Bishop Harrow, who answers her letters and asks no questions",
+   "contact": "Bishop Harrow, who answers his letters and asks no questions",
    "play": {
     "gun": {
      "type": "shotgun",
@@ -4373,7 +4373,7 @@
     "Bounty hunter who came back from the dead. Knows what Quill is."
    ],
    [
-    "Rev. Abigail Stone",
+    "Rev. Josiah Stone",
     "Circuit preacher with a shotgun. Finds the locked church."
    ]
   ],

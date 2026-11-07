@@ -148,18 +148,18 @@ Token:
 Isaiah Booker, Bounty hunter: a bounty hunter, Revenant (you died, and came back for unfinished business). Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them. Carrying: rifle, revolver, field glasses. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
-#### Rev. Abigail Stone
+#### Rev. Josiah Stone
 
 Portrait:
 
 ```
-Rev. Abigail Stone, Circuit preacher: a preacher, Old Money (your family has money, land or a name that opens doors). Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees. Carrying: shotgun, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+Rev. Josiah Stone, Circuit preacher: a preacher, Old Money (your family has money, land or a name that opens doors). Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across his knees. Carrying: shotgun, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
 ```
 
 Token:
 
 ```
-Rev. Abigail Stone, Circuit preacher: a preacher, Old Money (your family has money, land or a name that opens doors). Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees. Carrying: shotgun, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+Rev. Josiah Stone, Circuit preacher: a preacher, Old Money (your family has money, land or a name that opens doors). Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across his knees. Carrying: shotgun, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
 ### Tokens for Dead Man's Wages
