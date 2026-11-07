@@ -15,7 +15,8 @@
 // mountCampaign(api) with api: { PACK, gmRoot (the GM view's Campaign card), noteRoot (a card on the play tab for what
 //   the GM shares), esc, toast, saveText(text, name, say), onShare() (the shared part changed: send it),
 //   cards() (the cards the group holds: [{ tag, name }]; leave it out in a game without cards, and the outline has no
-//   triggers), words ({ card, cards }: the setting's word for a card) }
+//   triggers), words ({ card, cards }: the setting's word for a card), maps ({ names: [scene names], set(n) }: the battle maps
+//   a step of the outline can name, by number from 1; set(n) sets that one up on the battle map) }
 // returns { snapshot() (what the shared table sends players, or null), receive(shared), check() (look at the cards again),
 //   load(campaign, label) (put a whole campaign in, as Open file does, after asking before replacing one: true if it did) }.
 // Function declarations only.
@@ -62,6 +63,7 @@ function cpClean(raw) {
       if (kind === "arc") { // the trigger: how many cards, and whether it has fired
         const n = parseInt(x.unlockCount, 10); e.unlockCount = Number.isFinite(n) ? Math.max(0, Math.min(30, n)) : 0;
         e.unlockHint = !!x.unlockHint; e.unlocked = !!x.unlocked && cpHasTrigger(e);
+        e.maps = [...new Set((Array.isArray(x.maps) ? x.maps : []).map((n) => parseInt(n, 10)).filter((n) => n >= 1 && n <= 40))].slice(0, 6); // its battle maps
       }
       return e[F[kind][0][0]] ? e : null; // an entry needs its name or title
     }).filter(Boolean);
@@ -197,6 +199,7 @@ function cpRollPremise(PACK, rnd = Math.random) {
 function mountCampaign(api) {
   const { PACK, esc } = api, say = (m, err) => (api.toast ? api.toast(m, err) : null);
   const F = cpFields(), S = cpStatuses(), W = api.words || { card: "card", cards: "cards" };
+  const MAPS = api.maps && (api.maps.names || []).length ? api.maps : null; // the battle maps a step can name
   const TRIGGERS = typeof api.cards === "function"; // a game with cards: steps of the outline can wait for them
   const groupCards = () => { try { return api.cards ? api.cards() || [] : []; } catch { return []; } };
   const subjects = ((PACK.discovery && PACK.discovery.subjects) || []).map((x) => x[1]).filter(Boolean);
@@ -221,6 +224,7 @@ function mountCampaign(api) {
         <div class="field"><label><input type="checkbox" name="unlockHint"${x.unlockHint ? " checked" : ""}> Tell the players which ${esc(W.cards)} open it</label></div>
         ${field(kind, x, F.arc.find((f) => f[0] === "unlockText"))}</div>
         <datalist id="cp-subjects">${subjects.map((n) => `<option value="${esc(n)}">`).join("")}</datalist></fieldset>` : ""}
+      ${kind === "arc" && MAPS ? `<fieldset class="field wide"><legend class="label">Battle maps for this step</legend><div class="checks">${MAPS.names.map((n, i) => `<label><input type="checkbox" data-cpmapon value="${i + 1}"${(x.maps || []).includes(i + 1) ? " checked" : ""}> ${esc(n)}</label>`).join("")}</div></fieldset>` : ""}
       ${S[kind] ? `<div class="field"><label>Status</label><select name="status">${opts(S[kind], x.status || S[kind][0][0])}</select></div>` : ""}
       <div class="field"><label><input type="checkbox" name="shared"${x.shared ? " checked" : ""}> Share with the players${kind === "sessions" ? " (its title, date and recap)" : " (not the secret or notes)"}</label></div>
       <div class="btn-row field wide"><button class="btn primary" type="submit">Save</button><button type="button" class="btn" data-cproll="${kind}">Roll again</button>
@@ -237,6 +241,7 @@ function mountCampaign(api) {
   const item = (kind, x) => `<li><b>${kind === "arc" && cpHasTrigger(x) ? (x.unlocked ? "🔓 " : "🔒 ") : ""}${esc(x[F[kind][0][0]])}</b>${x.shared ? ` <span class="pill" title="The players see it">shared</span>` : ""} <span class="muted small">${esc(line(kind, x))}</span>
     <span class="btn-row" style="display:inline-flex;margin:0 0 0 6px"><button type="button" class="linkish" data-cpedit="${kind}" data-id="${esc(x.id)}">Open</button>
     <button type="button" class="linkish" data-cpshare="${kind}" data-id="${esc(x.id)}">${x.shared ? "Unshare" : "Share"}</button>
+    ${kind === "arc" && MAPS ? (x.maps || []).filter((n) => MAPS.names[n - 1]).map((n) => `<button type="button" class="linkish" data-cpmap="${n}" title="Set it up on the battle map">Map: ${esc(MAPS.names[n - 1].replace(/^\d+\.\s*/, ""))}</button>`).join("") : ""}
     ${kind === "arc" && x.unlocked ? `<button type="button" class="linkish" data-cprelock="${esc(x.id)}">Lock again</button>` : ""}
     ${kind === "arc" || kind === "sessions" ? `<button type="button" class="linkish" data-cpup="${kind}" data-id="${esc(x.id)}" aria-label="Move up">↑</button>` : ""}
     <button type="button" class="linkish" data-cpdel="${kind}" data-id="${esc(x.id)}">Delete</button></span></li>`;
@@ -285,6 +290,7 @@ function mountCampaign(api) {
     const v = (n) => (f.elements[n] ? f.elements[n].value : "");
     const e = Object.fromEntries(F[kind].map(([n]) => [n, v(n)]));
     if (S[kind]) e.status = v("status");
+    if (kind === "arc") e.maps = [...f.querySelectorAll("[data-cpmapon]:checked")].map((i) => +i.value);
     if (kind === "arc" && TRIGGERS) { e.unlockCount = v("unlockCount"); e.unlockHint = !!(f.elements.unlockHint && f.elements.unlockHint.checked); }
     e.shared = !!(f.elements.shared && f.elements.shared.checked);
     return e;
@@ -319,6 +325,7 @@ function mountCampaign(api) {
     root.addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
       const kind = b.dataset.cpnew || b.dataset.cproll || b.dataset.cpedit || b.dataset.cpshare || b.dataset.cpdel || b.dataset.cpup, id = b.dataset.id;
+      if (b.matches("[data-cpmap]")) { if (MAPS) MAPS.set(+b.dataset.cpmap); return; }
       if (b.matches("[data-cprelock]")) { const x = c.arc.find((y) => y.id === b.dataset.cprelock); if (x) { x.unlocked = false; store(x.shared); check(); } return; }
       if (b.matches("[data-cpexport]")) { api.saveText(JSON.stringify({ format: PACK.id + "-campaign", version: 1, ...c }, null, 1), `${c.name || PACK.terms.title + " campaign"}.json`, say); return; }
       if (b.matches("[data-cpclear]")) { if (confirm("Start a new campaign? This browser's campaign is cleared (save it to a file first to keep it).")) { const before = shareOf(); c = cpClean(null); editing = null; draft = null; store(shareOf() !== before); } return; }

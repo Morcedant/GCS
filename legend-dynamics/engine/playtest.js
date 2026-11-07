@@ -19,7 +19,10 @@
 //   addPictureToken), showMap?() (opens the battle map), givePictures?(name, portrait, token),
 //   loadCampaign?(campaign, label, setup) (into the Campaign tab, and the GM's table set up for it: true if it did), crew?() (the GM view's characters: [{ name, rank }]) }.
 // Returns { refresh() (the GM view's characters changed: their cards follow), scenes (their names), setScene(i) (scene i on
-//   the battle map: its map, the characters, and its people and enemies with their threats' numbers; resolves true) }.
+//   the battle map: its map, the characters, and its people and enemies with their threats' numbers; resolves true),
+//   threatChanged() (the adventure's threat moved: a scene on the map that grows with it gets its new arrivals) }.
+// api.threat?(): how far the adventure's threat has gone (times the Harvest clock has filled, boxes of Doom): a scene's
+//   pieces marked plus come one more each.
 //
 // The characters' cards: everyone in the adventure the same way (the pregenerated characters, the people and creatures in
 // its fights, the GM view's own characters, and anyone a picture is uploaded for), each with a portrait and a token,
@@ -103,11 +106,12 @@ function mountPlaytest(api) {
       armed = false; notes.value = ""; set("notes", null); e.target.textContent = "Clear"; say("Notes cleared.");
     }
   });
-  return { refresh: () => { if (maps) maps.refresh(); }, scenes: K.maps ? K.maps.scenes.map((x) => x.name) : [], setScene: (i) => (maps ? maps.setScene(i) : Promise.resolve(false)) };
+  return { refresh: () => { if (maps) maps.refresh(); }, scenes: K.maps ? K.maps.scenes.map((x) => x.name) : [], setScene: (i) => (maps ? maps.setScene(i) : Promise.resolve(false)),
+    threatChanged: () => { if (maps) maps.threatChanged(); } };
 }
 
 /** Who's in a scene, for its card: "Ghoul ×3, Ezra Quill". */
-function ptWho(M, n) { return (M.tokens || []).filter((t) => t.scenes && t.scenes[n]).map((t) => t.name.split(",")[0] + (t.scenes[n].count > 1 ? ` ×${t.scenes[n].count}` : "")).join(", "); }
+function ptWho(M, n) { return (M.tokens || []).filter((t) => t.scenes && t.scenes[n]).map((t) => t.name.split(",")[0] + (t.scenes[n].count > 1 ? ` ×${t.scenes[n].count}` : "") + (t.scenes[n].plus ? " (+1 for each time the threat has filled)" : "")).join(", "); }
 
 /** A name's words, for matching pictures to people: accents dropped, short words and the picture's kind left out. */
 function ptWords(t) {
@@ -195,17 +199,37 @@ function ptMaps(api, root) {
     }).join("");
   }
   renderPeople();
-  let byScene = new Map(), ready;
+  let byScene = new Map(), ready, onMap = null;   // onMap: the scene last set up, and the threat then
+  const get = (k) => { try { return localStorage.getItem((api.storeKey || "playtest") + "." + k); } catch { return null; } };
+  const set = (k, v) => { try { localStorage.setItem((api.storeKey || "playtest") + "." + k, v); } catch {} };
+  try { onMap = JSON.parse(get("scene") || "null"); } catch { onMap = null; }
+  const threatNow = () => Math.max(0, +(api.threat ? api.threat() : 0) || 0);
+  /** A scene's people and enemies, each with their picture and threat; how many of each: count(their scene entry). */
+  function piecesOf(n, count) {
+    return (M.tokens || []).filter((t) => t.scenes && t.scenes[n] && count(t.scenes[n]) > 0).map((t) => {
+      const nm = t.name.split(",")[0], who = people.find((p) => p.name === nm), pic = who && (who.token || who.portrait);
+      return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: count(t.scenes[n]), foe: t.scenes[n].foe };
+    });
+  }
+  /** The threat moved on: a scene on the map that grows with it (the Lazarus mine's ghouls) gets one more for each step. */
+  async function threatChanged() {
+    const th = threatNow();
+    if (!onMap || !api.map || !api.map.addPieces) return;
+    if (th <= onMap.threat) { if (th < onMap.threat) { onMap.threat = th; set("scene", JSON.stringify(onMap)); } return; }
+    const more = piecesOf(onMap.n, (s) => (s.plus ? th - onMap.threat : 0));
+    onMap.threat = th; set("scene", JSON.stringify(onMap));
+    if (!more.length) return;
+    await ready; const added = await api.map.addPieces(more);
+    if (added) say(`${more.map((p) => (p.count > 1 ? `${p.count} more ${p.name}s` : `Another ${p.name.toLowerCase()}`)).join(" and ")} on the battle map.`);
+  }
   /** Scene i on the battle map: its map, the characters, and everyone in it, each with their token picture and threat. */
   async function setScene(i) {
     if (!api.map || !api.map.setScene) return false;
     await ready;
     const x = M.scenes[i]; if (!x) return false;
-    const pieces = (M.tokens || []).filter((t) => t.scenes && t.scenes[x.n]).map((t) => {
-      const nm = t.name.split(",")[0], who = people.find((p) => p.name === nm), pic = who && (who.token || who.portrait);
-      return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: t.scenes[x.n].count, foe: t.scenes[x.n].foe };
-    });
+    const th = threatNow(), pieces = piecesOf(x.n, (s) => s.count + (s.plus ? th : 0));
     const r = await api.map.setScene({ url: byScene.has(i) ? byScene.get(i).src : "", yards: x.hex, pieces });
+    onMap = { n: x.n, threat: th }; set("scene", JSON.stringify(onMap));
     say(`${x.name.replace(/^\d+\.\s*/, "")} is on the battle map${r.map ? "" : " (no map picture for it yet: the plain grid)"}${x.hex ? `, ${x.hex} yard${x.hex === 1 ? "" : "s"} a hex` : ""}, with ${r.placed ? `${r.placed} in the scene` : "the characters"}.`);
     return true;
   }
@@ -239,5 +263,5 @@ function ptMaps(api, root) {
     } catch { say("That picture couldn't be loaded. Try again, or download it and use Background image… on the battle map.", true); }
     btn.disabled = false; btn.textContent = was;
   });
-  return { setScene, refresh: () => { const n = (api.crew ? api.crew() : []).map((x) => x.name).join("|"); if (n !== crewSeen) { crewSeen = n; renderPeople(); } } };
+  return { setScene, threatChanged, refresh: () => { const n = (api.crew ? api.crew() : []).map((x) => x.name).join("|"); if (n !== crewSeen) { crewSeen = n; renderPeople(); } } };
 }

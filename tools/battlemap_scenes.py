@@ -127,9 +127,10 @@ TOKENS = {
 # Who each token is in a fight, for the GM view's "Set up this scene": the setting's threat it plays (its boxes and
 # numbers go on the token), how many appear in a scene (one, where it isn't listed), and whether it's someone to talk
 # to rather than fight (foe False: a grey token). From the adventures' text: ghouls ×3, the hired guns ×2, the drones ×2,
-# the cultists (four, one blessed), Dask's two guardsmen, two tomb-dead, the retrieval team's four.
+# the cultists (four, one blessed), Dask's two guardsmen, two tomb-dead, the retrieval team's four. plus: the scenes where
+# one more comes for each time the adventure's threat has filled (Harvest) or each box it has marked (Doom).
 FIGHTS = {
-  "western": {"Ghoul": {"threat": "Ghoul", "count": {5: 3}}, "Ezra Quill, the revenant foreman": {"threat": "Revenant gunslinger", "foe": False},
+  "western": {"Ghoul": {"threat": "Ghoul", "count": {5: 3}, "plus": [5]}, "Ezra Quill, the revenant foreman": {"threat": "Revenant gunslinger", "foe": False},
               "Cyrus Pruitt, gunman": {"threat": "Outlaw"}, "Hired gun": {"threat": "Hired gun", "count": {6: 2}},
               "Sheriff Hiram Vance": {"threat": "Hired gun", "foe": False}, "Augustus Crane, the mine owner": {"foe": False}},
   "spaceopera": {"The crew's ship": {"foe": False}, "Vantor corporate frigate": {"threat": "Corporate frigate"}, "Syndicate enforcer": {"threat": "Syndicate enforcer"},
@@ -137,7 +138,7 @@ FIGHTS = {
                  "Ves Oro-Lan, the debt-broker": {"foe": False}, "The Warden": {"threat": "Rogue AI", "foe": False}},
   "fantasy": {"Cultist of the Burning God": {"threat": "Cultist", "count": {2: 3}}, "Blessed cultist": {"threat": "Cultist"},
               "Dask, the sellsword captain": {"threat": "Sellsword captain", "foe": {1: False}}, "Guardsman": {"threat": "Guardsman or bandit", "count": {6: 2}},
-              "Tomb-dead": {"threat": "Ghoul or tomb-dead", "count": {6: 2}}, "Ssethra, the serpent-priest": {"threat": "Serpent-priest"},
+              "Tomb-dead": {"threat": "Ghoul or tomb-dead", "count": {6: 2}, "plus": [6]}, "Ssethra, the serpent-priest": {"threat": "Serpent-priest"},
               "Ysolde Varr, the merchant princess": {"foe": False}},
   "aurora": {"Lupe Herrera": {"threat": "Lab escapee", "foe": False}, "Foundation retrieval agent": {"threat": "Foundation retrieval team", "count": {3: 4}},
              "Sergei Grachyov": {"threat": "Sergei Grachyov", "foe": False}},
@@ -157,7 +158,7 @@ def kit_maps(gid):
 def _fight(gid, n, z, l, sc):
     f = FIGHTS.get(gid, {}).get(n, {}); foe = f.get("foe", True)
     return {"name": n, "size": z, "look": l, "threat": f.get("threat", ""),
-            "scenes": {str(k): {"count": f.get("count", {}).get(k, 1), "foe": foe.get(k, True) if isinstance(foe, dict) else foe} for k in sc}}
+            "scenes": {str(k): {"count": f.get("count", {}).get(k, 1), "foe": foe.get(k, True) if isinstance(foe, dict) else foe, **({"plus": True} if k in f.get("plus", []) else {})} for k in sc}}
 
 
 # The pregenerated characters the playtesters play: a portrait and a token prompt each, written from their sheets

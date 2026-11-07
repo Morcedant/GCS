@@ -123,6 +123,16 @@ SETUP = {
 }
 
 
+# The battle maps each step of the outline happens on (the playtest kit's scene numbers, tools/battlemap_scenes.py):
+# opening the step in the Campaign tab sets its map up, with its people and enemies.
+MAPS = {
+    "western": [[1], [2], [3, 4], [3], [2], [5], [6]],
+    "spaceopera": [[1], [], [2], [3, 6], [5], [4], [5]],
+    "fantasy": [[1], [2], [3], [4, 5], [6], [7], [7]],
+    "aurora": [[1], [2], [2], [3], [3], []],
+}
+
+
 def setup(gid):
     return SETUP.get(gid)
 
@@ -164,7 +174,9 @@ def campaign(gid, pack, md):
         elif scenes: scenes[-1][1] += "\n\n" + p      # a scene's clue list, or what follows it
         elif hook: hook += "\n\n" + p
     clues = "\n".join(plain(l) for s in scenes for l in s[1].split("\n") if l.startswith("- "))
-    arc = [{"title": re.sub(r"^\d+\.\s*", "", h)[:80], "summary": plain(b)[:2000], "status": "planned"} for h, b in scenes]
+    maps = MAPS.get(gid, [])
+    arc = [{"title": re.sub(r"^\d+\.\s*", "", h)[:80], "summary": plain(b)[:2000], "status": "planned", "maps": maps[k] if k < len(maps) else []}
+           for k, (h, b) in enumerate(scenes)]
     run = "\n".join(f"{t}  {h}: {html_text(b)}" + (f" (Cut: {c[0]})" if c else "") for t, h, b, *c in kit["run"])
     session = {"title": f"Session 1: {title}", "status": "planned", "scenes": run[:3000],
                "threats": plain(re.sub(r"^\*\*Threats\.\*\*\s*", "", threats))[:1500], "clues": clues[:1500],

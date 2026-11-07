@@ -631,24 +631,36 @@ function mountBattleMap(api) {
     const at = (fc, fr) => { const C = Math.round((st.cols - 1) * fc), R = Math.round((st.rows - 1) * fr); return pointy() ? { q: C - Math.floor(R / 2), r: R } : { q: C, r: R - Math.floor(C / 2) }; };
     const crew = api.crew(), have = new Set(st.tokens.map((x) => x.ref));
     for (const c of crew) if (!have.has(c.id)) st.tokens.push({ id: uid(), ref: c.id, tsize: 1, ...freeHexNear(at(0.2, 0.5)) });
+    const placed = await placePieces(sc.pieces || [], at);
+    save(); draw(); fit();
+    return { map: mapOk, placed };
+  }
+  /** More of a scene's people or enemies, after it's set up (another ghoul when the Harvest clock fills): numbered on
+   *  from those already there. */
+  async function addPieces(pieces) {
+    if (st.kind !== "hex") { st.kind = "hex"; RT = TRACKS[0]; }
+    const at = (fc, fr) => { const C = Math.round((st.cols - 1) * fc), R = Math.round((st.rows - 1) * fr); return pointy() ? { q: C - Math.floor(R / 2), r: R } : { q: C, r: R - Math.floor(C / 2) }; };
+    const n = await placePieces(pieces, at, true); save(); draw(); return n;
+  }
+  async function placePieces(list, at, more) {
     const norm = (x) => String(x || "").toLowerCase().replace(/\s*\(.*?\)/g, "").trim();
     let placed = 0;
-    for (const pc of sc.pieces || []) {
+    for (const pc of list) {
       const th = pc.threat ? allThreats().find((x) => norm(x.name) === norm(pc.threat)) || allThreats().find((x) => norm(x.name).startsWith(norm(pc.threat))) : null;
       let img = null;
       if (pc.url) try { const r = await fetch(pc.url); if (r.ok) img = (await readImage(await r.blob(), 256)).url; } catch { /* a plain token */ }
       const ship = !!(th && (api.vehicles || []).includes(th)), n = Math.max(1, pc.count || 1);
+      const before = more ? st.tokens.filter((x) => !x.ref && x.name && (x.name === pc.name || x.name.startsWith(pc.name + " "))).length : 0;
       for (let i = 0; i < n; i++) {
-        st.tokens.push({ id: uid(), ref: null, name: n > 1 ? `${pc.name} ${i + 1}` : pc.name, color: pc.foe === false ? "#6b6b6b" : "#a33b2b", img, tsize: Math.max(1, Math.min(3, pc.tsize || 1)),
+        st.tokens.push({ id: uid(), ref: null, name: n > 1 || before ? `${pc.name} ${before + i + 1}` : pc.name, color: pc.foe === false ? "#6b6b6b" : "#a33b2b", img, tsize: Math.max(1, Math.min(3, pc.tsize || 1)),
           ...freeHexNear(at(0.75, 0.5)), boxes: th ? th.boxes || 1 : 1, injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
           stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
         placed++;
       }
     }
-    save(); draw(); fit();
-    return { map: mapOk, placed };
+    return placed;
   }
-  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, refresh: () => {
+  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();

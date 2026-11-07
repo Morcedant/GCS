@@ -2834,6 +2834,7 @@ tr.lvl-U td.target { color: var(--muted); }
     el.hidden = !sh; el.innerHTML = sh ? crewShipUI.html(sh) : "";
   }
   function renderShip() {
+    if (ptUI) ptUI.threatChanged(); // a track that is the adventure's threat (Doom) may bring more to the map
     if (wantedUI) wantedUI.render(); // the poster's reward follows the law's track
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
       const n = Math.min(max, ship[name] || 0);
@@ -3120,7 +3121,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const STORE_DISC = PACK.id + ".discovery.v1";
   const discBlank = () => ({ threat: { size: 6, filled: 0, count: 0 }, clocks: [] });
   let disc = (() => { const d = store.get(STORE_DISC, null); return d && typeof d === "object" && d.threat && Array.isArray(d.clocks) ? d : discBlank(); })();
-  const discSave = () => store.set(STORE_DISC, disc);
+  const discSave = () => { store.set(STORE_DISC, disc); if (ptUI) ptUI.threatChanged(); };
   const discSay = (m, err) => { $("disc-msg").textContent = m; $("disc-msg").className = "toast" + (err ? " err" : ""); };
   const PHASE_NAMES = () => (DISC.phases || []).map((p) => p[0]);
   const gateAt = (k) => k.plain ? Infinity : k.phases[0] + k.phases[1];
@@ -3951,7 +3952,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
   if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
-    server: TABLE_SERVER, map: battleMap, crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
+    server: TABLE_SERVER, map: battleMap, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
     givePictures: async (name, portraitUrl, tokenUrl) => {
       const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name)];
       if (!chars.length) return 0;
@@ -4021,6 +4022,8 @@ tr.lvl-U td.target { color: var(--muted); }
       clockOf: (id) => clocks.find((x) => x.id === id) || null,
       fillClock: (id, n) => { const c = clocks.find((x) => x.id === id); if (!c || !n) return; const was = c.filled; c.filled = Math.min(c.size, c.filled + n); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, was, c.filled); } }); }
   campaignUI = mountCampaign({ PACK, gmRoot: $("cp-card"), noteRoot: $("cp-note"), esc, toast, saveText, onShare: () => pushScene(),
+    // The playtest's battle maps: a step of the outline sets its map up, with its people and enemies.
+    maps: ptUI && ptUI.scenes.length ? { names: ptUI.scenes, set: (n) => { showGmTab("fight"); const s = $("pt-scene"); if (s) s.value = String(n - 1); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); ptUI.setScene(n - 1); } } : null,
     cards: () => gmCrew.flatMap((c) => c.cards || []), words: DISC ? { card: DISC.card, cards: DISC.cards } : null }); // triggers: the group's cards
   pushScene();
   $("guide-toc").addEventListener("click", (e) => { const a = e.target.closest("a[data-chap]"); if (a) { e.preventDefault(); showChapter(document.getElementById($("guide-pager").dataset.root), +a.dataset.chap); } });
