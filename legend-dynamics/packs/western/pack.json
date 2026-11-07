@@ -485,10 +485,7 @@
    "id": "frontier",
    "name": "Frontier-born",
    "tier": 0,
-   "adj": {
-    "Body": 1,
-    "Intellect": -1
-   },
+   "adj": {"Body": 1},
    "desc": "Raised on a homestead or a ranch, a long way from schools and doctors. Tough, practical, and at home in hard country.",
    "core": [],
    "form": null,
@@ -523,10 +520,7 @@
    "id": "city",
    "name": "City-bred",
    "tier": 0,
-   "adj": {
-    "Intellect": 1,
-    "Body": -1
-   },
+   "adj": {"Intellect": 1},
    "desc": "Schooled back east or in a western city: you read, you write, you know how the world runs on money and paper. The frontier is still learning you.",
    "core": [],
    "form": null,
@@ -561,10 +555,7 @@
    "id": "veteran",
    "name": "War Veteran",
    "tier": 0,
-   "adj": {
-    "Will": 1,
-    "Presence": -1
-   },
+   "adj": {"Will": 1},
    "desc": "You fought in the war, blue or gray, and came west with what was left of you. You know how to take orders, give them, and keep your head under fire.",
    "core": [],
    "form": null,
@@ -599,10 +590,7 @@
    "id": "drifter",
    "name": "Drifter",
    "tier": 0,
-   "adj": {
-    "Agility": 1,
-    "Will": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "No home, no ties, no questions: you've drifted from town to town for years and learned to read a room on the way in.",
    "core": [],
    "form": null,
@@ -637,10 +625,7 @@
    "id": "immigrant",
    "name": "Immigrant",
    "tier": 0,
-   "adj": {
-    "Will": 1,
-    "Presence": -1
-   },
+   "adj": {"Will": 1},
    "desc": "You crossed an ocean to get here, from Ireland, China, Germany, Italy, Mexico or anywhere else, and you've had to work twice as hard to be treated half as well.",
    "core": [],
    "form": null,
@@ -675,10 +660,7 @@
    "id": "oldmoney",
    "name": "Old Money",
    "tier": 0,
-   "adj": {
-    "Presence": 1,
-    "Body": -1
-   },
+   "adj": {"Presence": 1},
    "desc": "Your family has money, land or a name that opens doors. Out here it buys less than it used to, but it still buys plenty.",
    "core": [],
    "form": null,
@@ -713,10 +695,7 @@
    "id": "railroad",
    "name": "Railroad Hand",
    "tier": 0,
-   "adj": {
-    "Body": 1,
-    "Presence": -1
-   },
+   "adj": {"Body": 1},
    "desc": "You laid track, drove spikes, fired the engines or blew the tunnels. You know machines, explosives, and how the railroad treats its men.",
    "core": [],
    "form": null,
@@ -751,10 +730,7 @@
    "id": "sighted",
    "name": "Sighted",
    "tier": 1,
-   "adj": {
-    "Will": 1,
-    "Presence": -1
-   },
+   "adj": {"Will": 1},
    "desc": "Born with the second sight. You see ghosts, the true faces of monsters wearing human ones, and magic at work. Most people think you strange; monsters think you dangerous.",
    "core": [
     "The Sight: when a ghost, a disguised monster or working magic is near, you see it for what it is. Monsters who notice your stare may know what you are."
@@ -791,12 +767,7 @@
    "id": "werewolf",
    "name": "Werewolf",
    "tier": 2,
-   "adj": {
-    "Body": 1,
-    "Agility": 1,
-    "Intellect": -1,
-    "Will": -1
-   },
+   "adj": {"Body": 1, "Agility": 1},
    "desc": "Cursed with the wolf. By day you pass for anyone; under the full moon, or in fury, the beast takes you.",
    "core": [
     "Full moon: at moonrise you change, whether you want to or not. A Will roll at −2 delays it a few minutes.",
@@ -852,12 +823,7 @@
    "id": "dhampir",
    "name": "Dhampir",
    "tier": 2,
-   "adj": {
-    "Agility": 1,
-    "Presence": 1,
-    "Body": -1,
-    "Will": -1
-   },
+   "adj": {"Agility": 1, "Presence": 1},
    "desc": "Child of a vampire and a living mother. You walk in daylight, you heal fast, and the undead fear you, and want you.",
    "core": [
     "Undead sense: you feel a vampire or other undead within a short distance, with no details.",
@@ -896,11 +862,7 @@
    "id": "revenant",
    "name": "Revenant",
    "tier": 2,
-   "adj": {
-    "Body": 1,
-    "Will": 1,
-    "Presence": -2
-   },
+   "adj": {"Body": 1, "Will": 1},
    "desc": "You died, and came back for unfinished business. Your heart doesn't beat, your skin is cold, and you won't rest until it's done.",
    "core": [
     "Dead flesh: you don't breathe, eat or sleep, and poison and disease don't affect you. Medicine treats you at −2.",
@@ -939,12 +901,7 @@
    "id": "practitioner",
    "name": "Practitioner",
    "tier": 2,
-   "adj": {
-    "Intellect": 1,
-    "Will": 1,
-    "Body": -1,
-    "Presence": -1
-   },
+   "adj": {"Intellect": 1, "Will": 1},
    "desc": "A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German Braucherei, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.",
    "core": [
     "Rituals: describe the effect; the GM sets its weight (minor 2, significant 4, major 6 segments); fill that clock with Occult rolls at your tradition's pace.",
@@ -1037,12 +994,7 @@
    "id": "vampire",
    "name": "Vampire",
    "tier": 3,
-   "adj": {
-    "Presence": 2,
-    "Agility": 1,
-    "Body": -1,
-    "Will": -2
-   },
+   "adj": {"Presence": 2, "Agility": 1},
    "desc": "Undead, ageless and beautiful, with a thirst that never ends. You walk at night and remember centuries. Horror campaigns only.",
    "core": [
     "Undead: you don't breathe or age; Medicine can't heal you. Drinking blood can: Will against the victim's Body, and on a success you clear a box and they mark one.",
@@ -1097,12 +1049,7 @@
    "id": "pactbound",
    "name": "Pact-Bound",
    "tier": 3,
-   "adj": {
-    "Will": 2,
-    "Presence": 1,
-    "Body": -2,
-    "Agility": -1
-   },
+   "adj": {"Will": 2, "Presence": 1},
    "desc": "You made a bargain with something from below. It gave you power, and it will collect.",
    "core": [
     "Infernal power: once per scene, work a minor magical effect with a single Occult roll, no clock. Larger works need rituals.",
@@ -2022,13 +1969,7 @@
   "role": "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
   "reason": "Somebody has to stand up for the people who can't.",
   "connection": "Owes the town doctor for keeping quiet about how her last client really died.",
-  "attrs": {
-   "Body": 9,
-   "Agility": 11,
-   "Intellect": 14,
-   "Presence": 11,
-   "Will": 11
-  },
+  "attrs": {"Body": 10, "Agility": 10, "Intellect": 14, "Presence": 11, "Will": 11},
   "skills": {
    "Investigation": "S",
    "Read People": "T",
@@ -2080,13 +2021,7 @@
    "role": "Wears the badge in three counties, and sees what's under the faces of the men she arrests.",
    "reason": "I took an oath, and I keep my word.",
    "connection": "Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.",
-   "attrs": {
-    "Body": 12,
-    "Agility": 13,
-    "Intellect": 10,
-    "Presence": 9,
-    "Will": 11
-   },
+   "attrs": {"Body": 11, "Agility": 13, "Intellect": 10, "Presence": 10, "Will": 11},
    "skills": {
     "Shooting": "S",
     "Riding": "T",
@@ -2142,13 +2077,7 @@
    "role": "Left a Philadelphia practice for reasons he won't discuss, and patches up whoever comes through the door.",
    "reason": "Nobody out here knows what I did back east.",
    "connection": "Reverend Stone is the only one who knows why he left Philadelphia.",
-   "attrs": {
-    "Body": 9,
-    "Agility": 10,
-    "Intellect": 13,
-    "Presence": 12,
-    "Will": 11
-   },
+   "attrs": {"Body": 10, "Agility": 10, "Intellect": 13, "Presence": 11, "Will": 11},
    "skills": {
     "Medicine": "S",
     "Investigation": "T",
@@ -2201,13 +2130,7 @@
    "role": "Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon.",
    "reason": "Everything I do is for my family.",
    "connection": "Plays cards with Lucinda Marsh every Saturday, and loses.",
-   "attrs": {
-    "Body": 13,
-    "Agility": 13,
-    "Intellect": 9,
-    "Presence": 11,
-    "Will": 9
-   },
+   "attrs": {"Body": 11, "Agility": 13, "Intellect": 10, "Presence": 11, "Will": 10},
    "skills": {
     "Riding": "S",
     "Animal Handling": "T",
@@ -2262,13 +2185,7 @@
    "role": "Deals faro by night and reads the cards for anyone who'll pay, and the cards are never wrong.",
    "reason": "There's money out here for anyone with nerve enough to take it.",
    "connection": "Owes Ruth Calloway a favor for a warrant that went missing.",
-   "attrs": {
-    "Body": 9,
-    "Agility": 10,
-    "Intellect": 13,
-    "Presence": 12,
-    "Will": 11
-   },
+   "attrs": {"Body": 10, "Agility": 10, "Intellect": 13, "Presence": 11, "Will": 11},
    "skills": {
     "Gambling": "S",
     "Read People": "T",
@@ -2317,13 +2234,7 @@
    "role": "Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them.",
    "reason": "Someone did me wrong, and I mean to settle it.",
    "connection": "Taught Tom Feeney to shoot straight, and still reminds him of it.",
-   "attrs": {
-    "Body": 12,
-    "Agility": 13,
-    "Intellect": 11,
-    "Presence": 8,
-    "Will": 11
-   },
+   "attrs": {"Body": 11, "Agility": 13, "Intellect": 10, "Presence": 10, "Will": 11},
    "skills": {
     "Shooting": "S",
     "Tracking": "T",
@@ -2379,13 +2290,7 @@
    "role": "Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across his knees.",
    "reason": "The Lord sent me here for a reason, and I believe this is it.",
    "connection": "Keeps Dr. Webb's secret, and his whiskey hidden.",
-   "attrs": {
-    "Body": 9,
-    "Agility": 10,
-    "Intellect": 11,
-    "Presence": 14,
-    "Will": 12
-   },
+   "attrs": {"Body": 10, "Agility": 10, "Intellect": 11, "Presence": 14, "Will": 11},
    "skills": {
     "Persuasion": "S",
     "Leadership": "T",

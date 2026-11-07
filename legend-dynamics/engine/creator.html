@@ -447,6 +447,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-head b { font-family: var(--display); letter-spacing: .06em; text-transform: uppercase; font-size: 1.05rem; overflow-wrap: anywhere; }
 .gm-head .small { display: block; }
 .gm-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.gm-inj { display: inline-flex; align-items: center; gap: 8px; }
+.gm-generic { display: inline-flex; align-items: center; gap: 4px; margin-right: auto; }
 .gm-supermove { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 2px; padding: 5px 8px; border: 1px solid var(--accent); border-radius: 6px; }
 .gm-supermove-tag { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
 .gm-supermove b { color: var(--accent); }
@@ -698,7 +700,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <select id="f-customspeed"><option value="-1">Slower: Move −1</option><option value="0">Human pace</option><option value="1">Faster: Move +1</option></select></div>
             <div class="field wide" id="horror-wrap"><div class="checks"><label><input type="checkbox" id="f-horror"> {{restrictedToggle}}</label></div></div>
             <div class="field wide"><div class="trait-desc" id="species-desc"></div></div>
-            <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom adjustments (must total 0, each −2 to +2)</span>
+            <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom bonuses (0 to +2 each, +3 at most in all; they come out of your five attribute points)</span>
               <div class="adj-grid" id="species-adj"></div></div>
           </div>
           <div class="edges">
@@ -1474,6 +1476,7 @@ tr.lvl-U td.target { color: var(--muted); }
     { const f = out.pictureFrom && typeof out.pictureFrom === "object" ? out.pictureFrom : {}, ok = (u, have) => (have && typeof u === "string" && /^https:\/\/[^\s"<>]{1,400}$/.test(u) ? u : "");
       out.pictureFrom = { portrait: ok(f.portrait, out.portrait), token: ok(f.token, out.token) }; }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
+    out.generic = out.generic === true; // a generic NPC: the GM view takes more than one of them
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
     if (PACK.roleAliases && PACK.roleAliases[out.dept]) out.dept = PACK.roleAliases[out.dept]; // a calling merged into another (Marshal → Lawman)
@@ -1559,12 +1562,16 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- rules ----
   const speciesDef = () => SPECIES.find((x) => x[0] === ch.speciesId);
-  const adjOf = (c = ch) => (c.speciesId === "custom" ? c.speciesAdj : (SPECIES.find((x) => x[0] === c.speciesId) || [, , {}])[2]) || {};
+  // An origin only raises attributes: no one starts below the ordinary 10. Its bonuses come out of the five attribute
+  // points (adjBonus), so every origin starts with the same total. (A penalty in an older file or custom origin counts as 0.)
+  const adjOf = (c = ch) => Object.fromEntries(Object.entries((c.speciesId === "custom" ? c.speciesAdj : (SPECIES.find((x) => x[0] === c.speciesId) || [, , {}])[2]) || {}).filter(([, v]) => v > 0));
+  const adjBonus = (c = ch) => Object.values(adjOf(c)).reduce((a, v) => a + v, 0);
   // An attribute bought with advancement points raises both its floor and its ceiling by one.
   const boughtAttr = (n, c = ch) => ((c.attrBought || {})[n] || 0);
   const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0) + boughtAttr(n, c);
   const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0) + boughtAttr(n, c);
-  const adjTotal = () => ATTRS.reduce((a, [n]) => a + (ch.speciesAdj[n] || 0), 0);
+  const adjTotal = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.speciesAdj[n] || 0), 0);
+  const CUSTOM_ADJ_MAX = 3; // a custom origin: up to +2 on one attribute, +3 in all
   const spent = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.attrs[n] - baseOf(n)), 0);
   const adjText = (adj) => ATTRS.filter(([n]) => adj[n]).map(([n]) => `${n} ${signed(adj[n])}`).join(", ") || "No adjustments";
   // Changing species moves each attribute by the difference in adjustments, keeping the points already spent.
@@ -1583,6 +1590,7 @@ tr.lvl-U td.target { color: var(--muted); }
       const v = ch.attrs[n] - (before[n] || 0) + (after[n] || 0);
       ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), v));
     });
+    fitPool(ch); // the new origin's bonuses come out of the points: give back any spent beyond them
     // A higher tier leaves fewer Edges. If the ones taken no longer fit, clear them all to choose again,
     // and undo what they gave: the extra attribute points and the extra starting point.
     if (edgesSpent() <= edgesAvail()) return false;
@@ -1590,6 +1598,17 @@ tr.lvl-U td.target { color: var(--muted); }
     while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => ch.attrs[a] > baseOf(a)).sort((x, y) => ch.attrs[y] - ch.attrs[x])[0]; if (!n) break; ch.attrs[n]--; }
     if (ch.play && ch.play.duty > gritStart()) ch.play.duty = gritStart();
     return true;
+  }
+  /** Keep a character within the rules: nothing below its base (an older file made under origins that lowered
+   *  attributes), and no more points spent than the pool, taking back from the highest bought attribute first. */
+  function fitPool(c) {
+    const saved = ch; ch = c;
+    try {
+      let changed = false;
+      for (const [n] of ATTRS) if (c.attrs[n] < baseOf(n)) { c.attrs[n] = baseOf(n); changed = true; }
+      while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => c.attrs[a] > baseOf(a)).sort((x, y) => (c.attrs[y] - baseOf(y)) - (c.attrs[x] - baseOf(x)) || c.attrs[y] - c.attrs[x])[0]; if (!n) break; c.attrs[n]--; changed = true; }
+      return changed;
+    } finally { ch = saved; }
   }
   // Old hands: one Expert skill (+5) and seven Trained; everyone else: one Specialty (+3) and nine Trained.
   const isGS = () => ch.path === "hand";
@@ -1600,7 +1619,8 @@ tr.lvl-U td.target { color: var(--muted); }
   const hbBonus = (kind, c = ch, skill) => hbEdgeBonus(PACK, (k) => edgeN(k, c), kind, skill);
   const edgesAvail = (c = ch) => EDGE_POINTS - tierOf(c);
   const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeRaw(k, c), 0);
-  const pool = () => 5 + edgeN("attr");
+  const pool = (c = ch) => Math.max(0, 5 + edgeN("attr", c) - adjBonus(c));
+  fitPool(ch); // a character saved under the old origins (an attribute below 10) is put right on opening
   const gritStart = (c = ch) => 2 + edgeN("grit", c);
   // Some origins get one skill Trained for free.
   const freeSkillOf = (c = ch) => heritageOf(c)?.freeSkill || "";
@@ -1742,7 +1762,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const sp = spent(), nS = count("S"), nT = count("T");
     const overMax = ATTRS.filter(([n]) => ch.attrs[n] > maxOf(n) || ch.attrs[n] < baseOf(n)).map(([n]) => n);
     const sAdvOk = ch.sadv.id !== "custom" || (ch.sadv.name.trim() && ch.sadv.text.trim() && ch.sadv.compName.trim() && ch.sadv.compText.trim());
-    const speciesOk = ch.speciesId !== "custom" || (ch.species.trim() && adjTotal() === 0);
+    const speciesOk = ch.speciesId !== "custom" || (ch.species.trim() && adjTotal() <= CUSTOM_ADJ_MAX);
     const advOk = ch.sadv.id ? sAdvOk : ch.adv.id && (ch.adv.id !== "custom" || (ch.adv.name.trim() && ch.adv.text.trim())) &&
       (!(advDef()?.[4]) || ch.adv.detail.trim());
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
@@ -1754,7 +1774,7 @@ tr.lvl-U td.target { color: var(--muted); }
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
       [!!ch.dept, `${T.role} chosen`],
-      [!!speciesOk, speciesOk ? `${T.origin}: ${ch.species || "—"}` : !ch.species.trim() ? `Name your custom ${T.originLower}` : `Custom adjustments total ${signed(adjTotal())}; they must total 0`],
+      [!!speciesOk, speciesOk ? `${T.origin}: ${ch.species || "—"}` : !ch.species.trim() ? `Name your custom ${T.originLower}` : `Custom bonuses total ${signed(adjTotal())}; at most +${CUSTOM_ADJ_MAX}`],
       ...(horrorOff ? [[false, `${ch.species}: ${T.restrictedCheck}`]] : []),
       ...(ch.allegiance === "custom" && !(ch.allegianceDef || []).slice(1).every((x) => x.trim()) ? [[false, "Allegiance: give it a name, a benefit and a burden (agree them with the GM)"]] : []),
       // Gear that needs an Edge (Fracture Lines' powered armor).
@@ -1938,7 +1958,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("species-name-wrap").hidden = !custom;
     $("species-adj-wrap").hidden = !custom;
     const adjNow = adjOf();
-    $("species-desc").innerHTML = (custom ? `Record a ${T.originLower} agreed with your GM. Adjustments must total 0, from −2 to +2 each.` : esc(sd[3])) +
+    $("species-desc").innerHTML = (custom ? `Record a ${T.originLower} agreed with your GM. Its bonuses run from 0 to +2 each, +3 at most in all, and come out of your five attribute points: no one starts below 10.` : esc(sd[3])) +
       `<div class="adj-chips"><span class="adj-chip tier-chip">Tier ${tierOf()}</span>${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>` +
       heritageInfo();
     // Edges
@@ -2006,7 +2026,7 @@ tr.lvl-U td.target { color: var(--muted); }
     // attributes
     const POOL = pool(), sp = spent(), left = POOL - sp;
     $("pool-pips").innerHTML = Array.from({ length: POOL }, (_, i) => `<span class="pip ${i < sp ? "on" : ""}"></span>`).join("");
-    $("pool-left").textContent = left >= 0 ? `${left} left` : `${-left} over`;
+    $("pool-left").textContent = (left >= 0 ? `${left} left` : `${-left} over`) + (adjBonus() ? ` (your ${T.originLower}'s ${signed(adjBonus())} came out of them)` : "");
     ATTRS.forEach(([n]) => {
       $("av-" + n).textContent = ch.attrs[n];
       const adj = adjOf()[n] || 0;
@@ -2578,7 +2598,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
-  function load(c) { ch = normalize(c); last = null; $("r-setting").innerHTML = ""; $("r-result").hidden = true; bindFields(); render(); }
+  function load(c) { ch = normalize(c); fitPool(ch); last = null; $("r-setting").innerHTML = ""; $("r-result").hidden = true; bindFields(); render(); }
   // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
   // role swaps them, leaving every skill the player trained or raised themselves.
   function applyRoleSkills() {
@@ -2748,11 +2768,11 @@ tr.lvl-U td.target { color: var(--muted); }
   $("species-adj").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-adj]"); if (!b) return;
     const n = b.dataset.adj, v = (ch.speciesAdj[n] || 0) + +b.dataset.d;
-    if (v < -2 || v > 2) return;
+    if (v < 0 || v > 2 || (+b.dataset.d > 0 && adjTotal() >= CUSTOM_ADJ_MAX)) return;
     const before = adjOf()[n] || 0;
     ch.speciesAdj = { ...ch.speciesAdj, [n]: v };
     ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), ch.attrs[n] - before + v));
-    touch(); render();
+    fitPool(ch); touch(); render();
   });
   // ---- clocks and ship (table-wide, kept in this browser, not in a character file) ----
   const STORE_CLOCKS = PACK.id + ".clocks.v1", STORE_SHIP = PACK.id + ".tracks.v1";
@@ -2985,7 +3005,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- GM view: the whole crew at a glance ----
   const STORE_GM = PACK.id + ".gm.v1";
-  let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
+  let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize); gmCrew.forEach(fitPool);
   const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
   /* BATTLEMAP */
   /* TABLECLIENT */
@@ -3113,16 +3133,29 @@ tr.lvl-U td.target { color: var(--muted); }
       return { skills, dodge: dodge() + formDodge(c), move: foot, powerMove: power, adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
+  /** Characters into the GM view. The same file opened again updates its card. Someone already at the table isn't
+   *  added twice (by name), unless they're a generic NPC (a guard, a thug): then each copy is numbered ("Guard 2"). */
+  const baseName = (n) => String(n || "").trim().replace(/\s+\d+$/, "").toLowerCase();
   function gmAdd(list) {
-    let added = 0, updated = 0;
+    let added = 0, updated = 0; const dupes = [];
     for (const raw of list) {
       if (!raw || typeof raw !== "object" || !raw.attrs || !raw.skills) continue;
-      const c = normalize({ ...raw, example: false });
+      const c = normalize({ ...raw, example: false }); fitPool(c);
       const i = gmCrew.findIndex((x) => x.id === c.id);
-      if (i >= 0) { gmCrew[i] = c; updated++; } else { gmCrew.push(c); added++; }
+      const same = gmCrew.filter((x) => baseName(x.name) === baseName(c.name) && c.name.trim());
+      const generic = c.generic || same.some((x) => x.generic);
+      if (i >= 0 && !generic) { gmCrew[i] = c; updated++; continue; }
+      if (same.length && !generic) { dupes.push(c.name); continue; }
+      if (generic && same.length) {
+        const nums = same.map((x) => +((x.name.match(/\s(\d+)$/) || [])[1] || 1));
+        c.id = uid(); c.generic = true; c.tableKey = null;
+        c.name = `${c.name.replace(/\s+\d+$/, "")} ${Math.max(...nums) + 1}`;
+      }
+      gmCrew.push(c); added++;
     }
     saveGM(); renderGM();
-    return { added, updated };
+    if (dupes.length) setTimeout(() => gmSay(`${[...new Set(dupes)].join(", ")} ${dupes.length === 1 ? "is" : "are"} already at the table. Mark a character a generic NPC on their card to add more than one.`, true), 0);
+    return { added, updated, dupes: dupes.length };
   }
   let labPanel = null; // the Encounter panel (and, with a test configuration, the Rules Lab)
   // ---- discovery clocks, the threat clock they race, investigation costs, and minting cards (pack discovery) ----
@@ -3403,7 +3436,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power covers this far instead of the move on foot"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> <b class="num">${k.powerMove.yards.toLocaleString()} yd</b> a move</div>` : ""}
-        <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
+        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span></span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
         ${MTRACK ? `<div class="gm-row small"><span class="muted">${esc(MTRACK.name)}</span><span class="boxes">${Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.mind || 0) ? "on" : ""}" data-gm="${c.id}" data-gmmind="${i + 1}" aria-label="${esc(c.name)} ${esc(MTRACK.name)} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(MTRACK.effects[Math.min(MTRACK.boxes, c.play.mind || 0)].split(":")[0])}</span></div>` : ""}
@@ -3413,7 +3446,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${gmMagic(c)}
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
           <span><strong>Complication:</strong> ${esc(k.comp || "—")}${c.comp.trigger ? ` (trigger: ${esc(c.comp.trigger)})` : ""}${k.scomp ? `; ${esc(k.scomp)}` : ""}</span></div>
-        <div class="btn-row"><button class="linkish" data-gm="${c.id}" data-gmsave>Save character file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
+        <div class="btn-row"><label class="small gm-generic" title="A generic NPC (a guard, a thug) can be added more than once; each copy is numbered"><input type="checkbox" data-gm="${c.id}" data-gmgeneric${c.generic ? " checked" : ""}> Generic NPC</label><button class="linkish" data-gm="${c.id}" data-gmsave>Save character file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
       </article>`;
     }).join("") : `<div class="card hud"><p class="muted">No characters yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add characters saved in this browser, or the ready-made characters for a quick game.</p></div>`;
   }
@@ -3435,6 +3468,8 @@ tr.lvl-U td.target { color: var(--muted); }
     saveGM(); renderGM();
   });
   $("gm-grid").addEventListener("change", (e) => {
+    const g = e.target.closest("[data-gmgeneric]");
+    if (g) { const c = gmCrew.find((x) => x.id === g.dataset.gm); if (c) { c.generic = g.checked; saveGM(); renderGM(); gmSay(g.checked ? `${c.name} is a generic NPC: add them again for another, numbered.` : `${c.name} is one of a kind again.`); } return; }
     const el = e.target.closest("[data-gmdying]"); if (!el) return;
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (c) { c.play.dying = el.checked; saveGM(); renderGM(); }
   });
@@ -3457,17 +3492,17 @@ tr.lvl-U td.target { color: var(--muted); }
     }
     alAdded += mergeAllegiances(found.map((c) => c.allegianceDef));
     if (alAdded) renderAllegianceList();
-    const { added, updated } = gmAdd(found);
+    const { added, updated, dupes } = gmAdd(found); if (dupes && !added && !updated) return;
     gmSay(`${alAdded ? `${alAdded} campaign allegiance${alAdded > 1 ? "s" : ""} added. ` : ""}${added} added${updated ? `, ${updated} updated` : ""}${bad ? `; ${bad} file${bad > 1 ? "s weren't" : " wasn't"} a ${T.title} character file` : ""}.`, !!bad && !added && !updated);
   });
   $("gm-open").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("gm-files").click(); } });
-  $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { gmAdd([c]); gmSay(`Added ${c.name || "character"}.`); } e.target.value = ""; });
+  $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { const r = gmAdd([c]); if (r.added || r.updated) gmSay(`${r.updated ? "Updated" : "Added"} ${c.name || "character"}.`); } e.target.value = ""; });
   $("gm-add-pregen").addEventListener("change", (e) => {
     const c = PREGENS[+e.target.value];
     if (e.target.value !== "" && c) {
-      const id = uid(); gmAdd([{ ...JSON.parse(JSON.stringify(c)), id }]); gmSay(`Added ${c.name}.`);
-      const added = gmCrew.find((x) => x.id === id);
-      autoPictures(added).then((ok) => { if (ok) { store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); } });
+      const id = uid(), r = gmAdd([{ ...JSON.parse(JSON.stringify(c)), id }]);
+      const added = r.added ? gmCrew[gmCrew.length - 1] : null; if (added) gmSay(`Added ${added.name}.`);
+      if (added) autoPictures(added).then((ok) => { if (ok) { store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); } });
     }
     e.target.value = "";
   });

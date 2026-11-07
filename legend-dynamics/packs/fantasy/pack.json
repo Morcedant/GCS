@@ -379,10 +379,7 @@
    "id": "northlander",
    "name": "Northlander",
    "tier": 0,
-   "adj": {
-    "Body": 1,
-    "Intellect": -1
-   },
+   "adj": {"Body": 1},
    "desc": "From the frozen north: clans, longships and long winters. Hard to kill and slow to forgive.",
    "core": [],
    "form": null,
@@ -426,10 +423,7 @@
    "id": "crownlander",
    "name": "Crownlander",
    "tier": 0,
-   "adj": {
-    "Presence": 1,
-    "Will": -1
-   },
+   "adj": {"Presence": 1},
    "desc": "Born in the Gilded Cities that were once the empire's heart: silk, intrigue, and knives in the dark.",
    "core": [],
    "form": null,
@@ -473,10 +467,7 @@
    "id": "sandborn",
    "name": "Sand-born",
    "tier": 0,
-   "adj": {
-    "Will": 1,
-    "Presence": -1
-   },
+   "adj": {"Will": 1},
    "desc": "Nomads of the Burning Sands, who know every well, every buried city and every lie the dunes tell.",
    "core": [],
    "form": null,
@@ -520,10 +511,7 @@
    "id": "islander",
    "name": "Islander",
    "tier": 0,
-   "adj": {
-    "Agility": 1,
-    "Body": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "From the Shattered Isles of the south: corsairs, pearl-divers and sea-witches' children.",
    "core": [],
    "form": null,
@@ -567,10 +555,7 @@
    "id": "ashborn",
    "name": "Ashborn",
    "tier": 1,
-   "adj": {
-    "Body": 1,
-    "Presence": -1
-   },
+   "adj": {"Body": 1},
    "desc": "Grey-skinned descendants of the empire's sorcery-bred slave legions. The empire is gone; the brand remains.",
    "core": [
     "Fire-blooded: fire and heat mark one fewer box on you (minimum 0)."
@@ -616,10 +601,7 @@
    "id": "deepkin",
    "name": "Deepkin",
    "tier": 1,
-   "adj": {
-    "Will": 1,
-    "Presence": -1
-   },
+   "adj": {"Will": 1},
    "desc": "Pale folk from the cities beneath the mountains, who trade with the surface and fear what lies deeper.",
    "core": [
     "Darksight: you see in darkness as if by dim light.",
@@ -666,10 +648,7 @@
    "id": "witchblood",
    "name": "Witch-blooded",
    "tier": 1,
-   "adj": {
-    "Will": 1,
-    "Body": -1
-   },
+   "adj": {"Will": 1},
    "freeSkill": "Sorcery",
    "desc": "Human, with old sorcery in the veins: a witch grandmother, a sorcerer's bastard, or a pact made before you were born.",
    "core": [
@@ -717,11 +696,7 @@
    "id": "giantblood",
    "name": "Giant-blooded",
    "tier": 2,
-   "adj": {
-    "Body": 2,
-    "Agility": -1,
-    "Intellect": -1
-   },
+   "adj": {"Body": 2},
    "desc": "Seven feet and more, with a giant somewhere in the family tree. Strong, feared, and always too big for the door.",
    "core": [
     "Huge: your fists and kicks mark 2 boxes. Armor, saddles and doorways must be made for you."
@@ -767,12 +742,7 @@
    "id": "serpentkin",
    "name": "Serpent-kin",
    "tier": 2,
-   "adj": {
-    "Agility": 1,
-    "Intellect": 1,
-    "Body": -1,
-    "Presence": -1
-   },
+   "adj": {"Agility": 1, "Intellect": 1},
    "desc": "Last heirs of the serpent empire that ruled before humans. Scaled, cold-eyed, venomous, and distrusted everywhere.",
    "core": [
     "Cold blood: in freezing cold, −1 to all rolls.",
@@ -819,12 +789,7 @@
    "id": "demonmarked",
    "name": "Demon-marked",
    "tier": 2,
-   "adj": {
-    "Presence": 1,
-    "Will": 1,
-    "Body": -1,
-    "Intellect": -1
-   },
+   "adj": {"Presence": 1, "Will": 1},
    "desc": "Born of, bargained with, or claimed by the infernal: horns, burning eyes or a shadow that moves on its own.",
    "core": [
     "Infernal: fire marks one fewer box on you; holy rites and true names mark one extra.",
@@ -871,12 +836,7 @@
    "id": "skinchanger",
    "name": "Skinchanger",
    "tier": 2,
-   "adj": {
-    "Body": 1,
-    "Agility": 1,
-    "Intellect": -1,
-    "Presence": -1
-   },
+   "adj": {"Body": 1, "Agility": 1},
    "desc": "Beast-cursed: wolf, bear or great cat. You pass for human until fury or the moon lets the beast out.",
    "core": [
     "Cold iron: weapons of cold iron mark one extra box on you in beast form.",
@@ -940,12 +900,7 @@
    "id": "godblooded",
    "name": "Godblooded",
    "tier": 3,
-   "adj": {
-    "Presence": 1,
-    "Will": 1,
-    "Intellect": -1,
-    "Agility": -1
-   },
+   "adj": {"Presence": 1, "Will": 1},
    "desc": "Descended from a god who died when the Crown shattered. Miracles follow you, and so do those who want the god's last spark.",
    "core": [
     "Miracle: once per venture, the GM grants a small impossible thing: a door opens, a wound closes, a storm turns.",
@@ -992,11 +947,7 @@
    "id": "undying",
    "name": "Undying",
    "tier": 3,
-   "adj": {
-    "Will": 2,
-    "Body": -1,
-    "Presence": -1
-   },
+   "adj": {"Will": 2},
    "restricted": true,
    "desc": "A sorcerer who cheated death. Your heart no longer beats; your soul waits in a hidden phylactery.",
    "core": [
@@ -2026,13 +1977,7 @@
   "role": "Came south on a longship with nine brothers. She is the only one who came back from the Tomb of Ashes.",
   "reason": "Someone took everything from me. I mean to take it back, in blood.",
   "connection": "Mira Saltwind pulled her out of the sea after the longship burned; Kara owes her a life.",
-  "attrs": {
-   "Body": 13,
-   "Agility": 12,
-   "Intellect": 9,
-   "Presence": 11,
-   "Will": 11
-  },
+  "attrs": {"Body": 13, "Agility": 11, "Intellect": 10, "Presence": 11, "Will": 11},
   "skills": {
    "Melee": "S",
    "Athletics": "T",
@@ -2080,13 +2025,7 @@
    "role": "The best climber in the Gilded Cities, who stole a jewel from a sorcerer-prince and is only now learning it's a shard of the Crown.",
    "reason": "Gold, and plenty of it. Everything else follows.",
    "connection": "Cinder was paid to kill her and didn't. Neither of them has said why.",
-   "attrs": {
-    "Body": 11,
-    "Agility": 13,
-    "Intellect": 11,
-    "Presence": 12,
-    "Will": 9
-   },
+   "attrs": {"Body": 11, "Agility": 13, "Intellect": 11, "Presence": 11, "Will": 10},
    "skills": {
     "Thievery": "S",
     "Stealth": "T",
@@ -2128,13 +2067,7 @@
    "role": "Keeper of a drowned serpent temple's memory, searching the human kingdoms for its lost library.",
    "reason": "The old empire's secrets are out there. I will read them.",
    "connection": "Oren Sael shelters Ithrann at his shrine when no inn will take a serpent-kin.",
-   "attrs": {
-    "Body": 9,
-    "Agility": 12,
-    "Intellect": 13,
-    "Presence": 9,
-    "Will": 13
-   },
+   "attrs": {"Body": 10, "Agility": 11, "Intellect": 12, "Presence": 10, "Will": 13},
    "skills": {
     "Sorcery": "S",
     "Lore": "T",
@@ -2180,13 +2113,7 @@
    "role": "Run out of her village with stones and torches; sells cures and curses to whoever pays.",
    "reason": "Every day alive is a victory. I mean to have more of them.",
    "connection": "Gorrum carried her out of the burning village. He says he was just passing.",
-   "attrs": {
-    "Body": 9,
-    "Agility": 11,
-    "Intellect": 11,
-    "Presence": 11,
-    "Will": 13
-   },
+   "attrs": {"Body": 10, "Agility": 10, "Intellect": 11, "Presence": 11, "Will": 13},
    "skills": {
     "Sorcery": "S",
     "Healing": "T",
@@ -2232,13 +2159,7 @@
    "role": "Twenty years with the Iron Company, a wheel-lock pistol he calls Thunder, and a soft spot for strays.",
    "reason": "I did terrible things. I mean to balance the scales.",
    "connection": "Nyx is the stray he carried out of the fire. He'd die before he'd say he cares.",
-   "attrs": {
-    "Body": 15,
-    "Agility": 10,
-    "Intellect": 9,
-    "Presence": 10,
-    "Will": 11
-   },
+   "attrs": {"Body": 15, "Agility": 10, "Intellect": 10, "Presence": 10, "Will": 10},
    "skills": {
     "Melee": "S",
     "Marksmanship": "T",
@@ -2347,13 +2268,7 @@
    "role": "Made by the Ash Guild into its best knife; ran the night they ordered a child's death.",
    "reason": "No master, no chains, no one to answer to.",
    "connection": "Vessa Thorn was their last contract. They let her live and have been running ever since.",
-   "attrs": {
-    "Body": 12,
-    "Agility": 13,
-    "Intellect": 11,
-    "Presence": 9,
-    "Will": 11
-   },
+   "attrs": {"Body": 11, "Agility": 13, "Intellect": 11, "Presence": 10, "Will": 11},
    "skills": {
     "Stealth": "S",
     "Melee": "T",

@@ -662,4 +662,4 @@ Some of them (Steel Hawk, Vanguard, Zephyr) can be enemies or uneasy allies, as 
 
 <!-- SECTION:customorigin -->
 
-**Engineered Bloodline (tier 2).** Descended from a Foundation breeding program that ran from 1952 to 1971; your powers were designed, generations ago. *Adjustments:* Intellect +1, Presence −1. *Core rule:* your powers are documented in a Foundation file you've never seen; the GM may use it. *Origin advantage:* **Designed**: +2 to Powers with your Class II power. *Companion:* **Lineage**: other descendants exist, and some of them work for the Foundation; accept the encounter. *Powers:* one at Class II, two at Class I.
+**Engineered Bloodline (tier 2).** Descended from a Foundation breeding program that ran from 1952 to 1971; your powers were designed, generations ago. *Adjustments:* Intellect +1. *Core rule:* your powers are documented in a Foundation file you've never seen; the GM may use it. *Origin advantage:* **Designed**: +2 to Powers with your Class II power. *Companion:* **Lineage**: other descendants exist, and some of them work for the Foundation; accept the encounter. *Powers:* one at Class II, two at Class I.

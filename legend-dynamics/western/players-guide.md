@@ -66,28 +66,30 @@ Choose how your character trained (see Step 3):
 | Presence | Leadership, persuasion, social influence |
 | Will | Resolve, concentration, resisting fear and influence |
 
+**Ordinary people.** An ordinary adult has **10** in every attribute: Dodge 8, Move 5 yards, and 6 in anything they've never learned. A trade or a lifelong habit makes a skill Trained (11), and a real professional's work is a Specialty (13). A fit, trained guard or soldier might have Agility and Body 12 and move 8 yards. Nobody starts below 10: an attribute drops under it only for a reason in play, such as an injury, a curse or a form that changes the body.
+
 ### Origin and tier
 
-Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin adjusts some of them; the result is your **base**. Adjustments always total zero.
+Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin may raise some of them; the result is your **base**. No origin lowers an attribute below 10. Its bonuses come out of the points you spend next, so every origin starts with the same total.
 
 Origins can differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between origin power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
 
 | Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
-| City-bred | 0 | 3 | Body −1, Intellect +1 |
-| Drifter | 0 | 3 | Agility +1, Will −1 |
-| Frontier-born | 0 | 3 | Body +1, Intellect −1 |
-| Immigrant | 0 | 3 | Presence −1, Will +1 |
-| Old Money | 0 | 3 | Body −1, Presence +1 |
-| Railroad Hand | 0 | 3 | Body +1, Presence −1 |
-| War Veteran | 0 | 3 | Presence −1, Will +1 |
-| Sighted | 1 | 2 | Presence −1, Will +1 |
-| Dhampir | 2 | 1 | Body −1, Agility +1, Presence +1, Will −1 |
-| Practitioner | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
-| Revenant | 2 | 1 | Body +1, Presence −2, Will +1 |
-| Werewolf | 2 | 1 | Body +1, Agility +1, Intellect −1, Will −1 |
-| Pact-Bound | 3 | 0 | Body −2, Agility −1, Presence +1, Will +2 |
-| Vampire (horror) | 3 | 0 | Body −1, Agility +1, Presence +2, Will −2 |
+| City-bred | 0 | 3 | Intellect +1 |
+| Drifter | 0 | 3 | Agility +1 |
+| Frontier-born | 0 | 3 | Body +1 |
+| Immigrant | 0 | 3 | Will +1 |
+| Old Money | 0 | 3 | Presence +1 |
+| Railroad Hand | 0 | 3 | Body +1 |
+| War Veteran | 0 | 3 | Will +1 |
+| Sighted | 1 | 2 | Will +1 |
+| Dhampir | 2 | 1 | Agility +1, Presence +1 |
+| Practitioner | 2 | 1 | Intellect +1, Will +1 |
+| Revenant | 2 | 1 | Body +1, Will +1 |
+| Werewolf | 2 | 1 | Body +1, Agility +1 |
+| Pact-Bound | 3 | 0 | Presence +1, Will +2 |
+| Vampire (horror) | 3 | 0 | Agility +1, Presence +2 |
 
 ### Edges
 
@@ -107,7 +109,7 @@ Spend all your Edges. Each one buys:
 
 ### Spending points
 
-After applying your origin, distribute **five additional points** among the attributes, plus one for each attribute Edge.
+Distribute **five points** among the attributes, plus one for each attribute Edge, less your origin's bonuses: with Will +1, you have four to spend.
 
 - The starting maximum is **13**, plus any origin bonus to that attribute.
 - You cannot lower an attribute below its base to gain points.
@@ -189,11 +191,11 @@ Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained,
 
 ## Example character
 
-City-bred (tier 0, 3 Edges): +1 attribute point, Extra Trained skill, A friend. Body 9, Agility 11, Intellect 14, Presence 11, Will 11.
+City-bred (tier 0, 3 Edges): +1 attribute point, Extra Trained skill, A friend. Body 10, Agility 10, Intellect 14, Presence 11, Will 11.
 
 - **Specialty:** Investigation 17.
-- **Trained:** Gambling 15, Law 15, Medicine 15, Read People 15, Survival 15, Tracking 15, Deception 12, Persuasion 12, Riding 12, Shooting 12.
-- **Dodge:** 9.
+- **Trained:** Gambling 15, Law 15, Medicine 15, Read People 15, Survival 15, Tracking 15, Deception 12, Persuasion 12, Riding 11, Shooting 11.
+- **Dodge:** 8.
 - **Edges:** a friend: a clerk in the Pinkertons' regional office who'll pull a file, quietly.
 - **Advantage:** Pinkerton Credentials. **Complication:** Cannot Leave a Mystery Alone; trigger: a strange track or body no one can explain.
 
@@ -947,8 +949,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Deputy U.S. Marshal, Lawman. Sighted (tier 1).* Wears the badge in three counties, and sees what's under the faces of the men she arrests.
 
-- **Attributes:** Body 12, Agility 13, Intellect 10, Presence 9, Will 11. **Dodge** 12.
-- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Riding 14, Athletics 13, Law 11, Occult 11, Read People 11, Survival 11, Tracking 11, Leadership 10.
+- **Attributes:** Body 11, Agility 13, Intellect 10, Presence 10, Will 11. **Dodge** 12.
+- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Riding 14, Athletics 12, Law 11, Leadership 11, Occult 11, Read People 11, Survival 11, Tracking 11.
 - **Edges:** Second advantage, Extra Grit; second advantage: Badge: Deputy U.S. Marshal.
 - **Advantage:** Monster's Eye (origin; companion: Haunted). **Complication:** Law and Order; trigger: the town wants a hanging without a trial.
 - **Why I face the dark:** I took an oath, and I keep my word. **Connection:** Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.
@@ -957,8 +959,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Town physician, Doctor. City-bred (tier 0).* Left a Philadelphia practice for reasons he won't discuss, and patches up whoever comes through the door.
 
-- **Attributes:** Body 9, Agility 10, Intellect 13, Presence 12, Will 11. **Dodge** 8.
-- **Skills:** Medicine 16 (Specialty). Trained: Gambling 14, Investigation 14, Law 14, Read People 14, Survival 14, Tinkering 14, Leadership 13, Persuasion 13, Riding 11.
+- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 11, Will 11. **Dodge** 8.
+- **Skills:** Medicine 16 (Specialty). Trained: Gambling 14, Investigation 14, Law 14, Read People 14, Survival 14, Tinkering 14, Leadership 12, Persuasion 12, Riding 11.
 - **Edges:** Second advantage, A fine weapon or tool, A friend; second advantage: Battlefield Surgeon; a friend: the editor of the territorial newspaper, who owes him a life; a fine tool: his surgeon's instruments (+2 to Medicine for field treatment of a wound: stitching, dressing, setting a bone).
 - **Advantage:** Steady Hands. **Complication:** The Bottle; trigger: pain that won't quit.
 - **Why I face the dark:** Nobody out here knows what I did back east. **Connection:** Reverend Stone is the only one who knows why he left Philadelphia.
@@ -967,8 +969,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Horse breaker, Wrangler. Werewolf (tier 2).* Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon.
 
-- **Attributes:** Body 13, Agility 13, Intellect 9, Presence 11, Will 9. **Dodge** 12. **In monstrous form:** Body 15, Agility 14, Dodge 13.
-- **Skills:** Riding 16 (Specialty). Trained: Athletics 14, Brawling 14, Melee 14, Shooting 14, Stealth 14, Animal Handling 12, Gambling 10, Survival 10, Tinkering 10, Tracking 10.
+- **Attributes:** Body 11, Agility 13, Intellect 10, Presence 11, Will 10. **Dodge** 12. **In monstrous form:** Body 13, Agility 14, Dodge 13.
+- **Skills:** Riding 16 (Specialty). Trained: Brawling 14, Melee 14, Shooting 14, Stealth 14, Animal Handling 12, Athletics 12, Gambling 11, Survival 11, Tinkering 11, Tracking 11.
 - **Edges:** Extra Trained skill.
 - **Advantage:** Wolf's Nose (origin; companion: The Hunger). **Complication:** Short Fuse; trigger: someone insults you or yours.
 - **Why I face the dark:** Everything I do is for my family. **Connection:** Plays cards with Lucinda Marsh every Saturday, and loses.
@@ -977,8 +979,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Professional gambler, Gambler. Practitioner (tier 2); Old hand.* Deals faro by night and reads the cards for anyone who'll pay, and the cards are never wrong.
 
-- **Attributes:** Body 9, Agility 10, Intellect 13, Presence 12, Will 11. **Dodge** 8.
-- **Skills:** Gambling 18 (Expert). Trained: Investigation 14, Occult 14, Read People 14, Deception 13, Persuasion 13, Riding 11, Stealth 11.
+- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 11, Will 11. **Dodge** 8.
+- **Skills:** Gambling 18 (Expert). Trained: Investigation 14, Occult 14, Read People 14, Deception 12, Persuasion 12, Riding 11, Stealth 11.
 - **Edges:** A friend; a friend: Mae Lin, a faro dealer who hears everything said at her table.
 - **Advantage:** Cunning Folk (origin; companion: Old Superstitions). **Complication:** Owes the Wrong People; trigger: a collector arrives.
 - **Why I face the dark:** There's money out here for anyone with nerve enough to take it. **Connection:** Owes Ruth Calloway a favor for a warrant that went missing.
@@ -987,8 +989,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Bounty hunter, Bounty Hunter. Revenant (tier 2).* Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them.
 
-- **Attributes:** Body 12, Agility 13, Intellect 11, Presence 8, Will 11. **Dodge** 12.
-- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Melee 14, Riding 14, Stealth 14, Athletics 13, Investigation 12, Read People 12, Survival 12, Tracking 12.
+- **Attributes:** Body 11, Agility 13, Intellect 10, Presence 10, Will 11. **Dodge** 12.
+- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Melee 14, Riding 14, Stealth 14, Athletics 12, Investigation 11, Read People 11, Survival 11, Tracking 11.
 - **Edges:** A fine weapon or tool; a fine tool: a Sharps rifle with a telescopic sight (+2 to Shooting for aimed shots at Long range or farther).
 - **Advantage:** Unfeeling (origin; companion: Unfinished Business). **Complication:** Code of the West; trigger: the easy shot is in someone's back.
 - **Why I face the dark:** Someone did me wrong, and I mean to settle it. **Connection:** Taught Tom Feeney to shoot straight, and still reminds him of it.
@@ -997,8 +999,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Circuit preacher, Preacher. Old Money (tier 0).* Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across his knees.
 
-- **Attributes:** Body 9, Agility 10, Intellect 11, Presence 14, Will 12. **Dodge** 9.
-- **Skills:** Persuasion 17 (Specialty). Trained: Leadership 15, Investigation 12, Law 12, Medicine 12, Read People 12, Survival 12, Riding 11, Shooting 11, Athletics 10.
+- **Attributes:** Body 10, Agility 10, Intellect 11, Presence 14, Will 11. **Dodge** 9.
+- **Skills:** Persuasion 17 (Specialty). Trained: Leadership 15, Investigation 12, Law 12, Medicine 12, Read People 12, Survival 12, Athletics 11, Riding 11, Shooting 11.
 - **Edges:** +1 attribute point, Second advantage, A friend; second advantage: Unshakable Courage; a friend: Bishop Harrow, who answers his letters and asks no questions.
 - **Advantage:** Hellfire Preacher. **Complication:** Protects Others at Personal Risk; trigger: townsfolk are caught in the crossfire.
 - **Why I face the dark:** The Lord sent me here for a reason, and I believe this is it. **Connection:** Keeps Dr. Webb's secret, and his whiskey hidden.
@@ -1039,20 +1041,20 @@ Choose one advantage at character creation: a general advantage from this chapte
 
 | Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
-| City-bred | 0 | 3 | Body −1, Intellect +1 |
-| Drifter | 0 | 3 | Agility +1, Will −1 |
-| Frontier-born | 0 | 3 | Body +1, Intellect −1 |
-| Immigrant | 0 | 3 | Presence −1, Will +1 |
-| Old Money | 0 | 3 | Body −1, Presence +1 |
-| Railroad Hand | 0 | 3 | Body +1, Presence −1 |
-| War Veteran | 0 | 3 | Presence −1, Will +1 |
-| Sighted | 1 | 2 | Presence −1, Will +1 |
-| Dhampir | 2 | 1 | Body −1, Agility +1, Presence +1, Will −1 |
-| Practitioner | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
-| Revenant | 2 | 1 | Body +1, Presence −2, Will +1 |
-| Werewolf | 2 | 1 | Body +1, Agility +1, Intellect −1, Will −1 |
-| Pact-Bound | 3 | 0 | Body −2, Agility −1, Presence +1, Will +2 |
-| Vampire (horror) | 3 | 0 | Body −1, Agility +1, Presence +2, Will −2 |
+| City-bred | 0 | 3 | Intellect +1 |
+| Drifter | 0 | 3 | Agility +1 |
+| Frontier-born | 0 | 3 | Body +1 |
+| Immigrant | 0 | 3 | Will +1 |
+| Old Money | 0 | 3 | Presence +1 |
+| Railroad Hand | 0 | 3 | Body +1 |
+| War Veteran | 0 | 3 | Will +1 |
+| Sighted | 1 | 2 | Will +1 |
+| Dhampir | 2 | 1 | Agility +1, Presence +1 |
+| Practitioner | 2 | 1 | Intellect +1, Will +1 |
+| Revenant | 2 | 1 | Body +1, Will +1 |
+| Werewolf | 2 | 1 | Body +1, Agility +1 |
+| Pact-Bound | 3 | 0 | Presence +1, Will +2 |
+| Vampire (horror) | 3 | 0 | Agility +1, Presence +2 |
 
 ## Shared rules
 
@@ -1065,7 +1067,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 
 ## City-bred
 
-*Tier 0 · 3 Edges · Body −1, Intellect +1*
+*Tier 0 · 3 Edges · Intellect +1*
 
 Schooled back east or in a western city: you read, you write, you know how the world runs on money and paper. The frontier is still learning you.
 
@@ -1078,7 +1080,7 @@ Schooled back east or in a western city: you read, you write, you know how the w
 
 ## Drifter
 
-*Tier 0 · 3 Edges · Agility +1, Will −1*
+*Tier 0 · 3 Edges · Agility +1*
 
 No home, no ties, no questions: you've drifted from town to town for years and learned to read a room on the way in.
 
@@ -1091,7 +1093,7 @@ No home, no ties, no questions: you've drifted from town to town for years and l
 
 ## Frontier-born
 
-*Tier 0 · 3 Edges · Body +1, Intellect −1*
+*Tier 0 · 3 Edges · Body +1*
 
 Raised on a homestead or a ranch, a long way from schools and doctors. Tough, practical, and at home in hard country.
 
@@ -1104,7 +1106,7 @@ Raised on a homestead or a ranch, a long way from schools and doctors. Tough, pr
 
 ## Immigrant
 
-*Tier 0 · 3 Edges · Presence −1, Will +1*
+*Tier 0 · 3 Edges · Will +1*
 
 You crossed an ocean to get here, from Ireland, China, Germany, Italy, Mexico or anywhere else, and you've had to work twice as hard to be treated half as well.
 
@@ -1117,7 +1119,7 @@ You crossed an ocean to get here, from Ireland, China, Germany, Italy, Mexico or
 
 ## Old Money
 
-*Tier 0 · 3 Edges · Body −1, Presence +1*
+*Tier 0 · 3 Edges · Presence +1*
 
 Your family has money, land or a name that opens doors. Out here it buys less than it used to, but it still buys plenty.
 
@@ -1130,7 +1132,7 @@ Your family has money, land or a name that opens doors. Out here it buys less th
 
 ## Railroad Hand
 
-*Tier 0 · 3 Edges · Body +1, Presence −1*
+*Tier 0 · 3 Edges · Body +1*
 
 You laid track, drove spikes, fired the engines or blew the tunnels. You know machines, explosives, and how the railroad treats its men.
 
@@ -1143,7 +1145,7 @@ You laid track, drove spikes, fired the engines or blew the tunnels. You know ma
 
 ## War Veteran
 
-*Tier 0 · 3 Edges · Presence −1, Will +1*
+*Tier 0 · 3 Edges · Will +1*
 
 You fought in the war, blue or gray, and came west with what was left of you. You know how to take orders, give them, and keep your head under fire.
 
@@ -1156,7 +1158,7 @@ You fought in the war, blue or gray, and came west with what was left of you. Yo
 
 ## Sighted
 
-*Tier 1 · 2 Edges · Presence −1, Will +1*
+*Tier 1 · 2 Edges · Will +1*
 
 Born with the second sight. You see ghosts, the true faces of monsters wearing human ones, and magic at work. Most people think you strange; monsters think you dangerous.
 
@@ -1173,7 +1175,7 @@ Born with the second sight. You see ghosts, the true faces of monsters wearing h
 
 ## Dhampir
 
-*Tier 2 · 1 Edge · Body −1, Agility +1, Presence +1, Will −1*
+*Tier 2 · 1 Edge · Agility +1, Presence +1*
 
 Child of a vampire and a living mother. You walk in daylight, you heal fast, and the undead fear you, and want you.
 
@@ -1192,7 +1194,7 @@ Child of a vampire and a living mother. You walk in daylight, you heal fast, and
 
 ## Practitioner
 
-*Tier 2 · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
+*Tier 2 · 1 Edge · Intellect +1, Will +1*
 
 A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German Braucherei, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.
 
@@ -1217,7 +1219,7 @@ A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania G
 
 ## Revenant
 
-*Tier 2 · 1 Edge · Body +1, Presence −2, Will +1*
+*Tier 2 · 1 Edge · Body +1, Will +1*
 
 You died, and came back for unfinished business. Your heart doesn't beat, your skin is cold, and you won't rest until it's done.
 
@@ -1236,7 +1238,7 @@ You died, and came back for unfinished business. Your heart doesn't beat, your s
 
 ## Werewolf
 
-*Tier 2 · 1 Edge · Body +1, Agility +1, Intellect −1, Will −1*
+*Tier 2 · 1 Edge · Body +1, Agility +1*
 
 Cursed with the wolf. By day you pass for anyone; under the full moon, or in fury, the beast takes you.
 
@@ -1257,7 +1259,7 @@ Cursed with the wolf. By day you pass for anyone; under the full moon, or in fur
 
 ## Pact-Bound
 
-*Tier 3 · 0 Edges · Body −2, Agility −1, Presence +1, Will +2*
+*Tier 3 · 0 Edges · Presence +1, Will +2*
 
 You made a bargain with something from below. It gave you power, and it will collect.
 
@@ -1276,7 +1278,7 @@ You made a bargain with something from below. It gave you power, and it will col
 
 ## Vampire
 
-*Tier 3 · 0 Edges · Body −1, Agility +1, Presence +2, Will −2 · horror*
+*Tier 3 · 0 Edges · Agility +1, Presence +2 · horror*
 
 Undead, ageless and beautiful, with a thirst that never ends. You walk at night and remember centuries. Horror campaigns only.
 
@@ -1334,7 +1336,7 @@ When in doubt, choose the higher tier.
 
 ### 3. Attribute adjustments
 
-Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most origins change two to four attributes.
+Give bonuses from **0 to +2** per attribute, **+3 at most in all**. A bonus raises the attribute's base (+1 starts it at 11) and its starting maximum (13 plus the bonus), and comes out of the character's five attribute points, so a bigger bonus means fewer points to spend. Most origins raise one or two attributes. Nothing lowers an attribute: a people's weakness belongs in its core rules or its complications (a sun that burns, a body that tires in normal gravity), not in a number below 10.
 
 An origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
@@ -1353,13 +1355,13 @@ If the origin changes shape, give the form attribute bonuses (usually +2 to one 
 ### In the creator
 
 1. In step 2, choose **Custom origin…** at the end of the Origin list.
-2. Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.
+2. Name it, choose the tier you agreed, and set its bonuses. The checklist confirms they stay within +3, and the points left to spend go down by them.
 3. Write its core rules in **Other ability (GM approval required)** in step 4.
 4. In step 4, choose **Custom origin advantage…** and enter the advantage and its companion complication.
 
 ### Example
 
-**Ghost-touched (tier 1).** You died once, for a minute, and came back with something following you. *Adjustments:* Will +1, Body −1. *Core rule:* the dead notice you: you can sense a ghost nearby, but ghosts can sense you too. *Origin advantage:* **Speaks with the Dead**: +2 to Occult to call up and question a ghost. *Companion:* **Cold Company**: something from the other side follows you; when it matters, accept the chill, the stopped clock or the panicked horse.
+**Ghost-touched (tier 1).** You died once, for a minute, and came back with something following you. *Adjustments:* Will +1. *Core rule:* the dead notice you: you can sense a ghost nearby, but ghosts can sense you too. *Origin advantage:* **Speaks with the Dead**: +2 to Occult to call up and question a ghost. *Companion:* **Cold Company**: something from the other side follows you; when it matters, accept the chill, the stopped clock or the panicked horse.
 
 ## Threats, weapons and Edges for your table
 
@@ -1411,7 +1413,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
 
-**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, raised by any origin bonus, then 5 points less those bonuses; none below 10; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.
 

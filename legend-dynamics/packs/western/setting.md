@@ -304,4 +304,4 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 
 <!-- SECTION:customorigin -->
 
-**Ghost-touched (tier 1).** You died once, for a minute, and came back with something following you. *Adjustments:* Will +1, Body −1. *Core rule:* the dead notice you: you can sense a ghost nearby, but ghosts can sense you too. *Origin advantage:* **Speaks with the Dead**: +2 to Occult to call up and question a ghost. *Companion:* **Cold Company**: something from the other side follows you; when it matters, accept the chill, the stopped clock or the panicked horse.
+**Ghost-touched (tier 1).** You died once, for a minute, and came back with something following you. *Adjustments:* Will +1. *Core rule:* the dead notice you: you can sense a ghost nearby, but ghosts can sense you too. *Origin advantage:* **Speaks with the Dead**: +2 to Occult to call up and question a ghost. *Companion:* **Cold Company**: something from the other side follows you; when it matters, accept the chill, the stopped clock or the panicked horse.

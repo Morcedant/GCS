@@ -590,12 +590,7 @@
    "id": "ambrosia",
    "name": "Ambrosia",
    "tier": 3,
-   "adj": {
-    "Body": 1,
-    "Presence": 1,
-    "Intellect": -1,
-    "Agility": -1
-   },
+   "adj": {"Body": 1, "Presence": 1},
    "desc": "Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power. Rare, coveted and hunted; DIRE and the Foundation have both tried to make more.",
    "core": [
     "Idealized: you age a year for every ten.",
@@ -643,10 +638,7 @@
    "id": "labmade",
    "name": "Lab-made",
    "tier": 2,
-   "adj": {
-    "Body": 1,
-    "Presence": -1
-   },
+   "adj": {"Body": 1},
    "desc": "Made in a Foundation black lab, a DIRE program or somewhere worse. The powers are strong and unstable, the memories are patchy, and someone still has your file and wants their property back.",
    "core": [
     "Unstable: on a natural 17 or 18 with Powers, mark a box of Strain as well.",
@@ -693,10 +685,7 @@
    "id": "bonded",
    "name": "Bonded",
    "tier": 2,
-   "adj": {
-    "Will": 1,
-    "Presence": -1
-   },
+   "adj": {"Will": 1},
    "desc": "Joined to something else: an artifact, a spirit, a god or an entity from beyond. It shares its power, and sometimes its mind. Michael Lance's amulet, Uathach's litany, the Ice Reaper and the Atomic Man are all bonds.",
    "core": [
     "Choose the bond: an artifact you carry, or a spirit or entity that shares your body.",
@@ -744,10 +733,7 @@
    "id": "adept",
    "name": "Adept",
    "tier": 1,
-   "adj": {
-    "Intellect": 1,
-    "Body": -1
-   },
+   "adj": {"Intellect": 1},
    "desc": "A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.",
    "core": [
     "Mystic powers: your own powers come from the mystic list (Cantrips, Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).",
@@ -812,12 +798,7 @@
    "id": "mythic",
    "name": "Mythic",
    "tier": 3,
-   "adj": {
-    "Body": 1,
-    "Will": 1,
-    "Intellect": -1,
-    "Presence": -1
-   },
+   "adj": {"Body": 1, "Will": 1},
    "desc": "An ancient curse, blessing or bloodline: immortals, werewolves, the children of gods, warriors cursed by Jupiter. Mythic Operants are the oldest kind, and the hardest to classify.",
    "core": [
     "GM's approval: every power a Mythic character takes, Immortality included, is agreed with the GM.",
@@ -866,10 +847,7 @@
    "id": "otherworlder",
    "name": "Otherworlder",
    "tier": 2,
-   "adj": {
-    "Agility": 1,
-    "Will": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's. Under the Extraordinary Powers Act you aren't a person at all, which makes you hard to register and easy to disappear.",
    "core": [
     "Not a person under the Act: you can't register; you're Non-registered unless ExLAW makes you a deal.",
@@ -916,10 +894,7 @@
    "id": "touched",
    "name": "Touched",
    "tier": 2,
-   "adj": {
-    "Will": 1,
-    "Intellect": -1
-   },
+   "adj": {"Will": 1},
    "desc": "Changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky. Touched powers are strange, hard to classify and harder to control; the EMD files them under 'Other'.",
    "core": [
     "Unclassifiable: the EMD can't tell what you are, and neither can you; the GM may give a power an odd limit or an odd extra.",
@@ -966,10 +941,7 @@
    "id": "defector",
    "name": "Shadow Earth Defector",
    "tier": 2,
-   "adj": {
-    "Agility": 1,
-    "Presence": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "A duplicate from Shadow Earth, the dark reflection of our world, who turned on its rulers and stayed. Somewhere on this Earth lives your original, who may not know you exist; Shadow Earth wants you back, and everyone else wants to know whose side you're on.",
    "core": [
     "Your original: you are a copy of a real person on this Earth (agreed with the GM), and you share their face and their early memories.",
@@ -3118,13 +3090,7 @@
    "role": "Carries a jade seal that holds a guardian spirit, inherited from her grandmother. Her partner vanished on a case Director Humbacht closed personally.",
    "reason": "The law should mean something, for Operants and everyone else.",
    "connection": "Jess Calloway is the only reporter who asked about her missing partner. Kwan hasn't decided whether to trust her.",
-   "attrs": {
-    "Body": 10,
-    "Agility": 10,
-    "Intellect": 13,
-    "Presence": 9,
-    "Will": 13
-   },
+   "attrs": {"Body": 10, "Agility": 10, "Intellect": 13, "Presence": 10, "Will": 12},
    "skills": {
     "Investigation": "S",
     "Law": "T",
@@ -3245,13 +3211,7 @@
    "role": "The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets.",
    "reason": "The cameras love an Operant, and I love the cameras.",
    "connection": "Subject 19 saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.",
-   "attrs": {
-    "Body": 13,
-    "Agility": 9,
-    "Intellect": 9,
-    "Presence": 14,
-    "Will": 10
-   },
+   "attrs": {"Body": 11, "Agility": 10, "Intellect": 10, "Presence": 14, "Will": 10},
    "skills": {
     "Media": "S",
     "Leadership": "T",
@@ -3305,13 +3265,7 @@
    "role": "A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.",
    "reason": "Someone has to stand between ordinary people and what's out there.",
    "connection": "He taught Maeve Ashgrove's handler, and was the one who recognized what Maeve really is.",
-   "attrs": {
-    "Body": 9,
-    "Agility": 10,
-    "Intellect": 14,
-    "Presence": 10,
-    "Will": 13
-   },
+   "attrs": {"Body": 10, "Agility": 10, "Intellect": 13, "Presence": 10, "Will": 13},
    "skills": {
     "Powers": "S",
     "Occult": "T",
@@ -3423,13 +3377,7 @@
    "role": "Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.",
    "reason": "No lab, no registry and no government owns me.",
    "connection": "Saved Daybreak from a Foundation snatch team on live TV, and ran before the cameras turned.",
-   "attrs": {
-    "Body": 12,
-    "Agility": 13,
-    "Intellect": 11,
-    "Presence": 9,
-    "Will": 10
-   },
+   "attrs": {"Body": 12, "Agility": 12, "Intellect": 11, "Presence": 10, "Will": 10},
    "skills": {
     "Powers": "S",
     "Stealth": "T",
@@ -3482,13 +3430,7 @@
    "role": "A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from.",
    "reason": "No lab, no registry and no government owns me.",
    "connection": "Dr. Tobias Wren saw through her glamour the first day. He's kept her secret; she wonders what it'll cost.",
-   "attrs": {
-    "Body": 10,
-    "Agility": 14,
-    "Intellect": 11,
-    "Presence": 11,
-    "Will": 9
-   },
+   "attrs": {"Body": 10, "Agility": 14, "Intellect": 10, "Presence": 11, "Will": 10},
    "skills": {
     "Stealth": "S",
     "Athletics": "T",

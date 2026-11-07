@@ -570,11 +570,7 @@
    "id": "tessan",
    "name": "Tessan",
    "tier": 1,
-   "adj": {
-    "Body": 1,
-    "Will": 1,
-    "Agility": -2
-   },
+   "adj": {"Body": 1, "Will": 1},
    "desc": "Large, scaled, exceptionally long-lived beings for whom contractual obligation is the foundation of civilization. Tessan dynasties lend, insure and arbitrate across hundreds of worlds; contact with humanity has split them between traditional creditors and reformers.",
    "core": [
     "Long-lived: a Tessan remembers deals made before most humans' grandparents were born.",
@@ -621,11 +617,7 @@
    "id": "kel",
    "name": "Kel",
    "tier": 1,
-   "adj": {
-    "Intellect": 1,
-    "Will": 1,
-    "Presence": -2
-   },
+   "adj": {"Intellect": 1, "Will": 1},
    "desc": "Chitin-plated social beings raised in immense hive-cities, analytical and cooperative. The Kel homeworld is burdened by inherited Tessan debt; their search for new markets triggered humanity's First Contact Crisis. Kel society is split between loyalists, reformers and radicals.",
    "core": [
     "Hive-raised: after a day alone, −1 to all rolls until back among others.",
@@ -672,10 +664,7 @@
    "id": "mirrun",
    "name": "Mirrun",
    "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Body": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "Smooth-skinned amphibians from a deep-ocean world, agile swimmers famous for their humor. Their skin detects minute pressure changes; Mirrun researchers lead the field in gravimetric resonance detection.",
    "core": [
     "Amphibious: breathe water and swim at running speed; your skin must stay moist (−1 to all rolls after a day dry)."
@@ -721,11 +710,7 @@
    "id": "ylith",
    "name": "Ylith",
    "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Intellect": 1,
-    "Body": -2
-   },
+   "adj": {"Agility": 1, "Intellect": 1},
    "desc": "Hollow-boned, feathered gliders with broad wing-membranes and extraordinary vision. Their aerial city-states are renowned for navigation and cartography; confined spaces are profoundly uncomfortable for them.",
    "core": [
     "Glide: in normal gravity, glide down any height safely.",
@@ -772,12 +757,7 @@
    "id": "ozhvek",
    "name": "Ozhvek",
    "tier": 2,
-   "adj": {
-    "Body": 2,
-    "Will": 1,
-    "Agility": -2,
-    "Presence": -1
-   },
+   "adj": {"Body": 2, "Will": 1},
    "desc": "Massive, radially symmetrical founders of the Hegemony, on six powerful limbs, with sensory clusters all around their upper bodies and lifespans near five centuries. Their ancient houses are divided over what the empire should become.",
    "core": [
     "All-around senses: you can't be surprised from behind.",
@@ -824,11 +804,7 @@
    "id": "dresh",
    "name": "Dresh",
    "tier": 2,
-   "adj": {
-    "Body": 2,
-    "Agility": -1,
-    "Intellect": -1
-   },
+   "adj": {"Body": 2},
    "desc": "Dense, four-armed soldiers from a high-gravity world, armored in thick hide. Dresh legions were the Hegemony's ground forces for millennia; now their protectorates argue whether soldiers owe the throne, their commanders, or the people they protect.",
    "core": [
     "Four arms: hold a weapon and still climb, carry or work.",
@@ -876,11 +852,7 @@
    "id": "shivar",
    "name": "Shivar",
    "tier": 1,
-   "adj": {
-    "Will": 1,
-    "Intellect": 1,
-    "Body": -2
-   },
+   "adj": {"Will": 1, "Intellect": 1},
    "desc": "Tall, narrow beings of translucent tissue whose nervous systems share emotions in synchronized pulses. Their theology reads the corridors as cosmic order; their schism, between imperial zealots and moderates who see a universe of change, has fueled wars inside the Hegemony.",
    "core": [
     "Empath: you share emotions instantly with nearby Shivar, and feel the strong emotions of anyone close by. (Empathy, not psionics.)"
@@ -926,12 +898,7 @@
    "id": "brulvek",
    "name": "Brulvek",
    "tier": 1,
-   "adj": {
-    "Body": 1,
-    "Will": 1,
-    "Agility": -1,
-    "Presence": -1
-   },
+   "adj": {"Body": 1, "Will": 1},
    "desc": "Low, broad hexapods with powerful manipulator limbs and thick insulating hides, evolved among volcanoes and corrosive air. They built the Hegemony's shipyards; their engineers are sought everywhere for restoring machines centuries past replacement parts.",
    "core": [
     "Furnace hide: heat, smoke and corrosive air mark one fewer box and don't impair you."
@@ -977,12 +944,7 @@
    "id": "zhaq",
    "name": "Zhaq",
    "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Will": 1,
-    "Body": -1,
-    "Presence": -1
-   },
+   "adj": {"Agility": 1, "Will": 1},
    "desc": "Flexible, tripedal beings with segmented limbs and three independently focusing eyes. Isolated for six centuries by a corridor collapse, the Zhaq built free republics, and refused when the Hegemony came back. Their resistance inspires separatists everywhere.",
    "core": [
     "Three eyes: watch several directions at once.",
@@ -1029,11 +991,7 @@
    "id": "veyari",
    "name": "Veyari",
    "tier": 1,
-   "adj": {
-    "Intellect": 2,
-    "Body": -1,
-    "Agility": -1
-   },
+   "adj": {"Intellect": 2},
    "desc": "Small bipedal scholars with long, delicate fingers, soft scales and brains built for associative memory. Their neutral archives hold lost corridor data and ancient claims, which is why empires, corporations and zealots keep trying to seize them.",
    "core": [
     "Associative memory: recall anything you have experienced in detail."
@@ -1079,12 +1037,7 @@
    "id": "eshuum",
    "name": "Eshuum",
    "tier": 2,
-   "adj": {
-    "Intellect": 1,
-    "Will": 1,
-    "Body": -1,
-    "Presence": -1
-   },
+   "adj": {"Intellect": 1, "Will": 1},
    "desc": "Colonial organisms: an Eshuum person is a community of semi-independent biological units joined into one mind. They govern by consensus, and oppose forced separation and experiments on intelligent beings.",
    "core": [
     "Detachable units: send a small unit to scout a short distance; it reports what it senses.",
@@ -1131,12 +1084,7 @@
    "id": "khaum",
    "name": "Khaum",
    "tier": 2,
-   "adj": {
-    "Body": 2,
-    "Will": 1,
-    "Agility": -2,
-    "Presence": -1
-   },
+   "adj": {"Body": 2, "Will": 1},
    "desc": "Massive, eyeless burrowers with sensory whiskers and powerful digging limbs, whose cavern nations run for hundreds of kilometers underground. Cautious and long-planning, they have sheltered refugees from many Hegemony campaigns.",
    "core": [
     "Eyeless: perceive by pressure and vibration; darkness means nothing, but you can't read screens or print without aids.",
@@ -1184,11 +1132,7 @@
    "id": "vael",
    "name": "Vael",
    "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Intellect": 1,
-    "Body": -2
-   },
+   "adj": {"Agility": 1, "Intellect": 1},
    "desc": "Long, light-boned beings with four manipulator limbs, born in low gravity. Their homeworld died in an ancient stellar catastrophe; their living fleets now roam the corridors trading, repairing and carrying peoples between systems.",
    "core": [
     "Zero-g native: no penalty in zero gravity.",
@@ -1235,12 +1179,7 @@
    "id": "thrum",
    "name": "Thrum",
    "tier": 1,
-   "adj": {
-    "Presence": 1,
-    "Will": 1,
-    "Body": -1,
-    "Agility": -1
-   },
+   "adj": {"Presence": 1, "Will": 1},
    "desc": "Broad, soft-bodied beings whose internal cavities make low-frequency resonance; they speak in overlapping harmonies humans can't reproduce. Their acoustic science found the patterns in corridor fluctuations; they refuse to let it become weapons.",
    "core": [
     "Resonance: speak and hear through walls and floors; you need a translator for most other languages."
@@ -1286,12 +1225,7 @@
    "id": "corvani",
    "name": "Corvani",
    "tier": 1,
-   "adj": {
-    "Intellect": 1,
-    "Will": 1,
-    "Agility": -1,
-    "Presence": -1
-   },
+   "adj": {"Intellect": 1, "Will": 1},
    "desc": "Radially arranged, five-limbed beings with photosensitive skin, from forests where cooperation meant survival. They treat technology as ecology, and their restoration teams heal worlds the Hegemony stripped, often against mining corporations.",
    "core": [
     "Photosynthetic: after days without light you weaken (−1 to all rolls) until you rest under light."
@@ -1337,10 +1271,7 @@
    "id": "uxarra",
    "name": "Uxarra",
    "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Presence": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "Flexible, partly hydrostatic beings whose skin changes color, texture and sheen. Their homeworld's wild climates made them adaptable and self-reliant, and their camouflage has earned them an unfair reputation for deceit.",
    "core": [
     "Chromatic skin: change color and texture at will."
@@ -1386,12 +1317,7 @@
    "id": "sen",
    "name": "Sen",
    "tier": 2,
-   "adj": {
-    "Will": 2,
-    "Intellect": 1,
-    "Agility": -2,
-    "Presence": -1
-   },
+   "adj": {"Will": 2, "Intellect": 1},
    "desc": "Compact, slow-moving beings in layered mineral shells who live more than a thousand years. Their experiments have run for centuries; they have watched empires rise and fall, and their warnings about corridor instability carry great weight.",
    "core": [
     "Shell: once per fight, a hit marks one fewer box.",
@@ -1439,12 +1365,7 @@
    "id": "joruun",
    "name": "Joruun",
    "tier": 1,
-   "adj": {
-    "Body": 1,
-    "Will": 1,
-    "Agility": -1,
-    "Intellect": -1
-   },
+   "adj": {"Body": 1, "Will": 1},
    "desc": "Tall, powerful bipeds with thick skin, sensory ridges and acute hearing, from a cold, storm-wracked world. Their confederation has fought the Hegemony for centuries, built to keep resisting after its leaders fall.",
    "core": [
     "Cold-hardy: cold and storms don't impair you."
@@ -1490,12 +1411,7 @@
    "id": "qor",
    "name": "Qor",
    "tier": 2,
-   "adj": {
-    "Body": 2,
-    "Intellect": 1,
-    "Agility": -2,
-    "Presence": -1
-   },
+   "adj": {"Body": 2, "Intellect": 1},
    "desc": "Silicon-based beings of slowly growing crystal with distributed nervous systems, speaking by electromagnetic and mechanical oscillation. Masters of materials and computation, the Qor take Tessan capital but refuse debts that threaten sovereignty.",
    "core": [
     "Crystalline: immune to vacuum, toxins and disease; you need a translator to speak with most species.",
@@ -1544,11 +1460,7 @@
    "id": "ommek",
    "name": "Ommek",
    "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Intellect": 1,
-    "Body": -2
-   },
+   "adj": {"Agility": 1, "Intellect": 1},
    "desc": "Small, heavily articulated beings with many fine manipulators and exquisite touch, makers of robots, AI and automated ships. Their technocratic republics demand review of every major technology, and their defenses have made conquest too expensive.",
    "core": [
     "Fine manipulators: Engineering is Trained for free."
@@ -1595,10 +1507,7 @@
    "id": "vesh",
    "name": "Vesh",
    "tier": 0,
-   "adj": {
-    "Agility": 1,
-    "Body": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "Slender quadrupeds who handle tools with prehensile sensory tendrils, and who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.",
    "core": [
     "Quick on four legs: Move +1."
@@ -1645,12 +1554,7 @@
    "id": "uth",
    "name": "Uth",
    "tier": 1,
-   "adj": {
-    "Body": 1,
-    "Will": 1,
-    "Agility": -1,
-    "Presence": -1
-   },
+   "adj": {"Body": 1, "Will": 1},
    "desc": "Compact, thick-skinned beings with broad manipulators and complex chemical senses, whose civilization the Hegemony destroyed millennia ago. Uth communities live everywhere, keeping family history and memory; many work to reclaim their worlds, many refuse to be defined by loss.",
    "core": [
     "Chemical senses: identify people and substances by scent."
@@ -1696,12 +1600,7 @@
    "id": "draelin",
    "name": "Draelin",
    "tier": 1,
-   "adj": {
-    "Intellect": 1,
-    "Agility": 1,
-    "Body": -1,
-    "Will": -1
-   },
+   "adj": {"Intellect": 1, "Agility": 1},
    "desc": "Long, serpentine beings with two long arms and no legs, who sense electromagnetic fields, from a world of wild magnetic fields. Their cartographic guilds keep the best corridor charts in known space, and have sold them to both sides of more than one war.",
    "core": [
     "Field sense: feel electromagnetic fields, live wiring and active machinery nearby.",
@@ -1749,10 +1648,7 @@
    "id": "zethri",
    "name": "Zethri",
    "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Body": -1
-   },
+   "adj": {"Agility": 1},
    "desc": "Small, agile beings with four limbs, a prehensile tail and broad reflective eyes adapted to dim light. A corridor collapse isolated their colonies for centuries; reconnected, they found strangers who share their name, and now work at reunification.",
    "core": [
     "Dim-adapted: see in near-darkness; −1 to Agility-based rolls in bright light."
@@ -2932,13 +2828,7 @@
    "role": "A young reformer cut off by her dynasty's old creditors for writing off a client world's debt. She trades on her own now, and keeps her word.",
    "reason": "No empire, no creditor, no one owns me.",
    "connection": "She sold Mara Okonkwo the first debt Mara forgave. Neither regrets it.",
-   "attrs": {
-    "Body": 11,
-    "Agility": 8,
-    "Intellect": 12,
-    "Presence": 13,
-    "Will": 11
-   },
+   "attrs": {"Body": 11, "Agility": 10, "Intellect": 12, "Presence": 11, "Will": 11},
    "skills": {
     "Commerce": "S",
     "Diplomacy": "T",
@@ -2991,13 +2881,7 @@
    "role": "Scouts new markets to pay down her homeworld's debt, and wonders more each year whether the radicals are right.",
    "reason": "I owe more than I can ever repay, unless I take every job.",
    "connection": "Ilvi Saradh's AI found the corridor Kesh's hive needed; Kesh owes them both.",
-   "attrs": {
-    "Body": 10,
-    "Agility": 11,
-    "Intellect": 13,
-    "Presence": 8,
-    "Will": 13
-   },
+   "attrs": {"Body": 10, "Agility": 11, "Intellect": 13, "Presence": 10, "Will": 11},
    "skills": {
     "Navigation": "S",
     "Survival": "T",
@@ -3101,13 +2985,7 @@
    "role": "A guild navigator whose AI partner, Quill, remembers a corridor the guild says doesn't exist.",
    "reason": "The galaxy is full of things no one understands yet. I want to be first.",
    "connection": "Quill found the corridor Kesh's hive needed. Ilvi never told the guild.",
-   "attrs": {
-    "Body": 9,
-    "Agility": 12,
-    "Intellect": 13,
-    "Presence": 11,
-    "Will": 10
-   },
+   "attrs": {"Body": 10, "Agility": 11, "Intellect": 13, "Presence": 11, "Will": 10},
    "skills": {
     "Computers": "S",
     "Navigation": "T",
@@ -3163,13 +3041,7 @@
    "role": "Rebuilding a world the Hegemony strip-mined, against a mining corporation's lawyers and, lately, its guns.",
    "reason": "People out here need help, and I can give it.",
    "connection": "Sable cleaned up the corporation's files that proved Anwe's case, and asked nothing for it.",
-   "attrs": {
-    "Body": 11,
-    "Agility": 9,
-    "Intellect": 13,
-    "Presence": 10,
-    "Will": 13
-   },
+   "attrs": {"Body": 11, "Agility": 10, "Intellect": 13, "Presence": 10, "Will": 12},
    "skills": {
     "Science": "S",
     "Sensors": "T",
@@ -3215,13 +3087,7 @@
    "role": "A legionary who deserted rather than burn a Zhaq city. The Hegemony wants him back, or dead.",
    "reason": "Someone took everything from me. I'll find them.",
    "connection": "Rook fought him across the Zhaq border once. Now Rook watches his back.",
-   "attrs": {
-    "Body": 15,
-    "Agility": 11,
-    "Intellect": 9,
-    "Presence": 10,
-    "Will": 10
-   },
+   "attrs": {"Body": 14, "Agility": 11, "Intellect": 10, "Presence": 10, "Will": 10},
    "skills": {
     "Firearms": "S",
     "Close Combat": "T",

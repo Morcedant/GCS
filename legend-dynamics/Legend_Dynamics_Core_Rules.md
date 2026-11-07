@@ -47,9 +47,11 @@ Choose how your character trained (see Step 3):
 | Presence | Leadership, persuasion, social influence |
 | Will | Resolve, concentration, resisting fear and influence |
 
+**Ordinary people.** An ordinary adult has **10** in every attribute: Dodge 8, Move 5 yards, and 6 in anything they've never learned. A trade or a lifelong habit makes a skill Trained (11), and a real professional's work is a Specialty (13). A fit, trained guard or soldier might have Agility and Body 12 and move 8 yards. Nobody starts below 10: an attribute drops under it only for a reason in play, such as an injury, a curse or a form that changes the body.
+
 ### Origin and tier
 
-Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin adjusts some of them; the result is your **base**. Adjustments always total zero.
+Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin may raise some of them; the result is your **base**. No origin lowers an attribute below 10. Its bonuses come out of the points you spend next, so every origin starts with the same total.
 
 Origins can differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between origin power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
 
@@ -74,7 +76,7 @@ Each setting also offers special Edges of its own, such as powers in Aurora; its
 
 ### Spending points
 
-After applying your origin, distribute **five additional points** among the attributes, plus one for each attribute Edge.
+Distribute **five points** among the attributes, plus one for each attribute Edge, less your origin's bonuses: with Will +1, you have four to spend.
 
 - The starting maximum is **13**, plus any origin bonus to that attribute.
 - You cannot lower an attribute below its base to gain points.
@@ -669,7 +671,7 @@ When in doubt, choose the higher tier.
 
 ### 3. Attribute adjustments
 
-Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most origins change two to four attributes.
+Give bonuses from **0 to +2** per attribute, **+3 at most in all**. A bonus raises the attribute's base (+1 starts it at 11) and its starting maximum (13 plus the bonus), and comes out of the character's five attribute points, so a bigger bonus means fewer points to spend. Most origins raise one or two attributes. Nothing lowers an attribute: a people's weakness belongs in its core rules or its complications (a sun that burns, a body that tires in normal gravity), not in a number below 10.
 
 An origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
@@ -688,13 +690,13 @@ If the origin changes shape, give the form attribute bonuses (usually +2 to one 
 ### In the creator
 
 1. In step 2, choose **Custom origin…** at the end of the Origin list.
-2. Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.
+2. Name it, choose the tier you agreed, and set its bonuses. The checklist confirms they stay within +3, and the points left to spend go down by them.
 3. Write its core rules in **Other ability (GM approval required)** in step 4.
 4. In step 4, choose **Custom origin advantage…** and enter the advantage and its companion complication.
 
 ### Example
 
-**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.
+**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.
 
 ## Threats, weapons and Edges for your table
 
@@ -726,7 +728,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
 
-**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Specialist: one Specialty and nine Trained. Expert: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, raised by any origin bonus, then 5 points less those bonuses; none below 10; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Specialist: one Specialty and nine Trained. Expert: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert = attribute +5.
 

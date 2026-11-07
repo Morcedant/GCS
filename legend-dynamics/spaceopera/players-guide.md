@@ -76,39 +76,41 @@ Choose how your character trained (see Step 3):
 | Presence | Leadership, persuasion, social influence |
 | Will | Resolve, concentration, resisting fear and influence |
 
+**Ordinary people.** An ordinary adult has **10** in every attribute: Dodge 8, Move 5 yards, and 6 in anything they've never learned. A trade or a lifelong habit makes a skill Trained (11), and a real professional's work is a Specialty (13). A fit, trained guard or soldier might have Agility and Body 12 and move 8 yards. Nobody starts below 10: an attribute drops under it only for a reason in play, such as an injury, a curse or a form that changes the body.
+
 ### Species and tier
 
-Choose your species from the **Species** chapter. Every attribute starts at 10, and your species adjusts some of them; the result is your **base**. Adjustments always total zero.
+Choose your species from the **Species** chapter. Every attribute starts at 10, and your species may raise some of them; the result is your **base**. No species lowers an attribute below 10. Its bonuses come out of the points you spend next, so every species starts with the same total.
 
 Species can differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between species power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
 
 | Species | Tier | Edges | Adjustments |
 |---|---|---|---|
 | Human | 0 | 3 | None |
-| Vesh | 0 | 3 | Body −1, Agility +1 |
-| Brulvek | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
-| Corvani | 1 | 2 | Agility −1, Intellect +1, Presence −1, Will +1 |
-| Draelin | 1 | 2 | Body −1, Agility +1, Intellect +1, Will −1 |
-| Joruun | 1 | 2 | Body +1, Agility −1, Intellect −1, Will +1 |
-| Kel | 1 | 2 | Intellect +1, Presence −2, Will +1 |
-| Mirrun | 1 | 2 | Body −1, Agility +1 |
-| Ommek | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Shivar | 1 | 2 | Body −2, Intellect +1, Will +1 |
-| Tessan | 1 | 2 | Body +1, Agility −2, Will +1 |
-| Thrum | 1 | 2 | Body −1, Agility −1, Presence +1, Will +1 |
-| Uth | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
-| Uxarra | 1 | 2 | Agility +1, Presence −1 |
-| Vael | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Veyari | 1 | 2 | Body −1, Agility −1, Intellect +2 |
-| Ylith | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Zethri | 1 | 2 | Body −1, Agility +1 |
-| Zhaq | 1 | 2 | Body −1, Agility +1, Presence −1, Will +1 |
-| Dresh | 2 | 1 | Body +2, Agility −1, Intellect −1 |
-| Eshuum | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
-| Khaum | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
-| Ozhvek | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
-| Qor | 2 | 1 | Body +2, Agility −2, Intellect +1, Presence −1 |
-| Sen | 2 | 1 | Agility −2, Intellect +1, Presence −1, Will +2 |
+| Vesh | 0 | 3 | Agility +1 |
+| Brulvek | 1 | 2 | Body +1, Will +1 |
+| Corvani | 1 | 2 | Intellect +1, Will +1 |
+| Draelin | 1 | 2 | Agility +1, Intellect +1 |
+| Joruun | 1 | 2 | Body +1, Will +1 |
+| Kel | 1 | 2 | Intellect +1, Will +1 |
+| Mirrun | 1 | 2 | Agility +1 |
+| Ommek | 1 | 2 | Agility +1, Intellect +1 |
+| Shivar | 1 | 2 | Intellect +1, Will +1 |
+| Tessan | 1 | 2 | Body +1, Will +1 |
+| Thrum | 1 | 2 | Presence +1, Will +1 |
+| Uth | 1 | 2 | Body +1, Will +1 |
+| Uxarra | 1 | 2 | Agility +1 |
+| Vael | 1 | 2 | Agility +1, Intellect +1 |
+| Veyari | 1 | 2 | Intellect +2 |
+| Ylith | 1 | 2 | Agility +1, Intellect +1 |
+| Zethri | 1 | 2 | Agility +1 |
+| Zhaq | 1 | 2 | Agility +1, Will +1 |
+| Dresh | 2 | 1 | Body +2 |
+| Eshuum | 2 | 1 | Intellect +1, Will +1 |
+| Khaum | 2 | 1 | Body +2, Will +1 |
+| Ozhvek | 2 | 1 | Body +2, Will +1 |
+| Qor | 2 | 1 | Body +2, Intellect +1 |
+| Sen | 2 | 1 | Intellect +1, Will +2 |
 
 ### Edges
 
@@ -128,7 +130,7 @@ Spend all your Edges. Each one buys:
 
 ### Spending points
 
-After applying your species, distribute **five additional points** among the attributes, plus one for each attribute Edge.
+Distribute **five points** among the attributes, plus one for each attribute Edge, less your species's bonuses: with Will +1, you have four to spend.
 
 - The starting maximum is **13**, plus any species bonus to that attribute.
 - You cannot lower an attribute below its base to gain points.
@@ -1526,8 +1528,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Trader, disowned, Trader. Tessan (tier 1).* A young reformer cut off by her dynasty's old creditors for writing off a client world's debt. She trades on her own now, and keeps her word.
 
-- **Attributes:** Body 11, Agility 8, Intellect 12, Presence 13, Will 11. **Dodge** 6.
-- **Skills:** Commerce 15 (Specialty). Trained: Deception 14, Diplomacy 14, Leadership 14, Streetwise 14, Computers 13, Investigation 13, Navigation 13, Science 13, Psychology 12, Piloting 9.
+- **Attributes:** Body 11, Agility 10, Intellect 12, Presence 11, Will 11. **Dodge** 8.
+- **Skills:** Commerce 15 (Specialty). Trained: Computers 13, Investigation 13, Navigation 13, Science 13, Deception 12, Diplomacy 12, Leadership 12, Psychology 12, Streetwise 12, Piloting 11.
 - **Edges:** Extra Trained skill, A friend; a friend: her grandfather's old clerk, who still sends her the family's secrets.
 - **Advantage:** Ledger Memory (species; companion: Bound by Contract). **Complication:** Exile; trigger: your people on the same station.
 - **Why I'm out here:** No empire, no creditor, no one owns me. **Connection:** She sold Mara Okonkwo the first debt Mara forgave. Neither regrets it.
@@ -1536,8 +1538,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Market scout, Explorer. Kel (tier 1).* Scouts new markets to pay down her homeworld's debt, and wonders more each year whether the radicals are right.
 
-- **Attributes:** Body 10, Agility 11, Intellect 13, Presence 8, Will 13. **Dodge** 10.
-- **Skills:** Navigation 16 (Specialty). Trained: Commerce 14, Computers 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Survival 14, Piloting 12, Athletics 11.
+- **Attributes:** Body 10, Agility 11, Intellect 13, Presence 10, Will 11. **Dodge** 10.
+- **Skills:** Navigation 16 (Specialty). Trained: Commerce 14, Computers 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Piloting 12, Survival 12, Athletics 11.
 - **Edges:** Extra Resolve, A fine weapon or tool; a fine tool: a hive-made survey kit (+2 to Sensors for surveying a world: minerals, water and life signs).
 - **Advantage:** Debt-Born (species; companion: The Homeworld's Debt). **Complication:** Debt-Bound; trigger: a creditor offers to forgive it for a favor.
 - **Why I'm out here:** I owe more than I can ever repay, unless I take every job. **Connection:** Ilvi Saradh's AI found the corridor Kesh's hive needed; Kesh owes them both.
@@ -1556,8 +1558,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Guild navigator, AI Minder. Draelin (tier 1).* A guild navigator whose AI partner, Quill, remembers a corridor the guild says doesn't exist.
 
-- **Attributes:** Body 9, Agility 12, Intellect 13, Presence 11, Will 10. **Dodge** 11.
-- **Skills:** Computers 16 (Specialty). Trained: Commerce 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Piloting 13, Stealth 13, Diplomacy 12, Psychology 11, Athletics 10; Navigation 14 (free).
+- **Attributes:** Body 10, Agility 11, Intellect 13, Presence 11, Will 10. **Dodge** 10.
+- **Skills:** Computers 16 (Specialty). Trained: Commerce 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Diplomacy 12, Piloting 12, Stealth 12, Athletics 11, Psychology 11; Navigation 14 (free).
 - **Edges:** Extra Trained skill, A fine weapon or tool; a fine tool: Quill's core, a guild-grade AI (+2 to Computers for breaking old guild encryption and recovering lost navigation data).
 - **Advantage:** Corridor Sense. **Complication:** Dangerous Knowledge; trigger: someone close to the truth.
 - **Why I'm out here:** The galaxy is full of things no one understands yet. I want to be first. **Connection:** Quill found the corridor Kesh's hive needed. Ilvi never told the guild.
@@ -1566,8 +1568,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Restoration ecologist, Scientist. Corvani (tier 1).* Rebuilding a world the Hegemony strip-mined, against a mining corporation's lawyers and, lately, its guns.
 
-- **Attributes:** Body 11, Agility 9, Intellect 13, Presence 10, Will 13. **Dodge** 8.
-- **Skills:** Science 16 (Specialty). Trained: Computers 14, Engineering 14, Investigation 14, Medicine 14, Psychology 14, Sensors 14, Survival 14, Athletics 12, Diplomacy 11.
+- **Attributes:** Body 11, Agility 10, Intellect 13, Presence 10, Will 12. **Dodge** 9.
+- **Skills:** Science 16 (Specialty). Trained: Computers 14, Engineering 14, Investigation 14, Medicine 14, Sensors 14, Psychology 13, Survival 13, Athletics 12, Diplomacy 11.
 - **Edges:** +1 attribute point, A friend; a friend: a Veyari archivist who keeps the old survey records of her world.
 - **Advantage:** Restorer (species; companion: Ecological Safeguards). **Complication:** Protects Others; trigger: a civilian in the crossfire.
 - **Why I'm out here:** People out here need help, and I can give it. **Connection:** Sable cleaned up the corporation's files that proved Anwe's case, and asked nothing for it.
@@ -1576,8 +1578,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Deserter, Ninth Legion, Mercenary. Dresh (tier 2).* A legionary who deserted rather than burn a Zhaq city. The Hegemony wants him back, or dead.
 
-- **Attributes:** Body 15, Agility 11, Intellect 9, Presence 10, Will 10. **Dodge** 10.
-- **Skills:** Firearms 14 (Specialty). Trained: Athletics 16, Close Combat 16, Piloting 12, Stealth 12, Leadership 11, Survival 11, Engineering 10, Medicine 10, Sensors 10.
+- **Attributes:** Body 14, Agility 11, Intellect 10, Presence 10, Will 10. **Dodge** 10.
+- **Skills:** Firearms 14 (Specialty). Trained: Athletics 15, Close Combat 15, Piloting 12, Stealth 12, Engineering 11, Leadership 11, Medicine 11, Sensors 11, Survival 11.
 - **Edges:** Extra Resolve.
 - **Advantage:** Legion Drill (species; companion: Whose Soldier?). **Complication:** Hegemony Bounty; trigger: a hunter in the next berth.
 - **Why I'm out here:** Someone took everything from me. I'll find them. **Connection:** Rook fought him across the Zhaq border once. Now Rook watches his back.
@@ -1629,30 +1631,30 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Species | Tier | Edges | Adjustments |
 |---|---|---|---|
 | Human | 0 | 3 | None |
-| Vesh | 0 | 3 | Body −1, Agility +1 |
-| Brulvek | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
-| Corvani | 1 | 2 | Agility −1, Intellect +1, Presence −1, Will +1 |
-| Draelin | 1 | 2 | Body −1, Agility +1, Intellect +1, Will −1 |
-| Joruun | 1 | 2 | Body +1, Agility −1, Intellect −1, Will +1 |
-| Kel | 1 | 2 | Intellect +1, Presence −2, Will +1 |
-| Mirrun | 1 | 2 | Body −1, Agility +1 |
-| Ommek | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Shivar | 1 | 2 | Body −2, Intellect +1, Will +1 |
-| Tessan | 1 | 2 | Body +1, Agility −2, Will +1 |
-| Thrum | 1 | 2 | Body −1, Agility −1, Presence +1, Will +1 |
-| Uth | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
-| Uxarra | 1 | 2 | Agility +1, Presence −1 |
-| Vael | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Veyari | 1 | 2 | Body −1, Agility −1, Intellect +2 |
-| Ylith | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Zethri | 1 | 2 | Body −1, Agility +1 |
-| Zhaq | 1 | 2 | Body −1, Agility +1, Presence −1, Will +1 |
-| Dresh | 2 | 1 | Body +2, Agility −1, Intellect −1 |
-| Eshuum | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
-| Khaum | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
-| Ozhvek | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
-| Qor | 2 | 1 | Body +2, Agility −2, Intellect +1, Presence −1 |
-| Sen | 2 | 1 | Agility −2, Intellect +1, Presence −1, Will +2 |
+| Vesh | 0 | 3 | Agility +1 |
+| Brulvek | 1 | 2 | Body +1, Will +1 |
+| Corvani | 1 | 2 | Intellect +1, Will +1 |
+| Draelin | 1 | 2 | Agility +1, Intellect +1 |
+| Joruun | 1 | 2 | Body +1, Will +1 |
+| Kel | 1 | 2 | Intellect +1, Will +1 |
+| Mirrun | 1 | 2 | Agility +1 |
+| Ommek | 1 | 2 | Agility +1, Intellect +1 |
+| Shivar | 1 | 2 | Intellect +1, Will +1 |
+| Tessan | 1 | 2 | Body +1, Will +1 |
+| Thrum | 1 | 2 | Presence +1, Will +1 |
+| Uth | 1 | 2 | Body +1, Will +1 |
+| Uxarra | 1 | 2 | Agility +1 |
+| Vael | 1 | 2 | Agility +1, Intellect +1 |
+| Veyari | 1 | 2 | Intellect +2 |
+| Ylith | 1 | 2 | Agility +1, Intellect +1 |
+| Zethri | 1 | 2 | Agility +1 |
+| Zhaq | 1 | 2 | Agility +1, Will +1 |
+| Dresh | 2 | 1 | Body +2 |
+| Eshuum | 2 | 1 | Intellect +1, Will +1 |
+| Khaum | 2 | 1 | Body +2, Will +1 |
+| Ozhvek | 2 | 1 | Body +2, Will +1 |
+| Qor | 2 | 1 | Body +2, Intellect +1 |
+| Sen | 2 | 1 | Intellect +1, Will +2 |
 
 ## Human
 
@@ -1670,7 +1672,7 @@ Adaptable, socially restless, and remarkably willing to challenge established in
 
 ## Vesh
 
-*Tier 0 · 3 Edges · Body −1, Agility +1*
+*Tier 0 · 3 Edges · Agility +1*
 
 Slender quadrupeds who handle tools with prehensile sensory tendrils, and who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.
 
@@ -1688,7 +1690,7 @@ Slender quadrupeds who handle tools with prehensile sensory tendrils, and who re
 
 ## Brulvek
 
-*Tier 1 · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
+*Tier 1 · 2 Edges · Body +1, Will +1*
 
 Low, broad hexapods with powerful manipulator limbs and thick insulating hides, evolved among volcanoes and corrosive air. They built the Hegemony's shipyards; their engineers are sought everywhere for restoring machines centuries past replacement parts.
 
@@ -1706,7 +1708,7 @@ Low, broad hexapods with powerful manipulator limbs and thick insulating hides, 
 
 ## Corvani
 
-*Tier 1 · 2 Edges · Agility −1, Intellect +1, Presence −1, Will +1*
+*Tier 1 · 2 Edges · Intellect +1, Will +1*
 
 Radially arranged, five-limbed beings with photosensitive skin, from forests where cooperation meant survival. They treat technology as ecology, and their restoration teams heal worlds the Hegemony stripped, often against mining corporations.
 
@@ -1724,7 +1726,7 @@ Radially arranged, five-limbed beings with photosensitive skin, from forests whe
 
 ## Draelin
 
-*Tier 1 · 2 Edges · Body −1, Agility +1, Intellect +1, Will −1*
+*Tier 1 · 2 Edges · Agility +1, Intellect +1*
 
 Long, serpentine beings with two long arms and no legs, who sense electromagnetic fields, from a world of wild magnetic fields. Their cartographic guilds keep the best corridor charts in known space, and have sold them to both sides of more than one war.
 
@@ -1745,7 +1747,7 @@ Long, serpentine beings with two long arms and no legs, who sense electromagneti
 
 ## Joruun
 
-*Tier 1 · 2 Edges · Body +1, Agility −1, Intellect −1, Will +1*
+*Tier 1 · 2 Edges · Body +1, Will +1*
 
 Tall, powerful bipeds with thick skin, sensory ridges and acute hearing, from a cold, storm-wracked world. Their confederation has fought the Hegemony for centuries, built to keep resisting after its leaders fall.
 
@@ -1763,7 +1765,7 @@ Tall, powerful bipeds with thick skin, sensory ridges and acute hearing, from a 
 
 ## Kel
 
-*Tier 1 · 2 Edges · Intellect +1, Presence −2, Will +1*
+*Tier 1 · 2 Edges · Intellect +1, Will +1*
 
 Chitin-plated social beings raised in immense hive-cities, analytical and cooperative. The Kel homeworld is burdened by inherited Tessan debt; their search for new markets triggered humanity's First Contact Crisis. Kel society is split between loyalists, reformers and radicals.
 
@@ -1782,7 +1784,7 @@ Chitin-plated social beings raised in immense hive-cities, analytical and cooper
 
 ## Mirrun
 
-*Tier 1 · 2 Edges · Body −1, Agility +1*
+*Tier 1 · 2 Edges · Agility +1*
 
 Smooth-skinned amphibians from a deep-ocean world, agile swimmers famous for their humor. Their skin detects minute pressure changes; Mirrun researchers lead the field in gravimetric resonance detection.
 
@@ -1800,7 +1802,7 @@ Smooth-skinned amphibians from a deep-ocean world, agile swimmers famous for the
 
 ## Ommek
 
-*Tier 1 · 2 Edges · Body −2, Agility +1, Intellect +1*
+*Tier 1 · 2 Edges · Agility +1, Intellect +1*
 
 Small, heavily articulated beings with many fine manipulators and exquisite touch, makers of robots, AI and automated ships. Their technocratic republics demand review of every major technology, and their defenses have made conquest too expensive.
 
@@ -1820,7 +1822,7 @@ Small, heavily articulated beings with many fine manipulators and exquisite touc
 
 ## Shivar
 
-*Tier 1 · 2 Edges · Body −2, Intellect +1, Will +1*
+*Tier 1 · 2 Edges · Intellect +1, Will +1*
 
 Tall, narrow beings of translucent tissue whose nervous systems share emotions in synchronized pulses. Their theology reads the corridors as cosmic order; their schism, between imperial zealots and moderates who see a universe of change, has fueled wars inside the Hegemony.
 
@@ -1838,7 +1840,7 @@ Tall, narrow beings of translucent tissue whose nervous systems share emotions i
 
 ## Tessan
 
-*Tier 1 · 2 Edges · Body +1, Agility −2, Will +1*
+*Tier 1 · 2 Edges · Body +1, Will +1*
 
 Large, scaled, exceptionally long-lived beings for whom contractual obligation is the foundation of civilization. Tessan dynasties lend, insure and arbitrate across hundreds of worlds; contact with humanity has split them between traditional creditors and reformers.
 
@@ -1857,7 +1859,7 @@ Large, scaled, exceptionally long-lived beings for whom contractual obligation i
 
 ## Thrum
 
-*Tier 1 · 2 Edges · Body −1, Agility −1, Presence +1, Will +1*
+*Tier 1 · 2 Edges · Presence +1, Will +1*
 
 Broad, soft-bodied beings whose internal cavities make low-frequency resonance; they speak in overlapping harmonies humans can't reproduce. Their acoustic science found the patterns in corridor fluctuations; they refuse to let it become weapons.
 
@@ -1875,7 +1877,7 @@ Broad, soft-bodied beings whose internal cavities make low-frequency resonance; 
 
 ## Uth
 
-*Tier 1 · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
+*Tier 1 · 2 Edges · Body +1, Will +1*
 
 Compact, thick-skinned beings with broad manipulators and complex chemical senses, whose civilization the Hegemony destroyed millennia ago. Uth communities live everywhere, keeping family history and memory; many work to reclaim their worlds, many refuse to be defined by loss.
 
@@ -1893,7 +1895,7 @@ Compact, thick-skinned beings with broad manipulators and complex chemical sense
 
 ## Uxarra
 
-*Tier 1 · 2 Edges · Agility +1, Presence −1*
+*Tier 1 · 2 Edges · Agility +1*
 
 Flexible, partly hydrostatic beings whose skin changes color, texture and sheen. Their homeworld's wild climates made them adaptable and self-reliant, and their camouflage has earned them an unfair reputation for deceit.
 
@@ -1911,7 +1913,7 @@ Flexible, partly hydrostatic beings whose skin changes color, texture and sheen.
 
 ## Vael
 
-*Tier 1 · 2 Edges · Body −2, Agility +1, Intellect +1*
+*Tier 1 · 2 Edges · Agility +1, Intellect +1*
 
 Long, light-boned beings with four manipulator limbs, born in low gravity. Their homeworld died in an ancient stellar catastrophe; their living fleets now roam the corridors trading, repairing and carrying peoples between systems.
 
@@ -1930,7 +1932,7 @@ Long, light-boned beings with four manipulator limbs, born in low gravity. Their
 
 ## Veyari
 
-*Tier 1 · 2 Edges · Body −1, Agility −1, Intellect +2*
+*Tier 1 · 2 Edges · Intellect +2*
 
 Small bipedal scholars with long, delicate fingers, soft scales and brains built for associative memory. Their neutral archives hold lost corridor data and ancient claims, which is why empires, corporations and zealots keep trying to seize them.
 
@@ -1948,7 +1950,7 @@ Small bipedal scholars with long, delicate fingers, soft scales and brains built
 
 ## Ylith
 
-*Tier 1 · 2 Edges · Body −2, Agility +1, Intellect +1*
+*Tier 1 · 2 Edges · Agility +1, Intellect +1*
 
 Hollow-boned, feathered gliders with broad wing-membranes and extraordinary vision. Their aerial city-states are renowned for navigation and cartography; confined spaces are profoundly uncomfortable for them.
 
@@ -1967,7 +1969,7 @@ Hollow-boned, feathered gliders with broad wing-membranes and extraordinary visi
 
 ## Zethri
 
-*Tier 1 · 2 Edges · Body −1, Agility +1*
+*Tier 1 · 2 Edges · Agility +1*
 
 Small, agile beings with four limbs, a prehensile tail and broad reflective eyes adapted to dim light. A corridor collapse isolated their colonies for centuries; reconnected, they found strangers who share their name, and now work at reunification.
 
@@ -1985,7 +1987,7 @@ Small, agile beings with four limbs, a prehensile tail and broad reflective eyes
 
 ## Zhaq
 
-*Tier 1 · 2 Edges · Body −1, Agility +1, Presence −1, Will +1*
+*Tier 1 · 2 Edges · Agility +1, Will +1*
 
 Flexible, tripedal beings with segmented limbs and three independently focusing eyes. Isolated for six centuries by a corridor collapse, the Zhaq built free republics, and refused when the Hegemony came back. Their resistance inspires separatists everywhere.
 
@@ -2004,7 +2006,7 @@ Flexible, tripedal beings with segmented limbs and three independently focusing 
 
 ## Dresh
 
-*Tier 2 · 1 Edge · Body +2, Agility −1, Intellect −1*
+*Tier 2 · 1 Edge · Body +2*
 
 Dense, four-armed soldiers from a high-gravity world, armored in thick hide. Dresh legions were the Hegemony's ground forces for millennia; now their protectorates argue whether soldiers owe the throne, their commanders, or the people they protect.
 
@@ -2024,7 +2026,7 @@ Dense, four-armed soldiers from a high-gravity world, armored in thick hide. Dre
 
 ## Eshuum
 
-*Tier 2 · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
+*Tier 2 · 1 Edge · Intellect +1, Will +1*
 
 Colonial organisms: an Eshuum person is a community of semi-independent biological units joined into one mind. They govern by consensus, and oppose forced separation and experiments on intelligent beings.
 
@@ -2043,7 +2045,7 @@ Colonial organisms: an Eshuum person is a community of semi-independent biologic
 
 ## Khaum
 
-*Tier 2 · 1 Edge · Body +2, Agility −2, Presence −1, Will +1*
+*Tier 2 · 1 Edge · Body +2, Will +1*
 
 Massive, eyeless burrowers with sensory whiskers and powerful digging limbs, whose cavern nations run for hundreds of kilometers underground. Cautious and long-planning, they have sheltered refugees from many Hegemony campaigns.
 
@@ -2063,7 +2065,7 @@ Massive, eyeless burrowers with sensory whiskers and powerful digging limbs, who
 
 ## Ozhvek
 
-*Tier 2 · 1 Edge · Body +2, Agility −2, Presence −1, Will +1*
+*Tier 2 · 1 Edge · Body +2, Will +1*
 
 Massive, radially symmetrical founders of the Hegemony, on six powerful limbs, with sensory clusters all around their upper bodies and lifespans near five centuries. Their ancient houses are divided over what the empire should become.
 
@@ -2082,7 +2084,7 @@ Massive, radially symmetrical founders of the Hegemony, on six powerful limbs, w
 
 ## Qor
 
-*Tier 2 · 1 Edge · Body +2, Agility −2, Intellect +1, Presence −1*
+*Tier 2 · 1 Edge · Body +2, Intellect +1*
 
 Silicon-based beings of slowly growing crystal with distributed nervous systems, speaking by electromagnetic and mechanical oscillation. Masters of materials and computation, the Qor take Tessan capital but refuse debts that threaten sovereignty.
 
@@ -2102,7 +2104,7 @@ Silicon-based beings of slowly growing crystal with distributed nervous systems,
 
 ## Sen
 
-*Tier 2 · 1 Edge · Agility −2, Intellect +1, Presence −1, Will +2*
+*Tier 2 · 1 Edge · Intellect +1, Will +2*
 
 Compact, slow-moving beings in layered mineral shells who live more than a thousand years. Their experiments have run for centuries; they have watched empires rise and fall, and their warnings about corridor instability carry great weight.
 
@@ -2157,7 +2159,7 @@ When in doubt, choose the higher tier.
 
 ### 3. Attribute adjustments
 
-Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most species change two to four attributes.
+Give bonuses from **0 to +2** per attribute, **+3 at most in all**. A bonus raises the attribute's base (+1 starts it at 11) and its starting maximum (13 plus the bonus), and comes out of the character's five attribute points, so a bigger bonus means fewer points to spend. Most species raise one or two attributes. Nothing lowers an attribute: a people's weakness belongs in its core rules or its complications (a sun that burns, a body that tires in normal gravity), not in a number below 10.
 
 A species that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
@@ -2176,13 +2178,13 @@ If the species changes shape, give the form attribute bonuses (usually +2 to one
 ### In the creator
 
 1. In step 2, choose **Custom species…** at the end of the Species list.
-2. Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.
+2. Name it, choose the tier you agreed, and set its bonuses. The checklist confirms they stay within +3, and the points left to spend go down by them.
 3. Write its core rules in **Other ability (GM approval required)** in step 4.
 4. In step 4, choose **Custom species advantage…** and enter the advantage and its companion complication.
 
 ### Example
 
-**Rhessk (tier 1).** Small, quick, burrow-dwelling traders from a moon of the Tessan core worlds, long-time clients of the dynasties. *Adjustments:* Agility +1, Presence +1, Body −2. *Core rule:* night-adapted: see in near-darkness, −1 in bright light. *Species advantage:* **Tunnel-Runner**: +2 to Athletics in tight spaces. *Companion:* **Client People**: your family's dynasty calls on you; accept the errand.
+**Rhessk (tier 1).** Small, quick, burrow-dwelling traders from a moon of the Tessan core worlds, long-time clients of the dynasties. *Adjustments:* Agility +1, Presence +1. *Core rule:* night-adapted: see in near-darkness, −1 in bright light. *Species advantage:* **Tunnel-Runner**: +2 to Athletics in tight spaces. *Companion:* **Client People**: your family's dynasty calls on you; accept the errand.
 
 ## Threats, weapons and Edges for your table
 
@@ -2234,7 +2236,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
 
-**Creation:** attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. 3 points split between species tier and Edges. Specialist: one Specialty and nine Trained. Expert: one Expert at +5 and seven Trained. One advantage (general or species) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, raised by any species bonus, then 5 points less those bonuses; none below 10; maximum 13 plus any species bonus. 3 points split between species tier and Edges. Specialist: one Specialty and nine Trained. Expert: one Expert at +5 and seven Trained. One advantage (general or species) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Expert) = attribute +5.
 

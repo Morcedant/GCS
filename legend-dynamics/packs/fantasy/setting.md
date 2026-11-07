@@ -241,4 +241,4 @@ Opponents use the same rules as the characters. **Minor opponents** (guards, ban
 
 <!-- SECTION:customorigin -->
 
-**Ravenkin (tier 1).** Dark-eyed folk from the northern moors who share their dreams with ravens. *Adjustments:* Will +1, Presence −1. *Core rule:* raven-friend: ravens bring you small news (who passed, what's dead nearby), but they flock to you, and people call it an omen. *Ancestry advantage:* **Carrion Sight**: +2 to Tracking and Investigation to find the dead or what killed them. *Companion:* **Ill Omen**: villagers see the birds and bar their doors; accept the suspicion.
+**Ravenkin (tier 1).** Dark-eyed folk from the northern moors who share their dreams with ravens. *Adjustments:* Will +1. *Core rule:* raven-friend: ravens bring you small news (who passed, what's dead nearby), but they flock to you, and people call it an omen. *Ancestry advantage:* **Carrion Sight**: +2 to Tracking and Investigation to find the dead or what killed them. *Companion:* **Ill Omen**: villagers see the birds and bar their doors; accept the suspicion.

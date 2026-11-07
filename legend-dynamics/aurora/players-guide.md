@@ -75,24 +75,26 @@ Choose how your character trained (see Step 3):
 | Presence | Leadership, persuasion, social influence |
 | Will | Resolve, concentration, resisting fear and influence |
 
+**Ordinary people.** An ordinary adult has **10** in every attribute: Dodge 8, Move 5 yards, and 6 in anything they've never learned. A trade or a lifelong habit makes a skill Trained (11), and a real professional's work is a Specialty (13). A fit, trained guard or soldier might have Agility and Body 12 and move 8 yards. Nobody starts below 10: an attribute drops under it only for a reason in play, such as an injury, a curse or a form that changes the body.
+
 ### Origin and tier
 
-Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin adjusts some of them; the result is your **base**. Adjustments always total zero.
+Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin may raise some of them; the result is your **base**. No origin lowers an attribute below 10. Its bonuses come out of the points you spend next, so every origin starts with the same total.
 
 Origins can differ in power, so each has a **tier** from 0 to 3. Every character has **4 points** to split between origin power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
 
 | Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
 | Non-Operant | 0 | 4 | None |
-| Adept | 1 | 3 | Body −1, Intellect +1 |
+| Adept | 1 | 3 | Intellect +1 |
 | Aurora-born | 2 | 2 | None |
-| Bonded | 2 | 2 | Presence −1, Will +1 |
-| Lab-made | 2 | 2 | Body +1, Presence −1 |
-| Otherworlder | 2 | 2 | Agility +1, Will −1 |
-| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1, Presence −1 |
-| Touched | 2 | 2 | Intellect −1, Will +1 |
-| Ambrosia | 3 | 1 | Body +1, Agility −1, Intellect −1, Presence +1 |
-| Mythic | 3 | 1 | Body +1, Intellect −1, Presence −1, Will +1 |
+| Bonded | 2 | 2 | Will +1 |
+| Lab-made | 2 | 2 | Body +1 |
+| Otherworlder | 2 | 2 | Agility +1 |
+| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1 |
+| Touched | 2 | 2 | Will +1 |
+| Ambrosia | 3 | 1 | Body +1, Presence +1 |
+| Mythic | 3 | 1 | Body +1, Will +1 |
 
 ### Edges
 
@@ -113,7 +115,7 @@ Spend all your Edges. Each one buys:
 
 ### Spending points
 
-After applying your origin, distribute **five additional points** among the attributes, plus one for each attribute Edge.
+Distribute **five points** among the attributes, plus one for each attribute Edge, less your origin's bonuses: with Will +1, you have four to spend.
 
 - The starting maximum is **13**, plus any origin bonus to that attribute.
 - You cannot lower an attribute below its base to gain points.
@@ -1362,8 +1364,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Special Agent, ExLAW Chicago, ExLAW Agent. Bonded (tier 2).* Carries a jade seal that holds a guardian spirit, inherited from her grandmother. Her partner vanished on a case Director Humbacht closed personally.
 
-- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 9, Will 13. **Dodge** 9.
-- **Skills:** Investigation 16 (Specialty). Trained: Computers 14, Law 14, Occult 14, Powers 14, Read People 14, Athletics 11, Brawling 11, Firearms 11, Persuasion 10.
+- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 10, Will 12. **Dodge** 9.
+- **Skills:** Investigation 16 (Specialty). Trained: Computers 14, Law 14, Occult 14, Powers 13, Read People 13, Athletics 11, Brawling 11, Firearms 11, Persuasion 11.
 - **Edges:** Extra Spark, A friend; a friend: her missing partner's last informant, who only talks to her.
 - **Advantage:** The Voice Within (origin; companion: Two Minds). **Complication:** Can't Leave It Alone; trigger: a file that shouldn't exist.
 - **Powers:** Force Field II, Mystic Sight I, Telepathy I.
@@ -1385,8 +1387,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Daybreak, New Power Legion, Public Hero. Ambrosia (tier 3).* The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets.
 
-- **Attributes:** Body 13, Agility 9, Intellect 9, Presence 14, Will 10. **Dodge** 8.
-- **Skills:** Media 17 (Specialty). Trained: Deception 15, Leadership 15, Persuasion 15, Athletics 14, Brawling 14, Powers 11, Read People 11, Law 10, Piloting 10.
+- **Attributes:** Body 11, Agility 10, Intellect 10, Presence 14, Will 10. **Dodge** 9.
+- **Skills:** Media 17 (Specialty). Trained: Deception 15, Leadership 15, Persuasion 15, Athletics 12, Brawling 12, Law 11, Piloting 11, Powers 11, Read People 11.
 - **Edges:** Stronger Power.
 - **Advantage:** Golden Ideal (origin; companion: The Anger). **Complication:** Media Darling; trigger: a crowd with phones out.
 - **Powers:** Strength IV, Flight II, Toughness I.
@@ -1397,8 +1399,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Professor of comparative religion; Earth Warden, Occultist. Adept (tier 1); Expert.* A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.
 
-- **Attributes:** Body 9, Agility 10, Intellect 14, Presence 10, Will 13. **Dodge** 8.
-- **Skills:** Powers 18 (Expert). Trained: Investigation 15, Law 15, Medicine 15, Occult 15, Science 15, Read People 14, Persuasion 11.
+- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 10, Will 13. **Dodge** 8.
+- **Skills:** Powers 18 (Expert). Trained: Investigation 14, Law 14, Medicine 14, Occult 14, Read People 14, Science 14, Persuasion 11.
 - **Edges:** +1 attribute point, A fine weapon or tool, Stronger Power; a fine tool: the Lammas Grimoire, annotated in four hands (+2 to Occult for identifying a curse, a ritual or a summoning from its traces).
 - **Advantage:** Ritualist (origin; companion: Obsessed). **Complication:** Haunted; trigger: your bond demands something.
 - **Powers:** Warding III, Mystic Sight I.
@@ -1421,8 +1423,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Escaped Foundation subject, Fugitive. Lab-made (tier 2).* Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.
 
-- **Attributes:** Body 12, Agility 13, Intellect 11, Presence 9, Will 10. **Dodge** 12.
-- **Skills:** Powers 13 (Specialty). Trained: Piloting 14, Stealth 14, Athletics 13, Brawling 13, Computers 12, Engineering 12, Read People 11, Deception 10, Streetwise 10.
+- **Attributes:** Body 12, Agility 12, Intellect 11, Presence 10, Will 10. **Dodge** 11.
+- **Skills:** Powers 13 (Specialty). Trained: Athletics 13, Brawling 13, Piloting 13, Stealth 13, Computers 12, Engineering 12, Deception 11, Read People 11, Streetwise 11.
 - **Edges:** Extra Spark, Stronger Power.
 - **Advantage:** Lab Instincts (origin; companion: Test Subject). **Complication:** Hunted by a Lab; trigger: a van with no plates outside.
 - **Powers:** Blast III, Speed I, Technopathy I.
@@ -1433,8 +1435,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Cat burglar, on an ExLAW deal, Thief. Otherworlder (tier 2).* A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from.
 
-- **Attributes:** Body 10, Agility 14, Intellect 11, Presence 11, Will 9. **Dodge** 13.
-- **Skills:** Stealth 17 (Specialty). Trained: Melee 15, Deception 12, Engineering 12, Occult 12, Persuasion 12, Streetwise 12, Athletics 11, Powers 10, Read People 10.
+- **Attributes:** Body 10, Agility 14, Intellect 10, Presence 11, Will 10. **Dodge** 13.
+- **Skills:** Stealth 17 (Specialty). Trained: Melee 15, Deception 12, Persuasion 12, Streetwise 12, Athletics 11, Engineering 11, Occult 11, Powers 11, Read People 11.
 - **Edges:** A friend, Extra Spark; a friend: her ExLAW handler, Agent Dorsey, who covers for her more than he should.
 - **Advantage:** Inhuman Grace (origin; companion: Exile). **Complication:** Outsider; trigger: a form that asks for papers you don't have.
 - **Powers:** Invisibility II, Phasing I, Illusion I.
@@ -1478,15 +1480,15 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
 | Non-Operant | 0 | 4 | None |
-| Adept | 1 | 3 | Body −1, Intellect +1 |
+| Adept | 1 | 3 | Intellect +1 |
 | Aurora-born | 2 | 2 | None |
-| Bonded | 2 | 2 | Presence −1, Will +1 |
-| Lab-made | 2 | 2 | Body +1, Presence −1 |
-| Otherworlder | 2 | 2 | Agility +1, Will −1 |
-| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1, Presence −1 |
-| Touched | 2 | 2 | Intellect −1, Will +1 |
-| Ambrosia | 3 | 1 | Body +1, Agility −1, Intellect −1, Presence +1 |
-| Mythic | 3 | 1 | Body +1, Intellect −1, Presence −1, Will +1 |
+| Bonded | 2 | 2 | Will +1 |
+| Lab-made | 2 | 2 | Body +1 |
+| Otherworlder | 2 | 2 | Agility +1 |
+| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1 |
+| Touched | 2 | 2 | Will +1 |
+| Ambrosia | 3 | 1 | Body +1, Presence +1 |
+| Mythic | 3 | 1 | Body +1, Will +1 |
 
 ## Non-Operant
 
@@ -1509,7 +1511,7 @@ No powers at all: training, nerve, gear and the law. Most of ExLAW's agents, eve
 
 ## Adept
 
-*Tier 1 · 3 Edges · Body −1, Intellect +1*
+*Tier 1 · 3 Edges · Intellect +1*
 
 A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.
 
@@ -1548,7 +1550,7 @@ Powers that woke on their own: in the First Wave of April 1938, in the Second Wa
 
 ## Bonded
 
-*Tier 2 · 2 Edges · Presence −1, Will +1*
+*Tier 2 · 2 Edges · Will +1*
 
 Joined to something else: an artifact, a spirit, a god or an entity from beyond. It shares its power, and sometimes its mind. Michael Lance's amulet, Uathach's litany, the Ice Reaper and the Atomic Man are all bonds.
 
@@ -1568,7 +1570,7 @@ Joined to something else: an artifact, a spirit, a god or an entity from beyond.
 
 ## Lab-made
 
-*Tier 2 · 2 Edges · Body +1, Presence −1*
+*Tier 2 · 2 Edges · Body +1*
 
 Made in a Foundation black lab, a DIRE program or somewhere worse. The powers are strong and unstable, the memories are patchy, and someone still has your file and wants their property back.
 
@@ -1587,7 +1589,7 @@ Made in a Foundation black lab, a DIRE program or somewhere worse. The powers ar
 
 ## Otherworlder
 
-*Tier 2 · 2 Edges · Agility +1, Will −1*
+*Tier 2 · 2 Edges · Agility +1*
 
 Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's. Under the Extraordinary Powers Act you aren't a person at all, which makes you hard to register and easy to disappear.
 
@@ -1606,7 +1608,7 @@ Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parall
 
 ## Shadow Earth Defector
 
-*Tier 2 · 2 Edges · Agility +1, Presence −1 · GM's permission*
+*Tier 2 · 2 Edges · Agility +1 · GM's permission*
 
 A duplicate from Shadow Earth, the dark reflection of our world, who turned on its rulers and stayed. Somewhere on this Earth lives your original, who may not know you exist; Shadow Earth wants you back, and everyone else wants to know whose side you're on.
 
@@ -1626,7 +1628,7 @@ A duplicate from Shadow Earth, the dark reflection of our world, who turned on i
 
 ## Touched
 
-*Tier 2 · 2 Edges · Intellect −1, Will +1*
+*Tier 2 · 2 Edges · Will +1*
 
 Changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky. Touched powers are strange, hard to classify and harder to control; the EMD files them under 'Other'.
 
@@ -1645,7 +1647,7 @@ Changed by an exposure to something nobody can name: a peyote vision in the dese
 
 ## Ambrosia
 
-*Tier 3 · 1 Edge · Body +1, Agility −1, Intellect −1, Presence +1*
+*Tier 3 · 1 Edge · Body +1, Presence +1*
 
 Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power. Rare, coveted and hunted; DIRE and the Foundation have both tried to make more.
 
@@ -1665,7 +1667,7 @@ Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body,
 
 ## Mythic
 
-*Tier 3 · 1 Edge · Body +1, Intellect −1, Presence −1, Will +1*
+*Tier 3 · 1 Edge · Body +1, Will +1*
 
 An ancient curse, blessing or bloodline: immortals, werewolves, the children of gods, warriors cursed by Jupiter. Mythic Operants are the oldest kind, and the hardest to classify.
 
@@ -1721,7 +1723,7 @@ When in doubt, choose the higher tier.
 
 ### 3. Attribute adjustments
 
-Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most origins change two to four attributes.
+Give bonuses from **0 to +2** per attribute, **+3 at most in all**. A bonus raises the attribute's base (+1 starts it at 11) and its starting maximum (13 plus the bonus), and comes out of the character's five attribute points, so a bigger bonus means fewer points to spend. Most origins raise one or two attributes. Nothing lowers an attribute: a people's weakness belongs in its core rules or its complications (a sun that burns, a body that tires in normal gravity), not in a number below 10.
 
 An origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
@@ -1740,13 +1742,13 @@ If the origin changes shape, give the form attribute bonuses (usually +2 to one 
 ### In the creator
 
 1. In step 2, choose **Custom origin…** at the end of the Origin list.
-2. Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.
+2. Name it, choose the tier you agreed, and set its bonuses. The checklist confirms they stay within +3, and the points left to spend go down by them.
 3. Write its core rules in **Other ability (GM approval required)** in step 4.
 4. In step 4, choose **Custom origin advantage…** and enter the advantage and its companion complication.
 
 ### Example
 
-**Engineered Bloodline (tier 2).** Descended from a Foundation breeding program that ran from 1952 to 1971; your powers were designed, generations ago. *Adjustments:* Intellect +1, Presence −1. *Core rule:* your powers are documented in a Foundation file you've never seen; the GM may use it. *Origin advantage:* **Designed**: +2 to Powers with your Class II power. *Companion:* **Lineage**: other descendants exist, and some of them work for the Foundation; accept the encounter. *Powers:* one at Class II, two at Class I.
+**Engineered Bloodline (tier 2).** Descended from a Foundation breeding program that ran from 1952 to 1971; your powers were designed, generations ago. *Adjustments:* Intellect +1. *Core rule:* your powers are documented in a Foundation file you've never seen; the GM may use it. *Origin advantage:* **Designed**: +2 to Powers with your Class II power. *Companion:* **Lineage**: other descendants exist, and some of them work for the Foundation; accept the encounter. *Powers:* one at Class II, two at Class I.
 
 ## Threats, weapons and Edges for your table
 
@@ -1798,7 +1800,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
 
-**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 4 points split between origin tier and Edges. Specialist: one Specialty and nine Trained. Expert: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, raised by any origin bonus, then 5 points less those bonuses; none below 10; maximum 13 plus any origin bonus. 4 points split between origin tier and Edges. Specialist: one Specialty and nine Trained. Expert: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Expert) = attribute +5.
 

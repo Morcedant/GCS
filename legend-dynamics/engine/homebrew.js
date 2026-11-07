@@ -118,8 +118,10 @@ function hbClean(raw, PACK) {
   const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew).map((o) => o.id);
   const origins = list("origins").map((x) => {
     const name = hbText(x && x.name, 40), desc = hbText(x && x.desc, 400); if (!name || !desc) return null;
-    const adj = {}; for (const a of hbAttrs()) { const n = hbInt(x.adj && x.adj[a], -2, 2, 0); if (n) adj[a] = n; }
-    if (Object.values(adj).reduce((t, n) => t + n, 0) !== 0) return null; // every origin's changes total 0
+    // An origin only raises attributes (0 to +2 each, +3 in all): no one starts below 10, and the bonuses come out of
+    // the character's five attribute points. A lowered attribute in an older file is dropped.
+    const adj = {}; for (const a of hbAttrs()) { const n = hbInt(x.adj && x.adj[a], -2, 2, 0); if (n > 0) adj[a] = n; }
+    if (Object.values(adj).reduce((t, n) => t + n, 0) > 3) return null;
     const sk = [...new Set((Array.isArray(x.skills) ? x.skills : []).filter((k) => skillNames.includes(k)))].slice(0, 4);
     const traits = (Array.isArray(x.traits) ? x.traits : []).slice(0, 3).map((t) => ({ name: hbText(t && t.name, 40), text: hbText(t && t.text, 300),
       skill: skillNames.includes(t && t.skill) ? t.skill : "", compName: hbText(t && t.compName, 40), compText: hbText(t && t.compText, 300) }))
@@ -308,7 +310,7 @@ function mountHomebrew(api) {
   function originForm() {
     const x = editing && editing[0] === "origins" ? find("origins", editing[1]) : null;
     const maxTier = Math.max(0, ...(PACK.origins || []).filter((o) => !o.homebrew).map((o) => o.tier || 0));
-    const adjSel = (a) => `<div class="field"><label>${a}</label><select name="adj-${a}">${opts([["-2", "−2"], ["-1", "−1"], ["0", "0"], ["1", "+1"], ["2", "+2"]], String((x && x.adj[a]) || 0))}</select></div>`;
+    const adjSel = (a) => `<div class="field"><label>${a}</label><select name="adj-${a}">${opts([["0", "0"], ["1", "+1"], ["2", "+2"]], String((x && x.adj[a]) || 0))}</select></div>`;
     const skillSel = (i) => `<div class="field"><label>${cap(T.origin)} skill ${i + 1}</label><select name="sk${i}">${i ? `<option value="">None</option>` : ""}${opts(ALL_SKILLS, x ? x.skills[i] || "" : "")}</select></div>`;
     const trait = (i) => { const t = (x && x.traits[i]) || {}; return `<fieldset class="field wide hb-bonus"><legend class="label">${cap(T.origin)} advantage ${i + 1}${i ? " (optional)" : ""}</legend><div class="fields">
       <div class="field"><label>Name</label><input name="t${i}-name" maxlength="40" value="${esc(t.name || "")}" placeholder="${i ? "" : "e.g. Night Eyes"}"></div>
@@ -321,7 +323,7 @@ function mountHomebrew(api) {
       <div class="field"><label>Name</label><input name="name" maxlength="40" required value="${esc(x ? x.name : "")}" placeholder="e.g. Cave-born"></div>
       <div class="field"><label>Tier (paid from Edge points)</label><select name="tier">${opts(Array.from({ length: maxTier + 1 }, (_, i) => [String(i), String(i)]), String(x ? x.tier : 0))}</select></div>
       <div class="field wide"><label>Description</label><input name="desc" maxlength="400" required value="${esc(x ? x.desc : "")}" placeholder="Who they are and where they come from."></div>
-      <fieldset class="field wide hb-bonus"><legend class="label">Attribute changes (they must total 0)</legend><div class="fields">${hbAttrs().map(adjSel).join("")}</div></fieldset>
+      <fieldset class="field wide hb-bonus"><legend class="label">Attribute bonuses (+3 at most in all; they come out of the character's five attribute points)</legend><div class="fields">${hbAttrs().map(adjSel).join("")}</div></fieldset>
       ${[0, 1, 2, 3].map(skillSel).join("")}
       ${powerOrigins.length ? `<div class="field wide"><label>Powers</label><select name="powersLike"><option value="">None</option>${opts(powerOrigins.map((o) => [o.id, `As ${o.name}`]), x ? x.powersLike : "")}</select></div>` : ""}
       ${[0, 1, 2].map(trait).join("")}

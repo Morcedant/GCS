@@ -64,27 +64,29 @@ Choose how your character trained (see Step 3):
 | Presence | Leadership, persuasion, social influence |
 | Will | Resolve, concentration, resisting fear and influence |
 
+**Ordinary people.** An ordinary adult has **10** in every attribute: Dodge 8, Move 5 yards, and 6 in anything they've never learned. A trade or a lifelong habit makes a skill Trained (11), and a real professional's work is a Specialty (13). A fit, trained guard or soldier might have Agility and Body 12 and move 8 yards. Nobody starts below 10: an attribute drops under it only for a reason in play, such as an injury, a curse or a form that changes the body.
+
 ### Ancestry and tier
 
-Choose your ancestry from the **Ancestries** chapter. Every attribute starts at 10, and your ancestry adjusts some of them; the result is your **base**. Adjustments always total zero.
+Choose your ancestry from the **Ancestries** chapter. Every attribute starts at 10, and your ancestry may raise some of them; the result is your **base**. No ancestry lowers an attribute below 10. Its bonuses come out of the points you spend next, so every ancestry starts with the same total.
 
 Ancestries can differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between ancestry power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
 
 | Ancestry | Tier | Edges | Adjustments |
 |---|---|---|---|
-| Crownlander | 0 | 3 | Presence +1, Will −1 |
-| Islander | 0 | 3 | Body −1, Agility +1 |
-| Northlander | 0 | 3 | Body +1, Intellect −1 |
-| Sand-born | 0 | 3 | Presence −1, Will +1 |
-| Ashborn | 1 | 2 | Body +1, Presence −1 |
-| Deepkin | 1 | 2 | Presence −1, Will +1 |
-| Witch-blooded | 1 | 2 | Body −1, Will +1 |
-| Demon-marked | 2 | 1 | Body −1, Intellect −1, Presence +1, Will +1 |
-| Giant-blooded | 2 | 1 | Body +2, Agility −1, Intellect −1 |
-| Serpent-kin | 2 | 1 | Body −1, Agility +1, Intellect +1, Presence −1 |
-| Skinchanger | 2 | 1 | Body +1, Agility +1, Intellect −1, Presence −1 |
-| Godblooded | 3 | 0 | Agility −1, Intellect −1, Presence +1, Will +1 |
-| Undying (dark) | 3 | 0 | Body −1, Presence −1, Will +2 |
+| Crownlander | 0 | 3 | Presence +1 |
+| Islander | 0 | 3 | Agility +1 |
+| Northlander | 0 | 3 | Body +1 |
+| Sand-born | 0 | 3 | Will +1 |
+| Ashborn | 1 | 2 | Body +1 |
+| Deepkin | 1 | 2 | Will +1 |
+| Witch-blooded | 1 | 2 | Will +1 |
+| Demon-marked | 2 | 1 | Presence +1, Will +1 |
+| Giant-blooded | 2 | 1 | Body +2 |
+| Serpent-kin | 2 | 1 | Agility +1, Intellect +1 |
+| Skinchanger | 2 | 1 | Body +1, Agility +1 |
+| Godblooded | 3 | 0 | Presence +1, Will +1 |
+| Undying (dark) | 3 | 0 | Will +2 |
 
 ### Edges
 
@@ -105,7 +107,7 @@ Spend all your Edges. Each one buys:
 
 ### Spending points
 
-After applying your ancestry, distribute **five additional points** among the attributes, plus one for each attribute Edge.
+Distribute **five points** among the attributes, plus one for each attribute Edge, less your ancestry's bonuses: with Will +1, you have four to spend.
 
 - The starting maximum is **13**, plus any ancestry bonus to that attribute.
 - You cannot lower an attribute below its base to gain points.
@@ -181,11 +183,11 @@ Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained,
 
 ## Example character
 
-Northlander (tier 0, 3 Edges): +1 attribute point, Extra Fortune, A fine weapon or tool. Body 13, Agility 12, Intellect 9, Presence 11, Will 11.
+Northlander (tier 0, 3 Edges): +1 attribute point, Extra Fortune, A fine weapon or tool. Body 13, Agility 11, Intellect 10, Presence 11, Will 11.
 
 - **Specialty:** Melee 16.
-- **Trained:** Athletics 14, Brawling 14, Marksmanship 13, Riding 13, Sailing 13, Stealth 13, Read People 12, Survival 12, Tracking 10.
-- **Dodge:** 11.
+- **Trained:** Athletics 14, Brawling 14, Marksmanship 12, Read People 12, Riding 12, Sailing 12, Stealth 12, Survival 12, Tracking 11.
+- **Dodge:** 10.
 - **Edges:** a fine tool: her father's longaxe, Wolfbiter (+2 to Melee for breaking a shield, a door or a weapon).
 - **Advantage:** Berserker. **Complication:** Sworn Vengeance; trigger: news of where your enemy is.
 
@@ -923,8 +925,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Second-story artist, Thief. Crownlander (tier 0); Master.* The best climber in the Gilded Cities, who stole a jewel from a sorcerer-prince and is only now learning it's a shard of the Crown.
 
-- **Attributes:** Body 11, Agility 13, Intellect 11, Presence 12, Will 9. **Dodge** 12.
-- **Skills:** Thievery 18 (Expert). Trained: Stealth 14, Deception 13, Persuasion 13, Athletics 12, Craft 12, Investigation 12, Melee 12, Read People 10.
+- **Attributes:** Body 11, Agility 13, Intellect 11, Presence 11, Will 10. **Dodge** 12.
+- **Skills:** Thievery 18 (Expert). Trained: Stealth 14, Athletics 12, Craft 12, Deception 12, Investigation 12, Melee 12, Persuasion 12, Read People 11.
 - **Edges:** +1 attribute point, Extra Trained skill, A friend; a friend: Old Marrow, a fence in the Gilded Cities who buys anything and asks nothing.
 - **Advantage:** Lockbreaker. **Complication:** Keeper of a Secret; trigger: a powerful figure asks what you know.
 - **What drives me:** Gold, and plenty of it. Everything else follows. **Connection:** Cinder was paid to kill her and didn't. Neither of them has said why.
@@ -933,8 +935,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Last scholar of Ssa'keth, Sorcerer. Serpent-kin (tier 2).* Keeper of a drowned serpent temple's memory, searching the human kingdoms for its lost library.
 
-- **Attributes:** Body 9, Agility 12, Intellect 13, Presence 9, Will 13. **Dodge** 11.
-- **Skills:** Sorcery 16 (Specialty). Trained: Healing 14, Investigation 14, Lore 14, Read People 14, Survival 14, Stealth 13, Athletics 10, Deception 10, Persuasion 10.
+- **Attributes:** Body 10, Agility 11, Intellect 12, Presence 10, Will 13. **Dodge** 10.
+- **Skills:** Sorcery 16 (Specialty). Trained: Read People 14, Survival 14, Healing 13, Investigation 13, Lore 13, Stealth 12, Athletics 11, Deception 11, Persuasion 11.
 - **Edges:** +1 attribute point.
 - **Advantage:** Venom (ancestry; companion: Hated Blood). **Complication:** Outcast; trigger: someone recognizes your exile mark.
 - **What drives me:** The old empire's secrets are out there. I will read them. **Connection:** Oren Sael shelters Ithrann at his shrine when no inn will take a serpent-kin.
@@ -943,8 +945,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Hedge-witch, Witch. Witch-blooded (tier 1).* Run out of her village with stones and torches; sells cures and curses to whoever pays.
 
-- **Attributes:** Body 9, Agility 11, Intellect 11, Presence 11, Will 13. **Dodge** 10.
-- **Skills:** Sorcery 16 (Specialty). Trained: Read People 14, Survival 14, Craft 12, Deception 12, Healing 12, Lore 12, Persuasion 12, Stealth 12, Tracking 12, Athletics 10.
+- **Attributes:** Body 10, Agility 10, Intellect 11, Presence 11, Will 13. **Dodge** 9.
+- **Skills:** Sorcery 16 (Specialty). Trained: Read People 14, Survival 14, Craft 12, Deception 12, Healing 12, Lore 12, Persuasion 12, Tracking 12, Athletics 11, Stealth 11.
 - **Edges:** Extra Trained skill, Extra Fortune.
 - **Advantage:** Herb-Wise. **Complication:** Debt to a Sorcerer; trigger: a raven arrives with a sealed message.
 - **What drives me:** Every day alive is a victory. I mean to have more of them. **Connection:** Gorrum carried her out of the burning village. He says he was just passing.
@@ -953,8 +955,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Sergeant of the Iron Company, Sellsword. Giant-blooded (tier 2).* Twenty years with the Iron Company, a wheel-lock pistol he calls Thunder, and a soft spot for strays.
 
-- **Attributes:** Body 15, Agility 10, Intellect 9, Presence 10, Will 11. **Dodge** 9.
-- **Skills:** Melee 18 (Specialty). Trained: Athletics 16, Brawling 16, Read People 12, Survival 12, Leadership 11, Marksmanship 11, Persuasion 11, Riding 11, Healing 10.
+- **Attributes:** Body 15, Agility 10, Intellect 10, Presence 10, Will 10. **Dodge** 9.
+- **Skills:** Melee 18 (Specialty). Trained: Athletics 16, Brawling 16, Healing 11, Leadership 11, Marksmanship 11, Persuasion 11, Read People 11, Riding 11, Survival 11.
 - **Edges:** Second advantage; second advantage: Shield-Wall.
 - **Advantage:** Battle-Hardened. **Complication:** Old Rival; trigger: your rival arrives first.
 - **What drives me:** I did terrible things. I mean to balance the scales. **Connection:** Nyx is the stray he carried out of the fire. He'd die before he'd say he cares.
@@ -973,8 +975,8 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 *Former blade of the Ash Guild, Assassin. Ashborn (tier 1).* Made by the Ash Guild into its best knife; ran the night they ordered a child's death.
 
-- **Attributes:** Body 12, Agility 13, Intellect 11, Presence 9, Will 11. **Dodge** 12.
-- **Skills:** Stealth 16 (Specialty). Trained: Marksmanship 14, Thievery 14, Athletics 13, Brawling 13, Melee 13, Craft 12, Investigation 12, Read People 12, Survival 12, Deception 10.
+- **Attributes:** Body 11, Agility 13, Intellect 11, Presence 10, Will 11. **Dodge** 12.
+- **Skills:** Stealth 16 (Specialty). Trained: Marksmanship 14, Thievery 14, Athletics 12, Brawling 12, Craft 12, Investigation 12, Melee 12, Read People 12, Survival 12, Deception 11.
 - **Edges:** +1 attribute point, Extra Trained skill.
 - **Advantage:** Shadow-Walker. **Complication:** Wanted; trigger: a bounty hunter takes the next room.
 - **What drives me:** No master, no chains, no one to answer to. **Connection:** Vessa Thorn was their last contract. They let her live and have been running ever since.
@@ -1025,19 +1027,19 @@ Choose one advantage at character creation: a general advantage from this chapte
 
 | Ancestry | Tier | Edges | Adjustments |
 |---|---|---|---|
-| Crownlander | 0 | 3 | Presence +1, Will −1 |
-| Islander | 0 | 3 | Body −1, Agility +1 |
-| Northlander | 0 | 3 | Body +1, Intellect −1 |
-| Sand-born | 0 | 3 | Presence −1, Will +1 |
-| Ashborn | 1 | 2 | Body +1, Presence −1 |
-| Deepkin | 1 | 2 | Presence −1, Will +1 |
-| Witch-blooded | 1 | 2 | Body −1, Will +1 |
-| Demon-marked | 2 | 1 | Body −1, Intellect −1, Presence +1, Will +1 |
-| Giant-blooded | 2 | 1 | Body +2, Agility −1, Intellect −1 |
-| Serpent-kin | 2 | 1 | Body −1, Agility +1, Intellect +1, Presence −1 |
-| Skinchanger | 2 | 1 | Body +1, Agility +1, Intellect −1, Presence −1 |
-| Godblooded | 3 | 0 | Agility −1, Intellect −1, Presence +1, Will +1 |
-| Undying (dark) | 3 | 0 | Body −1, Presence −1, Will +2 |
+| Crownlander | 0 | 3 | Presence +1 |
+| Islander | 0 | 3 | Agility +1 |
+| Northlander | 0 | 3 | Body +1 |
+| Sand-born | 0 | 3 | Will +1 |
+| Ashborn | 1 | 2 | Body +1 |
+| Deepkin | 1 | 2 | Will +1 |
+| Witch-blooded | 1 | 2 | Will +1 |
+| Demon-marked | 2 | 1 | Presence +1, Will +1 |
+| Giant-blooded | 2 | 1 | Body +2 |
+| Serpent-kin | 2 | 1 | Agility +1, Intellect +1 |
+| Skinchanger | 2 | 1 | Body +1, Agility +1 |
+| Godblooded | 3 | 0 | Presence +1, Will +1 |
+| Undying (dark) | 3 | 0 | Will +2 |
 
 ## Shared rules
 
@@ -1050,7 +1052,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 
 ## Crownlander
 
-*Tier 0 · 3 Edges · Presence +1, Will −1*
+*Tier 0 · 3 Edges · Presence +1*
 
 Born in the Gilded Cities that were once the empire's heart: silk, intrigue, and knives in the dark.
 
@@ -1064,7 +1066,7 @@ Born in the Gilded Cities that were once the empire's heart: silk, intrigue, and
 
 ## Islander
 
-*Tier 0 · 3 Edges · Body −1, Agility +1*
+*Tier 0 · 3 Edges · Agility +1*
 
 From the Shattered Isles of the south: corsairs, pearl-divers and sea-witches' children.
 
@@ -1078,7 +1080,7 @@ From the Shattered Isles of the south: corsairs, pearl-divers and sea-witches' c
 
 ## Northlander
 
-*Tier 0 · 3 Edges · Body +1, Intellect −1*
+*Tier 0 · 3 Edges · Body +1*
 
 From the frozen north: clans, longships and long winters. Hard to kill and slow to forgive.
 
@@ -1092,7 +1094,7 @@ From the frozen north: clans, longships and long winters. Hard to kill and slow 
 
 ## Sand-born
 
-*Tier 0 · 3 Edges · Presence −1, Will +1*
+*Tier 0 · 3 Edges · Will +1*
 
 Nomads of the Burning Sands, who know every well, every buried city and every lie the dunes tell.
 
@@ -1106,7 +1108,7 @@ Nomads of the Burning Sands, who know every well, every buried city and every li
 
 ## Ashborn
 
-*Tier 1 · 2 Edges · Body +1, Presence −1*
+*Tier 1 · 2 Edges · Body +1*
 
 Grey-skinned descendants of the empire's sorcery-bred slave legions. The empire is gone; the brand remains.
 
@@ -1124,7 +1126,7 @@ Grey-skinned descendants of the empire's sorcery-bred slave legions. The empire 
 
 ## Deepkin
 
-*Tier 1 · 2 Edges · Presence −1, Will +1*
+*Tier 1 · 2 Edges · Will +1*
 
 Pale folk from the cities beneath the mountains, who trade with the surface and fear what lies deeper.
 
@@ -1143,7 +1145,7 @@ Pale folk from the cities beneath the mountains, who trade with the surface and 
 
 ## Witch-blooded
 
-*Tier 1 · 2 Edges · Body −1, Will +1*
+*Tier 1 · 2 Edges · Will +1*
 
 Human, with old sorcery in the veins: a witch grandmother, a sorcerer's bastard, or a pact made before you were born.
 
@@ -1164,7 +1166,7 @@ Human, with old sorcery in the veins: a witch grandmother, a sorcerer's bastard,
 
 ## Demon-marked
 
-*Tier 2 · 1 Edge · Body −1, Intellect −1, Presence +1, Will +1*
+*Tier 2 · 1 Edge · Presence +1, Will +1*
 
 Born of, bargained with, or claimed by the infernal: horns, burning eyes or a shadow that moves on its own.
 
@@ -1183,7 +1185,7 @@ Born of, bargained with, or claimed by the infernal: horns, burning eyes or a sh
 
 ## Giant-blooded
 
-*Tier 2 · 1 Edge · Body +2, Agility −1, Intellect −1*
+*Tier 2 · 1 Edge · Body +2*
 
 Seven feet and more, with a giant somewhere in the family tree. Strong, feared, and always too big for the door.
 
@@ -1201,7 +1203,7 @@ Seven feet and more, with a giant somewhere in the family tree. Strong, feared, 
 
 ## Serpent-kin
 
-*Tier 2 · 1 Edge · Body −1, Agility +1, Intellect +1, Presence −1*
+*Tier 2 · 1 Edge · Agility +1, Intellect +1*
 
 Last heirs of the serpent empire that ruled before humans. Scaled, cold-eyed, venomous, and distrusted everywhere.
 
@@ -1220,7 +1222,7 @@ Last heirs of the serpent empire that ruled before humans. Scaled, cold-eyed, ve
 
 ## Skinchanger
 
-*Tier 2 · 1 Edge · Body +1, Agility +1, Intellect −1, Presence −1*
+*Tier 2 · 1 Edge · Body +1, Agility +1*
 
 Beast-cursed: wolf, bear or great cat. You pass for human until fury or the moon lets the beast out.
 
@@ -1241,7 +1243,7 @@ Beast-cursed: wolf, bear or great cat. You pass for human until fury or the moon
 
 ## Godblooded
 
-*Tier 3 · 0 Edges · Agility −1, Intellect −1, Presence +1, Will +1*
+*Tier 3 · 0 Edges · Presence +1, Will +1*
 
 Descended from a god who died when the Crown shattered. Miracles follow you, and so do those who want the god's last spark.
 
@@ -1260,7 +1262,7 @@ Descended from a god who died when the Crown shattered. Miracles follow you, and
 
 ## Undying
 
-*Tier 3 · 0 Edges · Body −1, Presence −1, Will +2 · dark*
+*Tier 3 · 0 Edges · Will +2 · dark*
 
 A sorcerer who cheated death. Your heart no longer beats; your soul waits in a hidden phylactery.
 
@@ -1316,7 +1318,7 @@ When in doubt, choose the higher tier.
 
 ### 3. Attribute adjustments
 
-Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most ancestries change two to four attributes.
+Give bonuses from **0 to +2** per attribute, **+3 at most in all**. A bonus raises the attribute's base (+1 starts it at 11) and its starting maximum (13 plus the bonus), and comes out of the character's five attribute points, so a bigger bonus means fewer points to spend. Most ancestries raise one or two attributes. Nothing lowers an attribute: a people's weakness belongs in its core rules or its complications (a sun that burns, a body that tires in normal gravity), not in a number below 10.
 
 An ancestry that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
@@ -1335,13 +1337,13 @@ If the ancestry changes shape, give the form attribute bonuses (usually +2 to on
 ### In the creator
 
 1. In step 2, choose **Custom ancestry…** at the end of the Ancestry list.
-2. Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.
+2. Name it, choose the tier you agreed, and set its bonuses. The checklist confirms they stay within +3, and the points left to spend go down by them.
 3. Write its core rules in **Other ability (GM approval required)** in step 4.
 4. In step 4, choose **Custom ancestry advantage…** and enter the advantage and its companion complication.
 
 ### Example
 
-**Ravenkin (tier 1).** Dark-eyed folk from the northern moors who share their dreams with ravens. *Adjustments:* Will +1, Presence −1. *Core rule:* raven-friend: ravens bring you small news (who passed, what's dead nearby), but they flock to you, and people call it an omen. *Ancestry advantage:* **Carrion Sight**: +2 to Tracking and Investigation to find the dead or what killed them. *Companion:* **Ill Omen**: villagers see the birds and bar their doors; accept the suspicion.
+**Ravenkin (tier 1).** Dark-eyed folk from the northern moors who share their dreams with ravens. *Adjustments:* Will +1. *Core rule:* raven-friend: ravens bring you small news (who passed, what's dead nearby), but they flock to you, and people call it an omen. *Ancestry advantage:* **Carrion Sight**: +2 to Tracking and Investigation to find the dead or what killed them. *Companion:* **Ill Omen**: villagers see the birds and bar their doors; accept the suspicion.
 
 ## Threats, weapons and Edges for your table
 
@@ -1393,7 +1395,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
 
-**Creation:** attributes start at 10, adjusted by ancestry (always totaling zero), plus 5 points; maximum 13 plus any ancestry bonus. 3 points split between ancestry tier and Edges. Seasoned: one Specialty and nine Trained. Master: one Expert at +5 and seven Trained. One advantage (general or ancestry) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, raised by any ancestry bonus, then 5 points less those bonuses; none below 10; maximum 13 plus any ancestry bonus. 3 points split between ancestry tier and Edges. Seasoned: one Specialty and nine Trained. Master: one Expert at +5 and seven Trained. One advantage (general or ancestry) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Master) = attribute +5.
 

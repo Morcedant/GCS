@@ -74,13 +74,13 @@ test("homebrew advantages and origins join the creator's choices, held to the se
   const hb = HB.hbClean({
     advantages: [{ name: "Trail Cook", skill: "Survival", text: "+2 to Survival to feed a party." }, { name: "No text" }],
     origins: [{ name: "Cave-born", desc: "From under the hills.", tier: 9, adj: { Agility: 1, Presence: -1 }, skills: ["Tracking", "Juggling", "Stealth"], traits: [trait, { name: "half done" }] },
-      { name: "Lopsided", desc: "x", adj: { Body: 2 }, skills: ["Stealth"], traits: [trait] },
+      { name: "Lopsided", desc: "x", adj: { Body: 2, Agility: 2 }, skills: ["Stealth"], traits: [trait] },
       { name: "No advantage", desc: "x", adj: {}, skills: ["Stealth"], traits: [] }],
   }, P);
   assert.equal(hb.advantages.length, 1);
-  assert.equal(hb.origins.length, 1, "attributes must total 0, and an origin needs an advantage with its complication");
+  assert.equal(hb.origins.length, 1, "bonuses are +3 at most, and an origin needs an advantage with its complication");
   const o = hb.origins[0];
-  assert.deepEqual([o.tier, o.adj, o.skills, o.traits.length], [Math.max(...P.origins.map((x) => x.tier)), { Agility: 1, Presence: -1 }, ["Tracking", "Stealth"], 1]);
+  assert.deepEqual([o.tier, o.adj, o.skills, o.traits.length], [Math.max(...P.origins.map((x) => x.tier)), { Agility: 1 }, ["Tracking", "Stealth"], 1]);
   HB.hbApply(P, hb);
   const added = P.origins[n];
   assert.equal(added.name, "Cave-born (homebrew)");

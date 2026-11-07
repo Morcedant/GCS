@@ -988,4 +988,4 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 
 <!-- SECTION:customorigin -->
 
-**Rhessk (tier 1).** Small, quick, burrow-dwelling traders from a moon of the Tessan core worlds, long-time clients of the dynasties. *Adjustments:* Agility +1, Presence +1, Body −2. *Core rule:* night-adapted: see in near-darkness, −1 in bright light. *Species advantage:* **Tunnel-Runner**: +2 to Athletics in tight spaces. *Companion:* **Client People**: your family's dynasty calls on you; accept the errand.
+**Rhessk (tier 1).** Small, quick, burrow-dwelling traders from a moon of the Tessan core worlds, long-time clients of the dynasties. *Adjustments:* Agility +1, Presence +1. *Core rule:* night-adapted: see in near-darkness, −1 in bright light. *Species advantage:* **Tunnel-Runner**: +2 to Athletics in tight spaces. *Companion:* **Client People**: your family's dynasty calls on you; accept the errand.
