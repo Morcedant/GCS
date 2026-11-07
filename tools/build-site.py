@@ -16,6 +16,8 @@ links to beside it, so nothing points at claude.ai:
   /discord/<game>/                  each game's printable handout, with the bot's setup and code
   /blog/                            the dev blog: posts from the table server (/blog/?p=<id> for one post)
   /blog/write/                      the author's page for writing them, behind the DEV code (not linked or indexed)
+  /music/                           music for the table, every setting that has tracks (tools/music.py)
+  /<game>/music/                    that setting's tracks: a player, and a download for each and for all of them
 
 Run after build-legend.py:
 
@@ -25,7 +27,7 @@ Then upload legend-dynamics/site/ in Cloudflare (see legend-dynamics/CLOUDFLARE-
 """
 import html, importlib.util, pathlib, re, shutil, sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import gm_guides
+import gm_guides, music
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
@@ -106,6 +108,38 @@ main { flex: 1; }
 .ld-w-tools button:hover, .ld-w-tools button[aria-pressed="true"] { border-color: var(--ld-accent); }
 .ld-w-preview { border: 1px dashed var(--ld-line); border-radius: var(--ld-radius); padding: .4rem 1rem; max-width: none; }
 .ld-w-edit textarea { min-height: 22rem; font-size: 1rem; }
+/* The music pages (/music/, /<setting>/music/; website/music.js) */
+.ld-music { max-width: 52rem; }
+.ld-player { position: sticky; top: 0; z-index: 2; background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .9rem 1rem; margin: 0 0 1.2rem; display: grid; gap: .6rem; }
+.ld-now { display: flex; flex-wrap: wrap; gap: .2rem .8rem; align-items: baseline; }
+.ld-now-title { font: 600 1.1rem/1.2 var(--ld-label); color: var(--ld-ink); }
+.ld-seek, .ld-vol { accent-color: var(--ld-accent); }
+.ld-seek { width: 100%; }
+.ld-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .6rem; }
+.ld-controls button { background: var(--ld-panel); color: var(--ld-ink); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .5rem .9rem; font: 600 .9rem/1 var(--ld-body); cursor: pointer; min-height: 2.6rem; }
+.ld-controls button:hover, .ld-controls button[aria-pressed="true"] { border-color: var(--ld-accent); color: var(--ld-accent); }
+.ld-controls .ld-play { background: var(--ld-accent); color: var(--ld-on-accent); border-color: var(--ld-accent); min-width: 5.5rem; }
+.ld-controls .ld-play:hover { color: var(--ld-on-accent); }
+.ld-controls button:focus-visible, .ld-track-go:focus-visible { outline: 2px solid var(--ld-accent); outline-offset: 2px; }
+.ld-vol-l { display: flex; align-items: center; gap: .4rem; font-size: .85rem; color: var(--ld-ink-2); margin-left: auto; }
+.ld-tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.ld-track { display: grid; grid-template-columns: 1fr auto; gap: .3rem 1rem; align-items: center; background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .7rem .9rem; }
+.ld-track.is-current { border-color: var(--ld-accent); }
+.ld-track-go { display: flex; align-items: center; gap: .8rem; background: none; border: 0; padding: 0; color: var(--ld-ink); font: inherit; text-align: left; cursor: pointer; min-height: 2.4rem; }
+.ld-track-n { font: 600 .85rem/1 var(--ld-mono); color: var(--ld-ink-2); min-width: 1.6rem; }
+.ld-track-go[data-state="playing"] .ld-track-n { color: var(--ld-accent); }
+.ld-track-name { display: grid; gap: .15rem; }
+.ld-track-name small { color: var(--ld-ink-2); font-size: .85rem; }
+.ld-track-use, .ld-track-fine { grid-column: 1 / -1; font-size: .9rem; color: var(--ld-ink-2); }
+.ld-track-fine { font-size: .8rem; }
+.ld-track-dl { font-size: .9rem; white-space: nowrap; grid-column: 2; grid-row: 1; }
+.ld-track-native { grid-column: 1 / -1; width: 100%; }
+.ld-music--js .ld-track-native { display: none; }
+.ld-music-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.ld-music-card { display: grid; gap: .3rem; background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: 1rem 1.1rem; color: var(--ld-ink); text-decoration: none; }
+.ld-music-card:hover { border-color: var(--ld-accent); }
+.ld-music-card span { font-size: .9rem; color: var(--ld-ink-2); }
+@media (max-width: 560px) { .ld-track { grid-template-columns: 1fr; } .ld-track-dl { grid-column: 1; grid-row: auto; } .ld-vol-l { margin-left: 0; } }
 /* The playtest page (/playtest/) and the feedback the author reads */
 .ld-fb { border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .8rem 1rem; background: var(--ld-panel); display: grid; gap: .6rem; justify-items: start; }
 .ld-fb pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 .95rem/1.5 var(--ld-body); color: var(--ld-ink); }
@@ -142,7 +176,7 @@ PROTECT = """<style>.ld-protected { -webkit-user-select: none; user-select: none
   for (const ev of ["copy", "cut", "contextmenu", "dragstart"]) m.addEventListener(ev, (e) => e.preventDefault()); })();</script>"""
 
 
-def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, blog=False, robots=""):
+def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, blog=False, robots="", music=False):
     here = "/" + path.strip("/")
     here = "/" if here == "/" else here
     nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == here else ""}>{e(n)}</a>' for h, n in NAV)
@@ -171,10 +205,63 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="/dominion/">Dominion (strategy game)</a><a href="/playtest/">Playtest</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a>{MUSIC_LINK}<a href="/dominion/">Dominion (strategy game)</a><a href="/playtest/">Playtest</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}{'<script src="/music.js" defer></script>' if music else ""}
 </body>
 </html>
 """
+
+
+MUSIC = {}          # game → its tracks (tools/music.py), read at the start of main()
+MUSIC_LINK = ""     # the footer's link to /music/, once any setting has tracks
+MUSIC_SLUG = "/music"
+
+
+def mtime(sec):
+    return f"{sec // 60}:{sec % 60:02d}" if sec else ""
+
+
+def music_block(g):
+    """A setting's music: the player (music.js) and the tracks, each with its own audio control (without JavaScript) and download."""
+    t, ts, m = bw.pack(g)["terms"], MUSIC[g], music.manifest(g)
+    slug = SLUGS[g]
+    rows = []
+    for k, x in enumerate(ts):
+        src = f"{slug}/music/{x['file']}"
+        bits = [b for b in (x.get("mood"), mtime(x.get("seconds"))) if b]
+        sub = " · ".join(bits)
+        meta = "".join(f'<span class="ld-track-{c}">{e(x[c])}</span>' for c in ("use",) if x.get(c))
+        fine = " · ".join(e(x[c]) for c in ("credit", "license") if x.get(c))
+        rows.append(f'<li class="ld-track" data-track data-src="{e(src)}" data-title="{e(x["title"])}" data-sub="{e(sub)}" data-credit="{e(x.get("credit", ""))}" data-loop="{1 if x.get("loop") else 0}">'
+                    f'<button class="ld-track-go" type="button"><span class="ld-track-n">{k + 1}</span><span class="ld-track-name"><b>{e(x["title"])}</b>{f"<small>{e(sub)}</small>" if sub else ""}</span></button>'
+                    f'{meta}{f"<small class='ld-track-fine'>{fine}</small>" if fine else ""}'
+                    f'<audio class="ld-track-native" controls preload="none" src="{e(src)}"></audio>'
+                    f'<a class="ld-track-dl" href="{e(src)}" download>Download <span class="ld-note">{x["bytes"] / 1048576:.1f} MB</span></a></li>')
+    allzip = MUSIC_ZIPS.get(g)
+    return f"""<div class="ld ld-music" data-music data-setting="{e(t['title'])}">
+  <div class="ld-eyebrow">{e(t['title'])} · Music for the table</div>
+  <h1>Music</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">{e(m.get("intro") or f"Tracks for {t['title']} games: play them here while you play, or download them for your own table.")}</p>
+  <div class="ld-player" hidden>
+    <div class="ld-now"><b class="ld-now-title"></b><span class="ld-now-sub ld-note"></span></div>
+    <input class="ld-seek" type="range" min="0" max="1000" value="0" aria-label="Position in the track">
+    <div class="ld-controls">
+      <button type="button" data-act="prev" aria-label="Previous track">Prev</button>
+      <button type="button" data-act="play" class="ld-play" aria-label="Play">Play</button>
+      <button type="button" data-act="next" aria-label="Next track">Next</button>
+      <span class="ld-time ld-note">0:00 / –:––</span>
+      <button type="button" data-act="loop" aria-pressed="false" title="Repeat this track, for background at the table">Repeat track</button>
+      <button type="button" data-act="on" aria-pressed="true" title="When a track ends, play the next">Play on</button>
+      <label class="ld-vol-l">Volume <input class="ld-vol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+    </div>
+  </div>
+  <ol class="ld-tracks">{"".join(rows)}</ol>
+  {f'<div class="ld-actions"><a class="ld-button ld-button--ghost" href="{e(allzip[0])}" download>Download all {len(ts)} tracks <span class="ld-note">({allzip[1] / 1048576:.0f} MB zip)</span></a></div>' if allzip else ""}
+  <p class="ld-note" style="margin-top:1.2rem"><a href="{slug}">← {e(t['title'])}</a> · <a href="{MUSIC_SLUG}/">Music for every setting</a></p>
+</div>"""
+
+
+MUSIC_ZIPS = {}   # game → (its zip's address, size), when the whole set fits under Cloudflare's 25 MiB
 
 
 def write(rel, text):
@@ -234,6 +321,12 @@ def main():
     fonts_all = {bw.BRAND_FONTS} | {bw.pack(g)["terms"]["fontsHref"] for g in GAMES}
     font_links = lambda hrefs: "\n".join(f'<link rel="stylesheet" href="{e(h)}">' for h in sorted(hrefs))
 
+    # Music: each setting's tracks (legend-dynamics/<game>/music/, tools/music.py). A setting without any gets no page.
+    global MUSIC_LINK
+    for g in GAMES:
+        ts = music.tracks(g)
+        if ts: MUSIC[g] = ts
+    MUSIC_LINK = f'<a href="{MUSIC_SLUG}/">Music</a>' if MUSIC else ""
     write("site.css", (LD / "website" / "custom.css").read_text() + FRAME_CSS)
     write("favicon.svg", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#15171c"/>'
           '<path d="M32 9 52 21v22L32 55 12 43V21Z" fill="none" stroke="#9b6b1f" stroke-width="4"/>'
@@ -281,9 +374,39 @@ def main():
                f'<a href="{SLUGS[g]}">{e(t["title"])}</a></nav>')
         write(f"{slug}/create/index.html", re.sub(r"<!-- SITE-NAV:.*?-->", lambda _: nav, (LD / g / "index.html").read_text(), count=1))
         b = blocks(bw.game_page(g))
+        if g in MUSIC:
+            n = len(MUSIC[g])
+            b.append(f'<div class="ld"><div class="ld-eyebrow">Music for the table</div><h2 style="margin:.2rem 0 .6rem">{n} track{"" if n == 1 else "s"} for {e(t["title"])}</h2>'
+                     f'<p style="max-width:40rem">Play them on the site while you play, or download them for your own table.</p>'
+                     f'<div class="ld-actions"><a class="ld-button" href="{SLUGS[g]}/music/">Listen</a></div></div>')
         b.append(downloads(links))
         write(f"{slug}/index.html", page(SLUGS[g], f"{t['title']} · Legend Dynamics", re.sub(r"<[^>]+>", "", bw.first_para(g))[:300],
                                           b, theme=g, fonts=font_links({bw.BRAND_FONTS, t["fontsHref"]})))
+
+    # The music pages: each setting's tracks beside its page, a zip of them all (when it fits), and /music/ for every setting.
+    if MUSIC:
+        import zipfile
+        copy(LD / "website" / "music.js", "music.js")
+        for g, ts in MUSIC.items():
+            t, slug = bw.pack(g)["terms"], SLUGS[g].strip("/")
+            for x in ts: copy(x["path"], f"{slug}/music/{x['file']}")
+            total = sum(x["bytes"] for x in ts)
+            if len(ts) > 1 and total <= music.MAX_BYTES:
+                name = re.sub(r"[^A-Za-z0-9]+", "_", t["title"]).strip("_") + "_Music.zip"
+                (SITE / slug / "music").mkdir(parents=True, exist_ok=True)
+                with zipfile.ZipFile(SITE / slug / "music" / name, "w", zipfile.ZIP_STORED) as z:   # MP3s don't compress: stored
+                    for x in ts: z.write(x["path"], x["file"])
+                MUSIC_ZIPS[g] = (f"{SLUGS[g]}/music/{name}", (SITE / slug / "music" / name).stat().st_size)
+            elif len(ts) > 1:
+                print(f"music: {g}: all its tracks together are {total / 1048576:.0f} MiB, over Cloudflare's 25 MiB a file: no download-all zip (each track still downloads)")
+            write(f"{slug}/music/index.html", page(f"{SLUGS[g]}/music", f"Music · {t['title']} · Legend Dynamics", f"Music for {t['title']} games: listen while you play, or download the tracks.",
+                                                   [music_block(g)], theme=g, fonts=font_links({bw.BRAND_FONTS, t["fontsHref"]}), music=True))
+        cards = "".join(f'<li><a class="ld-music-card" href="{SLUGS[g]}/music/"><b>{e(bw.pack(g)["terms"]["title"])}</b><span>{len(MUSIC[g])} track{"" if len(MUSIC[g]) == 1 else "s"}'
+                        f'{" · " + ", ".join(sorted({x["mood"] for x in MUSIC[g] if x.get("mood")})) if any(x.get("mood") for x in MUSIC[g]) else ""}</span></a></li>' for g in GAMES if g in MUSIC)
+        write("music/index.html", page(MUSIC_SLUG, "Music · Legend Dynamics", "Music for Legend Dynamics games: tracks for each setting, to play at the table or download.",
+                                       [f'<div class="ld ld-hero"><div class="ld-eyebrow">Legend Dynamics</div><h1>Music for the table</h1><hr class="ld-rule">'
+                                        f'<p class="ld-lede">Tracks for each setting: put one on while you play, or download them for your own games.</p></div>',
+                                        f'<div class="ld"><ul class="ld-music-cards">{cards}</ul></div>'], fonts=font_links({bw.BRAND_FONTS})))
 
     core_docx = LD / "Legend_Dynamics_Core_Rules.docx"
     copy(core_docx, f"core-rules/{core_docx.name}")

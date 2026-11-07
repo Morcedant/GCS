@@ -83,3 +83,13 @@ on every run, so redeploy the bot after changing a pack.
 ## Website
 
 [`website/`](website/README.md) is a Squarespace kit for a Legend Dynamics site. It has a brand stylesheet with a theme for each game, ready-made Code Block HTML for the home page, each game page and the core rules, and `preview.html` to see it. Rebuild it with `python3 tools/build-website.py`; `tools/build-site.py` (the Cloudflare site) rebuilds it too.
+
+## Music
+
+Each setting can have music for the table: drop audio files into `legend-dynamics/<setting>/music/` (western,
+spaceopera, fantasy, aurora), or add them with `python3 tools/music.py add <setting> <file> --title … --mood …`
+(it converts WAV, FLAC and AIFF to MP3). `tools/build-site.py` then gives that setting a page, `/<setting>/music/`, with
+a player (playlist, repeat for ambience, play on, lock-screen controls) and a download for each track and for all of
+them, plus a link from the setting's page, `/music/` for every setting, and a Music link in the footer. A setting
+with no tracks gets no page. Each file must be under 25 MB (Cloudflare Pages' limit); `tools/music.py list` shows
+what each setting has. The details are in each folder's README.md.
