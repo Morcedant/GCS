@@ -475,6 +475,10 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-extra .gm-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .gm-extra textarea { width: 100%; min-height: 3.2em; font: inherit; font-size: .9rem; }
 .gm-extra .boxes { flex-wrap: wrap; }
+.gm-expics { display: grid; grid-template-columns: 3fr 2fr; gap: 6px; margin-bottom: 6px; }
+.gm-expic { position: relative; display: grid; place-items: center; height: 8.5rem; border-radius: 6px; background: var(--line); overflow: hidden; }
+.gm-expic img { width: 100%; height: 100%; object-fit: cover; } .gm-extok img { object-fit: contain; }
+.gm-expic label { position: absolute; bottom: 4px; right: 6px; background: var(--card, #fff); padding: 1px 6px; border-radius: 4px; }
 .gm-extra .gm-head > div { flex: 1; min-width: 0; } .gm-ex-name { width: 100%; font-weight: 700; }
 .gm-unstable { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .gm-supermove { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 2px; padding: 5px 8px; border: 1px solid var(--accent); border-radius: 6px; }
@@ -683,7 +687,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="78f7963" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 78f7963</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="2926f56" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 2926f56</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -10502,7 +10506,7 @@ function mountBattleMap(api) {
       if (!t.ex) continue;
       let x = null; try { x = api.extra(t.ex); } catch { return; } // the page's extras load just after the map
       if (!x) { delete t.ex; continue; }
-      t.name = x.name; t.boxes = x.boxes; t.injury = Math.min(x.injury, x.boxes);
+      t.name = x.name; t.boxes = x.boxes; t.injury = Math.min(x.injury, x.boxes); if (x.img) t.img = x.img;
     }
   }
   function draw() { syncExtras(); viewBox(); drawWorld(); drawGrid(); drawTokens(); drawMeasure(); drawSel(); syncForm(); }
@@ -12572,7 +12576,7 @@ function ptMaps(api, root) {
     list.innerHTML = people.map((x, i) => {
       const pic = (p, cls, word) => `<div class="pt-pic ${cls}">${p ? picHTML(p) : `${word} coming soon`}<\/div>`;
       const tok = x.token || x.portrait;
-      const acts = [x.pc && api.givePictures && (x.portrait || x.token) ? `<button type="button" class="btn primary" data-ptm-give="${i}">Give the pictures to ${esc(first(x.name))}<\/button>` : "",
+      const acts = [api.givePictures && (x.portrait || x.token) && (x.pc || (api.extraFor && api.extraFor(x.name))) ? `<button type="button" class="btn primary" data-ptm-give="${i}">Give the pictures to ${esc(first(x.name))}<\/button>` : "",
         !x.pc && api.map && tok ? `<button type="button" class="btn primary" data-ptm-add="${i}">Add to the battle map<\/button>` : "",
         x.portrait ? `<a class="btn" href="${esc(x.portrait.download)}" download>Portrait <span class="small muted">${size(x.portrait.bytes)}<\/span><\/a>` : "",
         x.token ? `<a class="btn" href="${esc(x.token.download)}" download>Token <span class="small muted">${size(x.token.bytes)}<\/span><\/a>` : ""].join("");
@@ -12689,7 +12693,7 @@ function ptMaps(api, root) {
     setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun, partyName: T.party,
     // The GM's extras: a token placed from an extra's card shares its boxes and injuries with the card.
-    extra: (id) => gmExtras.find((x) => x.id === id) || null,
+    extra: (id) => { const x = gmExtras.find((y) => y.id === id); return x ? { ...x, img: x.token || x.portrait || "" } : null; },
     setExtra: (id, patch) => { const x = gmExtras.find((y) => y.id === id); if (!x) return; Object.assign(x, patch); saveExtras(); renderExtras(); },
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
@@ -12806,7 +12810,11 @@ function ptMaps(api, root) {
     id: typeof x.id === "string" ? x.id : uid(), threat: typeof x.threat === "string" ? x.threat : null, name: x.name.trim().slice(0, 60),
     label: String(x.label || "").slice(0, 80), boxes: Math.max(1, Math.min(20, parseInt(x.boxes, 10) || 1)), injury: Math.max(0, parseInt(x.injury, 10) || 0),
     dodge: x.dodge === "" || x.dodge == null ? "" : String(x.dodge).slice(0, 6), attacks: String(x.attacks || "").slice(0, 200), trait: String(x.trait || "").slice(0, 300),
-    notes: String(x.notes || "").slice(0, 1000), generic: !!x.generic } : null;
+    notes: String(x.notes || "").slice(0, 1000), generic: !!x.generic,
+    // Their pictures (as a character's): a portrait for the card and a token for the map, from the bucket or uploaded.
+    portrait: typeof x.portrait === "string" && /^data:image\/(png|jpeg|webp|gif);base64,/.test(x.portrait) ? x.portrait : "",
+    token: typeof x.token === "string" && /^data:image\/(png|jpeg|webp|gif);base64,/.test(x.token) ? x.token : "",
+    pictureFrom: { portrait: x.pictureFrom && typeof x.pictureFrom.portrait === "string" && x.portrait ? x.pictureFrom.portrait.slice(0, 400) : "", token: x.pictureFrom && typeof x.pictureFrom.token === "string" && x.token ? x.pictureFrom.token.slice(0, 400) : "" } } : null;
   let gmExtras = (store.get(STORE_EXTRAS, []) || []).map(cleanExtra).filter(Boolean);
   const saveExtras = () => { store.set(STORE_EXTRAS, gmExtras); try { battleMap.refresh(); pushScene(); } catch { /* the map mounts first; nothing to follow yet */ } };
   /** An extra from a threat (by id), or a blank one: added unless someone named is already here; generic ones numbered. */
@@ -12820,6 +12828,7 @@ function ptMaps(api, root) {
       boxes: t ? t.boxes || 1 : 1, dodge: t && t.dodge != null ? t.dodge : "", attacks: t ? threatLine(t) : "", trait: t && t.trait ? `${t.trait}${t.traitText ? ": " + t.traitText : ""}` : "", generic });
     gmExtras.push(x); saveExtras(); renderExtras();
     if (!quiet) gmSay(`${x.name} is at the table, under Extras.`);
+    extraPictures([x]);
     return x;
   }
   function renderExtras() {
@@ -12827,6 +12836,8 @@ function ptMaps(api, root) {
     if (sel) sel.innerHTML = `<option value="">Choose someone…</option>` + extraThreats().map((t) => `<option value="${esc(t.id)}">${esc(t.label || t.name)}</option>`).join("") + `<option value="blank">Someone else (write them in)…</option>`;
     const root = $("gm-extras"); if (!root) return;
     root.innerHTML = gmExtras.length ? `<h3 class="gm-extras-head">Extras</h3><div class="gm-grid">${gmExtras.map((x) => `<article class="gm-card hud gm-extra ${x.injury >= x.boxes ? "down" : ""}" data-ex="${x.id}">
+        <div class="gm-expics"><div class="gm-expic">${x.portrait ? `<img src="${x.portrait}" alt="">` : `<span class="small muted">No portrait</span>`}<label class="linkish small">Portrait…<input type="file" accept="image/*" class="visually-hidden" data-expic="portrait"></label></div>
+          <div class="gm-expic gm-extok">${x.token ? `<img src="${x.token}" alt="">` : `<span class="small muted">No token</span>`}<label class="linkish small">Token…<input type="file" accept="image/*" class="visually-hidden" data-expic="token"></label></div></div>
         <div class="gm-head"><div><input type="text" class="gm-ex-name" data-exf="name" value="${esc(x.name)}" aria-label="Name" maxlength="60"><span class="small muted">${esc(x.label && x.label !== x.name ? x.label : x.threat ? "" : "Written in by the GM")}</span></div></div>
         <div class="gm-stats"><div><span>Dodge</span><b><input type="text" data-exf="dodge" value="${esc(x.dodge)}" inputmode="numeric" maxlength="6" aria-label="Dodge" style="width:3em;text-align:center"></b></div><div><span>Boxes</span><b><input type="text" data-exf="boxes" value="${x.boxes}" inputmode="numeric" maxlength="2" aria-label="Boxes" style="width:3em;text-align:center"></b></div><div><span>Marked</span><b>${Math.min(x.injury, x.boxes)}</b></div></div>
         <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: x.boxes }, (_, i) => `<button class="box ${i < x.injury ? "on" : ""}" data-exbox="${i + 1}" aria-label="${esc(x.name)} box ${i + 1}"></button>`).join("")}</span></span></div>
@@ -12856,18 +12867,34 @@ function ptMaps(api, root) {
       const t = x.threat && extraThreats().find((y) => y.id === x.threat);
       if (!x.generic && battleMap.hasExtra(x.id)) { showGmTab("fight"); gmSay(`${x.name} is on the battle map already.`); return; }
       const stats = [x.attacks, x.dodge !== "" ? `Dodge ${x.dodge}` : "", x.trait].filter(Boolean).join(" · ");
-      await battleMap.addPieces([{ name: x.name, url: "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true, ex: x.id, boxes: x.boxes, injury: x.injury, stats }]);
+      await battleMap.addPieces([{ name: x.name, url: x.token || x.portrait || "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true, ex: x.id, boxes: x.boxes, injury: x.injury, stats }]);
       showGmTab("fight"); gmSay(`${x.name} is on the battle map: a box marked there marks their card, and the other way round.`);
     }
   });
-  $("gm-extras").addEventListener("change", (e) => {
+  $("gm-extras").addEventListener("change", async (e) => {
+    const up = e.target.closest("[data-expic]");
+    if (up) {
+      const card = up.closest("[data-ex]"), x = card && gmExtras.find((y) => y.id === card.dataset.ex), file = up.files && up.files[0]; up.value = "";
+      if (!x || !file || !/^image\//.test(file.type)) { if (file) gmSay("That file isn't an image.", true); return; }
+      const u = URL.createObjectURL(file);
+      try { x[up.dataset.expic] = await pictureData(u, up.dataset.expic === "token" ? 256 : MAX_SIDE); x.pictureFrom[up.dataset.expic] = ""; saveExtras(); renderExtras(); gmSay(`${x.name}: ${up.dataset.expic} set.`); }
+      catch { gmSay("That picture couldn't be read.", true); } finally { URL.revokeObjectURL(u); }
+      return;
+    }
     const f = e.target.closest("[data-exf]"), card = e.target.closest("[data-ex]"); if (!f || !card) return;
     const x = gmExtras.find((y) => y.id === card.dataset.ex); if (!x) return;
     const k = f.dataset.exf;
     if (k === "generic") x.generic = f.checked; else x[k] = f.value;
     Object.assign(x, cleanExtra(x)); saveExtras(); if (k === "boxes" || k === "generic") renderExtras();
   });
+  /** Extras' pictures from the bucket (portrait - name, token - name), as the characters': new ones, and replaced ones. */
+  async function extraPictures(list) {
+    let n = 0;
+    for (const x of list) { try { if (await autoPictures(x)) n++; } catch { /* no pictures for them yet */ } }
+    if (n) { saveExtras(); renderExtras(); }
+  }
   renderExtras();
+  setTimeout(() => extraPictures(gmExtras), 1800);
   let labPanel = null; // the Encounter panel (and, with a test configuration, the Rules Lab)
   // ---- discovery clocks, the threat clock they race, investigation costs, and minting cards (pack discovery) ----
   const STORE_DISC = PACK.id + ".discovery.v1";
@@ -13716,10 +13743,12 @@ function ptMaps(api, root) {
   if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
     server: TABLE_SERVER, map: battleMap, extraFor: (name) => gmExtras.find((x) => x.name === name) || null, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
     givePictures: async (name, portraitUrl, tokenUrl) => {
-      const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name)];
+      const exs = gmExtras.filter((x) => x.name.replace(/\s+\d+$/, "") === name);
+      const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name), ...exs];
       if (!chars.length) return 0;
       const n = await givePics(chars, portraitUrl, tokenUrl);
       if (chars.includes(ch)) { touch(); render(); store.set(STORE_CURRENT, ch); }
+      if (exs.length) { saveExtras(); renderExtras(); }
       store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); return n;
     },
     showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); },

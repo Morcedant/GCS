@@ -337,7 +337,7 @@ function mountBattleMap(api) {
       if (!t.ex) continue;
       let x = null; try { x = api.extra(t.ex); } catch { return; } // the page's extras load just after the map
       if (!x) { delete t.ex; continue; }
-      t.name = x.name; t.boxes = x.boxes; t.injury = Math.min(x.injury, x.boxes);
+      t.name = x.name; t.boxes = x.boxes; t.injury = Math.min(x.injury, x.boxes); if (x.img) t.img = x.img;
     }
   }
   function draw() { syncExtras(); viewBox(); drawWorld(); drawGrid(); drawTokens(); drawMeasure(); drawSel(); syncForm(); }

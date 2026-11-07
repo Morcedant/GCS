@@ -191,7 +191,7 @@ function ptMaps(api, root) {
     list.innerHTML = people.map((x, i) => {
       const pic = (p, cls, word) => `<div class="pt-pic ${cls}">${p ? picHTML(p) : `${word} coming soon`}</div>`;
       const tok = x.token || x.portrait;
-      const acts = [x.pc && api.givePictures && (x.portrait || x.token) ? `<button type="button" class="btn primary" data-ptm-give="${i}">Give the pictures to ${esc(first(x.name))}</button>` : "",
+      const acts = [api.givePictures && (x.portrait || x.token) && (x.pc || (api.extraFor && api.extraFor(x.name))) ? `<button type="button" class="btn primary" data-ptm-give="${i}">Give the pictures to ${esc(first(x.name))}</button>` : "",
         !x.pc && api.map && tok ? `<button type="button" class="btn primary" data-ptm-add="${i}">Add to the battle map</button>` : "",
         x.portrait ? `<a class="btn" href="${esc(x.portrait.download)}" download>Portrait <span class="small muted">${size(x.portrait.bytes)}</span></a>` : "",
         x.token ? `<a class="btn" href="${esc(x.token.download)}" download>Token <span class="small muted">${size(x.token.bytes)}</span></a>` : ""].join("");
