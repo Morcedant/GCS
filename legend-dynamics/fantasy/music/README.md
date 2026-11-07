@@ -1,5 +1,9 @@
 # Music for this setting
 
+**The usual way is to upload tracks to Cloudflare** (the R2 bucket `legend-music`, one folder per setting: see
+`legend-dynamics/table-server/README.md`, *Music for the settings*); they show on the site at once. This folder is the
+other way: tracks built into the site itself.
+
 Put this setting's audio files here (MP3 is best; M4A, OGG and Opus work too), and the website gets a music page
 for it with a player and downloads. Nothing shows on the site until there's at least one track.
 

@@ -86,10 +86,15 @@ on every run, so redeploy the bot after changing a pack.
 
 ## Music
 
-Each setting can have music for the table: drop audio files into `legend-dynamics/<setting>/music/` (western,
-spaceopera, fantasy, aurora), or add them with `python3 tools/music.py add <setting> <file> --title … --mood …`
-(it converts WAV, FLAC and AIFF to MP3). `tools/build-site.py` then gives that setting a page, `/<setting>/music/`, with
-a player (playlist, repeat for ambience, play on, lock-screen controls) and a download for each track and for all of
-them, plus a link from the setting's page, `/music/` for every setting, and a Music link in the footer. A setting
-with no tracks gets no page. Each file must be under 25 MB (Cloudflare Pages' limit); `tools/music.py list` shows
-what each setting has. The details are in each folder's README.md.
+Each setting has a music page on the site (`/<setting>/music/`, and `/music/` for all of them), with a player
+(playlist, repeat for ambience, play on, lock-screen controls) and a download for each track.
+
+**Upload tracks to Cloudflare** (the usual way): into the table server's R2 bucket, `legend-music`, one folder per
+setting (`trails-of-blood-and-dust`, `fracture-lines`, `the-shattered-crown`, `aurora`). The pages list them at once,
+with no rebuild. Setting it up, naming and ordering tracks: `table-server/README.md`, *Music for the settings*.
+
+**Or build them into the site:** put files in `legend-dynamics/<setting>/music/` (western, spaceopera, fantasy, aurora)
+or use `python3 tools/music.py add <setting> <file> --title … --mood …`, then rebuild. These also get a download-all
+zip (if they total under 25 MB, Cloudflare Pages' limit for a file). The folders' README.md has the details.
+
+The pages, the setting pages' "Listen" block and the hub show a setting only once it has tracks.

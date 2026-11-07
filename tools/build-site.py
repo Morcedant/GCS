@@ -212,7 +212,10 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
 
 
 MUSIC = {}          # game → its tracks (tools/music.py), read at the start of main()
-MUSIC_LINK = ""     # the footer's link to /music/, once any setting has tracks
+MUSIC_LINK = ""     # the footer's link to /music/
+# The music pages exist when the table server does (its R2 bucket holds the tracks: table-server/src/music.js) or any
+# setting has tracks built in. Each lists what the server has when it opens, so uploads show at once.
+MUSIC_ON = False
 MUSIC_SLUG = "/music"
 
 
@@ -222,7 +225,7 @@ def mtime(sec):
 
 def music_block(g):
     """A setting's music: the player (music.js) and the tracks, each with its own audio control (without JavaScript) and download."""
-    t, ts, m = bw.pack(g)["terms"], MUSIC[g], music.manifest(g)
+    t, ts, m = bw.pack(g)["terms"], MUSIC.get(g, []), music.manifest(g)
     slug = SLUGS[g]
     rows = []
     for k, x in enumerate(ts):
@@ -237,7 +240,7 @@ def music_block(g):
                     f'<audio class="ld-track-native" controls preload="none" src="{e(src)}"></audio>'
                     f'<a class="ld-track-dl" href="{e(src)}" download>Download <span class="ld-note">{x["bytes"] / 1048576:.1f} MB</span></a></li>')
     allzip = MUSIC_ZIPS.get(g)
-    return f"""<div class="ld ld-music" data-music data-setting="{e(t['title'])}">
+    return f"""<div class="ld ld-music" data-music data-setting="{e(t['title'])}" data-folder="{e(slug.strip('/'))}" data-music-server="{e(BLOG_SERVER)}">
   <div class="ld-eyebrow">{e(t['title'])} · Music for the table</div>
   <h1>Music</h1>
   <hr class="ld-rule">
@@ -255,6 +258,8 @@ def music_block(g):
       <label class="ld-vol-l">Volume <input class="ld-vol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
     </div>
   </div>
+  <p class="ld-note" data-status hidden>Finding the tracks…</p>
+  <p class="ld-note" data-empty hidden>No tracks for {e(t['title'])} yet. Check back soon.</p>
   <ol class="ld-tracks">{"".join(rows)}</ol>
   {f'<div class="ld-actions"><a class="ld-button ld-button--ghost" href="{e(allzip[0])}" download>Download all {len(ts)} tracks <span class="ld-note">({allzip[1] / 1048576:.0f} MB zip)</span></a></div>' if allzip else ""}
   <p class="ld-note" style="margin-top:1.2rem"><a href="{slug}">← {e(t['title'])}</a> · <a href="{MUSIC_SLUG}/">Music for every setting</a></p>
@@ -322,11 +327,12 @@ def main():
     font_links = lambda hrefs: "\n".join(f'<link rel="stylesheet" href="{e(h)}">' for h in sorted(hrefs))
 
     # Music: each setting's tracks (legend-dynamics/<game>/music/, tools/music.py). A setting without any gets no page.
-    global MUSIC_LINK
+    global MUSIC_LINK, MUSIC_ON
     for g in GAMES:
         ts = music.tracks(g)
         if ts: MUSIC[g] = ts
-    MUSIC_LINK = f'<a href="{MUSIC_SLUG}/">Music</a>' if MUSIC else ""
+    MUSIC_ON = bool(MUSIC or BLOG_SERVER)
+    MUSIC_LINK = f'<a href="{MUSIC_SLUG}/">Music</a>' if MUSIC_ON else ""
     write("site.css", (LD / "website" / "custom.css").read_text() + FRAME_CSS)
     write("favicon.svg", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#15171c"/>'
           '<path d="M32 9 52 21v22L32 55 12 43V21Z" fill="none" stroke="#9b6b1f" stroke-width="4"/>'
@@ -374,17 +380,19 @@ def main():
                f'<a href="{SLUGS[g]}">{e(t["title"])}</a></nav>')
         write(f"{slug}/create/index.html", re.sub(r"<!-- SITE-NAV:.*?-->", lambda _: nav, (LD / g / "index.html").read_text(), count=1))
         b = blocks(bw.game_page(g))
-        if g in MUSIC:
-            n = len(MUSIC[g])
-            b.append(f'<div class="ld"><div class="ld-eyebrow">Music for the table</div><h2 style="margin:.2rem 0 .6rem">{n} track{"" if n == 1 else "s"} for {e(t["title"])}</h2>'
+        if MUSIC_ON:
+            # Shown once the setting has tracks (music.js asks the server; built-in tracks count from the start).
+            n = len(MUSIC.get(g, []))
+            b.append(f'<div class="ld" data-music-count="{slug}" data-static="{n}" data-music-server="{e(BLOG_SERVER)}"{"" if n else " hidden"}><div class="ld-eyebrow">Music for the table</div>'
+                     f'<h2 style="margin:.2rem 0 .6rem"><span data-n>{n} track{"" if n == 1 else "s"}</span> for {e(t["title"])}</h2>'
                      f'<p style="max-width:40rem">Play them on the site while you play, or download them for your own table.</p>'
                      f'<div class="ld-actions"><a class="ld-button" href="{SLUGS[g]}/music/">Listen</a></div></div>')
         b.append(downloads(links))
         write(f"{slug}/index.html", page(SLUGS[g], f"{t['title']} · Legend Dynamics", re.sub(r"<[^>]+>", "", bw.first_para(g))[:300],
-                                          b, theme=g, fonts=font_links({bw.BRAND_FONTS, t["fontsHref"]})))
+                                          b, theme=g, fonts=font_links({bw.BRAND_FONTS, t["fontsHref"]}), music=MUSIC_ON))
 
     # The music pages: each setting's tracks beside its page, a zip of them all (when it fits), and /music/ for every setting.
-    if MUSIC:
+    if MUSIC_ON:
         import zipfile
         copy(LD / "website" / "music.js", "music.js")
         for g, ts in MUSIC.items():
@@ -399,14 +407,17 @@ def main():
                 MUSIC_ZIPS[g] = (f"{SLUGS[g]}/music/{name}", (SITE / slug / "music" / name).stat().st_size)
             elif len(ts) > 1:
                 print(f"music: {g}: all its tracks together are {total / 1048576:.0f} MiB, over Cloudflare's 25 MiB a file: no download-all zip (each track still downloads)")
+        for g in GAMES:
+            t, slug = bw.pack(g)["terms"], SLUGS[g].strip("/")
             write(f"{slug}/music/index.html", page(f"{SLUGS[g]}/music", f"Music · {t['title']} · Legend Dynamics", f"Music for {t['title']} games: listen while you play, or download the tracks.",
                                                    [music_block(g)], theme=g, fonts=font_links({bw.BRAND_FONTS, t["fontsHref"]}), music=True))
-        cards = "".join(f'<li><a class="ld-music-card" href="{SLUGS[g]}/music/"><b>{e(bw.pack(g)["terms"]["title"])}</b><span>{len(MUSIC[g])} track{"" if len(MUSIC[g]) == 1 else "s"}'
-                        f'{" · " + ", ".join(sorted({x["mood"] for x in MUSIC[g] if x.get("mood")})) if any(x.get("mood") for x in MUSIC[g]) else ""}</span></a></li>' for g in GAMES if g in MUSIC)
+        cards = "".join(f'<li data-music-count="{SLUGS[g].strip("/")}" data-static="{len(MUSIC.get(g, []))}"{"" if MUSIC.get(g) else " hidden"}><a class="ld-music-card" href="{SLUGS[g]}/music/"><b>{e(bw.pack(g)["terms"]["title"])}</b>'
+                        f'<span data-n>{len(MUSIC.get(g, []))} track{"" if len(MUSIC.get(g, [])) == 1 else "s"}</span></a></li>' for g in GAMES)
         write("music/index.html", page(MUSIC_SLUG, "Music · Legend Dynamics", "Music for Legend Dynamics games: tracks for each setting, to play at the table or download.",
                                        [f'<div class="ld ld-hero"><div class="ld-eyebrow">Legend Dynamics</div><h1>Music for the table</h1><hr class="ld-rule">'
                                         f'<p class="ld-lede">Tracks for each setting: put one on while you play, or download them for your own games.</p></div>',
-                                        f'<div class="ld"><ul class="ld-music-cards">{cards}</ul></div>'], fonts=font_links({bw.BRAND_FONTS})))
+                                        f'<div class="ld" data-music-server="{e(BLOG_SERVER)}"><ul class="ld-music-cards">{cards}</ul>'
+                                        f'<p class="ld-note" data-music-none{" hidden" if MUSIC else ""}>No tracks yet. Check back soon.</p></div>'], fonts=font_links({bw.BRAND_FONTS}), music=True))
 
     core_docx = LD / "Legend_Dynamics_Core_Rules.docx"
     copy(core_docx, f"core-rules/{core_docx.name}")

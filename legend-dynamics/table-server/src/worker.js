@@ -12,6 +12,8 @@
  *   POST /api/blog/admin           { access, action: "list" | "get" | "save" | "delete", id?, post? }   an author only (the DEV secret)
  *   POST /api/feedback             { feedback }            → { ok }  playtest feedback from the site, from anyone (a few an hour each)
  *   POST /api/feedback/admin       { access, action: "list" | "delete", id? }   an author only: read it, or delete one
+ *   GET  /api/music?folder=F       → { tracks }             a setting's music, from the R2 bucket (music.js)
+ *   GET  /music/F/FILE             a track (seekable; ?download=1 to save it)
  *
  * ALLOWED_ORIGINS (a var in wrangler.toml) lists the sites whose pages may connect, comma-separated, or "*".
  * GM_CODES (a secret, set in the Cloudflare dashboard) lists the GMs who may start tables: "Name: code", one per line
@@ -22,6 +24,7 @@ import { newCode, validCode, hashKey, parseAccess, checkAccess } from "./logic.j
 export { Table } from "./table.js";
 import GM_GUIDES from "./gm-guides.js";
 import { BLOG_NAME } from "./blog.js";
+import { musicFetch } from "./music.js";
 
 /** Who may write the blog: a code in the DEV secret (a bare code, or "Name: code" lines), its own codes, not the GMs'.
  * Null for anyone else. @param {any} env @param {any} code */
@@ -38,7 +41,7 @@ const originOk = (env, origin) => {
 /** @param {any} env @param {string} origin */
 const cors = (env, origin) => ({
   "Access-Control-Allow-Origin": originOk(env, origin) ? origin || "*" : "null",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Vary": "Origin",
+  "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Range", "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges", "Vary": "Origin",
 });
 /** @param {any} body @param {number} status @param {Record<string, string>} headers */
 const json = (body, status, headers) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...headers } });
@@ -52,6 +55,8 @@ export default {
     const url = new URL(req.url), origin = req.headers.get("Origin") || "", h = cors(env, origin);
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
     if (!originOk(env, origin)) return json({ error: "This site isn't allowed to use the table server." }, 403, h);
+    // Music for the settings, from the R2 bucket (music.js).
+    const mu = await musicFetch(req, env, h); if (mu) return mu;
     if (url.pathname === "/") return new Response("Legend Dynamics table server. Start or join a table from a character creator.", { headers: { "Content-Type": "text/plain", ...h } });
 
     if (url.pathname === "/api/tables" && req.method === "POST") {

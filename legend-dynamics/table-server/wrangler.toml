@@ -11,6 +11,12 @@ class_name = "Table"
 tag = "v1"
 new_sqlite_classes = ["Table"]
 
+# Music for the settings (src/music.js): an R2 bucket you upload tracks to in the dashboard, one folder per setting.
+# Create the bucket (R2 → Create bucket → legend-music) BEFORE deploying this, or the deploy stops: see the README.
+[[r2_buckets]]
+binding = "MUSIC"
+bucket_name = "legend-music"
+
 [vars]
 # The sites whose pages may start and join tables, comma-separated (e.g. "https://legend-dynamics.pages.dev").
 # "*" allows any site; "null" allows a creator opened as a file from your computer.

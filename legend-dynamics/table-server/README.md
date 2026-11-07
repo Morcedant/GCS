@@ -70,6 +70,35 @@ The same server keeps the site's dev blog (`/blog/` on the website; the posts li
 
 It also keeps **playtest feedback** from the site's `/playtest/` page. Anyone can send it (a few answers an hour from each address, and the newest 2,000 are kept); only an author can read it: on `/blog/write/`, sign in with the `DEV` code and press **Playtest feedback**.
 
+### Music for the settings
+
+The site's music pages (`/music/`, and `/<setting>/music/` for each setting) list the tracks in a Cloudflare R2 bucket
+the moment you upload them: no rebuild, no new zip.
+
+1. **Create the bucket first.** In the Cloudflare dashboard open **R2 Object Storage → Create bucket**, and name it
+   exactly `legend-music`. (The first time, Cloudflare may ask you to turn R2 on and add a payment card; the free
+   allowance, 10 GB of storage with no charge for people listening, covers a lot of music.) Do this before this
+   server deploys again: `wrangler.toml` binds the bucket, and a deploy stops if it doesn't exist. If a deploy did stop,
+   create the bucket and retry it (the server that was running keeps running meanwhile).
+2. **Upload.** Open the bucket, and make one folder per setting, named as the setting's address on the site:
+   `trails-of-blood-and-dust`, `fracture-lines`, `the-shattered-crown`, `aurora`. Upload tracks into them (MP3 is best;
+   M4A, OGG, Opus, WAV and FLAC work too). The dashboard uploads files up to 300 MB each.
+3. **Names and order.** A track's title comes from its file name: `01 - the-long-road.mp3` shows as "The Long Road",
+   and a leading number sets the order. For more, upload a `tracks.json` into the setting's folder:
+
+   ```json
+   { "intro": "A sentence for the top of the page.",
+     "tracks": [ { "file": "01 - the-long-road.mp3", "title": "The Long Road", "mood": "Travel",
+                   "use": "For the trail between towns.", "credit": "Composed by …", "license": "…", "loop": true } ] }
+   ```
+
+   Only `file` is needed. Tracks it lists come first, in its order; any others follow. `"loop": true` makes a track
+   repeat by default (for ambience at the table).
+4. **Remove** a track by deleting it from the bucket. The pages update within a minute.
+
+Listeners play tracks on the page or download them (`/music/<folder>/<file>?download=1`). Nobody can upload or
+delete through the server: only you, in the dashboard.
+
 ## Use it
 
 - **GM:** GM view → **Shared table** → name it → **Start a table** (and the GM access code, the first time, if the server has `GM_CODES`). Share the code, or **Copy link** and send that (the link fills in the code). **Rejoin** gets you back in after closing the page; the key that makes you the GM stays in your browser.
