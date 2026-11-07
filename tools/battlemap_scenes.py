@@ -144,6 +144,8 @@ def pregen_subject(pack, c):
     """'Ruth Calloway, Deputy U.S. Marshal: a lawman, one of the Sighted (born with the second sight ...). ...'"""
     o = next((x for x in pack.get("origins", []) if x.get("id") == c.get("speciesId")), {})
     people = (o.get("desc") or "").split(". ")[0].rstrip(".")
+    import re   # the origins speak to the player ("your family"): about the character, here
+    people = re.sub(r"\b[Yy]ou're\b", "they're", re.sub(r"\b[Yy]ours?\b", lambda m: "their" if m.group(0).lower() == "your" else "theirs", re.sub(r"\b[Yy]ou\b", "they", people)))
     eq = {}
     for x in pack.get("equipment", []):
         if isinstance(x, list): eq[x[0]] = x[1]
