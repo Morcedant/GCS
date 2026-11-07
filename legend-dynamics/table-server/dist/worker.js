@@ -699,6 +699,76 @@ async function musicFetch(req, env, h) {
   return new Response(req.method === "HEAD" ? null : obj.body, { status, headers });
 }
 
+// src/maps.js
+var MAP_PREFIX = "battle-maps";
+var IMAGE_TYPES = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", avif: "image/avif", gif: "image/gif" };
+var imageType = (name) => name.includes(".") ? (
+  /** @type {any} */
+  IMAGE_TYPES[(name.split(".").pop() || "").toLowerCase()] || null
+) : null;
+function validMapKey(key) {
+  const p = key.split("/");
+  return p.length === 3 && p[0] === MAP_PREFIX && MUSIC_FOLDERS.includes(p[1]) && !!p[2] && !p[2].startsWith(".") && !!imageType(p[2]);
+}
+var sceneOf = (name) => {
+  const m = name.match(/^(\d{1,2})(?!\d)/);
+  return m ? +m[1] : null;
+};
+function buildMapList(objects, folder, base) {
+  const pre = `${MAP_PREFIX}/${folder}/`;
+  return objects.filter((o) => validMapKey(o.key) && o.key.startsWith(pre)).map((o) => {
+    const file = o.key.slice(pre.length), src = `${base}/maps/${folder}/${encodeURIComponent(file)}`;
+    return { file, title: titleFrom(file), scene: sceneOf(file), bytes: o.size, src, download: src + "?download=1" };
+  }).sort((a, b) => (a.scene ?? 999) - (b.scene ?? 999) || a.file.localeCompare(b.file, void 0, { numeric: true }));
+}
+async function listAll2(bucket, prefix) {
+  const out = [];
+  let cursor;
+  for (let i = 0; i < 20; i++) {
+    const r = await bucket.list({ prefix, cursor, limit: 1e3 });
+    out.push(...r.objects.map((o) => ({ key: o.key, size: o.size })));
+    if (!r.truncated) break;
+    cursor = r.cursor;
+  }
+  return out;
+}
+async function mapsFetch(req, env, h) {
+  const url = new URL(req.url), path = url.pathname;
+  if (path !== "/api/maps" && !path.startsWith("/maps/")) return null;
+  const json2 = (b, s, x = {}) => new Response(JSON.stringify(b), { status: s, headers: { "Content-Type": "application/json", ...h, ...x } });
+  if (req.method !== "GET" && req.method !== "HEAD") return json2({ error: "Not found." }, 404);
+  const bucket = env.MUSIC;
+  if (path === "/api/maps") {
+    if (!bucket) return json2({ error: "This server has no bucket yet.", maps: [], folders: {} }, 200, { "Cache-Control": "no-store" });
+    const folder = url.searchParams.get("folder");
+    if (folder) {
+      if (!MUSIC_FOLDERS.includes(folder)) return json2({ error: "No such setting." }, 404);
+      return json2({ folder, maps: buildMapList(await listAll2(bucket, `${MAP_PREFIX}/${folder}/`), folder, url.origin) }, 200, { "Cache-Control": "public, max-age=60" });
+    }
+    const all = await listAll2(bucket, MAP_PREFIX + "/");
+    return json2({ folders: Object.fromEntries(MUSIC_FOLDERS.map((f) => [f, all.filter((o) => validMapKey(o.key) && o.key.startsWith(`${MAP_PREFIX}/${f}/`)).length])) }, 200, { "Cache-Control": "public, max-age=60" });
+  }
+  let rest;
+  try {
+    rest = decodeURIComponent(path.slice("/maps/".length));
+  } catch {
+    rest = "";
+  }
+  const key = `${MAP_PREFIX}/${rest}`;
+  if (!bucket || !validMapKey(key)) return json2({ error: "Not found." }, 404);
+  const obj = await bucket.get(key, { onlyIf: req.headers });
+  if (!obj) return json2({ error: "Not found." }, 404);
+  const headers = new Headers(h);
+  if (obj.writeHttpMetadata) obj.writeHttpMetadata(headers);
+  headers.set("Content-Type", imageType(key) || "application/octet-stream");
+  headers.set("Cache-Control", "public, max-age=86400");
+  if (obj.httpEtag) headers.set("ETag", obj.httpEtag);
+  if (url.searchParams.get("download")) headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(rest.split("/")[1])}`);
+  if (!("body" in obj)) return new Response(null, { status: 304, headers });
+  headers.set("Content-Length", String(obj.size));
+  return new Response(req.method === "HEAD" ? null : obj.body, { status: 200, headers });
+}
+
 // src/worker.js
 async function blogAuthor(env, code) {
   const authors = parseAccess(env.DEV).map((a) => a.name === "GM" ? { ...a, name: "DEV" } : a);
@@ -734,6 +804,8 @@ var worker_default = {
     if (!originOk(env, origin)) return json({ error: "This site isn't allowed to use the table server." }, 403, h);
     const mu = await musicFetch(req, env, h);
     if (mu) return mu;
+    const mp = await mapsFetch(req, env, h);
+    if (mp) return mp;
     if (url.pathname === "/") return new Response("Legend Dynamics table server. Start or join a table from a character creator.", { headers: { "Content-Type": "text/plain", ...h } });
     if (url.pathname === "/api/tables" && req.method === "POST") {
       let body = {};

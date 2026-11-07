@@ -27,7 +27,7 @@ Then upload legend-dynamics/site/ in Cloudflare (see legend-dynamics/CLOUDFLARE-
 """
 import html, importlib.util, pathlib, re, shutil, sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import gm_guides, music
+import gm_guides, music, battlemap_scenes
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
@@ -140,6 +140,18 @@ main { flex: 1; }
 .ld-music-card:hover { border-color: var(--ld-accent); }
 .ld-music-card span { font-size: .9rem; color: var(--ld-ink-2); }
 @media (max-width: 560px) { .ld-track { grid-template-columns: 1fr; } .ld-track-dl { grid-column: 1; grid-row: auto; } .ld-vol-l { margin-left: 0; } }
+/* The playtest page's battle maps (website/maps.js) */
+.ld-map-adv { margin-top: 1.6rem; }
+.ld-map-adv h3 { margin: 0 0 .2rem; }
+.ld-maps { list-style: none; margin: .8rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; }
+.ld-map { background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; }
+.ld-map-pic { aspect-ratio: 16 / 9; max-width: 100%; display: grid; place-items: center; background: var(--ld-line); }
+.ld-map-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ld-map-pic a { display: block; width: 100%; height: 100%; }
+.ld-map-txt { display: grid; gap: .2rem; padding: .7rem .8rem 0; }
+.ld-map-dl { padding: .6rem .8rem .8rem; min-height: 1rem; }
+.ld-map-dl .ld-button { font-size: .85rem; }
+.ld-map-extras { margin: .4rem 0 0; padding-left: 1.2rem; }
 /* The playtest page (/playtest/) and the feedback the author reads */
 .ld-fb { border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .8rem 1rem; background: var(--ld-panel); display: grid; gap: .6rem; justify-items: start; }
 .ld-fb pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 .95rem/1.5 var(--ld-body); color: var(--ld-ink); }
@@ -176,7 +188,7 @@ PROTECT = """<style>.ld-protected { -webkit-user-select: none; user-select: none
   for (const ev of ["copy", "cut", "contextmenu", "dragstart"]) m.addEventListener(ev, (e) => e.preventDefault()); })();</script>"""
 
 
-def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, blog=False, robots="", music=False):
+def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, blog=False, robots="", music=False, maps=False):
     here = "/" + path.strip("/")
     here = "/" if here == "/" else here
     nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == here else ""}>{e(n)}</a>' for h, n in NAV)
@@ -205,7 +217,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a>{MUSIC_LINK}<a href="/dominion/">Dominion (strategy game)</a><a href="/playtest/">Playtest</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}{'<script src="/music.js" defer></script>' if music else ""}
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a>{MUSIC_LINK}<a href="/dominion/">Dominion (strategy game)</a><a href="/playtest/">Playtest</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}{'<script src="/music.js" defer></script>' if music else ""}{'<script src="/maps.js" defer></script>' if maps else ""}
 </body>
 </html>
 """
@@ -286,6 +298,22 @@ def downloads(links):
     return f'<div class="ld"><div class="ld-eyebrow">Downloads</div><ul class="ld-downloads">{items}</ul></div>'
 
 
+def maps_block():
+    """The playtest page's battle maps: every scene of the four first adventures, each filled in (maps.js) once its picture
+    is in the bucket (battle-maps/<setting>/, named with the scene's number first)."""
+    advs = []
+    for a in battlemap_scenes.ADVENTURES:
+        folder = SLUGS[a["id"]].strip("/")
+        cards = "".join(f'''<li class="ld-map" data-scene="{k + 1}" data-name="{e(name)}"><div class="ld-map-pic"><span class="ld-note">Map coming soon</span></div>
+<div class="ld-map-txt"><b>{e(name)}</b><span class="ld-note">Battle map: {e(hexs)} a hex · {e(area.replace("about ", ""))}</span></div><div class="ld-map-dl"></div></li>'''
+                        for k, (name, hexs, area, _d) in enumerate(a["scenes"]))
+        advs.append(f'''<section class="ld-map-adv" data-map-folder="{e(folder)}"><h3>{e(a["setting"])}: <i>{e(a["title"])}</i></h3><p class="ld-note" data-map-count>Looking for maps…</p>
+<ol class="ld-maps">{cards}</ol><div class="ld-map-extra"></div></section>''')
+    return f'''<div class="ld" id="maps" data-maps data-server="{e(BLOG_SERVER)}"><div class="ld-eyebrow">For the GM</div><h2>Battle maps</h2>
+<p style="max-width:44rem">A map for each scene of the four first adventures. To use one, download it, then in the GM view open the <b>Battle map</b>, choose <b>Background image…</b>, pick the picture, and set the hex size shown on its card, so distances and range bands come out right. At a table, you can also print it or put it on a screen.</p>
+{"".join(advs)}</div>'''
+
+
 # The playtest page: how to play for someone who has never seen the game, then the feedback form (website/blog.js
 # sends it to the table server; the author reads it on the Write page).
 PLAYTEST_HERO = """<div class="ld ld-hero"><div class="ld-eyebrow">Playtest</div><h1>Play it, then tell us how it went</h1><hr class="ld-rule">
@@ -358,7 +386,8 @@ def main():
     # Cloudflare Pages: always check for a newer copy of the pages, so a new upload shows at once.
     write("_headers", "/*\n  Cache-Control: no-cache\n")
     write("playtest/index.html", page("/playtest", "Playtest · Legend Dynamics", "Played a Legend Dynamics playtest? How to play in two minutes, and four questions about how it went.",
-                                      [PLAYTEST_HERO, PLAYTEST_HOW, PLAYTEST_FORM], fonts=font_links({bw.BRAND_FONTS}), blog=True))
+                                      [PLAYTEST_HERO, PLAYTEST_HOW, maps_block(), PLAYTEST_FORM], fonts=font_links({bw.BRAND_FONTS}), blog=True, maps=bool(BLOG_SERVER)))
+    copy(LD / "website" / "maps.js", "maps.js")
     write("blog/write/index.html", page(BLOG_SLUG + "/write", "Write · Dev blog · Legend Dynamics", "The dev blog's author page.",
                                         ['<div class="ld ld-hero"><div class="ld-eyebrow">Dev blog</div><h1>Write a post</h1><hr class="ld-rule"></div>',
                                          '<div class="ld" id="ld-blog-write"><noscript>Writing needs JavaScript.</noscript></div>'],

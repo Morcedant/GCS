@@ -104,6 +104,15 @@ the main file with [`dist/worker.js`](dist/worker.js) (the whole server in one f
 Listeners play tracks on the page or download them (`/music/<folder>/<file>?download=1`). Nobody can upload or
 delete through the server: only you, in the dashboard.
 
+### Battle maps for the playtest adventures
+
+The playtest page (`/playtest/`, *Battle maps*) shows a card for every scene of the four first adventures, and fills
+each one in when its picture is in the same bucket as the music. In the bucket, make a folder `battle-maps`, and in it
+one folder per setting, named as for music: `battle-maps/trails-of-blood-and-dust/`, `battle-maps/fracture-lines/`,
+`battle-maps/the-shattered-crown/`, `battle-maps/aurora/`. Upload PNG, JPEG or WebP pictures, each named with its
+scene's number first: `2 - Mercy Springs at noon.png` goes on scene 2's card. Pictures without a number are listed
+under *More maps*. The prompts for making them are in `legend-dynamics/battlemap-prompts.md`.
+
 ## Use it
 
 - **GM:** GM view → **Shared table** → name it → **Start a table** (and the GM access code, the first time, if the server has `GM_CODES`). Share the code, or **Copy link** and send that (the link fills in the code). **Rejoin** gets you back in after closing the page; the key that makes you the GM stays in your browser.

@@ -14,6 +14,8 @@
  *   POST /api/feedback/admin       { access, action: "list" | "delete", id? }   an author only: read it, or delete one
  *   GET  /api/music?folder=F       → { tracks }             a setting's music, from the R2 bucket (music.js)
  *   GET  /music/F/FILE             a track (seekable; ?download=1 to save it)
+ *   GET  /api/maps?folder=F        → { maps }               a setting's battle maps, from the bucket's battle-maps/ (maps.js)
+ *   GET  /maps/F/FILE              a map picture (?download=1 to save it)
  *
  * ALLOWED_ORIGINS (a var in wrangler.toml) lists the sites whose pages may connect, comma-separated, or "*".
  * GM_CODES (a secret, set in the Cloudflare dashboard) lists the GMs who may start tables: "Name: code", one per line
@@ -25,6 +27,7 @@ export { Table } from "./table.js";
 import GM_GUIDES from "./gm-guides.js";
 import { BLOG_NAME } from "./blog.js";
 import { musicFetch } from "./music.js";
+import { mapsFetch } from "./maps.js";
 
 /** Who may write the blog: a code in the DEV secret (a bare code, or "Name: code" lines), its own codes, not the GMs'.
  * Null for anyone else. @param {any} env @param {any} code */
@@ -57,6 +60,7 @@ export default {
     if (!originOk(env, origin)) return json({ error: "This site isn't allowed to use the table server." }, 403, h);
     // Music for the settings, from the R2 bucket (music.js).
     const mu = await musicFetch(req, env, h); if (mu) return mu;
+    const mp = await mapsFetch(req, env, h); if (mp) return mp;   // the playtest adventures' battle maps, same bucket (maps.js)
     if (url.pathname === "/") return new Response("Legend Dynamics table server. Start or join a table from a character creator.", { headers: { "Content-Type": "text/plain", ...h } });
 
     if (url.pathname === "/api/tables" && req.method === "POST") {
