@@ -111,6 +111,22 @@ FACTIONS = {
 }
 
 
+# What else the GM's table needs for the adventure, set up by the same button (the pregenerated characters always are):
+# clocks [[name, segments]], the discovery clock {name, phases}, the threat clock's size (where it's a clock), and the
+# villains' files on the heroes [{on, holder, knows}]. From the adventure's text and the kit's prep list.
+SETUP = {
+    "western": {"clocks": [["The ride to Mercy Springs (trail)", 4]], "discovery": {"name": "What's killing the miners", "phases": [2, 2, 2]}, "threat": 4},
+    "spaceopera": {"discovery": {"name": "A living hull: the Long Patience", "phases": [2, 2, 2]}, "threat": 6},
+    "fantasy": {"discovery": {"name": "The thing under Ain Haddu", "phases": [2, 2, 2]}},
+    "aurora": {"discovery": {"name": "Lupe Herrera's power", "phases": [2, 2, 2]}, "threat": 4,
+               "files": [{"on": "Subject 19", "holder": "The Foundation", "knows": "Always comes for the young ones"}]},
+}
+
+
+def setup(gid):
+    return SETUP.get(gid)
+
+
 def plain(md):
     """Markdown to plain text: bold and italics dropped, list bullets kept."""
     t = re.sub(r"\*\*(.+?)\*\*", r"\1", md)

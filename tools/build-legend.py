@@ -725,7 +725,7 @@ def build(pid, docx):
         # adventure's secrets, so it's in the page only while the GM's Guides are (gm_guides.GM_GUIDES_OPEN).
         import playtest_campaigns
         cp = playtest_campaigns.campaign(pid, pack, (pdir / "setting.md").read_text()) if gm_guides.GM_GUIDES_OPEN else None
-        if cp: pack["playtest"] = {**pack["playtest"], "campaign": cp}
+        if cp: pack["playtest"] = {**pack["playtest"], "campaign": cp, "setup": playtest_campaigns.setup(pid)}
     js = "const PACK = " + json.dumps({**with_core_combat(pack), "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = tpl.replace("/* RULES:CORE */", rules_js())

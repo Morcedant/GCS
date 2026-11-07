@@ -3350,6 +3350,16 @@ tr.lvl-U td.target { color: var(--muted); }
     if (b.dataset.hfdo === "delete") c.play.files = c.play.files.filter((x) => x !== f); else f[b.dataset.hfdo] = !f[b.dataset.hfdo];
     saveGM(); renderGM();
   });
+  /** A character's powers (by Class) and spells, for their card in the GM view; each power's effect on hover. */
+  function gmMagic(c) {
+    const saved = ch; ch = c;
+    try {
+      const pw = POWERS ? allPowers(c).filter((x) => powerDef(x.id)) : [];
+      const sp = SPELLS && canCast() && (c.spells || []).length ? SPELLS.list.filter(([k]) => c.spells.includes(k)) : [];
+      return (pw.length ? `<div class="gm-traits small"><span><strong>${esc(POWERS.plural)}:</strong> ${pw.map((x) => `<span title="${esc(isPure() && x.id === SPELLS.power ? "Pure sorcery" : powerEffect(x.id, x.cl))}">${esc(powerDef(x.id)[1])} ${x.cl}</span>`).join(", ")}</span></div>` : "")
+        + (sp.length ? `<div class="gm-traits small"><span><strong>${esc(SPELLS.plural)}:</strong> ${sp.map(([, n, eff]) => `<span title="${esc(eff)}">${esc(n)}</span>`).join(", ")}</span></div>` : "");
+    } catch { return ""; } finally { ch = saved; }
+  }
   function renderGM() {
     if (ptUI) ptUI.refresh(); // the playtest kit's character cards follow the GM view's characters
     renderFiles();
@@ -3390,6 +3400,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${hasXT(c) ? `<div class="gm-row small"><span class="muted">${esc(XTRACK.name)}</span><span class="boxes">${Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.xtrack || 0) ? "on" : ""}" data-gm="${c.id}" data-gmxt="${i + 1}" aria-label="${esc(c.name)} ${XTRACK.name} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(XTRACK.effects[Math.min(XTRACK.boxes, c.play.xtrack || 0)].split(":")[0])}</span></div>${XKNOWN ? `<div class="gm-row small"><span class="muted">${esc(XKNOWN.label)}</span><span>${knownList(c).map(esc).join(", ") || "no one"}</span></div>` : ""}` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
+        ${gmMagic(c)}
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
           <span><strong>Complication:</strong> ${esc(k.comp || "—")}${c.comp.trigger ? ` (trigger: ${esc(c.comp.trigger)})` : ""}${k.scomp ? `; ${esc(k.scomp)}` : ""}</span></div>
         <div class="btn-row"><button class="linkish" data-gm="${c.id}" data-gmsave>Save character file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
@@ -3949,7 +3960,45 @@ tr.lvl-U td.target { color: var(--muted); }
       store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); return n;
     },
     showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); },
-    loadCampaign: (c, label) => { if (!campaignUI || !campaignUI.load(c, label)) return false; showGmTab("campaign"); const k = $("cp-card"); if (k) k.scrollIntoView({ block: "start" }); return true; } }); }
+    loadCampaign: (c, label, setup) => {
+      if (!campaignUI || !campaignUI.load(c, label)) return false;
+      const done = setupTable(setup || {});
+      showGmTab("campaign"); const k = $("cp-card"); if (k) k.scrollIntoView({ block: "start" });
+      if (done.length) setTimeout(() => gmSay(`Loaded ${c.name}: the campaign, ${done.join(", ")}.`), 50);
+      return true;
+    } }); }
+  /** The playtest's table, alongside its campaign: the ready-made characters (with their pictures), the discovery clock,
+   *  the threat clock's size, the adventure's clocks and the villains' files. Nothing already there is added twice. */
+  function setupTable(S) {
+    const done = [], has = (n) => gmCrew.some((c) => (c.name || "").trim().toLowerCase() === n.trim().toLowerCase());
+    const fresh = PREGENS.filter((c) => !has(c.name)).map((c) => ({ ...JSON.parse(JSON.stringify(c)), id: uid() }));
+    if (fresh.length) {
+      gmAdd(fresh); done.push(`${fresh.length} ready-made character${fresh.length === 1 ? "" : "s"}`);
+      (async () => { let n = 0; for (const f of fresh) { const c = gmCrew.find((x) => x.id === f.id); if (c && await autoPictures(c)) n++; }
+        if (n) { store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); } })();
+    }
+    for (const [name, size] of S.clocks || []) if (!clocks.some((x) => x.name === name)) {
+      const nc = { id: uid(), name: String(name).slice(0, 60), size: +size || 4, kind: "progress", filled: 0 };
+      clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); done.push(`the clock "${nc.name}"`);
+    }
+    if (DISC && S.discovery && !disc.clocks.some((x) => x.name === S.discovery.name)) {
+      disc.clocks.push({ id: uid(), name: S.discovery.name, plain: false, phases: S.discovery.phases || [2, 2, 2], filled: 0, subject: "", tag: "", primary: "", minted: false });
+      done.push(`the ${DISC.card} clock "${S.discovery.name}"`);
+    }
+    if (DISC && S.threat && !DISC.threat.track && !disc.threat.filled && !disc.threat.count && disc.threat.size !== S.threat) {
+      disc.threat.size = S.threat; done.push(`${DISC.threat.name} at ${S.threat}`);
+    }
+    if (DISC) { discSave(); renderDisc(); }
+    if (HFILES) for (const f of S.files || []) {
+      const c = gmCrew.find((x) => (x.name || "").trim().toLowerCase() === f.on.toLowerCase());
+      if (c && !(c.play.files || []).some((x) => x.holder === f.holder && x.knows === f.knows)) {
+        c.play.files = [...(c.play.files || []), { id: uid(), holder: f.holder, knows: f.knows, gives: f.gives || HFILES.gives || "", found: false, destroyed: false }];
+        saveGM(); done.push(`${f.holder}'s file on ${c.name}`);
+      }
+    }
+    renderGM();
+    return done;
+  }
   // The crew's ship and the setting's tables (frontier.js), for a setting with them.
   if (PACK.crewShip) { $("crewship-card").hidden = false;
     crewShipUI = mountCrewShip({ PACK, root: $("crewship-card"), esc, toast: gmSay, onChange: () => { renderCrewShipView(); pushScene(); } }); renderCrewShipView(); }

@@ -12,11 +12,12 @@
 //   with its scene's number first, or after the scene its name matches; a token named starting "token".
 //
 // kit.campaign (tools/playtest_campaigns.py): the adventure as a campaign for the Campaign tab: its premise, a step of the
-//   outline for each scene, its people, places and factions, and the first session.
+//   outline for each scene, its people, places and factions, and the first session. kit.setup: what else the table needs
+//   ({ clocks: [[name, size]], discovery: { name, phases }, threat: size, files: [{ on, holder, knows }] }).
 //
 // mountPlaytest(api) with api: { kit, root, esc, storeKey, toast(m, err), server?, map? (the battle map: useBackgroundUrl,
 //   addPictureToken), showMap?() (opens the battle map), givePictures?(name, portrait, token),
-//   loadCampaign?(campaign, label) (into the Campaign tab: true if it did), crew?() (the GM view's characters: [{ name, rank }]) }.
+//   loadCampaign?(campaign, label, setup) (into the Campaign tab, and the GM's table set up for it: true if it did), crew?() (the GM view's characters: [{ name, rank }]) }.
 // Returns { refresh() } (the GM view's characters changed: their cards follow).
 //
 // The characters' cards: everyone in the adventure the same way (the pregenerated characters, the people and creatures in
@@ -63,7 +64,7 @@ function mountPlaytest(api) {
   const sec = (id, title, body, open) => `<details class="pt-sec" data-sec="${id}"${open ? " open" : ""}><summary><b>${esc(title)}</b></summary>${body}</details>`;
   root.innerHTML = `<h3>Playtest kit: ${esc(K.adv)}</h3>
     <p class="small muted">Run a three-hour playtest of this ${esc(K.term)} with people who've never seen the game: prepare, follow the run sheet, and ask the right questions after. The ${esc(K.term)} itself is in the GM's Guide.</p>
-    ${K.campaign && api.loadCampaign ? `<div class="pt-load"><button type="button" class="btn primary" data-pt-campaign>Load ${esc(K.adv)} into the Campaign tab</button><span class="small muted">The whole ${esc(K.term)} in one go: its premise and the truth behind it, a step of the outline for each scene, ${K.campaign.people.length} people, ${K.campaign.places.length} places, ${K.campaign.factions.length} faction${K.campaign.factions.length === 1 ? "" : "s"}, and the first session's plan. Nothing reaches the players until you share it.</span></div>` : ""}
+    ${K.campaign && api.loadCampaign ? `<div class="pt-load"><button type="button" class="btn primary" data-pt-campaign>Load ${esc(K.adv)}</button><span class="small muted">The whole ${esc(K.term)} in one go. The Campaign tab gets its premise and the truth behind it, a step of the outline for each scene, ${K.campaign.people.length} people, ${K.campaign.places.length} places, ${K.campaign.factions.length} faction${K.campaign.factions.length === 1 ? "" : "s"} and the first session's plan; the table gets the ready-made characters, with their pictures${K.setup && K.setup.discovery ? ", the discovery clock" : ""}${K.setup && K.setup.clocks ? ", its clocks" : ""}${K.setup && K.setup.files ? " and the villains' files" : ""}. Nothing reaches the players until you share it.</span></div>` : ""}
     ${sec("prep", "1. Before the session", `<ul class="pt-check">${K.prep.map((t, i) => `<li><label><input type="checkbox" data-pttick="${i}"${ticks[i] ? " checked" : ""}> <span>${t}</span></label></li>`).join("")}</ul>
       <p class="small"><b>The cast, in one line each</b></p>
       <div class="pt-cast">${K.cast.map(([n, t]) => `<div><b>${esc(n)}</b><span class="small muted">${esc(t)}</span></div>`).join("")}</div>
@@ -94,7 +95,7 @@ function mountPlaytest(api) {
     set("ticks", JSON.stringify(ticks));
   });
   root.addEventListener("click", (e) => {
-    if (e.target.closest("[data-pt-campaign]")) { api.loadCampaign(JSON.parse(JSON.stringify(K.campaign)), `the playtest's (${K.adv})`); return; }
+    if (e.target.closest("[data-pt-campaign]")) { api.loadCampaign(JSON.parse(JSON.stringify(K.campaign)), `the playtest's (${K.adv})`, K.setup || {}); return; }
     if (e.target.id === "pt-notes-copy") { copy(notes.value, (ok) => { if (!ok) notes.select(); say(ok ? "Notes copied." : "Selected: copy them yourself.", !ok); }); return; }
     if (e.target.id === "pt-notes-clear") {
       if (!armed) { armed = true; e.target.textContent = "Tap again to clear"; setTimeout(() => { armed = false; e.target.textContent = "Clear"; }, 3000); return; }
