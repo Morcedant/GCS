@@ -155,7 +155,7 @@ Ages are as of 2025. Each comes with a stat block, and each is in the GM view's 
 
 **Evelyn Dark, 25.** Born in Avalon to a line of witches descended from Hecate and Freya, with a rare gift for manipulating energy and matter. A seer foretold she would bring Avalon's doom, and at thirteen she fled to Earth in defiance of the Accords. She gathered homeless children into a ring of thieves and con artists, the **Dark Ones**, until the Foundation caught her two years later. Its experiments heightened and destabilized her powers; one destroyed the lab and the town around it, and she was the only survivor. In the decade since, she has used her powers sparingly, helping where she can and hiding from Earth's most powerful magic users.
 
-*Class V.* **Attacks** Powers 16 (raw energy, Class V). **Dodge** 12. **Boxes** 4. **Defense** III (a force field). **Powers** Cantrips IV, Blast V, Telekinesis IV, Force Field III, all of it heightened and destabilized by the Foundation. **Skills** Deception 14, Stealth 14, Streetwise 13, Occult 14. **Unstable.** On a natural 17 or 18 with Powers, the power hits everyone nearby. Using a power above Class III draws Avalon's hunters (Scrutiny).
+*Class V.* **Attacks** Powers 16 (raw energy, Class V). **Dodge** 12. **Boxes** 4. **Defense** III (a force field). **Powers** Cantrips IV, Blast V, Telekinesis IV, Force Field III, all of it heightened and destabilized by the Foundation. **Skills** Deception 14, Stealth 14, Streetwise 13, Occult 14. **Unstable II.** On a natural 17 or 18 with Powers, the power hits everyone nearby. Using a power above Class III draws Avalon's hunters (Scrutiny).
 
 **Milon Dubinsky, about 650.** Once a king in what is now Romania, who killed every man in a conquered village so he could marry the chieftain's wife. She poisoned him before the wedding, and when he begged for a cure, cursed him to undying life as a wolfman, unable to return to human form. He found he could share part of his curse with the descendants of his tribe (supernaturally tough and able to change back, but mortal), and over six centuries has built a small army of werewolves to do his bidding.
 
@@ -206,7 +206,7 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | White Hand soldier | Firearms 13 | 9 | 2 | Blast II | — | **Fanatic.** Never surrenders, never talks. |
 | Foundation retrieval team (minor) | Firearms 13 | 9 | 1 each | Tranquilizer rifles; a dampening net (Power Negation II) | — | **Recovery.** They want the target alive, and leave no witnesses. |
 | Rogue Aegis suit | Piloting 14 | 8 | 3 | Arm cannon (II) | II | **Pilot.** Hit the pilot (−4) or the power pack (−2) to end it fast. |
-| Lab escapee | Powers 13 | 10 | 3 | One wild power, Class II–III | II | **Unstable.** On a natural 17–18, the power hits everyone nearby. |
+| Lab escapee | Powers 13 | 10 | 3 | One wild power, Class II–III | II | **Unstable III.** On a natural 16–18 with Powers, the power hits everyone nearby. |
 | Shadow Earth duplicate | As the original | As the original | 3 | As the original | As the original | **Mirror.** Knows what the original knows; Mystic Sight reveals it. |
 | Dubinsky werewolf | Brawling 15 | 11 | 4 | Claws (II) | I | **Pack.** Comes in threes; silver ignores its Defense. |
 | Fey raider (Avalon) | Melee 14 | 12 | 2 | Elf-shot (II), glamour | — | **Cold iron.** Iron weapons count one Class higher against it. |

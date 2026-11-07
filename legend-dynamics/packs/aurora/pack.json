@@ -641,7 +641,7 @@
    "adj": {"Body": 1},
    "desc": "Made in a Foundation black lab, a DIRE program or somewhere worse. The powers are strong and unstable, the memories are patchy, and someone still has your file and wants their property back.",
    "core": [
-    "Unstable: on a natural 17 or 18 with Powers, mark a box of Strain as well.",
+    "Unstable II: a Powers roll flares on a natural 17 or 18 (see Unstable powers); mark a box of Strain as well.",
     "Property: the lab that made you knows your powers better than you do."
    ],
    "form": null,
@@ -1304,7 +1304,7 @@
   [
    "unstable",
    "Unstable Powers",
-   "Your powers flare when you're afraid or angry. Accept the collateral damage."
+   "Your powers flare when you're afraid or angry. Choose how unstable with the GM: Unstable I (a Powers roll flares on a natural 18), II (17–18) or III (16–18). Accept the collateral damage."
   ],
   [
    "code",
@@ -1401,7 +1401,7 @@
   "unstable": [
    "You're cornered",
    "Someone you love is hurt",
-   "A natural 18 on Powers"
+   "A flare on a Powers roll"
   ],
   "code": [
    "Killing them would end it",
@@ -5654,7 +5654,7 @@
     "wild"
    ],
    "trait": "Unstable",
-   "traitText": "On a natural 17–18, the power hits everyone nearby.",
+   "traitText": "Unstable III (dosed, and the tag in her neck): on a natural 16–18 with Powers, the power hits everyone nearby.",
    "traits": [
     {
      "type": "defenseClass",
@@ -6291,7 +6291,7 @@
     "op-blast5"
    ],
    "trait": "Unstable",
-   "traitText": "On a natural 17 or 18 with Powers, the power hits everyone nearby. Using a power above Class III draws Avalon's hunters (Scrutiny).",
+   "traitText": "Unstable II: on a natural 17 or 18 with Powers, the power hits everyone nearby. Using a power above Class III draws Avalon's hunters (Scrutiny).",
    "traits": [
     {
      "type": "defenseClass",
@@ -6836,6 +6836,7 @@
    "coolhead": 2
   }
  },
+ "unstable": {"skill": "Powers", "complication": "unstable", "origins": {"labmade": 2}, "max": 4, "strainLevel": 3, "strainAt": 3, "levels": [["I", "18"], ["II", "17–18"], ["III", "16–18"], ["IV", "15–18"]], "flare": "It hits everyone nearby, or does far more than you meant, and the GM says how. Accept the collateral; a flare can mark Collateral or Backlash.", "labmadeFlare": "Lab-made: mark a box of Strain as well.", "text": "Unstable powers come in levels. On a Powers roll, a natural in the level's range flares: Unstable I on an 18, II on 17–18, III on 16–18, IV on 15–18. Lab-made gives Unstable II; the Unstable Powers complication gives the level chosen with the GM (I to III); together they add, to IV at most. The GM can raise a level for a while (cornered, dosed, a Foundation tag) or lower it (training, treatment). At Strain 3, any power flares on 16–18, whatever its level."},
  "playtest": {
   "name": "Aurora",
   "short": "Aurora",

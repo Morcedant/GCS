@@ -978,6 +978,17 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 
 A night's sleep clears one box; a full day's rest clears them all.
 
+**Unstable powers.** Some powers flare: they go off bigger, wider or wilder than meant, and the GM says how (the blast hits everyone nearby, the fire spreads, the street goes dark). How often depends on the **level**: on a Powers roll, a natural in its range flares.
+
+| Level | Flares on a natural | About how often |
+|---|---|---|
+| Unstable I | 18 | 1 roll in 200 |
+| Unstable II | 17–18 | 1 in 50 |
+| Unstable III | 16–18 | 1 in 20 |
+| Unstable IV | 15–18 | 1 in 10 |
+
+**Lab-made** characters are Unstable II, and mark a box of Strain when they flare. The **Unstable Powers** complication gives the level chosen with the GM, I to III, and earns Spark whenever a flare costs you. The two add: a lab-made character with Unstable Powers I is Unstable III, up to IV at most. The GM can raise a level for a while (cornered, drugged, a Foundation tag broadcasting into your nerves) or lower it (training, a dampener, the right medication); the GM view keeps the level on each character's card. At **Strain 3**, any power flares on 16–18, whatever its level.
+
 ## Speed, flight and height
 
 Superheroes fight at speeds that make yards meaningless. These rules cover the moves, the extra actions, the air and the ground coming up to meet you.
@@ -1576,7 +1587,7 @@ Made in a Foundation black lab, a DIRE program or somewhere worse. The powers ar
 
 **Origin rules:**
 
-- Unstable: on a natural 17 or 18 with Powers, mark a box of Strain as well.
+- Unstable II: a Powers roll flares on a natural 17 or 18 (see Unstable powers); mark a box of Strain as well.
 - Property: the lab that made you knows your powers better than you do.
 
 **Suggested skills:** Powers, Stealth, Athletics, Deception.
@@ -1779,7 +1790,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 | Secret Identity | You live two lives. Accept the danger when someone gets close to the truth. |
 | Wanted | A warrant has your name or your mask on it. Accept the arrest attempt. |
 | Hunted by a Lab | The Foundation, DIRE or someone worse wants you back. Accept the retrieval team. |
-| Unstable Powers | Your powers flare when you're afraid or angry. Accept the collateral damage. |
+| Unstable Powers | Your powers flare when you're afraid or angry. Choose how unstable with the GM: Unstable I (a Powers roll flares on a natural 18), II (17–18) or III (16–18). Accept the collateral damage. |
 | Code Against Killing | You don't kill, whatever they've done. Accept the cost of mercy. |
 | Media Darling | The cameras follow you everywhere. Accept the attention at the worst moment. |
 | Under Oversight | The EPAOC or Internal Affairs is watching you. Accept the hearing. |

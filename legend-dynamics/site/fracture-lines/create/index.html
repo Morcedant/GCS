@@ -476,6 +476,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-extra textarea { width: 100%; min-height: 3.2em; font: inherit; font-size: .9rem; }
 .gm-extra .boxes { flex-wrap: wrap; }
 .gm-extra .gm-head > div { flex: 1; min-width: 0; } .gm-ex-name { width: 100%; font-weight: 700; }
+.gm-unstable { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .gm-supermove { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 2px; padding: 5px 8px; border: 1px solid var(--accent); border-radius: 6px; }
 .gm-supermove-tag { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
 .gm-supermove b { color: var(--accent); }
@@ -682,7 +683,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="761ea2f" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 761ea2f</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="5c0df34" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 5c0df34</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -853,6 +854,7 @@ tr.lvl-U td.target { color: var(--muted); }
                 <div class="field wide"><label for="f-comptext">What problem does it create?</label><textarea id="f-comptext" rows="2"></textarea></div>
               </div>
             </div>
+            <div class="field" id="comp-level-wrap" hidden><label for="f-complevel">How unstable</label><select id="f-complevel"></select></div>
             <div class="field wide"><div class="trait-desc" id="comp-desc"></div></div>
             <div class="field wide"><label for="f-comptrigger">Trigger, agreed with the GM</label>
               <select id="f-trigpick" aria-label="Quick pick a trigger" hidden></select>
@@ -8547,14 +8549,14 @@ return { mountLab };
       skills: Object.fromEntries(SKILLS.map(([n]) => [n, "U"])),
       adv: { id: "", name: "", text: "", detail: "" },
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
-      comp: { id: "", name: "", text: "", trigger: "" },
+      comp: { id: "", name: "", text: "", trigger: "", level: 1 },
       equipment: Object.fromEntries(EQUIPMENT.map(([k, , , meta]) => [k, !!(meta && meta.standard)])), // standard issue (a skinsuit) starts ticked
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token", token: "", pictureFrom: { portrait: "", token: "" },
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
-      play: { injury: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
+      play: { unstable: 0, injury: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -8590,6 +8592,8 @@ return { mountLab };
       out.pictureFrom = { portrait: ok(f.portrait, out.portrait), token: ok(f.token, out.token) }; }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     out.generic = out.generic === true; // a generic NPC: the GM view takes more than one of them
+    out.comp.level = Math.max(1, Math.min(3, parseInt(out.comp.level, 10) || 1)); // how unstable (PACK.unstable), I to III
+    out.play.unstable = Math.max(-4, Math.min(4, parseInt(out.play.unstable, 10) || 0)); // the GM's raise or lower, in play
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
     if (PACK.roleAliases && PACK.roleAliases[out.dept]) out.dept = PACK.roleAliases[out.dept]; // a calling merged into another (Marshal → Lawman)
@@ -8868,6 +8872,14 @@ return { mountLab };
   const advDef = () => ADVANTAGES.find((a) => a[0] === ch.adv.id);
   const compDef = () => COMPLICATIONS.find((a) => a[0] === ch.comp.id);
   const advName = () => ch.adv.id === "custom" ? (ch.adv.name || "Custom advantage") : advDef()?.[1] || "";
+  // Unstable powers (PACK.unstable): a level from the origin (Lab-made II) and the complication (I to III), added, with the
+  // GM's raise or lower in play; 0 to 4. On a roll of its skill, a natural at or above 19 − level flares. Strain 3 flares
+  // any power on 16–18.
+  const UNST = PACK.unstable || null;
+  const unstableBase = (c = ch) => !UNST ? 0 : (UNST.origins[c.speciesId] || 0) + (c.comp && c.comp.id === UNST.complication ? c.comp.level || 1 : 0);
+  const unstableOf = (c = ch) => !UNST ? 0 : Math.max(0, Math.min(UNST.max || 4, unstableBase(c) + ((c.play && c.play.unstable) || 0)));
+  const flareLevel = (c = ch) => Math.max(unstableOf(c), UNST && (c.play && c.play.ptrack || 0) >= (UNST.strainAt || 99) ? UNST.strainLevel || 0 : 0);
+  const unstableText = (lv) => lv ? `Unstable ${UNST.levels[lv - 1][0]} (a natural ${UNST.levels[lv - 1][1]})` : "";
   const compName = () => ch.comp.id === "custom" ? (ch.comp.name || "Custom complication") : compDef()?.[1] || "";
   const division = () => (ch.customRole ? ch.customGroup || PACK.groups[0].id : (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[0])[1]);
 
@@ -9189,7 +9201,11 @@ return { mountLab };
       $("f-trigpick").innerHTML = `<option value="">Suggested triggers: quick pick…</option>` + trig.map((x, i) => `<option value="${i}">${esc(x)}</option>`).join("");
       $("f-trigpick").dataset.for = ch.comp.id;
     }
-    $("comp-desc").innerHTML = cd ? esc(cd[2]) : ch.comp.id === "custom"
+    // Unstable Powers: choose its level; the sheet shows the character's whole level (with Lab-made's).
+    const isUnst = !!UNST && ch.comp.id === UNST.complication;
+    $("comp-level-wrap").hidden = !isUnst;
+    if (isUnst) $("f-complevel").innerHTML = [1, 2, 3].map((lv) => `<option value="${lv}"${ch.comp.level === lv ? " selected" : ""}>${esc(unstableText(lv))}</option>`).join("");
+    $("comp-desc").innerHTML = cd ? esc(cd[2]) + (isUnst ? ` <b>${esc(ch.name || "You")}: ${esc(unstableText(unstableOf()))}${UNST.origins[ch.speciesId] ? ` with your ${esc(ch.species)} ${esc(unstableText(UNST.origins[ch.speciesId]).split(" (")[0])}` : ""}.</b>` : "") : ch.comp.id === "custom"
       ? "Custom complications need a clear trigger and a meaningful, accepted consequence."
       : "A complication creates choices and problems. When it causes a meaningful problem you accept, you gain a " + T.point + " point.";
 
@@ -9374,6 +9390,7 @@ return { mountLab };
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
         ${XEDGE_NOTES.filter(([k]) => edgeN(k) && ch.edgeNotes[k]).map(([k, n, , , d]) => `<div class="field wide"><span class="label">${esc(n)}</span><span>${esc(ch.edgeNotes[k])}${d.sheetNote ? ` <span class="small muted">(${esc(d.sheetNote)})</span>` : ""}</span></div>`).join("")}
         ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}${isPure() && x.id === SPELLS.power ? ", pure sorcery" : ""}):</b> ${esc(isPure() && x.id === SPELLS.power ? `Know ${spellsKnown()} ${SPELLS.plural.toLowerCase()}, each working at ${SPELLS.tiers ? "the " + SPELLS.tiers[casterTier()] + " (Class " + x.cl + ")" : "Class " + x.cl}.` : powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
+        ${UNST && unstableOf() ? `<div class="field wide"><span class="label">${esc(unstableText(unstableOf()).split(" (")[0])}</span><span>A ${esc(UNST.skill)} roll flares on a natural ${esc(UNST.levels[unstableOf() - 1][1])}: ${esc(UNST.flare)}${UNST.origins[ch.speciesId] ? " " + esc(UNST.labmadeFlare) : ""}</span></div>` : ""}
         ${STATUSES && ch.status ? (() => { const st = STATUSES.find((x) => x[0] === ch.status); return `<div class="field"><span class="label">${esc(PACK.statusLabel || "Status")}: ${esc(st[1])}</span><span class="small">${esc(st[2])}</span><span class="small muted">${esc(st[3])}</span></div>`; })() : ""}
         ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n, eff]) => { const t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? ` (${SPELLS.tiers[t]}, ${boostText(t)})` : ""}:</b> ${esc(eff)}`; }).join("<br>")}${SPELLS.tiers ? `<br><span class="small muted">${helpBtn("boost")} Boosts, chosen as you cast, each −1 to the roll: Harder (+1 box or −1 more), Wider (a handful, then a crowd), Longer (a day, then until lifted), Farther (one range band).</span>` : ""}</span></div>` : ""}
         ${MAGIC && MAGIC.charms && ch.skills[MAGIC.skill] && ch.skills[MAGIC.skill] !== "U" && charmsOK() ? `<div class="field"><span class="label">Ready ${charmWord()}${helpBtn("charms")}</span><span>${readyCharms()}</span></div>` : ""}
@@ -9679,6 +9696,8 @@ return { mountLab };
     if (r.weaponNote) note += ` ${r.weaponNote}`;
     if (r.fireMod) note += ` (${signed(r.fireMod)} for the shot included.)`;
     if (r.jam) note += " Natural 18: the gun jams. Clearing it takes an action.";
+    { const lv = UNST && r.sk === UNST.skill ? flareLevel() : 0; // unstable powers: a natural in the level's range flares
+      if (lv && r.sum >= 19 - lv) note += ` <b>${unstableOf() >= lv ? esc(unstableText(lv).split(" (")[0]) : "Strain " + UNST.strainAt}: the power flares.</b> ${esc(UNST.flare)}${UNST.origins[ch.speciesId] ? " " + esc(UNST.labmadeFlare) : ""}`; }
     el.innerHTML = `
       <div class="dice">${r.dice.map((d) => `<span class="die rolling">${d}</span>`).join("")}
         <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span>${r.shared ? `<span class="small muted">· rolled by the table</span>` : ""}</div>
@@ -9812,6 +9831,7 @@ return { mountLab };
       else { ch.adv.id = t.value; ch.sadv.id = ""; }
       touch(); render();
     }
+    else if (t.id === "f-complevel") { ch.comp.level = +t.value || 1; touch(); render(); }
     else if (t.id === "f-comp") {
       // A suggested trigger belongs to the old complication; the player's own wording stays.
       if (Object.values(TRIGGERS).flat().includes(ch.comp.trigger.trim())) { ch.comp.trigger = ""; $("f-comptrigger").value = ""; }
@@ -13112,6 +13132,8 @@ function ptMaps(api, root) {
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
         ${gmMagic(c)}
+        ${UNST && (unstableOf(c) || unstableBase(c) || c.play.unstable || (POWERS && allPowers(c).length)) ? `<div class="gm-traits small gm-unstable"><span><strong>${unstableOf(c) ? esc(unstableText(unstableOf(c))) : "Stable for now"}</strong>${c.play.unstable ? ` <span class="muted">(${c.play.unstable > 0 ? "raised" : "lowered"} ${Math.abs(c.play.unstable)} by the GM)</span>` : ""}</span>
+          <span class="gm-duty"><button data-gm="${c.id}" data-gmunst="-1" aria-label="Lower ${esc(c.name)}'s instability">−</button><button data-gm="${c.id}" data-gmunst="1" aria-label="Raise ${esc(c.name)}'s instability">+</button></span></div>` : ""}
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
           <span><strong>Complication:</strong> ${esc(k.comp || "—")}${c.comp.trigger ? ` (trigger: ${esc(c.comp.trigger)})` : ""}${k.scomp ? `; ${esc(k.scomp)}` : ""}</span></div>
         <div class="btn-row"><label class="small gm-generic" title="A generic NPC (a guard, a thug) can be added more than once; each copy is numbered"><input type="checkbox" data-gm="${c.id}" data-gmgeneric${c.generic ? " checked" : ""}> Generic NPC</label><button class="linkish" data-gm="${c.id}" data-gmsave>Save character file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
@@ -13124,6 +13146,7 @@ function ptMaps(api, root) {
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
     if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
+    else if (el.dataset.gmunst) { const lv = unstableOf(c) + +el.dataset.gmunst; if (lv < 0 || lv > (UNST.max || 4)) return; c.play.unstable = lv - unstableBase(c); }
     else if (el.dataset.gmmind) { const i = +el.dataset.gmmind; c.play.mind = (c.play.mind || 0) === i ? i - 1 : i; }
     else if (el.dataset.gmxt) { const i = +el.dataset.gmxt; c.play.xtrack = (c.play.xtrack || 0) === i ? i - 1 : i; }
     else if ("gmform" in el.dataset) c.play.form = !inForm(c);
