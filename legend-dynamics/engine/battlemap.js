@@ -601,7 +601,22 @@ function mountBattleMap(api) {
     save(); draw(); return true;
   }
 
-  return { distanceBetween, snapshot, setState, moveOwn, refresh: () => {
+  // From the playtest kit: a scene's map as the hex map's background, at its hex size; a token with its picture.
+  async function useBackgroundUrl(url, yards) {
+    const r = await fetch(url); if (!r.ok) throw new Error("not found");
+    if (st.kind !== "hex") { st.kind = "hex"; RT = TRACKS[0]; }
+    if (yards > 0) st.scale = { n: yards, unit: "yd" };
+    await setBackground(await r.blob());
+  }
+  async function addPictureToken(name, url, tsize) {
+    const r = await fetch(url); if (!r.ok) throw new Error("not found");
+    const im = await readImage(await r.blob(), 256);
+    const others = toks().filter((x) => x.name === name || x.name.startsWith(name + " ")).length;
+    toks().push({ id: uid(), ref: null, name: others ? `${name} ${others + 1}` : name, color: "#6b6b6b", img: im.url, tsize: Math.max(1, Math.min(3, tsize || 1)),
+      ...spot(RT.startLane || Math.min(3, lanes().length - 1)), boxes: 1, injury: 0, threat: null, boxLabel: "Injury", stats: "" });
+    save(); draw();
+  }
+  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();

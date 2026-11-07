@@ -674,18 +674,6 @@ main { flex: 1; }
 .ld-music-card:hover { border-color: var(--ld-accent); }
 .ld-music-card span { font-size: .9rem; color: var(--ld-ink-2); }
 @media (max-width: 560px) { .ld-track { grid-template-columns: 1fr; } .ld-track-dl { grid-column: 1; grid-row: auto; } .ld-vol-l { margin-left: 0; } }
-/* The playtest page's battle maps (website/maps.js) */
-.ld-map-adv { margin-top: 1.6rem; }
-.ld-map-adv h3 { margin: 0 0 .2rem; }
-.ld-maps { list-style: none; margin: .8rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; }
-.ld-map { background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; }
-.ld-map-pic { aspect-ratio: 16 / 9; max-width: 100%; display: grid; place-items: center; background: var(--ld-line); }
-.ld-map-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.ld-map-pic a { display: block; width: 100%; height: 100%; }
-.ld-map-txt { display: grid; gap: .2rem; padding: .7rem .8rem 0; }
-.ld-map-dl { padding: .6rem .8rem .8rem; min-height: 1rem; }
-.ld-map-dl .ld-button { font-size: .85rem; }
-.ld-map-extras { margin: .4rem 0 0; padding-left: 1.2rem; }
 /* The playtest page (/playtest/) and the feedback the author reads */
 .ld-fb { border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .8rem 1rem; background: var(--ld-panel); display: grid; gap: .6rem; justify-items: start; }
 .ld-fb pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 .95rem/1.5 var(--ld-body); color: var(--ld-ink); }

@@ -104,15 +104,22 @@ the main file with [`dist/worker.js`](dist/worker.js) (the whole server in one f
 Listeners play tracks on the page or download them (`/music/<folder>/<file>?download=1`). Nobody can upload or
 delete through the server: only you, in the dashboard.
 
-### Battle maps for the playtest adventures
+### Battle maps and tokens for the playtest adventures
 
-The playtest page (`/playtest/`, *Battle maps*) shows a card for every scene of the four first adventures, and fills
-each one in when its picture is in the same bucket as the music. In the bucket, make a folder `battle-maps`, and in it
-one folder per setting, named as for music: `battle-maps/trails-of-blood-and-dust/`, `battle-maps/fracture-lines/`,
-`battle-maps/the-shattered-crown/`, `battle-maps/aurora/`. Upload PNG, JPEG or WebP pictures, each named with its
-scene's number first: `2 - Mercy Springs at noon.png` goes on scene 2's card. A picture without a number goes on the
-scene whose title its name matches best ("Mercy Springs by Night" goes on *Mercy Springs by night*); one that matches no
-scene is listed under *More maps*. A number is the sure way. The prompts for making them are in `legend-dynamics/battlemap-prompts.md`.
+The GM view's **Playtest** kit, in each setting's character creator, has a card for every scene of the first adventure
+and every token in its fights. Each card fills in once its picture is in the same bucket as the music, with **Use on
+the battle map** (a map, under the grid at its hex size), **Add to the battle map** (a token) and a download.
+
+In the bucket, make a folder `battle-maps`, and in it one folder per setting, named as for music:
+`battle-maps/trails-of-blood-and-dust/`, `battle-maps/fracture-lines/`, `battle-maps/the-shattered-crown/`,
+`battle-maps/aurora/`. Upload PNG, JPEG or WebP pictures:
+
+- **Maps:** start the name with the scene's number (`2 - Mercy Springs at noon.png`), the sure way; or use words from
+  the scene's title (`Mercy Springs by Night.png` goes on *Mercy Springs by night*).
+- **Tokens:** start the name with `token` and use the token's name (`token - ghoul.png`, `token - Ezra Quill.png`).
+
+Pictures that match nothing are listed under *More pictures*. The prompts for making them (maps that show only the
+place, and a separate token for everyone in a fight) are in `legend-dynamics/battlemap-prompts.md`.
 
 ## Use it
 

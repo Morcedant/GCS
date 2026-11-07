@@ -3870,7 +3870,8 @@ tr.lvl-U td.target { color: var(--muted); }
   homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), ritualRoot: $("hb-rituals"), heartInput: $("f-ma-heart"), esc, toast, saveText });
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
-  if (PACK.playtest) { $("pt-card").hidden = false; mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay }); }
+  if (PACK.playtest) { $("pt-card").hidden = false; mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
+    server: TABLE_SERVER, map: battleMap, showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); } }); }
   // The crew's ship and the setting's tables (frontier.js), for a setting with them.
   if (PACK.crewShip) { $("crewship-card").hidden = false;
     crewShipUI = mountCrewShip({ PACK, root: $("crewship-card"), esc, toast: gmSay, onChange: () => { renderCrewShipView(); pushScene(); } }); renderCrewShipView(); }
