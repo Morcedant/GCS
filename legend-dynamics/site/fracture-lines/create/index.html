@@ -472,6 +472,10 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
 .gm-inj { display: inline-flex; align-items: center; gap: 8px; }
 .gm-generic { display: inline-flex; align-items: center; gap: 4px; margin-right: auto; }
+.gm-extra .gm-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gm-extra textarea { width: 100%; min-height: 3.2em; font: inherit; font-size: .9rem; }
+.gm-extra .boxes { flex-wrap: wrap; }
+.gm-extra .gm-head > div { flex: 1; min-width: 0; } .gm-ex-name { width: 100%; font-weight: 700; }
 .gm-supermove { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 2px; padding: 5px 8px; border: 1px solid var(--accent); border-radius: 6px; }
 .gm-supermove-tag { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
 .gm-supermove b { color: var(--accent); }
@@ -678,7 +682,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d386345" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · d386345</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="aafa74a" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · aafa74a</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -989,6 +993,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="fields">
           <div class="field"><label for="gm-add-saved">Add from this browser</label><select id="gm-add-saved"></select></div>
           <div class="field"><label for="gm-add-pregen">Add ready-made characters</label><select id="gm-add-pregen"></select></div>
+          <div class="field"><label for="gm-add-extra">Add an extra: someone they meet</label><select id="gm-add-extra"></select></div>
         </div>
         <div class="btn-row">
           <button class="btn" id="gm-newsession">New session: reset everyone's Resolve</button>
@@ -1090,6 +1095,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </div>
     </div>
     <div class="gm-grid" id="gm-grid"></div>
+    <div class="no-print" id="gm-extras"></div>
         <!-- The Encounter panel: the production Encounter manager, or the Rules Lab's modeler where a test configuration exists -->
     <style>
   .lab-rules-sum { cursor: pointer; padding: 8px 10px; border: 1px dashed var(--accent); border-radius: 8px; margin: 4px 0 8px; }
@@ -12724,6 +12730,77 @@ function ptMaps(api, root) {
     if (dupes.length) setTimeout(() => gmSay(`${[...new Set(dupes)].join(", ")} ${dupes.length === 1 ? "is" : "are"} already at the table. Mark a character a generic NPC on their card to add more than one.`, true), 0);
     return { added, updated, dupes: dupes.length };
   }
+  // ---- extras: the people the characters meet (the setting's threats, homebrew ones, or anyone the GM writes in) ----
+  // Kept apart from the characters: their own card each (boxes, Dodge, attacks, trait, notes), and onto the battle map
+  // with their numbers. Someone named is at the table once; a generic one (a guard, the retrieval team) can be added
+  // again, numbered. In this browser (<game>.gmextras.v1) and in the group file.
+  const STORE_EXTRAS = PACK.id + ".gmextras.v1";
+  const extraThreats = () => (PACK.threats || []).filter((t) => t && t.name);
+  const threatLine = (t) => [...(t.attacks || []).map((a) => `${a.skill} ${a.target}`), t.weaponText || ""].filter(Boolean).join(" · ");
+  const cleanExtra = (x) => x && typeof x === "object" && typeof x.name === "string" && x.name.trim() ? {
+    id: typeof x.id === "string" ? x.id : uid(), threat: typeof x.threat === "string" ? x.threat : null, name: x.name.trim().slice(0, 60),
+    label: String(x.label || "").slice(0, 80), boxes: Math.max(1, Math.min(20, parseInt(x.boxes, 10) || 1)), injury: Math.max(0, parseInt(x.injury, 10) || 0),
+    dodge: x.dodge === "" || x.dodge == null ? "" : String(x.dodge).slice(0, 6), attacks: String(x.attacks || "").slice(0, 200), trait: String(x.trait || "").slice(0, 300),
+    notes: String(x.notes || "").slice(0, 1000), generic: !!x.generic } : null;
+  let gmExtras = (store.get(STORE_EXTRAS, []) || []).map(cleanExtra).filter(Boolean);
+  const saveExtras = () => store.set(STORE_EXTRAS, gmExtras);
+  /** An extra from a threat (by id), or a blank one: added unless someone named is already here; generic ones numbered. */
+  function addExtra(threatId, quiet, asName) {
+    const t = threatId ? extraThreats().find((x) => x.id === threatId) : null;
+    if (threatId && !t) return null;
+    const name = asName || (t ? t.name : "New extra"), generic = t && !asName ? !!t.minor : false;
+    const same = gmExtras.filter((x) => (t && !asName ? x.threat === t.id : false) || x.name.replace(/\s+\d+$/, "") === name);
+    if ((t || asName) && same.length && !generic) { if (!quiet) gmSay(`${name} is already at the table.`, true); return null; }
+    const x = cleanExtra({ id: uid(), threat: t ? t.id : null, name: generic && same.length ? `${name} ${same.length + 1}` : name, label: t ? t.label || "" : "",
+      boxes: t ? t.boxes || 1 : 1, dodge: t && t.dodge != null ? t.dodge : "", attacks: t ? threatLine(t) : "", trait: t && t.trait ? `${t.trait}${t.traitText ? ": " + t.traitText : ""}` : "", generic });
+    gmExtras.push(x); saveExtras(); renderExtras();
+    if (!quiet) gmSay(`${x.name} is at the table, under Extras.`);
+    return x;
+  }
+  function renderExtras() {
+    const sel = $("gm-add-extra");
+    if (sel) sel.innerHTML = `<option value="">Choose someone…</option>` + extraThreats().map((t) => `<option value="${esc(t.id)}">${esc(t.label || t.name)}</option>`).join("") + `<option value="blank">Someone else (write them in)…</option>`;
+    const root = $("gm-extras"); if (!root) return;
+    root.innerHTML = gmExtras.length ? `<h3 class="gm-extras-head">Extras</h3><div class="gm-grid">${gmExtras.map((x) => `<article class="gm-card hud gm-extra ${x.injury >= x.boxes ? "down" : ""}" data-ex="${x.id}">
+        <div class="gm-head"><div><input type="text" class="gm-ex-name" data-exf="name" value="${esc(x.name)}" aria-label="Name" maxlength="60"><span class="small muted">${esc(x.label && x.label !== x.name ? x.label : x.threat ? "" : "Written in by the GM")}</span></div></div>
+        <div class="gm-stats"><div><span>Dodge</span><b><input type="text" data-exf="dodge" value="${esc(x.dodge)}" inputmode="numeric" maxlength="6" aria-label="Dodge" style="width:3em;text-align:center"></b></div><div><span>Boxes</span><b><input type="text" data-exf="boxes" value="${x.boxes}" inputmode="numeric" maxlength="2" aria-label="Boxes" style="width:3em;text-align:center"></b></div><div><span>Marked</span><b>${Math.min(x.injury, x.boxes)}</b></div></div>
+        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: x.boxes }, (_, i) => `<button class="box ${i < x.injury ? "on" : ""}" data-exbox="${i + 1}" aria-label="${esc(x.name)} box ${i + 1}"></button>`).join("")}</span></span></div>
+        <div class="gm-cond ${x.injury >= x.boxes ? "out" : x.injury ? "hurt" : ""}">${x.injury >= x.boxes ? "Out" : x.injury ? `${x.injury} of ${x.boxes} marked` : "Unhurt"}</div>
+        <div class="field wide"><label class="small">Attacks</label><input type="text" data-exf="attacks" value="${esc(x.attacks)}" maxlength="200"></div>
+        <div class="field wide"><label class="small">Trait</label><input type="text" data-exf="trait" value="${esc(x.trait)}" maxlength="300"></div>
+        <div class="field wide"><label class="small">Notes</label><textarea data-exf="notes" maxlength="1000">${esc(x.notes)}</textarea></div>
+        <div class="btn-row"><label class="small gm-generic"><input type="checkbox" data-exf="generic"${x.generic ? " checked" : ""}> Generic</label><button class="linkish" data-exdo="map">Put on the battle map</button><button class="linkish" data-exdo="copy">Add another</button><button class="linkish danger" data-exdo="rm">Remove</button></div>
+      </article>`).join("")}</div>` : "";
+  }
+  $("gm-add-extra").addEventListener("change", (e) => {
+    const v = e.target.value; e.target.value = ""; if (!v) return;
+    if (v === "blank") { const x = addExtra(null, true); if (x) { gmSay("A new extra under Extras: name them and give their numbers."); const el = document.querySelector(`[data-ex="${x.id}"] .gm-ex-name`); if (el) { el.focus(); el.select(); } } return; }
+    addExtra(v);
+  });
+  $("gm-extras").addEventListener("click", async (e) => {
+    const card = e.target.closest("[data-ex]"); if (!card) return; const x = gmExtras.find((y) => y.id === card.dataset.ex); if (!x) return;
+    const box = e.target.closest("[data-exbox]");
+    if (box) { const i = +box.dataset.exbox; x.injury = x.injury === i ? i - 1 : i; saveExtras(); renderExtras(); return; }
+    const b = e.target.closest("[data-exdo]"); if (!b) return;
+    if (b.dataset.exdo === "rm") { gmExtras = gmExtras.filter((y) => y !== x); saveExtras(); renderExtras(); gmSay(`${x.name} removed.`); }
+    else if (b.dataset.exdo === "copy") {
+      if (!x.generic) { gmSay(`${x.name} is one of a kind. Tick Generic on their card to add more.`, true); return; }
+      const base = x.name.replace(/\s+\d+$/, ""), n = gmExtras.filter((y) => y.name.replace(/\s+\d+$/, "") === base).length;
+      gmExtras.splice(gmExtras.indexOf(x) + 1, 0, cleanExtra({ ...x, id: uid(), name: `${base} ${n + 1}`, injury: 0, notes: "" })); saveExtras(); renderExtras();
+    } else if (b.dataset.exdo === "map") {
+      const t = x.threat && extraThreats().find((y) => y.id === x.threat);
+      await battleMap.addPieces([{ name: x.name, url: "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true }]);
+      showGmTab("fight"); gmSay(`${x.name} is on the battle map.`);
+    }
+  });
+  $("gm-extras").addEventListener("change", (e) => {
+    const f = e.target.closest("[data-exf]"), card = e.target.closest("[data-ex]"); if (!f || !card) return;
+    const x = gmExtras.find((y) => y.id === card.dataset.ex); if (!x) return;
+    const k = f.dataset.exf;
+    if (k === "generic") x.generic = f.checked; else x[k] = f.value;
+    Object.assign(x, cleanExtra(x)); saveExtras(); if (k === "boxes" || k === "generic") renderExtras();
+  });
+  renderExtras();
   let labPanel = null; // the Encounter panel (and, with a test configuration, the Rules Lab)
   // ---- discovery clocks, the threat clock they race, investigation costs, and minting cards (pack discovery) ----
   const STORE_DISC = PACK.id + ".discovery.v1";
@@ -13047,6 +13124,7 @@ function ptMaps(api, root) {
       try {
         const data = JSON.parse(await f.text());
         if (Array.isArray(data.log)) mergeLog(data.log);
+        if (Array.isArray(data.extras)) { for (const x of data.extras.map(cleanExtra).filter(Boolean)) { const i = gmExtras.findIndex((y) => y.id === x.id); if (i >= 0) gmExtras[i] = x; else gmExtras.push(x); } saveExtras(); renderExtras(); }
         if (Array.isArray(data.allegiances)) alAdded += mergeAllegiances(data.allegiances);
         if (GRITTY && typeof data.gritty === "boolean") setGritty(data.gritty);
         if (DISC && data.discovery && data.discovery.threat && Array.isArray(data.discovery.clocks)) { disc = data.discovery; discSave(); }
@@ -13100,7 +13178,7 @@ function ptMaps(api, root) {
   renderAllegianceList();
   $("gm-save").onclick = () => {
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
-    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}), ...(DISC ? { discovery: disc } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
+    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), extras: gmExtras, log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}), ...(DISC ? { discovery: disc } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
   };
   // ---- The Encounter panel: the published rules in every setting with weapons as data; the Rules Lab's experiments
   // where a test configuration exists. Never used by the sheet. ----
@@ -13610,6 +13688,19 @@ function ptMaps(api, root) {
         saveGM(); done.push(`${f.holder}'s file on ${c.name}`);
       }
     }
+    // The adventure's people, as extras: each under their own name, with their threat's numbers where they have one.
+    const toks = (PACK.playtest && PACK.playtest.maps && PACK.playtest.maps.tokens) || [];
+    const norm = (x) => String(x || "").toLowerCase().replace(/\s*\(.*?\)/g, "").trim();
+    let ex = 0;
+    for (const tk of toks) {
+      if (tk.size === "ship") continue;
+      const th = tk.threat ? extraThreats().find((t) => norm(t.name) === norm(tk.threat)) || extraThreats().find((t) => norm(t.name).startsWith(norm(tk.threat))) : null;
+      const nm = tk.name.split(",")[0], generic = th && th.minor && Object.values(tk.scenes || {}).some((x) => x.count > 1);
+      if (gmExtras.some((x) => x.name.replace(/\s+\d+$/, "") === nm || (generic && th && x.threat === th.id))) continue; // already here (a second Load adds no one twice)
+      const x = th ? addExtra(th.id, true, generic ? null : nm) : addExtra(null, true, nm);
+      if (x) { ex++; if (!th) { x.label = "In the adventure"; x.notes = tk.look ? `Looks like ${tk.look}.` : ""; saveExtras(); } if (generic) { x.name = nm; saveExtras(); } }
+    }
+    if (ex) { renderExtras(); done.push(`${ex} extra${ex === 1 ? "" : "s"} (the adventure's people)`); }
     renderGM();
     return done;
   }
@@ -13656,7 +13747,7 @@ function ptMaps(api, root) {
   { let at = 0; try { at = +(sessionStorage.getItem(PACK.id + ".step") || 0); } catch {} showStep(at); }
 
   // ---- the GM view: one group of panels at a time ----
-  const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
+  const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid", "#gm-extras"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
     ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card", "#files-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools", ...(DISC ? [] : ["#files-card"])]], ["campaign", "Campaign", ["#cp-card"]], ["homebrew", "Homebrew", ["#hb-card"]],
     ...(PACK.playtest ? [["playtest", "Playtest", ["#pt-card"]]] : [])];
   for (const [id, , sels] of GM_GROUPS) for (const q of sels) { const el = document.querySelector("#view-gm " + q); if (el) el.dataset.gmpane = id; }
