@@ -494,7 +494,7 @@ function mountBattleMap(api) {
       st.kind = b.dataset.kind; RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0]; sel = null; measure = null; mode = "move"; fillThreats(); save(); draw();
       if (!V().set) fit();
     } else if (k === "posse") {
-      const crew = api.crew(), have = new Set(toks().map((x) => x.ref).filter(Boolean)), add = crew.filter((c) => !have.has(c.id));
+      const crew = api.crew().filter((c) => !c.extra), have = new Set(toks().map((x) => x.ref).filter(Boolean)), add = crew.filter((c) => !have.has(c.id)); // the party, not the extras
       if (!crew.length) { say("Add characters to the GM view first.", true); return; }
       for (const c of add) toks().push({ id: uid(), ref: c.id, tsize: 1, ...spot(0) });
       save(); draw(); say(add.length ? `Placed ${add.length} from the ${PARTY}.` : `The whole ${PARTY} is already on the map.`);
@@ -636,13 +636,14 @@ function mountBattleMap(api) {
   async function setScene(sc) {
     if (st.kind !== "hex") { st.kind = "hex"; RT = TRACKS[0]; }
     sel = null; measure = null;
-    st.tokens = st.tokens.filter((t) => t.ref);
+    const isExtra = (id) => { const c = api.crew().find((x) => x.id === id); return !c || !!c.extra; };
+    st.tokens = st.tokens.filter((t) => t.ref && !isExtra(t.ref)); // the party stays; extras come with their scene
     if (sc.yards > 0) st.scale = { n: sc.yards, unit: "yd" };
     let mapOk = false;
     if (sc.url) try { const r = await fetch(sc.url); if (r.ok) { const im = await readImage(await r.blob(), 4096); bgs.hex = im.url; st.bgW = im.w; st.bgH = im.h; alignToPicture(); await idb.set(bgKey("hex"), im.url); mapOk = true; } } catch { /* the scene works on the plain grid */ }
     if (!mapOk) { bgs.hex = null; st.bgW = st.bgH = 0; try { await idb.del(bgKey("hex")); } catch {} }
     const at = (fc, fr) => { const C = Math.round((st.cols - 1) * fc), R = Math.round((st.rows - 1) * fr); return pointy() ? { q: C - Math.floor(R / 2), r: R } : { q: C, r: R - Math.floor(C / 2) }; };
-    const crew = api.crew(), have = new Set(st.tokens.map((x) => x.ref));
+    const crew = api.crew().filter((c) => !c.extra), have = new Set(st.tokens.map((x) => x.ref));
     for (const c of crew) if (!have.has(c.id)) st.tokens.push({ id: uid(), ref: c.id, tsize: 1, ...freeHexNear(at(0.2, 0.5)) });
     const placed = await placePieces(sc.pieces || [], at);
     save(); draw(); fit();
@@ -659,6 +660,8 @@ function mountBattleMap(api) {
     const norm = (x) => String(x || "").toLowerCase().replace(/\s*\(.*?\)/g, "").trim();
     let placed = 0;
     for (const pc of list) {
+      // Someone at the table as a character (an extra): their own token, linked to their card.
+      if (pc.ref) { if (!st.tokens.some((x) => x.ref === pc.ref)) { st.tokens.push({ id: uid(), ref: pc.ref, tsize: Math.max(1, Math.min(3, pc.tsize || 1)), ...freeHexNear(at(0.75, 0.5)) }); placed++; } continue; }
       const th = pc.threat ? allThreats().find((x) => norm(x.name) === norm(pc.threat)) || allThreats().find((x) => norm(x.name).startsWith(norm(pc.threat))) : null;
       let img = null;
       if (pc.url) try { const r = await fetch(pc.url); if (r.ok) img = (await readImage(await r.blob(), 256)).url; } catch { /* a plain token */ }
@@ -675,8 +678,14 @@ function mountBattleMap(api) {
     return placed;
   }
   /** Is an extra on the map already (a token placed from its card)? */
+  /** A character from the GM view (an extra) onto the map, linked to their card, unless they're on it already. */
+  function addCrew(id) {
+    if (st.kind !== "hex") { st.kind = "hex"; RT = TRACKS[0]; }
+    if (!st.tokens.some((t) => t.ref === id)) st.tokens.push({ id: uid(), ref: id, tsize: 1, ...freeHexNear(centerHex()) });
+    save(); draw();
+  }
   const hasExtra = (id) => [...st.tokens, ...Object.values(st.rts).flatMap((r) => r.tokens)].some((t) => t.ex === id);
-  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, hasExtra, refresh: () => {
+  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, hasExtra, addCrew, refresh: () => {
     syncExtras();
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));

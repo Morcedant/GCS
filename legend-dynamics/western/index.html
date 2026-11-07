@@ -479,6 +479,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-expic label { position: absolute; bottom: 4px; right: 6px; background: var(--card, #fff); padding: 1px 6px; border-radius: 4px; }
 .gm-extra .gm-head > div { flex: 1; min-width: 0; } .gm-ex-name { width: 100%; font-weight: 700; }
 .gm-unstable { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gm-extras-head { margin: 18px 0 8px; } .gm-extras-head .small { font-weight: 400; margin-left: 6px; }
+.gm-exrow { flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-bottom: 4px; }
 .gm-supermove { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 2px; padding: 5px 8px; border: 1px solid var(--accent); border-radius: 6px; }
 .gm-supermove-tag { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
 .gm-supermove b { color: var(--accent); }
@@ -685,9 +687,10 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="ca8d42c" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · ca8d42c</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="21b8a8e" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 21b8a8e</span><!-- VERSION:END --></div>
   </header>
 
+  <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
   <div id="example-banner" class="example-banner" hidden>
     <span>This is the guide's <b>example lawman</b>, loaded so you can see a finished build. Start your own when you're ready.</span>
     <button class="btn primary" id="banner-new">Start a new character</button>
@@ -998,7 +1001,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="fields">
           <div class="field"><label for="gm-add-saved">Add from this browser</label><select id="gm-add-saved"></select></div>
           <div class="field"><label for="gm-add-pregen">Add ready-made characters</label><select id="gm-add-pregen"></select></div>
-          <div class="field"><label for="gm-add-extra">Add an extra: someone they meet</label><select id="gm-add-extra"></select></div>
+          <div class="field"><label for="gm-add-extra">Add an NPC: someone they meet</label><select id="gm-add-extra"></select></div>
         </div>
         <div class="btn-row">
           <button class="btn" id="gm-newsession">New session: reset everyone's Grit</button>
@@ -6864,7 +6867,9 @@ function mountLab(api) {
     const mindTraits = [...(md ? [{ type: "mindDefense", value: md, label: `Mind Defense ${["", "I", "II", "III", "IV", "V", "VI"][md]}` }] : []), ...steady];
     const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])
       ? [{ type: "extraDefense", value: 1, label: "Speed: a second defense" }] : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    // An extra (the GM's character for someone they meet): their own boxes and weapons, on the side the GM gave them.
+    if (c.extra) for (const w of c.npcWeapons || []) if (WEAPONS[w]) weapons.push(w);
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: c.extra && c.foe ? "foe" : "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
@@ -6874,7 +6879,7 @@ function mountLab(api) {
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
+      boxes: c.extra ? c.npcBoxes || 3 : 3, injury: c.extra ? c.play.marks || 0 : c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
       ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes } : {}), will: c.attrs.Will, ...(SD ? sdTraits(c) : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A character's edge in a showdown: Quick Draw's bonus (an advantage), and an ability that wins a tied draw. @param {any} c */
@@ -6939,7 +6944,8 @@ function mountLab(api) {
     for (const p of en.participants) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
-      if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
+      const cInj = c.extra ? c.play.marks || 0 : c.play.injury || 0;
+      if (cInj !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: cInj, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if (MT && (c.play.mind || 0) !== (p.mind || 0)) E.override(en, rules(), LD, "mind", { pid: p.pid, mind: c.play.mind || 0, reason: "changed on the character card" });
       if (!!c.play.frightened !== isFrightened(p)) E.setCondition(en, p.pid, (p.conditions || []).find((x) => /^frightened\b/i.test(x)) || "Frightened", !!c.play.frightened);
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
@@ -6956,7 +6962,8 @@ function mountLab(api) {
     for (const p of en.participants) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
-      c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      if (c.extra && api.setMarks) api.setMarks(c, p.injury); else c.play.injury = Math.min(3, p.injury);
+      c.play.dying = p.dying; c.play.duty = p.points;
       c.play.frightened = isFrightened(p);
       if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
@@ -7669,6 +7676,16 @@ return { mountLab };
       out.pictureFrom = { portrait: ok(f.portrait, out.portrait), token: ok(f.token, out.token) }; }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     out.generic = out.generic === true; // a generic NPC: the GM view takes more than one of them
+    // An extra: someone the characters meet, kept by the GM as a full character (tagged Extra). Their own number of boxes,
+    // the threat they came from, its fight traits and weapons, a note, and which side they're on.
+    out.extra = out.extra === true;
+    if (out.extra) {
+      out.npcBoxes = Math.max(1, Math.min(20, parseInt(out.npcBoxes, 10) || 3));
+      out.npcTraits = (Array.isArray(out.npcTraits) ? out.npcTraits : []).filter((t) => t && typeof t === "object" && typeof t.type === "string").slice(0, 20);
+      out.npcWeapons = (Array.isArray(out.npcWeapons) ? out.npcWeapons : []).filter((w) => typeof w === "string").slice(0, 12);
+      out.npcNote = String(out.npcNote || "").slice(0, 1000); out.threat = typeof out.threat === "string" ? out.threat : null; out.foe = out.foe !== false;
+      out.play.marks = Math.max(0, Math.min(out.npcBoxes, parseInt(out.play.marks, 10) || 0));
+    }
     out.comp.level = Math.max(1, Math.min(3, parseInt(out.comp.level, 10) || 1)); // how unstable (PACK.unstable), I to III
     out.comp.vuln = PACK.damageTypes && (PACK.damageTypes.vulnerable || []).includes(out.comp.vuln) ? out.comp.vuln : ""; // a Vulnerability's type
     out.play.unstable = Math.max(-4, Math.min(4, parseInt(out.play.unstable, 10) || 0)); // the GM's raise or lower, in play
@@ -7797,6 +7814,7 @@ return { mountLab };
   /** Keep a character within the rules: nothing below its base (an older file made under origins that lowered
    *  attributes), and no more points spent than the pool, taking back from the highest bought attribute first. */
   function fitPool(c) {
+    if (c.extra) return false; // an extra (the GM's character for someone met) isn't held to the creation rules
     const saved = ch; ch = c;
     try {
       let changed = false;
@@ -8798,7 +8816,10 @@ return { mountLab };
   }
 
   // ---- persistence ----
-  function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
+  function save() {
+    if (ch.extra) { const i = gmCrew.findIndex((x) => x.id === ch.id); if (i >= 0) { gmCrew[i] = normalize({ ...JSON.parse(JSON.stringify(ch)), play: gmCrew[i].play }); saveGM(); } return; }
+    store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch));
+  }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
     const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [],
@@ -9720,7 +9741,7 @@ function mountBattleMap(api) {
       st.kind = b.dataset.kind; RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0]; sel = null; measure = null; mode = "move"; fillThreats(); save(); draw();
       if (!V().set) fit();
     } else if (k === "posse") {
-      const crew = api.crew(), have = new Set(toks().map((x) => x.ref).filter(Boolean)), add = crew.filter((c) => !have.has(c.id));
+      const crew = api.crew().filter((c) => !c.extra), have = new Set(toks().map((x) => x.ref).filter(Boolean)), add = crew.filter((c) => !have.has(c.id)); // the party, not the extras
       if (!crew.length) { say("Add characters to the GM view first.", true); return; }
       for (const c of add) toks().push({ id: uid(), ref: c.id, tsize: 1, ...spot(0) });
       save(); draw(); say(add.length ? `Placed ${add.length} from the ${PARTY}.` : `The whole ${PARTY} is already on the map.`);
@@ -9862,13 +9883,14 @@ function mountBattleMap(api) {
   async function setScene(sc) {
     if (st.kind !== "hex") { st.kind = "hex"; RT = TRACKS[0]; }
     sel = null; measure = null;
-    st.tokens = st.tokens.filter((t) => t.ref);
+    const isExtra = (id) => { const c = api.crew().find((x) => x.id === id); return !c || !!c.extra; };
+    st.tokens = st.tokens.filter((t) => t.ref && !isExtra(t.ref)); // the party stays; extras come with their scene
     if (sc.yards > 0) st.scale = { n: sc.yards, unit: "yd" };
     let mapOk = false;
     if (sc.url) try { const r = await fetch(sc.url); if (r.ok) { const im = await readImage(await r.blob(), 4096); bgs.hex = im.url; st.bgW = im.w; st.bgH = im.h; alignToPicture(); await idb.set(bgKey("hex"), im.url); mapOk = true; } } catch { /* the scene works on the plain grid */ }
     if (!mapOk) { bgs.hex = null; st.bgW = st.bgH = 0; try { await idb.del(bgKey("hex")); } catch {} }
     const at = (fc, fr) => { const C = Math.round((st.cols - 1) * fc), R = Math.round((st.rows - 1) * fr); return pointy() ? { q: C - Math.floor(R / 2), r: R } : { q: C, r: R - Math.floor(C / 2) }; };
-    const crew = api.crew(), have = new Set(st.tokens.map((x) => x.ref));
+    const crew = api.crew().filter((c) => !c.extra), have = new Set(st.tokens.map((x) => x.ref));
     for (const c of crew) if (!have.has(c.id)) st.tokens.push({ id: uid(), ref: c.id, tsize: 1, ...freeHexNear(at(0.2, 0.5)) });
     const placed = await placePieces(sc.pieces || [], at);
     save(); draw(); fit();
@@ -9885,6 +9907,8 @@ function mountBattleMap(api) {
     const norm = (x) => String(x || "").toLowerCase().replace(/\s*\(.*?\)/g, "").trim();
     let placed = 0;
     for (const pc of list) {
+      // Someone at the table as a character (an extra): their own token, linked to their card.
+      if (pc.ref) { if (!st.tokens.some((x) => x.ref === pc.ref)) { st.tokens.push({ id: uid(), ref: pc.ref, tsize: Math.max(1, Math.min(3, pc.tsize || 1)), ...freeHexNear(at(0.75, 0.5)) }); placed++; } continue; }
       const th = pc.threat ? allThreats().find((x) => norm(x.name) === norm(pc.threat)) || allThreats().find((x) => norm(x.name).startsWith(norm(pc.threat))) : null;
       let img = null;
       if (pc.url) try { const r = await fetch(pc.url); if (r.ok) img = (await readImage(await r.blob(), 256)).url; } catch { /* a plain token */ }
@@ -9901,8 +9925,14 @@ function mountBattleMap(api) {
     return placed;
   }
   /** Is an extra on the map already (a token placed from its card)? */
+  /** A character from the GM view (an extra) onto the map, linked to their card, unless they're on it already. */
+  function addCrew(id) {
+    if (st.kind !== "hex") { st.kind = "hex"; RT = TRACKS[0]; }
+    if (!st.tokens.some((t) => t.ref === id)) st.tokens.push({ id: uid(), ref: id, tsize: 1, ...freeHexNear(centerHex()) });
+    save(); draw();
+  }
   const hasExtra = (id) => [...st.tokens, ...Object.values(st.rts).flatMap((r) => r.tokens)].some((t) => t.ex === id);
-  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, hasExtra, refresh: () => {
+  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, addPieces, hasExtra, addCrew, refresh: () => {
     syncExtras();
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
@@ -11652,7 +11682,7 @@ function ptMaps(api, root) {
       const nm = t.name.split(",")[0], who = people.find((p) => p.name === nm), pic = who && (who.token || who.portrait);
       const n1 = count(t.scenes[n]), ex = n1 === 1 && api.extraFor ? api.extraFor(nm) : null; // someone at the table as an extra: their card and token share boxes
       return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: n1, foe: t.scenes[n].foe,
-        ...(ex ? { ex: ex.id, boxes: ex.boxes, injury: ex.injury } : {}) };
+        ...(ex ? { ref: ex.id } : {}) };
     });
   }
   /** The threat moved on: a scene on the map that grows with it (the Lazarus mine's ghouls) gets one more for each step. */
@@ -11749,22 +11779,19 @@ function ptMaps(api, root) {
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
     setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun, partyName: T.party,
-    // The GM's extras: a token placed from an extra's card shares its boxes and injuries with the card.
-    extra: (id) => { const x = gmExtras.find((y) => y.id === id); return x ? { ...x, img: x.token || x.portrait || "" } : null; },
-    setExtra: (id, patch) => { const x = gmExtras.find((y) => y.id === id); if (!x) return; Object.assign(x, patch); saveExtras(); renderExtras(); },
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
       attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
       return { id: c.id, tableKey: c.tableKey || null, name: c.name || "Unnamed", portrait: c.token || c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
-        injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
+        injury: marksOf(c), boxes: boxesOf(c), extra: !!c.extra, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
         mtrack: MTRACK ? { name: MTRACK.name, max: MTRACK.boxes, value: c.play.mind || 0 } : null,
         stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...(k.powerMove ? [`${k.powerMove.name} ${k.powerMove.yards.toLocaleString()} yd`] : []), ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
-      if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
+      if ("injury" in patch) { if (c.extra) setMarks(c, patch.injury); else { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; } }
       if ("dying" in patch) c.play.dying = !!patch.dying;
       if ("stunned" in patch) c.play.stunned = !!patch.stunned;
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
@@ -11856,102 +11883,97 @@ function ptMaps(api, root) {
     if (dupes.length) setTimeout(() => gmSay(`${[...new Set(dupes)].join(", ")} ${dupes.length === 1 ? "is" : "are"} already at the table. Mark a character a generic NPC on their card to add more than one.`, true), 0);
     return { added, updated, dupes: dupes.length };
   }
-  // ---- extras: the people the characters meet (the setting's threats, homebrew ones, or anyone the GM writes in) ----
-  // Kept apart from the characters: their own card each (boxes, Dodge, attacks, trait, notes), and onto the battle map
-  // with their numbers. Someone named is at the table once; a generic one (a guard, the retrieval team) can be added
-  // again, numbered. In this browser (<game>.gmextras.v1) and in the group file.
-  const STORE_EXTRAS = PACK.id + ".gmextras.v1";
+  // ---- extras: the people the characters meet, kept as full characters (tagged Extra) in the GM view ----
+  // From the setting's threats (homebrew ones too), worked out into a sheet the GM can adjust in the creator; or written
+  // in from a blank one. Their own number of boxes, the threat's fight traits and weapons, a note, and a side.
+  // Someone named is at the table once; a generic one (a guard, the retrieval team) can be added again, numbered.
   const extraThreats = () => (PACK.threats || []).filter((t) => t && t.name);
-  const threatLine = (t) => [...(t.attacks || []).map((a) => `${a.skill} ${a.target}`), t.weaponText || ""].filter(Boolean).join(" · ");
-  const cleanExtra = (x) => x && typeof x === "object" && typeof x.name === "string" && x.name.trim() ? {
-    id: typeof x.id === "string" ? x.id : uid(), threat: typeof x.threat === "string" ? x.threat : null, name: x.name.trim().slice(0, 60),
-    label: String(x.label || "").slice(0, 80), boxes: Math.max(1, Math.min(20, parseInt(x.boxes, 10) || 1)), injury: Math.max(0, parseInt(x.injury, 10) || 0),
-    dodge: x.dodge === "" || x.dodge == null ? "" : String(x.dodge).slice(0, 6), attacks: String(x.attacks || "").slice(0, 200), trait: String(x.trait || "").slice(0, 300),
-    notes: String(x.notes || "").slice(0, 1000), generic: !!x.generic,
-    // Their pictures (as a character's): a portrait for the card and a token for the map, from the bucket or uploaded.
-    portrait: typeof x.portrait === "string" && /^data:image\/(png|jpeg|webp|gif);base64,/.test(x.portrait) ? x.portrait : "",
-    token: typeof x.token === "string" && /^data:image\/(png|jpeg|webp|gif);base64,/.test(x.token) ? x.token : "",
-    pictureFrom: { portrait: x.pictureFrom && typeof x.pictureFrom.portrait === "string" && x.portrait ? x.pictureFrom.portrait.slice(0, 400) : "", token: x.pictureFrom && typeof x.pictureFrom.token === "string" && x.token ? x.pictureFrom.token.slice(0, 400) : "" } } : null;
-  let gmExtras = (store.get(STORE_EXTRAS, []) || []).map(cleanExtra).filter(Boolean);
-  const saveExtras = () => { store.set(STORE_EXTRAS, gmExtras); try { battleMap.refresh(); pushScene(); } catch { /* the map mounts first; nothing to follow yet */ } };
-  /** An extra from a threat (by id), or a blank one: added unless someone named is already here; generic ones numbered. */
+  function boxesOf(c) { return c.extra ? c.npcBoxes || 3 : 3; } // hoisted: the battle map asks as it mounts
+  /** An extra's boxes marked: their injury level follows (the last box: out; the one before: seriously hurt). */
+  function setMarks(c, m) {
+    const nb = boxesOf(c); m = Math.max(0, Math.min(nb, m)); c.play.marks = m;
+    c.play.injury = m >= nb ? 3 : m <= 0 ? 0 : nb - m === 1 ? 2 : 1;
+    if (c.play.injury < 3) c.play.dying = false;
+  }
+  function marksOf(c) { return c.extra ? c.play.marks || 0 : c.play.injury || 0; }
+  /** A threat's stat block as a character: Dodge gives Agility, each attack a skill at its target (the attribute raised as
+   *  far as it needs), attack powers and protection powers at their Class, and the rest as fight traits and a note. */
+  function threatToCharacter(t) {
+    const c = normalize({ ...blank(), id: uid(), name: t.name, rank: t.label && t.label !== t.name ? t.label : "", extra: true, threat: t.id, foe: true, generic: !!t.minor,
+      npcBoxes: t.boxes || 1, npcTraits: JSON.parse(JSON.stringify(t.traits || [])), npcWeapons: (t.weapons || []).slice(), npcNote: [t.trait ? `${t.trait}: ${t.traitText || ""}` : "", t.weaponText ? `Attacks: ${t.weaponText}` : ""].filter(Boolean).join("\n") });
+    c.play.duty = 0;
+    if (typeof t.dodge === "number") c.attrs.Agility = Math.max(BASE, Math.min(20, t.dodge + 2));
+    for (const a of t.attacks || []) {
+      const sk = SKILLS.find((x) => x[0] === a.skill); if (!sk) continue;
+      const at = sk[1], need = a.target - c.attrs[at];
+      const lvl = need >= 3 ? "S" : "T";
+      if (a.target - LEVELS[lvl].mod > c.attrs[at]) c.attrs[at] = Math.min(20, a.target - LEVELS[lvl].mod);
+      c.skills[a.skill] = lvl;
+    }
+    const R = ["", "I", "II", "III", "IV", "V", "VI"], learned = [];
+    for (const w of t.weapons || []) { const m = String(w).match(/^(?:op|pw)-(strength|blast|speed|natural|tk|elemental|weather|gravity|shadow|manifest)(\d)$/);
+      const id = m && ({ tk: "telekinesis" })[m[1]] || (m && m[1]); if (m && POWERS && powerDef(id) && !learned.some((x) => x.id === id)) learned.push({ id, cl: R[+m[2]] }); }
+    for (const tr of t.traits || []) if (tr.type === "defenseClass" && tr.value && POWERS) {
+      const id = Array.isArray(tr.covers) && tr.covers.includes("energy") ? "forcefield" : "toughness";
+      if (powerDef(id) && !learned.some((x) => x.id === id)) learned.push({ id, cl: R[tr.value] });
+    }
+    if (learned.length) { c.powersLearned = learned; c.npcTraits = c.npcTraits.filter((tr) => !(tr.type === "defenseClass" && !(tr.covers || []).includes("mystic"))); }
+    return c;
+  }
+  /** An extra added to the GM view: from a threat (by id), or a blank one; named as asked. Null if someone named is here. */
   function addExtra(threatId, quiet, asName) {
     const t = threatId ? extraThreats().find((x) => x.id === threatId) : null;
     if (threatId && !t) return null;
-    const name = asName || (t ? t.name : "New extra"), generic = t && !asName ? !!t.minor : false;
-    const same = gmExtras.filter((x) => (t && !asName ? x.threat === t.id : false) || x.name.replace(/\s+\d+$/, "") === name);
-    if ((t || asName) && same.length && !generic) { if (!quiet) gmSay(`${name} is already at the table.`, true); return null; }
-    const x = cleanExtra({ id: uid(), threat: t ? t.id : null, name: generic && same.length ? `${name} ${same.length + 1}` : name, label: t ? t.label || "" : "",
-      boxes: t ? t.boxes || 1 : 1, dodge: t && t.dodge != null ? t.dodge : "", attacks: t ? threatLine(t) : "", trait: t && t.trait ? `${t.trait}${t.traitText ? ": " + t.traitText : ""}` : "", generic });
-    gmExtras.push(x); saveExtras(); renderExtras();
-    if (!quiet) gmSay(`${x.name} is at the table, under Extras.`);
-    extraPictures([x]);
-    return x;
+    const c = t ? threatToCharacter(t) : normalize({ ...blank(), id: uid(), name: asName || "New extra", extra: true, foe: false, npcBoxes: 3 });
+    if (t && asName) { c.name = asName; c.generic = false; }
+    if (!t) c.play.duty = 0;
+    const base = (n) => String(n || "").replace(/\s+\d+$/, "").toLowerCase(), same = gmCrew.filter((x) => base(x.name) === base(c.name));
+    if (same.length && !(c.generic || same.some((x) => x.generic))) { if (!quiet) gmSay(`${c.name} is already at the table.`, true); return null; }
+    if (same.length) { c.generic = true; c.name = `${c.name} ${same.length + 1}`; }
+    gmCrew.push(c); saveGM(); renderGM();
+    if (!quiet) gmSay(`${c.name} is at the table, under NPCs. Open them in the creator to fill in more.`);
+    autoPictures(c).then((ok) => { if (ok) { saveGM(); renderGM(); } }).catch(() => {});
+    return c;
   }
   function renderExtras() {
     const sel = $("gm-add-extra");
     if (sel) sel.innerHTML = `<option value="">Choose someone…</option>` + extraThreats().map((t) => `<option value="${esc(t.id)}">${esc(t.label || t.name)}</option>`).join("") + `<option value="blank">Someone else (write them in)…</option>`;
-    const root = $("gm-extras"); if (!root) return;
-    root.innerHTML = gmExtras.length ? `<h3 class="gm-extras-head">Extras</h3><div class="gm-grid">${gmExtras.map((x) => `<article class="gm-card hud gm-extra ${x.injury >= x.boxes ? "down" : ""}" data-ex="${x.id}">
-        <div class="gm-expics"><div class="gm-expic">${x.portrait ? `<img src="${x.portrait}" alt="">` : `<span class="small muted">No portrait</span>`}<label class="linkish small">Portrait…<input type="file" accept="image/*" class="visually-hidden" data-expic="portrait"></label></div>
-          <div class="gm-expic gm-extok">${x.token ? `<img src="${x.token}" alt="">` : `<span class="small muted">No token</span>`}<label class="linkish small">Token…<input type="file" accept="image/*" class="visually-hidden" data-expic="token"></label></div></div>
-        <div class="gm-head"><div><input type="text" class="gm-ex-name" data-exf="name" value="${esc(x.name)}" aria-label="Name" maxlength="60"><span class="small muted">${esc(x.label && x.label !== x.name ? x.label : x.threat ? "" : "Written in by the GM")}</span></div></div>
-        <div class="gm-stats"><div><span>Dodge</span><b><input type="text" data-exf="dodge" value="${esc(x.dodge)}" inputmode="numeric" maxlength="6" aria-label="Dodge" style="width:3em;text-align:center"></b></div><div><span>Boxes</span><b><input type="text" data-exf="boxes" value="${x.boxes}" inputmode="numeric" maxlength="2" aria-label="Boxes" style="width:3em;text-align:center"></b></div><div><span>Marked</span><b>${Math.min(x.injury, x.boxes)}</b></div></div>
-        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: x.boxes }, (_, i) => `<button class="box ${i < x.injury ? "on" : ""}" data-exbox="${i + 1}" aria-label="${esc(x.name)} box ${i + 1}"></button>`).join("")}</span></span></div>
-        <div class="gm-cond ${x.injury >= x.boxes ? "out" : x.injury ? "hurt" : ""}">${x.injury >= x.boxes ? "Out" : x.injury ? `${x.injury} of ${x.boxes} marked` : "Unhurt"}</div>
-        <div class="field wide"><label class="small">Attacks</label><input type="text" data-exf="attacks" value="${esc(x.attacks)}" maxlength="200"></div>
-        <div class="field wide"><label class="small">Trait</label><input type="text" data-exf="trait" value="${esc(x.trait)}" maxlength="300"></div>
-        <div class="field wide"><label class="small">Notes</label><textarea data-exf="notes" maxlength="1000">${esc(x.notes)}</textarea></div>
-        <div class="btn-row"><label class="small gm-generic"><input type="checkbox" data-exf="generic"${x.generic ? " checked" : ""}> Generic</label><button class="linkish" data-exdo="map">Put on the battle map</button><button class="linkish" data-exdo="copy">Add another</button><button class="linkish danger" data-exdo="rm">Remove</button></div>
-      </article>`).join("")}</div>` : "";
   }
   $("gm-add-extra").addEventListener("change", (e) => {
     const v = e.target.value; e.target.value = ""; if (!v) return;
-    if (v === "blank") { const x = addExtra(null, true); if (x) { gmSay("A new extra under Extras: name them and give their numbers."); const el = document.querySelector(`[data-ex="${x.id}"] .gm-ex-name`); if (el) { el.focus(); el.select(); } } return; }
+    if (v === "blank") { const c = addExtra(null, true); if (c) gmSay(`${c.name} is under NPCs: open them in the creator to make them.`); return; }
     addExtra(v);
   });
-  $("gm-extras").addEventListener("click", async (e) => {
-    const card = e.target.closest("[data-ex]"); if (!card) return; const x = gmExtras.find((y) => y.id === card.dataset.ex); if (!x) return;
-    const box = e.target.closest("[data-exbox]");
-    if (box) { const i = +box.dataset.exbox; x.injury = x.injury === i ? i - 1 : i; saveExtras(); renderExtras(); return; }
-    const b = e.target.closest("[data-exdo]"); if (!b) return;
-    if (b.dataset.exdo === "rm") { gmExtras = gmExtras.filter((y) => y !== x); saveExtras(); renderExtras(); gmSay(`${x.name} removed.`); }
-    else if (b.dataset.exdo === "copy") {
-      if (!x.generic) { gmSay(`${x.name} is one of a kind. Tick Generic on their card to add more.`, true); return; }
-      const base = x.name.replace(/\s+\d+$/, ""), n = gmExtras.filter((y) => y.name.replace(/\s+\d+$/, "") === base).length;
-      gmExtras.splice(gmExtras.indexOf(x) + 1, 0, cleanExtra({ ...x, id: uid(), name: `${base} ${n + 1}`, injury: 0, notes: "" })); saveExtras(); renderExtras();
-    } else if (b.dataset.exdo === "map") {
-      const t = x.threat && extraThreats().find((y) => y.id === x.threat);
-      if (!x.generic && battleMap.hasExtra(x.id)) { showGmTab("fight"); gmSay(`${x.name} is on the battle map already.`); return; }
-      const stats = [x.attacks, x.dodge !== "" ? `Dodge ${x.dodge}` : "", x.trait].filter(Boolean).join(" · ");
-      await battleMap.addPieces([{ name: x.name, url: x.token || x.portrait || "", tsize: 1, threat: t ? t.label || t.name : "", count: 1, foe: true, ex: x.id, boxes: x.boxes, injury: x.injury, stats }]);
-      showGmTab("fight"); gmSay(`${x.name} is on the battle map: a box marked there marks their card, and the other way round.`);
+  // Extras kept apart before (cards of their own): each becomes a character, with what it had.
+  {
+    const STORE_EXTRAS = PACK.id + ".gmextras.v1", old = store.get(STORE_EXTRAS, null);
+    if (Array.isArray(old) && old.length) {
+      for (const x of old) {
+        if (!x || !x.name || gmCrew.some((c) => c.id === x.id)) continue;
+        const t = x.threat && extraThreats().find((y) => y.id === x.threat);
+        const c = t ? threatToCharacter(t) : normalize({ ...blank(), extra: true, foe: false });
+        Object.assign(c, { id: typeof x.id === "string" ? x.id : uid(), name: x.name, generic: !!x.generic, npcBoxes: Math.max(1, parseInt(x.boxes, 10) || c.npcBoxes || 3),
+          npcNote: [c.npcNote, x.attacks && !t ? `Attacks: ${x.attacks}` : "", x.trait && !t ? x.trait : "", x.notes || ""].filter(Boolean).join("\n").slice(0, 1000),
+          portrait: x.portrait || "", portraitShape: x.portrait ? "portrait" : "token", token: x.token || "", pictureFrom: x.pictureFrom || { portrait: "", token: "" } });
+        const n = normalize(c); setMarks(n, parseInt(x.injury, 10) || 0); gmCrew.push(n);
+      }
+      saveGM(); store.set(STORE_EXTRAS, []);
     }
-  });
-  $("gm-extras").addEventListener("change", async (e) => {
-    const up = e.target.closest("[data-expic]");
-    if (up) {
-      const card = up.closest("[data-ex]"), x = card && gmExtras.find((y) => y.id === card.dataset.ex), file = up.files && up.files[0]; up.value = "";
-      if (!x || !file || !/^image\//.test(file.type)) { if (file) gmSay("That file isn't an image.", true); return; }
-      const u = URL.createObjectURL(file);
-      try { x[up.dataset.expic] = await pictureData(u, up.dataset.expic === "token" ? 256 : MAX_SIDE); x.pictureFrom[up.dataset.expic] = ""; saveExtras(); renderExtras(); gmSay(`${x.name}: ${up.dataset.expic} set.`); }
-      catch { gmSay("That picture couldn't be read.", true); } finally { URL.revokeObjectURL(u); }
-      return;
-    }
-    const f = e.target.closest("[data-exf]"), card = e.target.closest("[data-ex]"); if (!f || !card) return;
-    const x = gmExtras.find((y) => y.id === card.dataset.ex); if (!x) return;
-    const k = f.dataset.exf;
-    if (k === "generic") x.generic = f.checked; else x[k] = f.value;
-    Object.assign(x, cleanExtra(x)); saveExtras(); if (k === "boxes" || k === "generic") renderExtras();
-  });
-  /** Extras' pictures from the bucket (portrait - name, token - name), as the characters': new ones, and replaced ones. */
-  async function extraPictures(list) {
-    let n = 0;
-    for (const x of list) { try { if (await autoPictures(x)) n++; } catch { /* no pictures for them yet */ } }
-    if (n) { saveExtras(); renderExtras(); }
   }
   renderExtras();
-  setTimeout(() => extraPictures(gmExtras), 1800);
+  /** Open an extra in the creator to change them; the changes go back to their card. The sheet that was open comes back after. */
+  let extraReturn = null;
+  function openExtra(c) {
+    if (!ch.extra) extraReturn = JSON.parse(JSON.stringify(ch));
+    load(JSON.parse(JSON.stringify(c))); selectTab("create");
+    $("extra-bar").hidden = false; $("extra-bar-name").textContent = c.name;
+    window.scrollTo(0, 0);
+  }
+  function closeExtra() {
+    $("extra-bar").hidden = true;
+    if (extraReturn) { const r = extraReturn; extraReturn = null; load(r); store.set(STORE_CURRENT, ch); }
+    selectTab("gm"); renderGM();
+  }
   let labPanel = null; // the Encounter panel (and, with a test configuration, the Rules Lab)
   // ---- discovery clocks, the threat clock they race, investigation costs, and minting cards (pack discovery) ----
   const STORE_DISC = PACK.id + ".discovery.v1";
@@ -12159,7 +12181,7 @@ function ptMaps(api, root) {
   function renderFilesNow() {
     const card = $("files-card"); if (!card) return;
     card.hidden = !HFILES; if (!HFILES) return;
-    const crew = gmCrew.filter((c) => c.name), all = crew.flatMap((c) => (c.play.files || []).map((f) => ({ c, f })));
+    const crew = gmCrew.filter((c) => c.name && !c.extra), all = crew.flatMap((c) => (c.play.files || []).map((f) => ({ c, f })));
     if (!crew.some((c) => c.id === fileFor)) fileFor = crew[0] ? crew[0].id : "";
     const holders = [...new Set((PACK.threats || []).filter((t) => t.named || !t.minor).map((t) => t.name))];
     card.innerHTML = `<h3>${esc(HFILES.title)}</h3><p class="small muted">${HFILES.intro}</p>
@@ -12220,18 +12242,18 @@ function ptMaps(api, root) {
       const tied = order.some((o, j) => j !== i && o.a === a && o.q === q);
       return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${q ? `<span class="tie">${esc(powerFirst(c) ? "Speed: acts first" : roleAbility(c)[0])}</span>` : ""}${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
     }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add characters to see the turn order.</li>`;
-    $("gm-grid").innerHTML = gmCrew.length ? gmCrew.map((c) => {
-      const k = gmCalc(c), inj = c.play.injury;
-      const cond = INJURY[inj][0] + (INJURY[inj][2] ? ` (${INJURY[inj][2]} physical)` : "");
-      const art = c.portrait ? `<img class="avatar ${c.portraitShape === "portrait" ? "portrait" : ""}" src="${c.portrait}" alt="">`
+    const cardOf = (c) => {
+      const k = gmCalc(c), inj = c.play.injury, nb = boxesOf(c), mk = marksOf(c);
+      const cond = c.extra && nb !== 3 ? (mk >= nb ? "Out" : mk ? `${mk} of ${nb} marked` : "Unhurt") : INJURY[inj][0] + (INJURY[inj][2] ? ` (${INJURY[inj][2]} physical)` : "");
+      const art = (c.extra ? c.portrait || c.token : c.portrait) ? `<img class="avatar ${c.portraitShape === "portrait" ? "portrait" : ""}" src="${c.extra ? c.portrait || c.token : c.portrait}" alt="">`
         : badgeSvg(k.div);
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
-          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
+          <span class="small muted">${esc((c.extra ? [c.rank, c.foe ? "NPC · enemy" : "NPC"] : [c.rank, c.species, c.dept]).filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power covers this far instead of the move on foot"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> <b class="num">${k.powerMove.yards.toLocaleString()} yd</b> a move</div>` : ""}
-        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span></span>
+        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: nb }, (_, j) => j + 1).map((i) => `<button class="box ${i <= mk ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span></span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
         ${MTRACK ? `<div class="gm-row small"><span class="muted">${esc(MTRACK.name)}</span><span class="boxes">${Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.mind || 0) ? "on" : ""}" data-gm="${c.id}" data-gmmind="${i + 1}" aria-label="${esc(c.name)} ${esc(MTRACK.name)} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(MTRACK.effects[Math.min(MTRACK.boxes, c.play.mind || 0)].split(":")[0])}</span></div>` : ""}
@@ -12239,19 +12261,27 @@ function ptMaps(api, root) {
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
         ${gmMagic(c)}
+        ${c.extra ? `${(c.npcTraits || []).filter((t) => t.label).length ? `<div class="gm-traits small"><span><strong>In a fight:</strong> ${esc(c.npcTraits.filter((t) => t.label).map((t) => t.label + (t.covers ? ` (${t.covers.join(", ")})` : "")).join("; "))}</span></div>` : ""}${c.npcNote ? `<div class="gm-traits small"><span>${esc(c.npcNote).replace(/\n/g, "<br>")}</span></div>` : ""}` : ""}
         ${UNST && (unstableOf(c) || unstableBase(c) || c.play.unstable || (POWERS && allPowers(c).length)) ? `<div class="gm-traits small gm-unstable"><span><strong>${unstableOf(c) ? esc(unstableText(unstableOf(c))) : "Stable for now"}</strong>${c.play.unstable ? ` <span class="muted">(${c.play.unstable > 0 ? "raised" : "lowered"} ${Math.abs(c.play.unstable)} by the GM)</span>` : ""}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmunst="-1" aria-label="Lower ${esc(c.name)}'s instability">−</button><button data-gm="${c.id}" data-gmunst="1" aria-label="Raise ${esc(c.name)}'s instability">+</button></span></div>` : ""}
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
           <span><strong>Complication:</strong> ${esc(k.comp || "—")}${c.comp.trigger ? ` (trigger: ${esc(c.comp.trigger)})` : ""}${k.scomp ? `; ${esc(k.scomp)}` : ""}</span></div>
-        <div class="btn-row"><label class="small gm-generic" title="A generic NPC (a guard, a thug) can be added more than once; each copy is numbered"><input type="checkbox" data-gm="${c.id}" data-gmgeneric${c.generic ? " checked" : ""}> Generic NPC</label><button class="linkish" data-gm="${c.id}" data-gmsave>Save character file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
+        <div class="btn-row">${c.extra ? `<div class="btn-row gm-exrow"><button class="btn" data-gm="${c.id}" data-gmopen>Open in the creator</button><button class="linkish" data-gm="${c.id}" data-gmmap>Put on the battle map</button>
+          <label class="linkish small">Portrait…<input type="file" accept="image/*" class="visually-hidden" data-gm="${c.id}" data-gmpic="portrait"></label><label class="linkish small">Token…<input type="file" accept="image/*" class="visually-hidden" data-gm="${c.id}" data-gmpic="token"></label>
+          <label class="small gm-generic"><input type="checkbox" data-gm="${c.id}" data-gmfoe${c.foe ? " checked" : ""}> Enemy</label></div>` : ""}<label class="small gm-generic" title="A generic NPC (a guard, a thug) can be added more than once; each copy is numbered"><input type="checkbox" data-gm="${c.id}" data-gmgeneric${c.generic ? " checked" : ""}> Generic NPC</label><button class="linkish" data-gm="${c.id}" data-gmsave>Save character file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
       </article>`;
-    }).join("") : `<div class="card hud"><p class="muted">No characters yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add characters saved in this browser, or the ready-made characters for a quick game.</p></div>`;
+    };
+    const pcs = gmCrew.filter((c) => !c.extra), exs = gmCrew.filter((c) => c.extra);
+    $("gm-grid").innerHTML = pcs.length ? pcs.map(cardOf).join("") : `<div class="card hud"><p class="muted">No characters yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add characters saved in this browser, or the ready-made characters for a quick game.</p></div>`;
+    $("gm-extras").innerHTML = exs.length ? `<h3 class="gm-extras-head">NPCs <span class="small muted">the people they meet, played by the GM and kept as full characters: open one in the creator to change them</span></h3><div class="gm-grid">${exs.map(cardOf).join("")}</div>` : "";
   }
   $("gm-gunfight").addEventListener("change", (e) => { gunfight = e.target.checked; renderGM(); });
-  $("gm-grid").addEventListener("click", (e) => {
+  for (const gid of ["gm-grid", "gm-extras"]) $(gid).addEventListener("click", (e) => {
     const el = e.target.closest("[data-gm]"); if (!el || el.matches("input")) return;
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
-    if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
+    if (el.dataset.gmbox) { const i = +el.dataset.gmbox; if (c.extra) setMarks(c, marksOf(c) === i ? i - 1 : i); else { c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; } }
+    else if ("gmopen" in el.dataset) { openExtra(c); return; }
+    else if ("gmmap" in el.dataset) { battleMap.addCrew(c.id); showGmTab("fight"); gmSay(`${c.name} is on the battle map: their card and token share boxes.`); return; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
     else if (el.dataset.gmunst) { const lv = unstableOf(c) + +el.dataset.gmunst; if (lv < 0 || lv > (UNST.max || 4)) return; c.play.unstable = lv - unstableBase(c); }
     else if (el.dataset.gmmind) { const i = +el.dataset.gmmind; c.play.mind = (c.play.mind || 0) === i ? i - 1 : i; }
@@ -12265,7 +12295,18 @@ function ptMaps(api, root) {
     }
     saveGM(); renderGM();
   });
-  $("gm-grid").addEventListener("change", (e) => {
+  for (const gid of ["gm-grid", "gm-extras"]) $(gid).addEventListener("change", async (e) => {
+    const pic = e.target.closest("[data-gmpic]");
+    if (pic) {
+      const c = gmCrew.find((x) => x.id === pic.dataset.gm), file = pic.files && pic.files[0]; pic.value = "";
+      if (!c || !file || !/^image\//.test(file.type)) { if (file) gmSay("That file isn't an image.", true); return; }
+      const u = URL.createObjectURL(file);
+      try { const d = await pictureData(u, pic.dataset.gmpic === "token" ? 256 : MAX_SIDE); if (pic.dataset.gmpic === "token") c.token = d; else { c.portrait = d; c.portraitShape = "portrait"; } c.pictureFrom = { ...(c.pictureFrom || {}), [pic.dataset.gmpic]: "" }; saveGM(); renderGM(); battleMap.refresh(); gmSay(`${c.name}: ${pic.dataset.gmpic} set.`); }
+      catch { gmSay("That picture couldn't be read.", true); } finally { URL.revokeObjectURL(u); }
+      return;
+    }
+    const fo = e.target.closest("[data-gmfoe]");
+    if (fo) { const c = gmCrew.find((x) => x.id === fo.dataset.gm); if (c) { c.foe = fo.checked; saveGM(); renderGM(); } return; }
     const g = e.target.closest("[data-gmgeneric]");
     if (g) { const c = gmCrew.find((x) => x.id === g.dataset.gm); if (c) { c.generic = g.checked; saveGM(); renderGM(); gmSay(g.checked ? `${c.name} is a generic NPC: add them again for another, numbered.` : `${c.name} is one of a kind again.`); } return; }
     const el = e.target.closest("[data-gmdying]"); if (!el) return;
@@ -12278,7 +12319,6 @@ function ptMaps(api, root) {
       try {
         const data = JSON.parse(await f.text());
         if (Array.isArray(data.log)) mergeLog(data.log);
-        if (Array.isArray(data.extras)) { for (const x of data.extras.map(cleanExtra).filter(Boolean)) { const i = gmExtras.findIndex((y) => y.id === x.id); if (i >= 0) gmExtras[i] = x; else gmExtras.push(x); } saveExtras(); renderExtras(); }
         if (Array.isArray(data.allegiances)) alAdded += mergeAllegiances(data.allegiances);
         if (GRITTY && typeof data.gritty === "boolean") setGritty(data.gritty);
         if (DISC && data.discovery && data.discovery.threat && Array.isArray(data.discovery.clocks)) { disc = data.discovery; discSave(); }
@@ -12332,7 +12372,7 @@ function ptMaps(api, root) {
   renderAllegianceList();
   $("gm-save").onclick = () => {
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
-    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), extras: gmExtras, log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}), ...(DISC ? { discovery: disc } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
+    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}), ...(DISC ? { discovery: disc } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
   };
   // ---- The Encounter panel: the published rules in every setting with weapons as data; the Rules Lab's experiments
   // where a test configuration exists. Never used by the sheet. ----
@@ -12341,10 +12381,11 @@ function ptMaps(api, root) {
       traitsFor: (c) => [...hbEdgeTraits(PACK, (k) => edgeN(k, c)), // homebrew Edges' fight traits
         // Each protection power is its own Defense, covering its damage types (Toughness: physical; Force Field: physical and energy).
         ...(DT && POWERS ? allPowers(c).filter((x) => DT.powers[x.id]).map((x) => ({ type: "defenseClass", value: classIndex(x.cl) + 1, covers: DT.powers[x.id], label: `${powerDef(x.id)[1]} ${x.cl}` })) : []),
-        ...(vulnOf(c) ? [{ type: "weakness", material: vulnOf(c), extra: 1, label: `Vulnerability: ${vulnOf(c)}` }] : [])],
+        ...(vulnOf(c) ? [{ type: "weakness", material: vulnOf(c), extra: 1, label: `Vulnerability: ${vulnOf(c)}` }] : []),
+        ...(c.extra ? c.npcTraits || [] : [])], // an extra's own fight traits (from their threat)
       mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
       onScene: () => pushScene(), // the shared table's players see the fight
-      crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
+      crew: () => gmCrew, setMarks, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
       // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
       // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.
       powers: (c) => (POWERS ? allPowers(c).map((x) => ({ id: x.id, cls: classIndex(x.cl) + 1 })) : []), // the Class of each power a character has
@@ -12798,14 +12839,12 @@ function ptMaps(api, root) {
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
   if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
-    server: TABLE_SERVER, map: battleMap, extraFor: (name) => gmExtras.find((x) => x.name === name) || null, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
+    server: TABLE_SERVER, map: battleMap, extraFor: (name) => gmCrew.find((x) => x.extra && x.name === name) || null, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
     givePictures: async (name, portraitUrl, tokenUrl) => {
-      const exs = gmExtras.filter((x) => x.name.replace(/\s+\d+$/, "") === name);
-      const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name), ...exs];
+      const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name || (c.extra && c.name.replace(/\s+\d+$/, "") === name))];
       if (!chars.length) return 0;
       const n = await givePics(chars, portraitUrl, tokenUrl);
       if (chars.includes(ch)) { touch(); render(); store.set(STORE_CURRENT, ch); }
-      if (exs.length) { saveExtras(); renderExtras(); }
       store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); return n;
     },
     showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); },
@@ -12855,11 +12894,12 @@ function ptMaps(api, root) {
       if (tk.size === "ship") continue;
       const th = tk.threat ? extraThreats().find((t) => norm(t.name) === norm(tk.threat)) || extraThreats().find((t) => norm(t.name).startsWith(norm(tk.threat))) : null;
       const nm = tk.name.split(",")[0], generic = th && th.minor && Object.values(tk.scenes || {}).some((x) => x.count > 1);
-      if (gmExtras.some((x) => x.name.replace(/\s+\d+$/, "") === nm || (generic && th && x.threat === th.id))) continue; // already here (a second Load adds no one twice)
+      if (gmCrew.some((x) => x.extra && (x.name.replace(/\s+\d+$/, "") === nm || (th && x.threat === th.id)))) continue; // already here (a second Load adds no one twice)
       const x = th ? addExtra(th.id, true, generic ? null : nm) : addExtra(null, true, nm);
-      if (x) { ex++; if (!th) { x.label = "In the adventure"; x.notes = tk.look ? `Looks like ${tk.look}.` : ""; saveExtras(); } if (generic) { x.name = nm; saveExtras(); } }
+      if (x) { ex++; if (!th) { x.rank = "In the adventure"; x.npcNote = tk.look ? `Looks like ${tk.look}.` : ""; x.foe = false; } if (generic) x.name = nm;
+        const f = Object.values(tk.scenes || {})[0]; if (f && f.foe === false) x.foe = false; saveGM(); }
     }
-    if (ex) { renderExtras(); done.push(`${ex} extra${ex === 1 ? "" : "s"} (the adventure's people)`); }
+    if (ex) { renderGM(); done.push(`${ex} NPC${ex === 1 ? "" : "s"} (the adventure's people)`); }
     renderGM();
     return done;
   }
@@ -12905,6 +12945,7 @@ function ptMaps(api, root) {
   $("view-create").addEventListener("click", (e) => { const b = e.target.closest("button[data-step]"); if (b) showStep(+b.dataset.step, true); });
   { let at = 0; try { at = +(sessionStorage.getItem(PACK.id + ".step") || 0); } catch {} showStep(at); }
 
+  $("extra-bar-done").addEventListener("click", () => closeExtra());
   // ---- the GM view: one group of panels at a time ----
   const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid", "#gm-extras"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
     ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card", "#files-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools", ...(DISC ? [] : ["#files-card"])]], ["campaign", "Campaign", ["#cp-card"]], ["homebrew", "Homebrew", ["#hb-card"]],

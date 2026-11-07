@@ -210,7 +210,7 @@ function ptMaps(api, root) {
       const nm = t.name.split(",")[0], who = people.find((p) => p.name === nm), pic = who && (who.token || who.portrait);
       const n1 = count(t.scenes[n]), ex = n1 === 1 && api.extraFor ? api.extraFor(nm) : null; // someone at the table as an extra: their card and token share boxes
       return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: n1, foe: t.scenes[n].foe,
-        ...(ex ? { ex: ex.id, boxes: ex.boxes, injury: ex.injury } : {}) };
+        ...(ex ? { ref: ex.id } : {}) };
     });
   }
   /** The threat moved on: a scene on the map that grows with it (the Lazarus mine's ghouls) gets one more for each step. */

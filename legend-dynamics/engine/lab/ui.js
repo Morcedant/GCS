@@ -225,7 +225,9 @@ export function mountLab(api) {
     const mindTraits = [...(md ? [{ type: "mindDefense", value: md, label: `Mind Defense ${["", "I", "II", "III", "IV", "V", "VI"][md]}` }] : []), ...steady];
     const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])
       ? [{ type: "extraDefense", value: 1, label: "Speed: a second defense" }] : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    // An extra (the GM's character for someone they meet): their own boxes and weapons, on the side the GM gave them.
+    if (c.extra) for (const w of c.npcWeapons || []) if (WEAPONS[w]) weapons.push(w);
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: c.extra && c.foe ? "foe" : "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
@@ -235,7 +237,7 @@ export function mountLab(api) {
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
+      boxes: c.extra ? c.npcBoxes || 3 : 3, injury: c.extra ? c.play.marks || 0 : c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
       ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes } : {}), will: c.attrs.Will, ...(SD ? sdTraits(c) : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A character's edge in a showdown: Quick Draw's bonus (an advantage), and an ability that wins a tied draw. @param {any} c */
@@ -300,7 +302,8 @@ export function mountLab(api) {
     for (const p of en.participants) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
-      if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
+      const cInj = c.extra ? c.play.marks || 0 : c.play.injury || 0;
+      if (cInj !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: cInj, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if (MT && (c.play.mind || 0) !== (p.mind || 0)) E.override(en, rules(), LD, "mind", { pid: p.pid, mind: c.play.mind || 0, reason: "changed on the character card" });
       if (!!c.play.frightened !== isFrightened(p)) E.setCondition(en, p.pid, (p.conditions || []).find((x) => /^frightened\b/i.test(x)) || "Frightened", !!c.play.frightened);
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
@@ -317,7 +320,8 @@ export function mountLab(api) {
     for (const p of en.participants) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
-      c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      if (c.extra && api.setMarks) api.setMarks(c, p.injury); else c.play.injury = Math.min(3, p.injury);
+      c.play.dying = p.dying; c.play.duty = p.points;
       c.play.frightened = isFrightened(p);
       if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
