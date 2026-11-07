@@ -46,7 +46,7 @@ BLOG_SLUG = "/blog"
 # The table server holds the blog's posts (legend-dynamics/table-server/server-url.txt, as for the creators).
 _url = (LD / "table-server" / "server-url.txt")
 BLOG_SERVER = _url.read_text().strip() if _url.exists() else ""
-NAV = [("/", "Home"), (bw.START_SLUG, "Start here"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.TABLE_SLUG, "Shared table"), (bw.DISCORD_SLUG, "Discord"), (BLOG_SLUG, "Dev blog"), (bw.CONTACT_SLUG, "Contact")]
+NAV = [("/", "Home"), (bw.START_SLUG, "Start here"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.TABLE_SLUG, "Shared table"), (bw.DISCORD_SLUG, "Discord"), (BLOG_SLUG, "Dev blog"), ("/music", "Music"), (bw.CONTACT_SLUG, "Contact")]
 
 FRAME_CSS = """
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
