@@ -5,7 +5,7 @@
 How to read the effects:
 
 - **Damage** comes from the attack's Class: **I = 1 box, II = 2 boxes, III = 2 boxes and knocked down, IV+ = 3 boxes.**
-- **Defense Class** is what protection powers give you. An attack above it hits in full, an equal one marks a box fewer, a lower one does nothing. Ordinary guns are Class I, heavy weapons and Aegis cannons Class II, anti-tank weapons and explosives Class III.
+- **Defense Class** is what protection powers give you. An attack must be at least one Class above it to do anything, and then marks a box fewer; an equal or lower one does nothing. Ordinary guns are Class I, heavy weapons and Aegis cannons Class II, anti-tank weapons and explosives Class III.
 - **Roll Powers** to aim a power at someone or use it with skill. Targets resist with Dodge (things you can dodge), Body (things that work on the body) or Will (things that work on the mind).
 - **Pushing:** for one action, use a power one Class higher and mark a box of **Strain**.
 - **(GM)** marks powers that need the GM's approval because they can break a story.

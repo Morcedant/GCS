@@ -13,7 +13,7 @@ const rules = X.buildRules(X.PUBLISHED, { blast2: blast }, null, JSON.parse(JSON
 function fight(seed) {
   const enc = E.newEncounter({ name: "Rooftop", setting: "aurora", baseline: LD.CORE_BASELINE, config: X.PUBLISHED, seed });
   for (const [name, side] of [["Volt", "pc"], ["Tide", "pc"]]) E.addParticipant(enc, { kind: "pc", side, name, agility: 12, dodge: 10, skills: { Powers: 18 }, weapons: ["blast2"] });
-  E.addParticipant(enc, { kind: "npc", name: "Bulwark", agility: 10, dodge: 9, skills: {}, weapons: [], boxes: 4, traits: [{ type: "defenseClass", value: 3 }] });
+  E.addParticipant(enc, { kind: "npc", name: "Bulwark", agility: 10, dodge: 9, skills: {}, weapons: [], boxes: 4, traits: [{ type: "defenseClass", value: 2 }] });
   E.startCombat(enc, rules);
   const [volt, tide, foe] = enc.participants;
   return { enc, volt, tide, foe };
@@ -24,10 +24,10 @@ test("a team-up raises the Class by one against Defense, and logs the partner", 
   let seed = 1;
   while (!shot(fight(seed)).event.hit) seed++;
   const alone = shot(fight(seed)).event;
-  assert.ok(!alone.damage, "Class II against Defense III does nothing");
+  assert.ok(!alone.damage, "Class II against Defense II does nothing");
   const f = fight(seed), together = shot(f, f.tide.pid).event;
   assert.equal(together.hit, true);
-  assert.equal(together.damage, 1, "Class III against Defense III: 2 boxes, one fewer");
+  assert.equal(together.damage, 1, "Class III against Defense II: 2 boxes, one fewer");
   assert.deepEqual(together.teamUp, { pid: f.tide.pid, name: "Tide", cls: 3 });
   assert.equal(f.foe.injury, 1);
 });

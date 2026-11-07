@@ -295,13 +295,13 @@ export function resolveAttack(input, hooks, roll) {
   // A trait that ignores small hits: always, or once per fight (oncePerFight; the encounter marks it used).
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && !t.used && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null, shrugged: shrug.label || "ignoreHits" };
-  // A Defense Class (Aurora): an attack whose Class is below it does nothing, one equal to it marks a box fewer.
+  // A Defense Class (Aurora): an attack must be at least one Class above it to do anything, and then marks a box fewer.
   const dc = liveTraits(defender).find((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
   if (dc) {
     const cls = weapon.class || 1;
     const R = ["", "I", "II", "III", "IV", "V", "VI"], D = `Defense ${R[dc.value] || dc.value}`, C = `Class ${R[cls] || cls}`;
-    if (cls < dc.value) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
-    if (cls === dc.value) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`; }
+    if (cls <= dc.value) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
+    dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`;
     if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
   }
   // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".

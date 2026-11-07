@@ -98,8 +98,8 @@ test("stun weapons, Defense Classes and always-on armor", () => {
   const claws2 = { id: "claws2", reach: "melee", class: 2, damage: { melee: { boxes: 2 } } }, pistol = { id: "pistol", band: "close", class: 1, damage: { any: { boxes: 2 } } };
   const D2 = [{ type: "defenseClass", value: 2 }];
   assert.equal(hit(pistol, D2).damage, null, "a Class I attack does nothing to Defense II");
-  assert.equal(hit(claws2, D2).damage.boxes, 1, "an equal Class marks one box fewer");
-  assert.equal(hit({ ...claws2, class: 3 }, D2).damage.boxes, 2, "a higher Class hits in full");
+  assert.equal(hit(claws2, D2).damage, null, "an equal Class does nothing either: it takes one Class above");
+  assert.equal(hit({ ...claws2, class: 3 }, D2).damage.boxes, 1, "a Class above gets through, marking one box fewer");
   const chromed = [{ type: "armor", minBoxes: 2, reduce: 1, always: true, label: "Chromed" }];
   assert.equal(hit(claws2, chromed).damage.boxes, 1);
   assert.equal(hit(claws2, chromed).armorUsed, "Chromed");

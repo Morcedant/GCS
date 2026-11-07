@@ -2994,7 +2994,7 @@
   ],
   [
    "Defense",
-   "Roll Powers to aim a power. An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."
+   "Roll Powers to aim a power. An attack must be at least one Class above your Defense to do anything, and then marks one box fewer; equal or lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."
   ],
   [
    "Strain",
