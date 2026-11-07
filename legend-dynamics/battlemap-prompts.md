@@ -74,6 +74,94 @@ Battle map setting: **2 yards a hex**.
 A wealthy mine owner's house at midnight, the roof removed so the ground floor shows from above: a front porch, entry hall and staircase, a parlor with a piano and fireplace, a study with a desk and an iron safe, a kitchen and back door. Outside: a gravel drive with a carriage, a picket fence, a garden. Moonlight outside; one lamp lit in the study. The map shows an area about 45 by 25 yards. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. Top-down battle map for a tabletop roleplaying game, seen from directly overhead (orthographic, no perspective tilt, no horizon). Fill the whole frame edge to edge: no border, frame, vignette, compass or legend. No grid, no text, no labels, no numbers. Show only the place itself: no people, creatures, animals, figures or tokens, and no ships or vehicles that could take part in a fight (they are separate tokens placed on top of the map); only wrecked, parked or abandoned vehicles that the scene names. Floors and ground read clearly as open, walkable space; walls, furniture, rocks and other cover are easy to tell apart from above, with soft shadows that show their height. Landscape, 16:9.
 ```
 
+### The characters
+
+A portrait (for the sheet) and a token (for the battle map) for each pregenerated character. Upload them to the same folder as the maps, named `portrait - <name>` and `token - <name>`, for example `portrait - Ruth Calloway.png`.
+
+#### Ruth Calloway
+
+Portrait:
+
+```
+Ruth Calloway, Deputy U.S. Marshal: a lawman, Sighted (born with the second sight). Wears the badge in three counties, and sees what's under the faces of the men she arrests. Carrying: revolver, rifle. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Ruth Calloway, Deputy U.S. Marshal: a lawman, Sighted (born with the second sight). Wears the badge in three counties, and sees what's under the faces of the men she arrests. Carrying: revolver, rifle. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Dr. Elias Webb
+
+Portrait:
+
+```
+Dr. Elias Webb, Town physician: a doctor, City-bred (schooled back east or in a western city: you read, you write, you know how the world runs on money and paper). Left a Philadelphia practice for reasons he won't discuss, and patches up whoever comes through the door. Carrying: doctor's bag, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Dr. Elias Webb, Town physician: a doctor, City-bred (schooled back east or in a western city: you read, you write, you know how the world runs on money and paper). Left a Philadelphia practice for reasons he won't discuss, and patches up whoever comes through the door. Carrying: doctor's bag, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Tom Feeney
+
+Portrait:
+
+```
+Tom Feeney, Horse breaker: a wrangler, Werewolf (cursed with the wolf). Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon. Carrying: rifle, knife. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Tom Feeney, Horse breaker: a wrangler, Werewolf (cursed with the wolf). Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon. Carrying: rifle, knife. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Lucinda Marsh
+
+Portrait:
+
+```
+Lucinda Marsh, Professional gambler: a gambler, Practitioner (a human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German Braucherei, the old hermetic arts or worse). Deals faro by night and reads the cards for anyone who'll pay, and the cards are never wrong. Carrying: lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Lucinda Marsh, Professional gambler: a gambler, Practitioner (a human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German Braucherei, the old hermetic arts or worse). Deals faro by night and reads the cards for anyone who'll pay, and the cards are never wrong. Carrying: lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Isaiah Booker
+
+Portrait:
+
+```
+Isaiah Booker, Bounty hunter: a bounty hunter, Revenant (you died, and came back for unfinished business). Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them. Carrying: rifle, revolver, field glasses. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Isaiah Booker, Bounty hunter: a bounty hunter, Revenant (you died, and came back for unfinished business). Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them. Carrying: rifle, revolver, field glasses. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Rev. Abigail Stone
+
+Portrait:
+
+```
+Rev. Abigail Stone, Circuit preacher: a preacher, Old Money (your family has money, land or a name that opens doors). Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees. Carrying: shotgun, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Rev. Abigail Stone, Circuit preacher: a preacher, Old Money (your family has money, land or a name that opens doors). Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees. Carrying: shotgun, lantern and matches. Hand-painted Gothic Western illustration. Palette: dust ochre, sun-bleached timber, bone white and oxblood, with lamp-amber light at night. Gritty texture, like a hand-colored engraving. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin tarnished brass rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
 ### Tokens for Dead Man's Wages
 
 Everyone and everything that fights or moves in a scene is a token, made apart from the maps. Upload each to the same folder as the maps, with a name starting `token`, for example `token - ghoul.png`.
@@ -194,6 +282,108 @@ Battle map setting: **1 yard a hex**.
 
 ```
 A cold vault deep in the ship: walls of sealed seed drawers in rows, cold mist on the floor, a central catalogue console, frost on the metal, a heavy round door. The living growth has stopped at the threshold, as if it knew to keep out. The map shows an area about 20 by 11 yards. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. The colony ship Long Patience is different: 140 years old, its hull grown over with a bark-like living lattice, warm, faintly glowing, like the inside of a tree. Top-down battle map for a tabletop roleplaying game, seen from directly overhead (orthographic, no perspective tilt, no horizon). Fill the whole frame edge to edge: no border, frame, vignette, compass or legend. No grid, no text, no labels, no numbers. Show only the place itself: no people, creatures, animals, figures or tokens, and no ships or vehicles that could take part in a fight (they are separate tokens placed on top of the map); only wrecked, parked or abandoned vehicles that the scene names. Floors and ground read clearly as open, walkable space; walls, furniture, rocks and other cover are easy to tell apart from above, with soft shadows that show their height. Landscape, 16:9.
+```
+
+### The characters
+
+A portrait (for the sheet) and a token (for the battle map) for each pregenerated character. Upload them to the same folder as the maps, named `portrait - <name>` and `token - <name>`, for example `portrait - Ruth Calloway.png`.
+
+#### Thessk Varo-Hun
+
+Portrait:
+
+```
+Thessk Varo-Hun, Trader, disowned: a trader, Tessan (large, scaled, exceptionally long-lived beings for whom contractual obligation is the foundation of civilization). A young reformer cut off by her dynasty's old creditors for writing off a client world's debt. She trades on her own now, and keeps her word. Carrying: laser pistol, scanner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Thessk Varo-Hun, Trader, disowned: a trader, Tessan (large, scaled, exceptionally long-lived beings for whom contractual obligation is the foundation of civilization). A young reformer cut off by her dynasty's old creditors for writing off a client world's debt. She trades on her own now, and keeps her word. Carrying: laser pistol, scanner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin scuffed steel rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Kesh of the Seventh Hive
+
+Portrait:
+
+```
+Kesh of the Seventh Hive, Market scout: an explorer, Kel (chitin-plated social beings raised in immense hive-cities, analytical and cooperative). Scouts new markets to pay down her homeworld's debt, and wonders more each year whether the radicals are right. Carrying: scanner, stunner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Kesh of the Seventh Hive, Market scout: an explorer, Kel (chitin-plated social beings raised in immense hive-cities, analytical and cooperative). Scouts new markets to pay down her homeworld's debt, and wonders more each year whether the radicals are right. Carrying: scanner, stunner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin scuffed steel rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Rook
+
+Portrait:
+
+```
+Rook, Former Concord marine: an augment, Human (adaptable, socially restless, and remarkably willing to challenge established institutions). Rebuilt after the Zhaq border war with a cyber-arm and reflex wiring. The implant payments are overdue, and the company that made them knows where Rook drinks. Carrying: slug carbine, vibroblade, body armor. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Rook, Former Concord marine: an augment, Human (adaptable, socially restless, and remarkably willing to challenge established institutions). Rebuilt after the Zhaq border war with a cyber-arm and reflex wiring. The implant payments are overdue, and the company that made them knows where Rook drinks. Carrying: slug carbine, vibroblade, body armor. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin scuffed steel rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Ilvi Saradh
+
+Portrait:
+
+```
+Ilvi Saradh, Guild navigator: an AI minder, Draelin (long, serpentine beings with two long arms and no legs, who sense electromagnetic fields, from a world of wild magnetic fields). A guild navigator whose AI partner, Quill, remembers a corridor the guild says doesn't exist. Carrying: laser pistol, intrusion deck, scanner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Ilvi Saradh, Guild navigator: an AI minder, Draelin (long, serpentine beings with two long arms and no legs, who sense electromagnetic fields, from a world of wild magnetic fields). A guild navigator whose AI partner, Quill, remembers a corridor the guild says doesn't exist. Carrying: laser pistol, intrusion deck, scanner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin scuffed steel rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Dr. Anwe Tal
+
+Portrait:
+
+```
+Dr. Anwe Tal, Restoration ecologist: a scientist, Corvani (radially arranged, five-limbed beings with photosensitive skin, from forests where cooperation meant survival). Rebuilding a world the Hegemony strip-mined, against a mining corporation's lawyers and, lately, its guns. Carrying: scanner, stunner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Dr. Anwe Tal, Restoration ecologist: a scientist, Corvani (radially arranged, five-limbed beings with photosensitive skin, from forests where cooperation meant survival). Rebuilding a world the Hegemony strip-mined, against a mining corporation's lawyers and, lately, its guns. Carrying: scanner, stunner. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin scuffed steel rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Brakka
+
+Portrait:
+
+```
+Brakka, Deserter, Ninth Legion: a mercenary, Dresh (dense, four-armed soldiers from a high-gravity world, armored in thick hide). A legionary who deserted rather than burn a Zhaq city. The Hegemony wants him back, or dead. Carrying: plasma rifle, body armor, vibroblade. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Brakka, Deserter, Ninth Legion: a mercenary, Dresh (dense, four-armed soldiers from a high-gravity world, armored in thick hide). A legionary who deserted rather than burn a Zhaq city. The Hegemony wants him back, or dead. Carrying: plasma rifle, body armor, vibroblade. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin scuffed steel rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Sable
+
+Portrait:
+
+```
+Sable, Freelance intrusion specialist: a hacker, Human (adaptable, socially restless, and remarkably willing to challenge established institutions). Breaks into any system for the right price. Secretly psionic, hidden by the Quiet Network; every checkpoint is a gamble. Carrying: slug pistol, intrusion deck. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Sable, Freelance intrusion specialist: a hacker, Human (adaptable, socially restless, and remarkably willing to challenge established institutions). Breaks into any system for the right price. Secretly psionic, hidden by the Quiet Network; every checkpoint is a gamble. Carrying: slug pistol, intrusion deck. Painted science-fiction illustration, worn and lived-in: scuffed alloy, cable runs, warning stripes, teal emergency light and amber work light. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin scuffed steel rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
 ### Tokens for Salvage Rights
@@ -335,6 +525,108 @@ Battle map setting: **2 yards a hex**.
 A vaulted chamber half flooded with dark, still water that drips from cracks in the ceiling, where the oasis drains in. A coiled stone dais rises from the water in the middle; stepping stones and a ledge around the walls; holes in the walls where snakes nest; fallen stone where the ceiling is starting to give way. The map shows an area about 40 by 22 yards. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. Top-down battle map for a tabletop roleplaying game, seen from directly overhead (orthographic, no perspective tilt, no horizon). Fill the whole frame edge to edge: no border, frame, vignette, compass or legend. No grid, no text, no labels, no numbers. Show only the place itself: no people, creatures, animals, figures or tokens, and no ships or vehicles that could take part in a fight (they are separate tokens placed on top of the map); only wrecked, parked or abandoned vehicles that the scene names. Floors and ground read clearly as open, walkable space; walls, furniture, rocks and other cover are easy to tell apart from above, with soft shadows that show their height. Landscape, 16:9.
 ```
 
+### The characters
+
+A portrait (for the sheet) and a token (for the battle map) for each pregenerated character. Upload them to the same folder as the maps, named `portrait - <name>` and `token - <name>`, for example `portrait - Ruth Calloway.png`.
+
+#### Vessa Thorn
+
+Portrait:
+
+```
+Vessa Thorn, Second-story artist: a thief, Crownlander (born in the Gilded Cities that were once the empire's heart: silk, intrigue, and knives in the dark). The best climber in the Gilded Cities, who stole a jewel from a sorcerer-prince and is only now learning it's a shard of the Crown. Carrying: dagger, thieves' tools, rope and grapnel. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Vessa Thorn, Second-story artist: a thief, Crownlander (born in the Gilded Cities that were once the empire's heart: silk, intrigue, and knives in the dark). The best climber in the Gilded Cities, who stole a jewel from a sorcerer-prince and is only now learning it's a shard of the Crown. Carrying: dagger, thieves' tools, rope and grapnel. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Ithrann
+
+Portrait:
+
+```
+Ithrann, Last scholar of Ssa'keth: a sorcerer, Serpent-kin (last heirs of the serpent empire that ruled before humans). Keeper of a drowned serpent temple's memory, searching the human kingdoms for its lost library. Carrying: dagger, ritual focus. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Ithrann, Last scholar of Ssa'keth: a sorcerer, Serpent-kin (last heirs of the serpent empire that ruled before humans). Keeper of a drowned serpent temple's memory, searching the human kingdoms for its lost library. Carrying: dagger, ritual focus. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Nyx
+
+Portrait:
+
+```
+Nyx, Hedge-witch: a witch, Witch-blooded (human, with old sorcery in the veins: a witch grandmother, a sorcerer's bastard, or a pact made before you were born). Run out of her village with stones and torches; sells cures and curses to whoever pays. Carrying: dagger, healer's satchel, ritual focus. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Nyx, Hedge-witch: a witch, Witch-blooded (human, with old sorcery in the veins: a witch grandmother, a sorcerer's bastard, or a pact made before you were born). Run out of her village with stones and torches; sells cures and curses to whoever pays. Carrying: dagger, healer's satchel, ritual focus. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Gorrum Ironjaw
+
+Portrait:
+
+```
+Gorrum Ironjaw, Sergeant of the Iron Company: a sellsword, Giant-blooded (seven feet and more, with a giant somewhere in the family tree). Twenty years with the Iron Company, a wheel-lock pistol he calls Thunder, and a soft spot for strays. Carrying: sword or axe, shield, mail shirt, wheel-lock pistol. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Gorrum Ironjaw, Sergeant of the Iron Company: a sellsword, Giant-blooded (seven feet and more, with a giant somewhere in the family tree). Twenty years with the Iron Company, a wheel-lock pistol he calls Thunder, and a soft spot for strays. Carrying: sword or axe, shield, mail shirt, wheel-lock pistol. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Mira Saltwind
+
+Portrait:
+
+```
+Mira Saltwind, Free captain, without a ship: a corsair, Islander (from the Shattered Isles of the south: corsairs, pearl-divers and sea-witches' children). Captain of the Kestrel until a sea-witch sank her. She kept her mother's arquebus and her crew's debts. Carrying: arquebus, sword or axe. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Mira Saltwind, Free captain, without a ship: a corsair, Islander (from the Shattered Isles of the south: corsairs, pearl-divers and sea-witches' children). Captain of the Kestrel until a sea-witch sank her. She kept her mother's arquebus and her crew's debts. Carrying: arquebus, sword or axe. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Cinder
+
+Portrait:
+
+```
+Cinder, Former blade of the Ash Guild: an assassin, Ashborn (grey-skinned descendants of the empire's sorcery-bred slave legions). Made by the Ash Guild into its best knife; ran the night they ordered a child's death. Carrying: dagger, crossbow and bolts, rope and grapnel. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Cinder, Former blade of the Ash Guild: an assassin, Ashborn (grey-skinned descendants of the empire's sorcery-bred slave legions). Made by the Ash Guild into its best knife; ran the night they ordered a child's death. Carrying: dagger, crossbow and bolts, rope and grapnel. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Oren Sael
+
+Portrait:
+
+```
+Oren Sael, Keeper of the Last Shrine: a priest, Sand-born (nomads of the Burning Sands, who know every well, every buried city and every lie the dunes tell). The last priest of Haddu, god of wells, who keeps a shrine no caravan visits and a flame that is going out. Carrying: spear, healer's satchel, ritual focus. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Oren Sael, Keeper of the Last Shrine: a priest, Sand-born (nomads of the Burning Sands, who know every well, every buried city and every lie the dunes tell). The last priest of Haddu, god of wells, who keeps a shrine no caravan visits and a flame that is going out. Carrying: spear, healer's satchel, ritual focus. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
 ### Tokens for The Thirsting Well
 
 Everyone and everything that fights or moves in a scene is a token, made apart from the maps. Upload each to the same folder as the maps, with a name starting `token`, for example `token - ghoul.png`.
@@ -436,6 +728,108 @@ Battle map setting: **2 yards a hex**.
 
 ```
 The street under the elevated train tracks at night: steel pillars in rows, parked cars, the shuttered fronts of a taqueria and a laundromat, an alley mouth, a vacant lot behind a chain-link fence, and an unmarked white van with its side door open. Deep shadows between the pillars; one working light far off. The map shows an area about 50 by 28 yards. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. Top-down battle map for a tabletop roleplaying game, seen from directly overhead (orthographic, no perspective tilt, no horizon). Fill the whole frame edge to edge: no border, frame, vignette, compass or legend. No grid, no text, no labels, no numbers. Show only the place itself: no people, creatures, animals, figures or tokens, and no ships or vehicles that could take part in a fight (they are separate tokens placed on top of the map); only wrecked, parked or abandoned vehicles that the scene names. Floors and ground read clearly as open, walkable space; walls, furniture, rocks and other cover are easy to tell apart from above, with soft shadows that show their height. Landscape, 16:9.
+```
+
+### The characters
+
+A portrait (for the sheet) and a token (for the battle map) for each pregenerated character. Upload them to the same folder as the maps, named `portrait - <name>` and `token - <name>`, for example `portrait - Ruth Calloway.png`.
+
+#### Rachel Kwan
+
+Portrait:
+
+```
+Rachel Kwan, Special Agent, ExLAW Chicago: an exlaw agent, Bonded (joined to something else: an artifact, a spirit, a god or an entity from beyond). Carries a jade seal that holds a guardian spirit, inherited from her grandmother. Her partner vanished on a case Director Humbacht closed personally. Carrying: pistol, dampening cuffs, body armor. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Rachel Kwan, Special Agent, ExLAW Chicago: an exlaw agent, Bonded (joined to something else: an artifact, a spirit, a god or an entity from beyond). Carries a jade seal that holds a guardian spirit, inherited from her grandmother. Her partner vanished on a case Director Humbacht closed personally. Carrying: pistol, dampening cuffs, body armor. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Luis "Bulldog" Ortega
+
+Portrait:
+
+```
+Luis "Bulldog" Ortega, Aegis pilot, Chicago wing: an aegis pilot, Non-Operant (no powers at all: training, nerve, gear and the law). Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't. Carrying: aegis as-6 suit, pistol. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Luis "Bulldog" Ortega, Aegis pilot, Chicago wing: an aegis pilot, Non-Operant (no powers at all: training, nerve, gear and the law). Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't. Carrying: aegis as-6 suit, pistol. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Naomi Price
+
+Portrait:
+
+```
+Naomi Price, Daybreak, New Power Legion: a public hero, Ambrosia (dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power). The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets. Carrying: camera and press pass. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Naomi Price, Daybreak, New Power Legion: a public hero, Ambrosia (dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power). The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets. Carrying: camera and press pass. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Dr. Tobias Wren
+
+Portrait:
+
+```
+Dr. Tobias Wren, Professor of comparative religion; Earth Warden: an occultist, Adept (a student of metatropic manipulation, the science everyone else calls magic). A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Dr. Tobias Wren, Professor of comparative religion; Earth Warden: an occultist, Adept (a student of metatropic manipulation, the science everyone else calls magic). A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Jess Calloway
+
+Portrait:
+
+```
+Jess Calloway, Freelance investigative reporter: a journalist, Touched (changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky). Touched a Raster Zero file in 2024 and saw the room it came from. Nobody knows she's an Operant; she's been pulling the thread ever since. Carrying: camera and press pass, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Jess Calloway, Freelance investigative reporter: a journalist, Touched (changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky). Touched a Raster Zero file in 2024 and saw the room it came from. Nobody knows she's an Operant; she's been pulling the thread ever since. Carrying: camera and press pass, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Subject 19
+
+Portrait:
+
+```
+Subject 19, "Static", escaped Foundation subject: a fugitive, Lab-made (made in a Foundation black lab, a DIRE program or somewhere worse). Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking. Carrying: lock picks, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Subject 19, "Static", escaped Foundation subject: a fugitive, Lab-made (made in a Foundation black lab, a DIRE program or somewhere worse). Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking. Carrying: lock picks, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
+#### Maeve Ashgrove
+
+Portrait:
+
+```
+Maeve Ashgrove, Cat burglar, on an ExLAW deal: a thief, Otherworlder (born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's). A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from. Carrying: lock picks, baton or knife. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+```
+
+Token:
+
+```
+Maeve Ashgrove, Cat burglar, on an ExLAW deal: a thief, Otherworlder (born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's). A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from. Carrying: lock picks, baton or knife. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
 ### Tokens for Static on the Line

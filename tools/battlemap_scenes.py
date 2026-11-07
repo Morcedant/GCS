@@ -131,4 +131,34 @@ def kit_maps(gid):
     if not a: return None
     hexy = lambda h: int(h.split()[0]) if h.split()[0].isdigit() else None
     return {"folder": a["folder"], "scenes": [{"n": k + 1, "name": n, "hex": hexy(h), "hexText": h, "area": ar} for k, (n, h, ar, _d) in enumerate(a["scenes"])],
-            "tokens": [{"name": n, "size": z, "look": l} for n, z, l, _sc in TOKENS[gid]["tokens"]]}
+            "tokens": [{"name": n, "size": z, "look": l} for n, z, l, _sc in TOKENS[gid]["tokens"]], "pregens": []}
+
+
+# The pregenerated characters the playtesters play: a portrait and a token prompt each, written from their sheets
+# (legend-dynamics/packs/<game>/pack.json "pregens") and their people's description.
+PORTRAIT_RULES = ("A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, "
+                  "facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit "
+                  "background in the adventure's palette. No text, no name, no frame or border, no other people.")
+
+def pregen_subject(pack, c):
+    """'Ruth Calloway, Deputy U.S. Marshal: a lawman, one of the Sighted (born with the second sight ...). ...'"""
+    o = next((x for x in pack.get("origins", []) if x.get("id") == c.get("speciesId")), {})
+    people = (o.get("desc") or "").split(". ")[0].rstrip(".")
+    eq = {}
+    for x in pack.get("equipment", []):
+        if isinstance(x, list): eq[x[0]] = x[1]
+    items = [eq.get(k, k) for k, v in (c.get("equipment") or {}).items() if v and eq.get(k, k) not in ("Skinsuit", "Travel papers", "Badge and ID", "Radio and phone")
+             and not any(w in eq.get(k, k).lower() for w in ("horse", "camel", "sea chest", "kit"))]   # nothing that isn't in their hands
+    dept = " ".join(w if w.isupper() else w.lower() for w in c.get("dept", "").split())
+    first = f"{c['name']}, {c.get('rank', '')}: {'an' if dept[:1].upper() in 'AEIOU' else 'a'} {dept}, {c.get('species', '')}"
+    return (f"{first} ({people[0].lower() + people[1:]})" if people else first) + f". {c.get('role', '')}" + (f" Carrying: {', '.join(items).lower()}." if items else "")
+
+def pregen_prompts(gid, pack):
+    """[(name, portrait prompt, token prompt)] for an adventure's pregenerated characters."""
+    a = next(x for x in ADVENTURES if x["id"] == gid)
+    out = []
+    for c in pack.get("pregens", []):
+        subj = pregen_subject(pack, c)
+        style = a["style"].split(" The colony ship")[0]   # the places' notes aren't for people
+        out.append((c["name"], f"{subj} {style} {PORTRAIT_RULES}", f"{subj} {style} " + TOKEN_RULES.format(rim=TOKENS[gid]["rim"])))
+    return out

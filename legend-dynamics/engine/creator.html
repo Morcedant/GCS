@@ -1432,7 +1432,7 @@ tr.lvl-U td.target { color: var(--muted); }
       equipment: Object.fromEntries(EQUIPMENT.map(([k, , , meta]) => [k, !!(meta && meta.standard)])), // standard issue (a skinsuit) starts ticked
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
-      portrait: "", portraitShape: "token",
+      portrait: "", portraitShape: "token", token: "",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
       play: { injury: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
@@ -1464,6 +1464,8 @@ tr.lvl-U td.target { color: var(--muted); }
     out.powersLearned = (Array.isArray(out.powersLearned) ? out.powersLearned : []).filter((x) => x && typeof x === "object").map((x) => ({ id: POWERS && POWERS.list.some((p) => p[0] === x.id) ? x.id : "", cl: CLASS_NAMES.includes(x.cl) ? x.cl : "I" }));
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
+    // A separate token for the battle map (the playtest kit's character tokens); the portrait stands in without one.
+    if (typeof out.token !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.token)) out.token = "";
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
@@ -2653,6 +2655,7 @@ tr.lvl-U td.target { color: var(--muted); }
       load({ ...JSON.parse(JSON.stringify(PREGENS[+t.value])), id: uid(), example: false });
       t.value = ""; selectTab("create");
       toast(`Loaded ${ch.name}. Save to file to keep your copy.`);
+      { const c = ch; autoPictures(c).then((ok) => { if (ok && ch === c) { touch(); render(); store.set(STORE_CURRENT, ch); } }); }
     }
     else if (t.id === "f-speciesid") {
       const had = ch.sadv.id && sAdvName();
@@ -3024,7 +3027,7 @@ tr.lvl-U td.target { color: var(--muted); }
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
       attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
-      return { id: c.id, tableKey: c.tableKey || null, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
+      return { id: c.id, tableKey: c.tableKey || null, name: c.name || "Unnamed", portrait: c.token || c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
         injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
@@ -3435,7 +3438,11 @@ tr.lvl-U td.target { color: var(--muted); }
   $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { gmAdd([c]); gmSay(`Added ${c.name || "character"}.`); } e.target.value = ""; });
   $("gm-add-pregen").addEventListener("change", (e) => {
     const c = PREGENS[+e.target.value];
-    if (e.target.value !== "" && c) { gmAdd([{ ...JSON.parse(JSON.stringify(c)), id: uid() }]); gmSay(`Added ${c.name}.`); }
+    if (e.target.value !== "" && c) {
+      const id = uid(); gmAdd([{ ...JSON.parse(JSON.stringify(c)), id }]); gmSay(`Added ${c.name}.`);
+      const added = gmCrew.find((x) => x.id === id);
+      autoPictures(added).then((ok) => { if (ok) { store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); } });
+    }
     e.target.value = "";
   });
   // Campaign allegiances the GM adds on the fly.
@@ -3588,6 +3595,50 @@ tr.lvl-U td.target { color: var(--muted); }
   $("log-title").addEventListener("focus", () => { if (!$("log-title").value && seed) $("log-title").placeholder = `${SEEDS.mission[1][seed.mission]} (${SEEDS.place[1][seed.place].toLowerCase()})`; });
 
   var gmReady = true;
+
+  // ---- the playtest's pictures: the pregenerated characters' portraits and tokens, from the table server's bucket ----
+  const PT_MAPS = PACK.playtest && PACK.playtest.maps;
+  let ptPics = null;
+  function ptPictures() {
+    if (!PT_MAPS || !TABLE_SERVER) return Promise.resolve([]);
+    if (!ptPics) ptPics = fetch(`${TABLE_SERVER}/api/maps?folder=${encodeURIComponent(PT_MAPS.folder)}`).then((r) => r.json()).then((b) => b.maps || []).catch(() => { ptPics = null; return []; });
+    return ptPics;
+  }
+  /** The best "portrait …" or "token …" picture for a character's name, by the words they share. */
+  function pictureFor(pics, kind, name) {
+    const nw = (String(name).toLowerCase().match(/[a-z]{3,}/g) || []).filter((w) => !["the", "and"].includes(w));
+    let best = null, bs = 0;
+    for (const p of pics) {
+      if (!new RegExp("^" + kind + "\\b", "i").test(p.file)) continue;
+      const w = new Set(String(p.title).toLowerCase().match(/[a-z]{3,}/g) || []), sc = nw.filter((x) => w.has(x)).length;
+      if (sc > bs) { bs = sc; best = p; }
+    }
+    return best;
+  }
+  /** A picture from a link, scaled down to keep a character small (as an uploaded portrait is). */
+  async function pictureData(url, max) {
+    const r = await fetch(url); if (!r.ok) throw new Error("not found");
+    const u = URL.createObjectURL(await r.blob());
+    try {
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = u; });
+      const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement("canvas");
+      cv.width = Math.max(1, Math.round(img.naturalWidth * k)); cv.height = Math.max(1, Math.round(img.naturalHeight * k));
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      const d = cv.toDataURL("image/webp", 0.85); return d.startsWith("data:image/webp") ? d : cv.toDataURL("image/png");
+    } finally { URL.revokeObjectURL(u); }
+  }
+  async function givePics(chars, portraitUrl, tokenUrl) {
+    const p = portraitUrl ? await pictureData(portraitUrl, MAX_SIDE) : "", t = tokenUrl ? await pictureData(tokenUrl, 256) : "";
+    for (const c of chars) { if (p) { c.portrait = p; c.portraitShape = "portrait"; } if (t) c.token = t; }
+    return chars.length;
+  }
+  /** A pregenerated character just loaded: give them their pictures, if the bucket has them and they have none. */
+  async function autoPictures(c) {
+    if (!c || c.portrait || c.token) return false;
+    const pics = await ptPictures(), p = pictureFor(pics, "portrait", c.name), t = pictureFor(pics, "token", c.name);
+    if (!p && !t) return false;
+    try { await givePics([c], p && p.src, t && t.src); return true; } catch { return false; }
+  }
 
   // ---- portrait ----
   // Images are scaled down in the browser so a character stays small enough to save and share as JSON.
@@ -3871,7 +3922,15 @@ tr.lvl-U td.target { color: var(--muted); }
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
   if (PACK.playtest) { $("pt-card").hidden = false; mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
-    server: TABLE_SERVER, map: battleMap, showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); } }); }
+    server: TABLE_SERVER, map: battleMap,
+    givePictures: async (name, portraitUrl, tokenUrl) => {
+      const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name)];
+      if (!chars.length) return 0;
+      const n = await givePics(chars, portraitUrl, tokenUrl);
+      if (chars.includes(ch)) { touch(); render(); store.set(STORE_CURRENT, ch); }
+      store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); return n;
+    },
+    showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); } }); }
   // The crew's ship and the setting's tables (frontier.js), for a setting with them.
   if (PACK.crewShip) { $("crewship-card").hidden = false;
     crewShipUI = mountCrewShip({ PACK, root: $("crewship-card"), esc, toast: gmSay, onChange: () => { renderCrewShipView(); pushScene(); } }); renderCrewShipView(); }

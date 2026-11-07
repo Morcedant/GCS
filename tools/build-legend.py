@@ -716,7 +716,7 @@ def build(pid, docx):
     if pack.get("playtest"):
         sys.path.insert(0, str(ROOT / "tools")); import battlemap_scenes
         km = battlemap_scenes.kit_maps(pid)
-        if km: pack["playtest"] = {**pack["playtest"], "maps": km}
+        if km: pack["playtest"] = {**pack["playtest"], "maps": {**km, "pregens": [{"name": c["name"], "rank": c.get("rank", "")} for c in pack.get("pregens", [])]}}
     js = "const PACK = " + json.dumps({**with_core_combat(pack), "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = tpl.replace("/* RULES:CORE */", rules_js())

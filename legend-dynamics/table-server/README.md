@@ -106,8 +106,8 @@ delete through the server: only you, in the dashboard.
 
 ### Battle maps and tokens for the playtest adventures
 
-The GM view's **Playtest** kit, in each setting's character creator, has a card for every scene of the first adventure
-and every token in its fights. Each card fills in once its picture is in the same bucket as the music, with **Use on
+The GM view's **Playtest** kit, in each setting's character creator, has a card for every pregenerated character, every
+scene of the first adventure and every token in its fights. Each card fills in once its picture is in the same bucket as the music, with **Use on
 the battle map** (a map, under the grid at its hex size), **Add to the battle map** (a token) and a download.
 
 In the bucket, make a folder `battle-maps`, and in it one folder per setting, named as for music:
@@ -117,6 +117,10 @@ In the bucket, make a folder `battle-maps`, and in it one folder per setting, na
 - **Maps:** start the name with the scene's number (`2 - Mercy Springs at noon.png`), the sure way; or use words from
   the scene's title (`Mercy Springs by Night.png` goes on *Mercy Springs by night*).
 - **Tokens:** start the name with `token` and use the token's name (`token - ghoul.png`, `token - Ezra Quill.png`).
+- **The characters:** `portrait - <name>` and `token - <name>` for each pregenerated character (`portrait - Ruth Calloway.png`,
+  `token - Ruth Calloway.png`). Loading that character from the pregenerated characters, on a sheet or in the GM view,
+  gives them their portrait (on the sheet) and token (on the battle map) by itself; the kit's **Give the pictures**
+  button gives them to copies already loaded.
 
 Pictures that match nothing are listed under *More pictures*. The prompts for making them (maps that show only the
 place, and a separate token for everyone in a fight) are in `legend-dynamics/battlemap-prompts.md`.
