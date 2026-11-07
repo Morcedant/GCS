@@ -18,7 +18,8 @@
 // mountPlaytest(api) with api: { kit, root, esc, storeKey, toast(m, err), server?, map? (the battle map: useBackgroundUrl,
 //   addPictureToken), showMap?() (opens the battle map), givePictures?(name, portrait, token),
 //   loadCampaign?(campaign, label, setup) (into the Campaign tab, and the GM's table set up for it: true if it did), crew?() (the GM view's characters: [{ name, rank }]) }.
-// Returns { refresh() } (the GM view's characters changed: their cards follow).
+// Returns { refresh() (the GM view's characters changed: their cards follow), scenes (their names), setScene(i) (scene i on
+//   the battle map: its map, the characters, and its people and enemies with their threats' numbers; resolves true) }.
 //
 // The characters' cards: everyone in the adventure the same way (the pregenerated characters, the people and creatures in
 // its fights, the GM view's own characters, and anyone a picture is uploaded for), each with a portrait and a token,
@@ -69,11 +70,11 @@ function mountPlaytest(api) {
       <p class="small"><b>The cast, in one line each</b></p>
       <div class="pt-cast">${K.cast.map(([n, t]) => `<div><b>${esc(n)}</b><span class="small muted">${esc(t)}</span></div>`).join("")}</div>
       <p class="small muted">${esc(K.castNote || "")}</p>`, true)}
-    ${K.maps && api.server ? sec("maps", "2. Characters, maps and tokens", `<p class="small">A portrait and a token for everyone in the ${esc(K.term)}, and a map for each scene, ready to use. <b>Give the pictures</b> puts a character's portrait on their sheet and their token on the battle map; <b>Use on the battle map</b> puts a scene's map under the grid at its hex size; <b>Add to the battle map</b> puts a token on it. Download any of them to print, or for another table.</p>
+    ${K.maps && api.server ? sec("maps", "2. Characters, maps and tokens", `<p class="small">A portrait and a token for everyone in the ${esc(K.term)}, and a map for each scene, ready to use. <b>Give the pictures</b> puts a character's portrait on their sheet and their token on the battle map; <b>Set up on the battle map</b> puts a scene's map under the grid at its hex size, with the characters on one side and everyone in the scene on the other (enemies with their threat's boxes and numbers); <b>Add to the battle map</b> puts one more token on it. Download any of them to print, or for another table.</p>
       <p class="small muted" data-ptm-status>Looking for the pictures…</p>
       <h4>The characters</h4><p class="small muted">Everyone in the ${esc(K.term)}, each with a portrait and a token: name the pictures <i>Portrait - name</i> and <i>Token - name</i> in the bucket, and a picture for someone new gets a card of their own. A pregenerated character gets their pictures by themselves when they're loaded; <b>Give the pictures</b> gives them to copies already loaded.</p>
       <ol class="pt-maps" data-ptm-people></ol>
-      <h4>Scenes</h4><ol class="pt-maps">${K.maps.scenes.map((x) => `<li data-ptm-scene="${x.n}"><div class="pt-pic">Map coming soon</div><div class="pt-txt"><b>${esc(x.name)}</b><span class="small muted">${x.hex ? `${x.hex} yard${x.hex === 1 ? "" : "s"} a hex` : esc(x.hexText)} · ${esc(x.area.replace(/^about /, ""))}</span></div><div class="pt-acts"></div></li>`).join("")}</ol>
+      <h4>Scenes</h4><ol class="pt-maps">${K.maps.scenes.map((x) => `<li data-ptm-scene="${x.n}"><div class="pt-pic">Map coming soon</div><div class="pt-txt"><b>${esc(x.name)}</b><span class="small muted">${x.hex ? `${x.hex} yard${x.hex === 1 ? "" : "s"} a hex` : esc(x.hexText)} · ${esc(x.area.replace(/^about /, ""))}</span>${ptWho(K.maps, x.n) ? `<span class="small">In it: ${esc(ptWho(K.maps, x.n))}</span>` : ""}</div><div class="pt-acts"></div></li>`).join("")}</ol>
       <div data-ptm-extra></div>`, true) : ""}
     ${sec("run", "3. The run sheet: three hours", `<p class="small">The full ${esc(K.term)} is written for one or two sessions; this is the cut for one evening. If you're running behind, take the cuts: they're only ever on side scenes. The story's main beats, its climax and its choice are never cut; shorten the talk around them instead.</p>
       <ol class="pt-run">${[...K.run, ptWrapRow()].map(([t, h, body, cut]) => `<li><span class="pt-mark num">${esc(t)}</span><div><b>${esc(h)}</b>${body}${cut ? `<p class="small"><span class="pt-cut">Cut</span> ${esc(cut)}</p>` : ""}</div></li>`).join("")}</ol>`)}
@@ -102,8 +103,11 @@ function mountPlaytest(api) {
       armed = false; notes.value = ""; set("notes", null); e.target.textContent = "Clear"; say("Notes cleared.");
     }
   });
-  return { refresh: () => { if (maps) maps.refresh(); } };
+  return { refresh: () => { if (maps) maps.refresh(); }, scenes: K.maps ? K.maps.scenes.map((x) => x.name) : [], setScene: (i) => (maps ? maps.setScene(i) : Promise.resolve(false)) };
 }
+
+/** Who's in a scene, for its card: "Ghoul ×3, Ezra Quill". */
+function ptWho(M, n) { return (M.tokens || []).filter((t) => t.scenes && t.scenes[n]).map((t) => t.name.split(",")[0] + (t.scenes[n].count > 1 ? ` ×${t.scenes[n].count}` : "")).join(", "); }
 
 /** A name's words, for matching pictures to people: accents dropped, short words and the picture's kind left out. */
 function ptWords(t) {
@@ -191,19 +195,33 @@ function ptMaps(api, root) {
     }).join("");
   }
   renderPeople();
-  let byScene = new Map();
-  fetch(`${api.server}/api/maps?folder=${encodeURIComponent(M.folder)}`).then((r) => r.json()).then((b) => {
+  let byScene = new Map(), ready;
+  /** Scene i on the battle map: its map, the characters, and everyone in it, each with their token picture and threat. */
+  async function setScene(i) {
+    if (!api.map || !api.map.setScene) return false;
+    await ready;
+    const x = M.scenes[i]; if (!x) return false;
+    const pieces = (M.tokens || []).filter((t) => t.scenes && t.scenes[x.n]).map((t) => {
+      const nm = t.name.split(",")[0], who = people.find((p) => p.name === nm), pic = who && (who.token || who.portrait);
+      return { name: nm, url: pic ? pic.src : "", tsize: t.size === "ship" ? 2 : parseInt(t.size, 10) || 1, threat: t.threat || "", count: t.scenes[x.n].count, foe: t.scenes[x.n].foe };
+    });
+    const r = await api.map.setScene({ url: byScene.has(i) ? byScene.get(i).src : "", yards: x.hex, pieces });
+    say(`${x.name.replace(/^\d+\.\s*/, "")} is on the battle map${r.map ? "" : " (no map picture for it yet: the plain grid)"}${x.hex ? `, ${x.hex} yard${x.hex === 1 ? "" : "s"} a hex` : ""}, with ${r.placed ? `${r.placed} in the scene` : "the characters"}.`);
+    return true;
+  }
+  ready = fetch(`${api.server}/api/maps?folder=${encodeURIComponent(M.folder)}`).then((r) => r.json()).then((b) => {
     pics = b.maps || [];
     const maps = pics.filter((p) => !isTok(p) && !isPortrait(p)), used = new Set();
     renderPeople();
     for (const x of M.scenes) { const p = maps.find((m) => m.scene === x.n); if (p) { byScene.set(x.n - 1, p); used.add(p.file); } }
     for (const [i, p] of best(maps.filter((m) => !used.has(m.file) && m.scene == null), M.scenes.map((x, i) => (byScene.has(i) ? { name: "", area: "" } : x)), (x) => x.area || "")) { byScene.set(i, p); used.add(p.file); }
-    for (const [i, p] of byScene) card(root.querySelector(`[data-ptm-scene="${M.scenes[i].n}"]`), p, api.map ? `<button type="button" class="btn primary" data-ptm-use="${i}">Use on the battle map</button>` : "");
+    const setBtn = (i) => (api.map ? `<button type="button" class="btn primary" data-ptm-use="${i}">Set up on the battle map</button>` : "");
+    M.scenes.forEach((x, i) => { const li = root.querySelector(`[data-ptm-scene="${x.n}"]`); if (byScene.has(i)) card(li, byScene.get(i), setBtn(i)); else li.querySelector(".pt-acts").innerHTML = setBtn(i); });
     const extra = maps.filter((p) => !used.has(p.file));
     if (extra.length) root.querySelector("[data-ptm-extra]").innerHTML = `<h4>More maps</h4><ul class="small">${extra.map((p) => `<li><a href="${esc(p.src)}" target="_blank" rel="noopener">${esc(p.title)}</a> · <a href="${esc(p.download)}" download>Download</a></li>`).join("")}</ul>`;
     const ready = people.filter((x) => x.portrait || x.token).length;
     status.textContent = pics.length ? `${ready} of ${people.length} characters and ${byScene.size} of ${M.scenes.length} maps have pictures.` : "No pictures uploaded yet: the cards fill in as they are.";
-  }).catch(() => { status.textContent = "The pictures couldn't be loaded just now (no connection to the table server)."; });
+  }).catch(() => { status.textContent = "The pictures couldn't be loaded just now (no connection to the table server)."; pics = pics || []; });
   root.addEventListener("click", async (e) => {
     const u = e.target.closest("[data-ptm-use]"), a = e.target.closest("[data-ptm-add]"), g = e.target.closest("[data-ptm-give]");
     if (!u && !a && !g) return;
@@ -215,11 +233,11 @@ function ptMaps(api, root) {
         say(n ? `${x.name}: pictures given to ${n === 1 ? "the copy" : `all ${n} copies`} in this browser.` : `${x.name} isn't loaded here yet. Load them from the pregenerated characters, on a sheet or in the GM view, and the pictures come with them.`, !n);
         btn.disabled = false; btn.textContent = was; return;
       }
-      if (u) { const i = +u.dataset.ptmUse, x = M.scenes[i]; await api.map.useBackgroundUrl(byScene.get(i).src, x.hex); say(`${x.name.replace(/^\d+\.\s*/, "")}: on the battle map${x.hex ? `, ${x.hex} yard${x.hex === 1 ? "" : "s"} a hex` : ""}.`); }
+      if (u) await setScene(+u.dataset.ptmUse);
       else { const x = people[+a.dataset.ptmAdd]; await api.map.addPictureToken(x.name, (x.token || x.portrait).src, x.size || 1); say(`${x.name} is on the battle map.`); }
       if (api.showMap) api.showMap();
     } catch { say("That picture couldn't be loaded. Try again, or download it and use Background image… on the battle map.", true); }
     btn.disabled = false; btn.textContent = was;
   });
-  return { refresh: () => { const n = (api.crew ? api.crew() : []).map((x) => x.name).join("|"); if (n !== crewSeen) { crewSeen = n; renderPeople(); } } };
+  return { setScene, refresh: () => { const n = (api.crew ? api.crew() : []).map((x) => x.name).join("|"); if (n !== crewSeen) { crewSeen = n; renderPeople(); } } };
 }

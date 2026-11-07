@@ -20,7 +20,8 @@
 //   onChange(): called after every change to the map (the shared table sends it on to the players)
 //   viewer: true for a player's copy of the GM's map (shared table): no editing; canMove(token) says which tokens the
 //     player may drag (their own), and onMove(token, to) sends the move to the GM
-// Returns { refresh() } to call when the characters or tracks change; snapshot() (the map as the players see it, without
+// Returns { refresh() } to call when the characters or tracks change; setScene(scene) (a playtest scene: its map at its
+// hex size, the characters on one side and its people and enemies on the other, each enemy with its threat's numbers); snapshot() (the map as the players see it, without
 // pictures), setState(snapshot) for a viewer, and moveOwn(key, to) for the GM to apply a player's move.
 function mountBattleMap(api) {
   const SVGNS = "http://www.w3.org/2000/svg", SQ3 = Math.sqrt(3);
@@ -616,7 +617,38 @@ function mountBattleMap(api) {
       ...spot(RT.startLane || Math.min(3, lanes().length - 1)), boxes: 1, injury: 0, threat: null, boxLabel: "Injury", stats: "" });
     save(); draw();
   }
-  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, refresh: () => {
+  /** A playtest scene, set up in one go: { url (its map, or none), yards (a hex), pieces: [{ name, url (its token picture,
+   *  or none), tsize, threat (a threat's name: its boxes and numbers come with it), count, foe }] }. The map's other tokens
+   *  go (the characters stay), the characters stand on the left, and the scene's people and enemies on the right. */
+  async function setScene(sc) {
+    if (st.kind !== "hex") { st.kind = "hex"; RT = TRACKS[0]; }
+    sel = null; measure = null;
+    st.tokens = st.tokens.filter((t) => t.ref);
+    if (sc.yards > 0) st.scale = { n: sc.yards, unit: "yd" };
+    let mapOk = false;
+    if (sc.url) try { const r = await fetch(sc.url); if (r.ok) { const im = await readImage(await r.blob(), 4096); bgs.hex = im.url; st.bgW = im.w; st.bgH = im.h; alignToPicture(); await idb.set(bgKey("hex"), im.url); mapOk = true; } } catch { /* the scene works on the plain grid */ }
+    if (!mapOk) { bgs.hex = null; st.bgW = st.bgH = 0; try { await idb.del(bgKey("hex")); } catch {} }
+    const at = (fc, fr) => { const C = Math.round((st.cols - 1) * fc), R = Math.round((st.rows - 1) * fr); return pointy() ? { q: C - Math.floor(R / 2), r: R } : { q: C, r: R - Math.floor(C / 2) }; };
+    const crew = api.crew(), have = new Set(st.tokens.map((x) => x.ref));
+    for (const c of crew) if (!have.has(c.id)) st.tokens.push({ id: uid(), ref: c.id, tsize: 1, ...freeHexNear(at(0.2, 0.5)) });
+    const norm = (x) => String(x || "").toLowerCase().replace(/\s*\(.*?\)/g, "").trim();
+    let placed = 0;
+    for (const pc of sc.pieces || []) {
+      const th = pc.threat ? allThreats().find((x) => norm(x.name) === norm(pc.threat)) || allThreats().find((x) => norm(x.name).startsWith(norm(pc.threat))) : null;
+      let img = null;
+      if (pc.url) try { const r = await fetch(pc.url); if (r.ok) img = (await readImage(await r.blob(), 256)).url; } catch { /* a plain token */ }
+      const ship = !!(th && (api.vehicles || []).includes(th)), n = Math.max(1, pc.count || 1);
+      for (let i = 0; i < n; i++) {
+        st.tokens.push({ id: uid(), ref: null, name: n > 1 ? `${pc.name} ${i + 1}` : pc.name, color: pc.foe === false ? "#6b6b6b" : "#a33b2b", img, tsize: Math.max(1, Math.min(3, pc.tsize || 1)),
+          ...freeHexNear(at(0.75, 0.5)), boxes: th ? th.boxes || 1 : 1, injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
+          stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
+        placed++;
+      }
+    }
+    save(); draw(); fit();
+    return { map: mapOk, placed };
+  }
+  return { distanceBetween, snapshot, setState, moveOwn, useBackgroundUrl, addPictureToken, setScene, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();

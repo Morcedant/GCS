@@ -3964,7 +3964,9 @@ tr.lvl-U td.target { color: var(--muted); }
       if (!campaignUI || !campaignUI.load(c, label)) return false;
       const done = setupTable(setup || {});
       showGmTab("campaign"); const k = $("cp-card"); if (k) k.scrollIntoView({ block: "start" });
-      if (done.length) setTimeout(() => gmSay(`Loaded ${c.name}: the campaign, ${done.join(", ")}.`), 50);
+      // The first scene on the battle map, once the characters' pictures have had a moment to arrive.
+      setTimeout(async () => { const ok = ptUI && ptUI.scenes.length && await ptUI.setScene(0); if (ok) { const sel = $("pt-scene"); if (sel) sel.value = "0"; done.push(`the first scene on the battle map (pick the others above the map)`); }
+        gmSay(`Loaded ${c.name}: the campaign, ${done.join(", ")}.`); }, 400);
       return true;
     } }); }
   /** The playtest's table, alongside its campaign: the ready-made characters (with their pictures), the discovery clock,
@@ -3998,6 +4000,11 @@ tr.lvl-U td.target { color: var(--muted); }
     }
     renderGM();
     return done;
+  }
+  // The playtest's scenes, one pick away on the battle map: each sets up its map and everyone in it.
+  if (ptUI && ptUI.scenes.length && $("battlemap")) {
+    $("battlemap").insertAdjacentHTML("beforebegin", `<div class="field pt-scenebar no-print"><label for="pt-scene">Playtest scene: ${esc(PACK.playtest.adv)}</label><select id="pt-scene"><option value="">Set up a scene on the map…</option>${ptUI.scenes.map((n, i) => `<option value="${i}">${esc(n)}</option>`).join("")}</select></div>`);
+    $("pt-scene").addEventListener("change", (e) => { if (e.target.value !== "") ptUI.setScene(+e.target.value); });
   }
   // The crew's ship and the setting's tables (frontier.js), for a setting with them.
   if (PACK.crewShip) { $("crewship-card").hidden = false;

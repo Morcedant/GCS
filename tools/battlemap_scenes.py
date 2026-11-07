@@ -124,6 +124,26 @@ TOKENS = {
 }
 
 
+# Who each token is in a fight, for the GM view's "Set up this scene": the setting's threat it plays (its boxes and
+# numbers go on the token), how many appear in a scene (one, where it isn't listed), and whether it's someone to talk
+# to rather than fight (foe False: a grey token). From the adventures' text: ghouls ×3, the hired guns ×2, the drones ×2,
+# the cultists (four, one blessed), Dask's two guardsmen, two tomb-dead, the retrieval team's four.
+FIGHTS = {
+  "western": {"Ghoul": {"threat": "Ghoul", "count": {5: 3}}, "Ezra Quill, the revenant foreman": {"threat": "Revenant gunslinger", "foe": False},
+              "Cyrus Pruitt, gunman": {"threat": "Outlaw"}, "Hired gun": {"threat": "Hired gun", "count": {6: 2}},
+              "Sheriff Hiram Vance": {"threat": "Hired gun", "foe": False}, "Augustus Crane, the mine owner": {"foe": False}},
+  "spaceopera": {"The crew's ship": {"foe": False}, "Vantor corporate frigate": {"threat": "Corporate frigate"}, "Syndicate enforcer": {"threat": "Syndicate enforcer"},
+                 "Combat drone": {"threat": "Combat drone", "count": {4: 2}}, "Corporate assassin": {"threat": "Corporate assassin"},
+                 "Ves Oro-Lan, the debt-broker": {"foe": False}, "The Warden": {"threat": "Rogue AI", "foe": False}},
+  "fantasy": {"Cultist of the Burning God": {"threat": "Cultist", "count": {2: 3}}, "Blessed cultist": {"threat": "Cultist"},
+              "Dask, the sellsword captain": {"threat": "Sellsword captain", "foe": {1: False}}, "Guardsman": {"threat": "Guardsman or bandit", "count": {6: 2}},
+              "Tomb-dead": {"threat": "Ghoul or tomb-dead", "count": {6: 2}}, "Ssethra, the serpent-priest": {"threat": "Serpent-priest"},
+              "Ysolde Varr, the merchant princess": {"foe": False}},
+  "aurora": {"Lupe Herrera": {"threat": "Lab escapee", "foe": False}, "Foundation retrieval agent": {"threat": "Foundation retrieval team", "count": {3: 4}},
+             "Sergei Grachyov": {"threat": "Sergei Grachyov", "foe": False}},
+}
+
+
 def kit_maps(gid):
     """What the GM view's playtest kit needs for an adventure's maps and tokens: its bucket folder, the scenes (number,
     name, yards a hex or None) and the tokens (name, size in hexes or "ship")."""
@@ -131,7 +151,13 @@ def kit_maps(gid):
     if not a: return None
     hexy = lambda h: int(h.split()[0]) if h.split()[0].isdigit() else None
     return {"folder": a["folder"], "scenes": [{"n": k + 1, "name": n, "hex": hexy(h), "hexText": h, "area": ar} for k, (n, h, ar, _d) in enumerate(a["scenes"])],
-            "tokens": [{"name": n, "size": z, "look": l} for n, z, l, _sc in TOKENS[gid]["tokens"]], "pregens": []}
+            "tokens": [_fight(gid, n, z, l, sc) for n, z, l, sc in TOKENS[gid]["tokens"]], "pregens": []}
+
+
+def _fight(gid, n, z, l, sc):
+    f = FIGHTS.get(gid, {}).get(n, {}); foe = f.get("foe", True)
+    return {"name": n, "size": z, "look": l, "threat": f.get("threat", ""),
+            "scenes": {str(k): {"count": f.get("count", {}).get(k, 1), "foe": foe.get(k, True) if isinstance(foe, dict) else foe} for k in sc}}
 
 
 # The pregenerated characters the playtesters play: a portrait and a token prompt each, written from their sheets
