@@ -468,6 +468,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-head b { font-family: var(--display); letter-spacing: .06em; text-transform: uppercase; font-size: 1.05rem; overflow-wrap: anywhere; }
 .gm-head .small { display: block; }
 .gm-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.gm-supermove { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 2px; padding: 5px 8px; border: 1px solid var(--accent); border-radius: 6px; }
+.gm-supermove-tag { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.gm-supermove b { color: var(--accent); }
 .gm-stats div { border: 1px solid var(--line); border-radius: 6px; padding: 4px 2px; background: var(--well); }
 .gm-stats span { display: block; font: .56rem var(--mono); letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
 .gm-stats b { font: 400 1.15rem var(--mono); color: var(--chrome); }
@@ -671,7 +674,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="32cded6" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 32cded6</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="f245822" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · f245822</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -7861,7 +7864,9 @@ return { mountLab };
   const powerMove = (c = ch) => { if (!FIGHT || !FIGHT.move) return null;
     let best = null; for (const x of allPowers(c)) { const t = FIGHT.move[x.id]; const y = t && t[Math.min(classIndex(x.cl), t.length - 1)];
       if (y && (!best || y > best.yards)) best = { yards: y, name: `${powerDef(x.id)[1]} ${x.cl}` }; } return best; };
-  const moveOf = (c = ch) => Math.max(LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c), powerMove(c)?.yards || 0);
+  // A character's own move, on foot (Agility, Body, Athletics), before any power that moves them.
+  const footMoveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c);
+  const moveOf = (c = ch) => Math.max(footMoveOf(c), powerMove(c)?.yards || 0);
   // Acting first (powers.fight.actFirst: Speed), for the GM's turn order.
   const powerFirst = (c) => { const f = FIGHT && FIGHT.actFirst; return !!f && allPowers(c).some((x) => x.id === f.power && classIndex(x.cl) + 1 >= f.from); };
   // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
@@ -11658,7 +11663,7 @@ function ptMaps(api, root) {
         injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
         mtrack: MTRACK ? { name: MTRACK.name, max: MTRACK.boxes, value: c.play.mind || 0 } : null,
-        stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+        stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...(k.powerMove ? [`${k.powerMove.name} ${k.powerMove.yards.toLocaleString()} yd`] : []), ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
       if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
@@ -11723,7 +11728,10 @@ function ptMaps(api, root) {
     try {
       const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) + formSkill(n, c), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
-      return { skills, dodge: dodge() + formDodge(c), move: moveNow(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+      // Move on foot, and a power's move apart from it (Flight II: 300 yd), each as their injuries leave it.
+      const inj = (c.play && c.play.injury) || 0, pm = powerMove(c), foot = LD.injuredMove(footMoveOf(c), inj);
+      const power = pm && pm.yards > footMoveOf(c) ? { name: pm.name, yards: LD.injuredMove(pm.yards, inj) } : null;
+      return { skills, dodge: dodge() + formDodge(c), move: foot, powerMove: power, adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
   function gmAdd(list) {
@@ -12015,6 +12023,7 @@ function ptMaps(api, root) {
           <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
+        ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power covers this far instead of the move on foot"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> <b class="num">${k.powerMove.yards.toLocaleString()} yd</b> a move</div>` : ""}
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
