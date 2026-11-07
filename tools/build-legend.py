@@ -715,6 +715,10 @@ def build(pid, docx):
     # The playtest kit's battle maps and tokens (tools/battlemap_scenes.py; the pictures come from the table server's bucket).
     if pack.get("playtest"):
         sys.path.insert(0, str(ROOT / "tools")); import battlemap_scenes
+        # A cut is for a side scene only: never the story's main beats (its last two scenes, the climax and the choice).
+        for row in pack["playtest"]["run"][-2:]:
+            if len(row) > 3 and row[3]:
+                sys.exit(f"{pid}: the run sheet's '{row[1]}' is a main beat of the story, and can't have a cut")
         km = battlemap_scenes.kit_maps(pid)
         if km: pack["playtest"] = {**pack["playtest"], "maps": {**km, "pregens": [{"name": c["name"], "rank": c.get("rank", "")} for c in pack.get("pregens", [])]}}
         # The adventure as a campaign, for the kit's "Load into the Campaign tab" (tools/playtest_campaigns.py). It holds the

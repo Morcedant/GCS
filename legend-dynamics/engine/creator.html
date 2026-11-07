@@ -1256,6 +1256,7 @@ tr.lvl-U td.target { color: var(--muted); }
   let wantedUI = null; // frontier.js: wanted posters in the GM view
   let crewShipUI = null, sharedCrewShip = null; // frontier.js: the crew's ship (the GM's, or the one the shared table sent)
   let campaignUI = null; // campaign.js: the GM's campaign builder, mounted with homebrew
+  let ptUI = null; // playtest.js: the playtest kit, for a setting with one
   // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
   const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
   const ATTRS = [
@@ -3350,6 +3351,7 @@ tr.lvl-U td.target { color: var(--muted); }
     saveGM(); renderGM();
   });
   function renderGM() {
+    if (ptUI) ptUI.refresh(); // the playtest kit's character cards follow the GM view's characters
     renderFiles();
     if (campaignUI) campaignUI.check(); // a card just recorded may unlock a step of the campaign
     renderDisc();
@@ -3608,12 +3610,11 @@ tr.lvl-U td.target { color: var(--muted); }
     return ptPics;
   }
   /** The best "portrait …" or "token …" picture for a character's name, by the words they share. */
-  function pictureFor(pics, kind, name) {
-    const nw = (String(name).toLowerCase().match(/[a-z]{3,}/g) || []).filter((w) => !["the", "and"].includes(w));
+  function pictureFor(pics, kind, name) {   // by the words they share, forgiving a misspelling (playtest.js)
     let best = null, bs = 0;
     for (const p of pics) {
-      if (!new RegExp("^" + kind + "\\b", "i").test(p.file)) continue;
-      const w = new Set(String(p.title).toLowerCase().match(/[a-z]{3,}/g) || []), sc = nw.filter((x) => w.has(x)).length;
+      if (!new RegExp("^\\s*" + kind + "\\b", "i").test(p.file)) continue;
+      const sc = ptNameScore(ptPicName(p), name);
       if (sc > bs) { bs = sc; best = p; }
     }
     return best;
@@ -3938,8 +3939,8 @@ tr.lvl-U td.target { color: var(--muted); }
   homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), ritualRoot: $("hb-rituals"), heartInput: $("f-ma-heart"), esc, toast, saveText });
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
-  if (PACK.playtest) { $("pt-card").hidden = false; mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
-    server: TABLE_SERVER, map: battleMap,
+  if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
+    server: TABLE_SERVER, map: battleMap, crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
     givePictures: async (name, portraitUrl, tokenUrl) => {
       const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name)];
       if (!chars.length) return 0;
