@@ -58,7 +58,7 @@ ADVENTURES = [
    ("7. Ssethra: the drowned chamber", "2 yards", "about 40 by 22 yards",
     "A vaulted chamber half flooded with dark, still water that drips from cracks in the ceiling, where the oasis drains in. A coiled stone dais rises from the water in the middle; stepping stones and a ledge around the walls; holes in the walls where snakes nest; fallen stone where the ceiling is starting to give way."),
   ]},
- {"id": "aurora", "folder": "aurora", "setting": "Aurora", "title": "Static on the Line",
+ {"id": "aurora", "folder": "aurora", "setting": "Aurora", "title": "Dead Air",
   "style": "Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges.",
   "scenes": [
    ("1. The bridge in the blackout", "2 yards", "about 60 by 34 yards",

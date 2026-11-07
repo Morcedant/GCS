@@ -687,7 +687,7 @@ On the map: 1 hex · 1. Qasreth: Ysolde's barge.
 A merchant princess in silks and gold, a fan in one hand. Painted sword-and-sorcery illustration: sun-bleached sandstone, ochre dunes, faded lapis and gold, deep black tomb shadows, torchlight and harsh desert sun. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin worn gold rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
-## Aurora: Static on the Line
+## Aurora: Dead Air
 
 **Series prompt**
 
@@ -809,13 +809,13 @@ Jess Calloway, Freelance investigative reporter: a journalist, Touched (changed 
 Portrait:
 
 ```
-Subject 19, "Static", escaped Foundation subject: a fugitive, Lab-made (made in a Foundation black lab, a DIRE program or somewhere worse). Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking. Carrying: lock picks, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
+Subject 19, escaped Foundation subject: a fugitive, Lab-made (made in a Foundation black lab, a DIRE program or somewhere worse). Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking. Carrying: lock picks, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A character portrait for a tabletop roleplaying game, portrait orientation (3:4): head and shoulders to the waist, facing the viewer, a clear, characterful face and pose, the gear they carry visible where it fits. A plain, softly lit background in the adventure's palette. No text, no name, no frame or border, no other people.
 ```
 
 Token:
 
 ```
-Subject 19, "Static", escaped Foundation subject: a fugitive, Lab-made (made in a Foundation black lab, a DIRE program or somewhere worse). Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking. Carrying: lock picks, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+Subject 19, escaped Foundation subject: a fugitive, Lab-made (made in a Foundation black lab, a DIRE program or somewhere worse). Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking. Carrying: lock picks, hacking rig. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
 #### Maeve Ashgrove
@@ -832,7 +832,7 @@ Token:
 Maeve Ashgrove, Cat burglar, on an ExLAW deal: a thief, Otherworlder (born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's). A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from. Carrying: lock picks, baton or knife. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
-### Tokens for Static on the Line
+### Tokens for Dead Air
 
 Everyone and everything that fights or moves in a scene is a token, made apart from the maps. Upload each to the same folder as the maps, with a name starting `token`, for example `token - ghoul.png`.
 

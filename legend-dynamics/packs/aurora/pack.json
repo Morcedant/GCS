@@ -3244,7 +3244,7 @@
    "speciesId": "ambrosia",
    "role": "The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets.",
    "reason": "The cameras love an Operant, and I love the cameras.",
-   "connection": "Static saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.",
+   "connection": "Subject 19 saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.",
    "attrs": {
     "Body": 13,
     "Agility": 9,
@@ -3416,7 +3416,7 @@
   {
    "species": "Lab-made",
    "name": "Subject 19",
-   "rank": "\"Static\", escaped Foundation subject",
+   "rank": "Escaped Foundation subject",
    "dept": "Fugitive",
    "path": "rounded",
    "speciesId": "labmade",
@@ -6595,7 +6595,7 @@
     "title": "Your first case",
     "intro": "A ready-to-run case to start a campaign with. Everything it needs is here, and the pregenerated characters in the creator are written into it.",
     "take": [
-     "## The first case: Static on the Line"
+     "## The first case: Dead Air"
     ]
    },
    {
@@ -6897,16 +6897,16 @@
  "playtest": {
   "name": "Aurora",
   "short": "Aurora",
-  "adv": "Static on the Line",
+  "adv": "Dead Air",
   "term": "case",
   "fan": false,
   "feedback": "legenddynamicsrpg.com/playtest",
   "prep": [
-   "Read <i>Static on the Line</i> in the GM's Guide (Aurora creator → Guide tab → GM's Guide → Your first case). It's about two pages.",
+   "Read <i>Dead Air</i> in the GM's Guide (Aurora creator → Guide tab → GM's Guide → Your first case). It's about two pages.",
    "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
    "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
    "In the Discovery tab, prepare a dossier on Lupe Herrera's power, with the Escalation clock (4).",
-   "In the GM view's files tool, give the Foundation a file on Static (for example, <i>Always comes for the young ones</i>): it gives the retrieval team +2 when it applies.",
+   "In the GM view's files tool, give the Foundation a file on Subject 19 (for example, <i>Always comes for the young ones</i>): it gives the retrieval team +2 when it applies.",
    "In <i>Map and fight</i>, check you can add four of the Foundation retrieval team, and have Sergei Grachyov's entry to hand (he talks, he doesn't fight).",
    "The day before: send everyone the time, the table link, and the Playtest page, <code>legenddynamicsrpg.com/playtest</code>. Tell them there's nothing to read.",
    "Have a timer or clock in view. The run sheet below has the times."
@@ -6933,7 +6933,7 @@
     "Reporter, secretly an Operant. First on the scene."
    ],
    [
-    "Subject 19, \"Static\"",
+    "Subject 19",
     "Lab escapee. Knows the Foundation made this girl."
    ],
    [
@@ -6941,7 +6941,7 @@
     "Fey thief on an ExLAW deal. Knows a vault guard's walk."
    ]
   ],
-  "castNote": "With fewer players, keep Static (the heart of it) and Kwan (the law). Daybreak or Jess brings the cameras into it.",
+  "castNote": "With fewer players, keep Subject 19 (the heart of it) and Kwan (the law). Daybreak or Jess brings the cameras into it.",
   "run": [
    [
     "0:00",
@@ -6956,33 +6956,33 @@
    [
     "0:25",
     "The bridge",
-    "<p>Lupe is terrified, and shouting makes it worse. Start the dossier and the Escalation clock (4): each time it fills, her next surge is bigger. Talking (Persuasion, Read People, or Static's own sparks) works better than force; force marks Collateral.</p>"
+    "<p>Lupe is terrified, and shouting makes it worse. Start the dossier and the Escalation clock (4): each time it fills, her next surge is bigger. Talking (Persuasion, Read People, or Subject 19's own sparks) works better than force; force marks Collateral.</p>"
    ],
    [
     "0:55",
     "The cameras and the dossier",
-    "<p>Daybreak's producers, Jess, the cordon. Powers on camera may mark Backlash, and risk a secret identity's Exposure. Clues: Lupe's story, the tag in her neck, the triggered surges, Static's memory. <b>Three clues are enough.</b></p>"
+    "<p>Daybreak's producers, Jess, the cordon. Powers on camera may mark Backlash, and risk a secret identity's Exposure. Clues: Lupe's story, the tag in her neck, the triggered surges, Subject 19's memory. <b>Three clues are enough.</b></p>"
    ],
    [
     "1:40",
     "The retrieval",
-    "<p>The Foundation team hits: four of them, a jammer blinding the Aegis suit. They want Lupe alive and no witnesses. The big fight, and the place for a team-up. Their file on Static gives them +2 when it applies.</p>"
+    "<p>The Foundation team hits: four of them, a jammer blinding the Aegis suit. They want Lupe alive and no witnesses. The big fight, and the place for a team-up. Their file on Subject 19 gives them +2 when it applies.</p>"
    ],
    [
     "2:20",
     "Grachyov",
-    "<p>Sergei Grachyov walks out of the dark and offers a trade: Static for the girl. Let the players feel how dangerous he is, and decide.</p>",
+    "<p>Sergei Grachyov walks out of the dark and offers a trade: Subject 19 for the girl. Let the players feel how dangerous he is, and decide.</p>",
     "Have him make the offer and leave before they answer."
    ],
    [
     "2:35",
     "Where Lupe goes",
-    "<p>ExLAW custody and a Raster file, the sponsor's clinic and contract, or Static's underground. And does Jess run the story? Mark Scrutiny or Backlash as it falls.</p>"
+    "<p>ExLAW custody and a Raster file, the sponsor's clinic and contract, or Subject 19's underground. And does Jess run the story? Mark Scrutiny or Backlash as it falls.</p>"
    ]
   ]
  },
  "firstAdventure": {
-  "title": "Static on the Line",
+  "title": "Dead Air",
   "kind": "A superhero case",
   "blurb": "Half of Chicago's Pilsen neighborhood goes dark, and a terrified fifteen-year-old made of lightning stands on a bridge. ExLAW, the TV cameras and someone in an unmarked van all want to reach her first.",
   "length": "One or two sessions, for 3 to 7 players, with the ready-made characters",

@@ -1391,7 +1391,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 - **Advantage:** Golden Ideal (origin; companion: The Anger). **Complication:** Media Darling; trigger: a crowd with phones out.
 - **Powers:** Strength IV, Flight II, Toughness I.
 - **Legal status:** Registered.
-- **Why I do this:** The cameras love an Operant, and I love the cameras. **Connection:** Static saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.
+- **Why I do this:** The cameras love an Operant, and I love the cameras. **Connection:** Subject 19 saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.
 
 ## Dr. Tobias Wren
 
@@ -1419,7 +1419,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 ## Subject 19
 
-*"Static", escaped Foundation subject, Fugitive. Lab-made (tier 2).* Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.
+*Escaped Foundation subject, Fugitive. Lab-made (tier 2).* Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.
 
 - **Attributes:** Body 12, Agility 13, Intellect 11, Presence 9, Will 10. **Dodge** 12.
 - **Skills:** Powers 13 (Specialty). Trained: Piloting 14, Stealth 14, Athletics 13, Brawling 13, Computers 12, Engineering 12, Read People 11, Deception 10, Streetwise 10.
