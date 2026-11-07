@@ -284,7 +284,10 @@ export function resolveAttack(input, hooks, roll) {
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
   // What the attack is made of (weapon.materials: silver, cold iron, a wooden stake, fire), against the defender's
   // weaknesses and the protections those materials get past (setting data on traits).
-  const mats = weapon.materials || [], made = (/** @type {string[] | undefined} */ list) => (list || []).some((m) => mats.includes(m));
+  // Its damage type (Aurora: physical, energy, mystic; physical when it doesn't say) and element (fire, cold…) count as
+  // what it's made of, so a weakness or a Vulnerability to fire works like a werewolf's to silver.
+  const dtype = weapon.dtype || "physical";
+  const mats = [...(weapon.materials || []), dtype, ...(weapon.element ? [weapon.element] : [])], made = (/** @type {string[] | undefined} */ list) => (list || []).some((m) => mats.includes(m));
   // A weakness: that material marks extra boxes (a werewolf and silver).
   const weak = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "weakness" && mats.includes(t.material));
   if (weak.length) { dmg = { ...dmg, boxes: dmg.boxes + weak.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extra || 1), 0) }; out.weakness = weak.map((/** @type {any} */ t) => t.label || t.material).join(", "); }
@@ -295,11 +298,21 @@ export function resolveAttack(input, hooks, roll) {
   // A trait that ignores small hits: always, or once per fight (oncePerFight; the encounter marks it used).
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && !t.used && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null, shrugged: shrug.label || "ignoreHits" };
+  // Immune to the type or element: nothing gets through below Class VI.
+  const cls0 = weapon.class || 1, immune = liveTraits(defender).find((/** @type {any} */ t) => t.type === "immuneType" && made([t.dtype]));
+  if (immune && cls0 < 6) return { ...out, outcome: `hit, marks nothing (${immune.label || "immune to " + immune.dtype})`, hit: true, damage: null, shrugged: immune.label || "immune" };
   // A Defense Class (Aurora): an attack must be at least one Class above it to do anything, and then marks a box fewer.
-  const dc = liveTraits(defender).find((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
+  // Each Defense says which damage types it covers (Toughness: physical; a force field: physical and energy); against
+  // any other it counts one Class lower. With several, the best one for this attack counts. Resistant to a type: +1.
+  const dcs = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
+  const resist = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "resistType" && made([t.dtype])).reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.value || 1), 0);
+  const best = dcs.map((/** @type {any} */ t) => ({ t, v: Math.max(0, t.value - (Array.isArray(t.covers) && !t.covers.includes(dtype) ? 1 : 0)) })).sort((x, y) => y.v - x.v)[0];
+  const dcv = (best ? best.v : 0) + resist;
+  const dc = dcv > 0 ? { value: dcv, label: best ? best.t.label : "Resistant" } : null;
   if (dc) {
     const cls = weapon.class || 1;
-    const R = ["", "I", "II", "III", "IV", "V", "VI"], D = `Defense ${R[dc.value] || dc.value}`, C = `Class ${R[cls] || cls}`;
+    const R = ["", "I", "II", "III", "IV", "V", "VI"], why = [best && best.v < best.t.value ? `${best.t.label || "Defense"} is one Class lower against ${dtype}` : "", resist ? `resistant to ${dtype}` : ""].filter(Boolean).join("; ");
+    const D = `Defense ${R[dc.value] || dc.value}${why ? ` (${why})` : ""}`, C = `Class ${R[cls] || cls}${dtype !== "physical" ? " " + dtype : ""}`;
     if (cls <= dc.value) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
     dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`;
     if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };

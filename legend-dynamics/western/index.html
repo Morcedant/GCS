@@ -681,7 +681,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="15d3ead" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 15d3ead</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="6632d71" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · 6632d71</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -852,6 +852,7 @@ tr.lvl-U td.target { color: var(--muted); }
                 <div class="field wide"><label for="f-comptext">What problem does it create?</label><textarea id="f-comptext" rows="2"></textarea></div>
               </div>
             </div>
+            <div class="field" id="comp-vuln-wrap" hidden><label for="f-compvuln">Vulnerable to</label><select id="f-compvuln"></select></div>
             <div class="field" id="comp-level-wrap" hidden><label for="f-complevel">How unstable</label><select id="f-complevel"></select></div>
             <div class="field wide"><div class="trait-desc" id="comp-desc"></div></div>
             <div class="field wide"><label for="f-comptrigger">Trigger, agreed with the GM</label>
@@ -5594,7 +5595,10 @@ function resolveAttack(input, hooks, roll) {
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
   // What the attack is made of (weapon.materials: silver, cold iron, a wooden stake, fire), against the defender's
   // weaknesses and the protections those materials get past (setting data on traits).
-  const mats = weapon.materials || [], made = (/** @type {string[] | undefined} */ list) => (list || []).some((m) => mats.includes(m));
+  // Its damage type (Aurora: physical, energy, mystic; physical when it doesn't say) and element (fire, cold…) count as
+  // what it's made of, so a weakness or a Vulnerability to fire works like a werewolf's to silver.
+  const dtype = weapon.dtype || "physical";
+  const mats = [...(weapon.materials || []), dtype, ...(weapon.element ? [weapon.element] : [])], made = (/** @type {string[] | undefined} */ list) => (list || []).some((m) => mats.includes(m));
   // A weakness: that material marks extra boxes (a werewolf and silver).
   const weak = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "weakness" && mats.includes(t.material));
   if (weak.length) { dmg = { ...dmg, boxes: dmg.boxes + weak.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extra || 1), 0) }; out.weakness = weak.map((/** @type {any} */ t) => t.label || t.material).join(", "); }
@@ -5605,11 +5609,21 @@ function resolveAttack(input, hooks, roll) {
   // A trait that ignores small hits: always, or once per fight (oncePerFight; the encounter marks it used).
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && !t.used && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null, shrugged: shrug.label || "ignoreHits" };
+  // Immune to the type or element: nothing gets through below Class VI.
+  const cls0 = weapon.class || 1, immune = liveTraits(defender).find((/** @type {any} */ t) => t.type === "immuneType" && made([t.dtype]));
+  if (immune && cls0 < 6) return { ...out, outcome: `hit, marks nothing (${immune.label || "immune to " + immune.dtype})`, hit: true, damage: null, shrugged: immune.label || "immune" };
   // A Defense Class (Aurora): an attack must be at least one Class above it to do anything, and then marks a box fewer.
-  const dc = liveTraits(defender).find((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
+  // Each Defense says which damage types it covers (Toughness: physical; a force field: physical and energy); against
+  // any other it counts one Class lower. With several, the best one for this attack counts. Resistant to a type: +1.
+  const dcs = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
+  const resist = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "resistType" && made([t.dtype])).reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.value || 1), 0);
+  const best = dcs.map((/** @type {any} */ t) => ({ t, v: Math.max(0, t.value - (Array.isArray(t.covers) && !t.covers.includes(dtype) ? 1 : 0)) })).sort((x, y) => y.v - x.v)[0];
+  const dcv = (best ? best.v : 0) + resist;
+  const dc = dcv > 0 ? { value: dcv, label: best ? best.t.label : "Resistant" } : null;
   if (dc) {
     const cls = weapon.class || 1;
-    const R = ["", "I", "II", "III", "IV", "V", "VI"], D = `Defense ${R[dc.value] || dc.value}`, C = `Class ${R[cls] || cls}`;
+    const R = ["", "I", "II", "III", "IV", "V", "VI"], why = [best && best.v < best.t.value ? `${best.t.label || "Defense"} is one Class lower against ${dtype}` : "", resist ? `resistant to ${dtype}` : ""].filter(Boolean).join("; ");
+    const D = `Defense ${R[dc.value] || dc.value}${why ? ` (${why})` : ""}`, C = `Class ${R[cls] || cls}${dtype !== "physical" ? " " + dtype : ""}`;
     if (cls <= dc.value) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
     dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`;
     if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
@@ -6179,7 +6193,9 @@ function mindAttack(enc, rules, core, cmd, opts, x) {
   const blocked = md > cls;
   const ra = core.resolve(dice("attack"), target), rd = blocked || !ra.success ? null : core.resolve(dice("dodge"), resistTarget);
   const win = !blocked && ra.success && (!rd || !rd.success || ra.contestMargin > rd.contestMargin);
-  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) : 0;
+  // A Vulnerability to mind (a weakness to "mind"): a mind attack that wins marks one more.
+  const mweak = (d.traits || []).filter((/** @type {any} */ t) => t.type === "weakness" && t.material === "mind").reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extra || 1), 0);
+  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) + mweak : 0;
   if (win) d.mind = Math.min(d.mindBoxes || 3, (d.mind || 0) + boxes);
   const out = win && isOut(d);
   const outcome = blocked ? `no effect (Mind Defense ${R[md]} against a Class ${R[cls]} mind)` : !ra.success ? "failed" : !win ? "resisted"
@@ -7606,7 +7622,7 @@ return { mountLab };
       skills: Object.fromEntries(SKILLS.map(([n]) => [n, "U"])),
       adv: { id: "", name: "", text: "", detail: "" },
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
-      comp: { id: "", name: "", text: "", trigger: "", level: 1 },
+      comp: { id: "", name: "", text: "", trigger: "", level: 1, vuln: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k, , , meta]) => [k, !!(meta && meta.standard)])), // standard issue (a skinsuit) starts ticked
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
@@ -7650,6 +7666,7 @@ return { mountLab };
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     out.generic = out.generic === true; // a generic NPC: the GM view takes more than one of them
     out.comp.level = Math.max(1, Math.min(3, parseInt(out.comp.level, 10) || 1)); // how unstable (PACK.unstable), I to III
+    out.comp.vuln = PACK.damageTypes && (PACK.damageTypes.vulnerable || []).includes(out.comp.vuln) ? out.comp.vuln : ""; // a Vulnerability's type
     out.play.unstable = Math.max(-4, Math.min(4, parseInt(out.play.unstable, 10) || 0)); // the GM's raise or lower, in play
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
@@ -7937,7 +7954,10 @@ return { mountLab };
   const unstableOf = (c = ch) => !UNST ? 0 : Math.max(0, Math.min(UNST.max || 4, unstableBase(c) + ((c.play && c.play.unstable) || 0)));
   const flareLevel = (c = ch) => Math.max(unstableOf(c), UNST && (c.play && c.play.ptrack || 0) >= (UNST.strainAt || 99) ? UNST.strainLevel || 0 : 0);
   const unstableText = (lv) => lv ? `Unstable ${UNST.levels[lv - 1][0]} (a natural ${UNST.levels[lv - 1][1]})` : "";
-  const compName = () => ch.comp.id === "custom" ? (ch.comp.name || "Custom complication") : compDef()?.[1] || "";
+  // Damage types (PACK.damageTypes): what each protection power covers, and the Vulnerability complication's kind of harm.
+  const DT = PACK.damageTypes || null;
+  const vulnOf = (c = ch) => (DT && c.comp && c.comp.id === "vulnerable" && c.comp.vuln ? c.comp.vuln : "");
+  const compName = () => ch.comp.id === "custom" ? (ch.comp.name || "Custom complication") : (compDef()?.[1] || "") + (vulnOf() ? ` (${vulnOf()})` : "");
   const division = () => (ch.customRole ? ch.customGroup || PACK.groups[0].id : (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[0])[1]);
 
   function checks() {
@@ -8259,7 +8279,9 @@ return { mountLab };
       $("f-trigpick").dataset.for = ch.comp.id;
     }
     // Unstable Powers: choose its level; the sheet shows the character's whole level (with Lab-made's).
-    const isUnst = !!UNST && ch.comp.id === UNST.complication;
+    const isUnst = !!UNST && ch.comp.id === UNST.complication, isVuln = !!DT && ch.comp.id === "vulnerable";
+    $("comp-vuln-wrap").hidden = !isVuln;
+    if (isVuln) $("f-compvuln").innerHTML = `<option value="">Choose with the GM…</option>` + DT.vulnerable.map((v) => `<option value="${esc(v)}"${ch.comp.vuln === v ? " selected" : ""}>${esc(capFirst(v))}${(DT.types.find((t) => t[0] === v) || [])[2] ? ` (${esc(DT.types.find((t) => t[0] === v)[2])})` : ""}</option>`).join("");
     $("comp-level-wrap").hidden = !isUnst;
     if (isUnst) $("f-complevel").innerHTML = [1, 2, 3].map((lv) => `<option value="${lv}"${ch.comp.level === lv ? " selected" : ""}>${esc(unstableText(lv))}</option>`).join("");
     $("comp-desc").innerHTML = cd ? esc(cd[2]) + (isUnst ? ` <b>${esc(ch.name || "You")}: ${esc(unstableText(unstableOf()))}${UNST.origins[ch.speciesId] ? ` with your ${esc(ch.species)} ${esc(unstableText(UNST.origins[ch.speciesId]).split(" (")[0])}` : ""}.</b>` : "") : ch.comp.id === "custom"
@@ -8889,6 +8911,7 @@ return { mountLab };
       touch(); render();
     }
     else if (t.id === "f-complevel") { ch.comp.level = +t.value || 1; touch(); render(); }
+    else if (t.id === "f-compvuln") { ch.comp.vuln = t.value; touch(); render(); }
     else if (t.id === "f-comp") {
       // A suggested trigger belongs to the old complication; the player's own wording stays.
       if (Object.values(TRIGGERS).flat().includes(ch.comp.trigger.trim())) { ch.comp.trigger = ""; $("f-comptrigger").value = ""; }
@@ -12288,7 +12311,10 @@ function ptMaps(api, root) {
   // where a test configuration exists. Never used by the sheet. ----
   if ((PACK.arms || []).length) {
     labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
-      traitsFor: (c) => hbEdgeTraits(PACK, (k) => edgeN(k, c)), // homebrew Edges' fight traits
+      traitsFor: (c) => [...hbEdgeTraits(PACK, (k) => edgeN(k, c)), // homebrew Edges' fight traits
+        // Each protection power is its own Defense, covering its damage types (Toughness: physical; Force Field: physical and energy).
+        ...(DT && POWERS ? allPowers(c).filter((x) => DT.powers[x.id]).map((x) => ({ type: "defenseClass", value: classIndex(x.cl) + 1, covers: DT.powers[x.id], label: `${powerDef(x.id)[1]} ${x.cl}` })) : []),
+        ...(vulnOf(c) ? [{ type: "weakness", material: vulnOf(c), extra: 1, label: `Vulnerability: ${vulnOf(c)}` }] : [])],
       mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
       onScene: () => pushScene(), // the shared table's players see the fight
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
@@ -12296,7 +12322,7 @@ function ptMaps(api, root) {
       // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.
       powers: (c) => (POWERS ? allPowers(c).map((x) => ({ id: x.id, cls: classIndex(x.cl) + 1 })) : []), // the Class of each power a character has
       calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), move: moveOf(c), agility: c.attrs.Agility + formAttr("Agility", c),
-        defense: POWERS ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
+        defense: POWERS && !DT ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },

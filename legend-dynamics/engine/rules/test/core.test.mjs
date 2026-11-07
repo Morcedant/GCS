@@ -86,6 +86,26 @@ test("Crown capabilities: margin damage, per-weapon jams, price, Boosts, defende
   assert.equal(huge.outcome, "hit, marks nothing (Huge)"); assert.equal(huge.damage, null);
 });
 
+test("damage types: each Defense covers its own, and a Vulnerability marks a box more", () => {
+  const roll = (/** @type {string} */ k) => (k === "attack" ? [1, 1, 1] : [6, 6, 6]);
+  const atk = { id: "a", skillTarget: 12, injury: 0 };
+  const hit = (/** @type {any} */ weapon, /** @type {any[]} */ traits = []) => LD.resolveAttack({ attacker: atk, defender: { id: "d", canDodge: true, dodgeBase: 9, injury: 0, traits }, weapon, band: "close" }, LD.NO_HOOKS, roll);
+  const punch3 = { id: "p3", band: "close", class: 3, damage: { any: { boxes: 2 } } }, blast3 = { ...punch3, id: "b3", dtype: "energy" }, fire3 = { ...blast3, element: "fire" };
+  const tough3 = [{ type: "defenseClass", value: 3, covers: ["physical"], label: "Toughness III" }];
+  assert.equal(hit(punch3, tough3).damage, null, "Toughness III stops a Class III blow");
+  assert.equal(hit(blast3, tough3).damage.boxes, 1, "against energy it counts as Defense II: a Class III blast gets through, a box fewer");
+  assert.match(hit(blast3, tough3).defenseClass, /one Class lower against energy/);
+  const field3 = [{ type: "defenseClass", value: 3, covers: ["physical", "energy"], label: "Force Field III" }];
+  assert.equal(hit(blast3, field3).damage, null, "a force field covers energy");
+  assert.equal(hit(blast3, [...tough3, ...field3]).damage, null, "with two Defenses, the better one for the attack counts");
+  assert.equal(hit({ ...punch3, dtype: "mystic" }, field3).damage.boxes, 1, "a mystic attack: the field counts one Class lower");
+  assert.equal(hit(fire3, [{ type: "weakness", material: "fire", extra: 1, label: "Vulnerability: fire" }]).damage.boxes, 3, "a Vulnerability to fire: a box more");
+  assert.equal(hit(blast3, [{ type: "weakness", material: "energy", extra: 1 }]).damage.boxes, 3, "a Vulnerability to a whole type");
+  assert.equal(hit(fire3, [{ type: "resistType", dtype: "fire", value: 1 }, ...tough3]).damage, null, "resistant to fire: Defense +1 against it");
+  assert.equal(hit(fire3, [{ type: "immuneType", dtype: "fire", label: "Fireproof" }]).damage, null, "immune: nothing below Class VI");
+  assert.equal(hit({ ...fire3, class: 6 }, [{ type: "immuneType", dtype: "fire" }]).damage.boxes, 2, "Class VI gets through");
+});
+
 test("stun weapons, Defense Classes and always-on armor", () => {
   // Attack dice 3 (a natural success), defense dice 18 (a natural failure): every attack lands.
   const roll = (/** @type {string} */ k) => (k === "attack" ? [1, 1, 1] : [6, 6, 6]);

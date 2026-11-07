@@ -358,7 +358,9 @@ function mindAttack(enc, rules, core, cmd, opts, x) {
   const blocked = md > cls;
   const ra = core.resolve(dice("attack"), target), rd = blocked || !ra.success ? null : core.resolve(dice("dodge"), resistTarget);
   const win = !blocked && ra.success && (!rd || !rd.success || ra.contestMargin > rd.contestMargin);
-  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) : 0;
+  // A Vulnerability to mind (a weakness to "mind"): a mind attack that wins marks one more.
+  const mweak = (d.traits || []).filter((/** @type {any} */ t) => t.type === "weakness" && t.material === "mind").reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extra || 1), 0);
+  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) + mweak : 0;
   if (win) d.mind = Math.min(d.mindBoxes || 3, (d.mind || 0) + boxes);
   const out = win && isOut(d);
   const outcome = blocked ? `no effect (Mind Defense ${R[md]} against a Class ${R[cls]} mind)` : !ra.success ? "failed" : !win ? "resisted"

@@ -1302,6 +1302,11 @@
    "The Foundation, DIRE or someone worse wants you back. Accept the retrieval team."
   ],
   [
+   "vulnerable",
+   "Vulnerability",
+   "One kind of harm gets to you: an energy, the mystic, the mind, or one element or material (fire, electricity, silver…), chosen with the GM. Its attacks mark one box more. Accept the hurt when your enemies learn it."
+  ],
+  [
    "unstable",
    "Unstable Powers",
    "Your powers flare when you're afraid or angry. Choose how unstable with the GM: Unstable I (a Powers roll flares on a natural 18), II (17–18) or III (16–18). Accept the collateral damage."
@@ -1397,6 +1402,11 @@
    "A van with no plates outside",
    "A doctor knows too much about your powers",
    "Someone from the lab is in the crowd"
+  ],
+  "vulnerable": [
+   "An enemy brings exactly the wrong thing",
+   "The fight moves somewhere full of it",
+   "A file that names your weakness"
   ],
   "unstable": [
    "You're cornered",
@@ -3793,7 +3803,7 @@
   },
   {
    "id": "armcannon",
-   "name": "Aegis arm cannon",
+   "dtype": "energy", "name": "Aegis arm cannon",
    "skill": "Piloting",
    "band": "long",
    "damage": {
@@ -3870,7 +3880,7 @@
   },
   {
    "id": "blast2",
-   "name": "Blast (Class II)",
+   "dtype": "energy", "name": "Blast (Class II)",
    "skill": "Firearms",
    "band": "medium",
    "damage": {
@@ -3901,7 +3911,7 @@
   },
   {
    "id": "elfshot",
-   "name": "Elf-shot (Class II)",
+   "dtype": "mystic", "name": "Elf-shot (Class II)",
    "skill": "Melee",
    "reach": "melee",
    "damage": {
@@ -3917,7 +3927,7 @@
   },
   {
    "id": "breach",
-   "name": "Breach rifle (Class II)",
+   "dtype": "energy", "name": "Breach rifle (Class II)",
    "skill": "Firearms",
    "band": "long",
    "damage": {
@@ -3932,7 +3942,7 @@
   },
   {
    "id": "wild",
-   "name": "Wild power (Class II)",
+   "dtype": "energy", "name": "Wild power (Class II)",
    "skill": "Powers",
    "band": "medium",
    "damage": {
@@ -3947,7 +3957,7 @@
   },
   {
    "id": "roots",
-   "name": "Grasping roots (Class II)",
+   "dtype": "mystic", "name": "Grasping roots (Class II)",
    "skill": "Brawling",
    "reach": "melee",
    "damage": {
@@ -3963,7 +3973,7 @@
   },
   {
    "id": "op-blast3",
-   "name": "Power blast (Class III)",
+   "dtype": "energy", "name": "Power blast (Class III)",
    "skill": "Powers",
    "class": 3,
    "traits": [],
@@ -3978,7 +3988,7 @@
   },
   {
    "id": "op-blast4",
-   "name": "Power blast (Class IV)",
+   "dtype": "energy", "name": "Power blast (Class IV)",
    "skill": "Powers",
    "class": 4,
    "traits": [],
@@ -3993,7 +4003,7 @@
   },
   {
    "id": "op-blast5",
-   "name": "Power blast (Class V)",
+   "dtype": "energy", "name": "Power blast (Class V)",
    "skill": "Powers",
    "class": 5,
    "traits": [],
@@ -4008,7 +4018,7 @@
   },
   {
    "id": "op-blast6",
-   "name": "Power blast (Class VI)",
+   "dtype": "energy", "name": "Power blast (Class VI)",
    "skill": "Powers",
    "class": 6,
    "traits": [],
@@ -4108,7 +4118,7 @@
   },
   {
    "id": "op-weapon3",
-   "name": "Power weapon in hand (Class III)",
+   "dtype": "mystic", "name": "Power weapon in hand (Class III)",
    "skill": "Melee",
    "class": 3,
    "traits": [],
@@ -4124,7 +4134,7 @@
   },
   {
    "id": "op-weapon4",
-   "name": "Power weapon in hand (Class IV)",
+   "dtype": "mystic", "name": "Power weapon in hand (Class IV)",
    "skill": "Melee",
    "class": 4,
    "traits": [],
@@ -4140,7 +4150,7 @@
   },
   {
    "id": "op-manifest3",
-   "name": "Manifested firearm (Class III)",
+   "dtype": "energy", "name": "Manifested firearm (Class III)",
    "skill": "Firearms",
    "class": 3,
    "traits": [],
@@ -4155,7 +4165,7 @@
   },
   {
    "id": "op-sidearm2",
-   "name": "Advanced sidearm (Class II)",
+   "dtype": "energy", "name": "Advanced sidearm (Class II)",
    "skill": "Firearms",
    "class": 2,
    "traits": [],
@@ -4170,7 +4180,7 @@
   },
   {
    "id": "op-nightmare2",
-   "name": "Living nightmare (Class II; Will resists)",
+   "dtype": "mind", "name": "Living nightmare (Class II; Will resists)",
    "skill": "Powers",
    "class": 2,
    "traits": [],
@@ -4258,7 +4268,7 @@
   },
   {
    "id": "pw-blast1",
-   "name": "Blast I (Class I)",
+   "dtype": "energy", "name": "Blast I (Class I)",
    "skill": "Powers",
    "class": 1,
    "traits": [],
@@ -4335,7 +4345,7 @@
   },
   {
    "id": "pw-blast2",
-   "name": "Blast II (Class II)",
+   "dtype": "energy", "name": "Blast II (Class II)",
    "skill": "Powers",
    "class": 2,
    "traits": [],
@@ -4386,7 +4396,7 @@
   },
   {
    "id": "pw-weather2",
-   "name": "Weather Control II: lightning (Class II)",
+   "dtype": "energy", "element": "electricity", "name": "Weather Control II: lightning (Class II)",
    "skill": "Powers",
    "class": 2,
    "traits": [],
@@ -4403,7 +4413,7 @@
   },
   {
    "id": "pw-manifest2",
-   "name": "Manifested weapon II (Class II)",
+   "dtype": "energy", "name": "Manifested weapon II (Class II)",
    "skill": "Firearms",
    "class": 2,
    "traits": [],
@@ -4497,7 +4507,7 @@
   },
   {
    "id": "pw-blast3",
-   "name": "Blast III (Class III)",
+   "dtype": "energy", "name": "Blast III (Class III)",
    "skill": "Powers",
    "class": 3,
    "traits": [],
@@ -4548,7 +4558,7 @@
   },
   {
    "id": "pw-weather3",
-   "name": "Weather Control III: lightning (Class III)",
+   "dtype": "energy", "element": "electricity", "name": "Weather Control III: lightning (Class III)",
    "skill": "Powers",
    "class": 3,
    "traits": [],
@@ -4565,7 +4575,7 @@
   },
   {
    "id": "pw-manifest3",
-   "name": "Manifested weapon III (Class III)",
+   "dtype": "energy", "name": "Manifested weapon III (Class III)",
    "skill": "Firearms",
    "class": 3,
    "traits": [],
@@ -4616,7 +4626,7 @@
   },
   {
    "id": "pw-shadow3",
-   "name": "Shadow III: construct (Class II)",
+   "dtype": "mystic", "name": "Shadow III: construct (Class II)",
    "skill": "Powers",
    "class": 2,
    "traits": [],
@@ -4693,7 +4703,7 @@
   },
   {
    "id": "pw-blast4",
-   "name": "Blast IV (Class IV)",
+   "dtype": "energy", "name": "Blast IV (Class IV)",
    "skill": "Powers",
    "class": 4,
    "traits": [],
@@ -4744,7 +4754,7 @@
   },
   {
    "id": "pw-weather4",
-   "name": "Weather Control IV: lightning (Class IV)",
+   "dtype": "energy", "element": "electricity", "name": "Weather Control IV: lightning (Class IV)",
    "skill": "Powers",
    "class": 4,
    "traits": [],
@@ -4761,7 +4771,7 @@
   },
   {
    "id": "pw-manifest4",
-   "name": "Manifested weapon IV (Class IV)",
+   "dtype": "energy", "name": "Manifested weapon IV (Class IV)",
    "skill": "Firearms",
    "class": 4,
    "traits": [],
@@ -4812,7 +4822,7 @@
   },
   {
    "id": "pw-shadow4",
-   "name": "Shadow IV: construct (Class III)",
+   "dtype": "mystic", "name": "Shadow IV: construct (Class III)",
    "skill": "Powers",
    "class": 3,
    "traits": [],
@@ -4889,7 +4899,7 @@
   },
   {
    "id": "pw-blast5",
-   "name": "Blast V (Class V)",
+   "dtype": "energy", "name": "Blast V (Class V)",
    "skill": "Powers",
    "class": 5,
    "traits": [],
@@ -4940,7 +4950,7 @@
   },
   {
    "id": "pw-weather5",
-   "name": "Weather Control V: lightning (Class V)",
+   "dtype": "energy", "element": "electricity", "name": "Weather Control V: lightning (Class V)",
    "skill": "Powers",
    "class": 5,
    "traits": [],
@@ -4957,7 +4967,7 @@
   },
   {
    "id": "pw-manifest5",
-   "name": "Manifested weapon V (Class V)",
+   "dtype": "energy", "name": "Manifested weapon V (Class V)",
    "skill": "Firearms",
    "class": 5,
    "traits": [],
@@ -5008,7 +5018,7 @@
   },
   {
    "id": "pw-shadow5",
-   "name": "Shadow V: construct (Class IV)",
+   "dtype": "mystic", "name": "Shadow V: construct (Class IV)",
    "skill": "Powers",
    "class": 4,
    "traits": [],
@@ -5085,7 +5095,7 @@
   },
   {
    "id": "pw-blast6",
-   "name": "Blast VI (Class VI)",
+   "dtype": "energy", "name": "Blast VI (Class VI)",
    "skill": "Powers",
    "class": 6,
    "traits": [],
@@ -5136,7 +5146,7 @@
   },
   {
    "id": "pw-weather6",
-   "name": "Weather Control VI: lightning (Class VI)",
+   "dtype": "energy", "element": "electricity", "name": "Weather Control VI: lightning (Class VI)",
    "skill": "Powers",
    "class": 6,
    "traits": [],
@@ -5153,7 +5163,7 @@
   },
   {
    "id": "pw-manifest6",
-   "name": "Manifested weapon VI (Class VI)",
+   "dtype": "energy", "name": "Manifested weapon VI (Class VI)",
    "skill": "Firearms",
    "class": 6,
    "traits": [],
@@ -5204,7 +5214,7 @@
   },
   {
    "id": "pw-shadow6",
-   "name": "Shadow VI: construct (Class V)",
+   "dtype": "mystic", "name": "Shadow VI: construct (Class V)",
    "skill": "Powers",
    "class": 5,
    "traits": [],
@@ -5353,7 +5363,7 @@
   },
   {
    "id": "pw-psy2",
-   "name": "Telepathy II: psychic stab (Class I; Will resists)",
+   "dtype": "mind", "name": "Telepathy II: psychic stab (Class I; Will resists)",
    "skill": "Powers",
    "class": 1,
    "traits": [],
@@ -5371,7 +5381,7 @@
   },
   {
    "id": "pw-psy3",
-   "name": "Telepathy III: psychic stab (Class II; Will resists)",
+   "dtype": "mind", "name": "Telepathy III: psychic stab (Class II; Will resists)",
    "skill": "Powers",
    "class": 2,
    "traits": [],
@@ -5389,7 +5399,7 @@
   },
   {
    "id": "pw-psy4",
-   "name": "Telepathy IV: psychic stab (Class III; Will resists)",
+   "dtype": "mind", "name": "Telepathy IV: psychic stab (Class III; Will resists)",
    "skill": "Powers",
    "class": 3,
    "traits": [],
@@ -5407,7 +5417,7 @@
   },
   {
    "id": "pw-psy5",
-   "name": "Telepathy V: psychic stab (Class IV; Will resists)",
+   "dtype": "mind", "name": "Telepathy V: psychic stab (Class IV; Will resists)",
    "skill": "Powers",
    "class": 4,
    "traits": [],
@@ -5425,7 +5435,7 @@
   },
   {
    "id": "pw-psy6",
-   "name": "Telepathy VI: psychic stab (Class V; Will resists)",
+   "dtype": "mind", "name": "Telepathy VI: psychic stab (Class V; Will resists)",
    "skill": "Powers",
    "class": 5,
    "traits": [],
@@ -5443,7 +5453,7 @@
   },
   {
    "id": "pw-fear3",
-   "name": "Illusion III: fears made real (Class II; Will resists)",
+   "dtype": "mind", "name": "Illusion III: fears made real (Class II; Will resists)",
    "skill": "Powers",
    "class": 2,
    "traits": [],
@@ -5461,7 +5471,7 @@
   },
   {
    "id": "pw-fear4",
-   "name": "Illusion IV: fears made real (Class III; Will resists)",
+   "dtype": "mind", "name": "Illusion IV: fears made real (Class III; Will resists)",
    "skill": "Powers",
    "class": 3,
    "traits": [],
@@ -5479,7 +5489,7 @@
   },
   {
    "id": "pw-fear5",
-   "name": "Illusion V: fears made real (Class IV; Will resists)",
+   "dtype": "mind", "name": "Illusion V: fears made real (Class IV; Will resists)",
    "skill": "Powers",
    "class": 4,
    "traits": [],
@@ -5497,7 +5507,7 @@
   },
   {
    "id": "pw-fear6",
-   "name": "Illusion VI: fears made real (Class V; Will resists)",
+   "dtype": "mind", "name": "Illusion VI: fears made real (Class V; Will resists)",
    "skill": "Powers",
    "class": 5,
    "traits": [],
@@ -5560,7 +5570,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 1,
+     "value": 1, "covers": ["physical"],
      "label": "Defense I"
     }
    ]
@@ -5630,7 +5640,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 2,
+     "value": 2, "covers": ["physical", "energy"],
      "label": "Defense II"
     }
    ]
@@ -5658,7 +5668,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 2,
+     "value": 2, "covers": ["physical"],
      "label": "Defense II"
     }
    ]
@@ -5700,7 +5710,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 1,
+     "value": 1, "covers": ["physical"],
      "label": "Defense I"
     }
    ]
@@ -5749,7 +5759,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 2,
+     "value": 2, "covers": ["physical", "energy"],
      "label": "Defense II"
     }
    ]
@@ -5777,7 +5787,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 1,
+     "value": 1, "covers": ["physical"],
      "label": "Defense I"
     }
    ]
@@ -5802,10 +5812,10 @@
    ],
    "trait": "Rooted",
    "traitText": "Fire hurts it, but burning it brings the forest down on you.",
-   "traits": [
+   "traits": [{"type": "weakness", "material": "fire", "extra": 1, "label": "Fire hurts it"}, 
     {
      "type": "defenseClass",
-     "value": 2,
+     "value": 2, "covers": ["physical", "mystic"],
      "label": "Defense II"
     }
    ]
@@ -5839,7 +5849,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 4,
+     "value": 4, "covers": ["physical"],
      "label": "Defense IV"
     }
    ],
@@ -5869,7 +5879,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 1,
+     "value": 1, "covers": ["physical"],
      "label": "Defense I"
     },
     {
@@ -5905,7 +5915,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 2,
+     "value": 2, "covers": ["physical", "mystic"],
      "label": "Defense II"
     }
    ]
@@ -5967,7 +5977,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 4,
+     "value": 4, "covers": ["physical"],
      "label": "Defense IV"
     }
    ],
@@ -6002,7 +6012,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 1,
+     "value": 1, "covers": ["physical"],
      "label": "Defense I"
     }
    ]
@@ -6036,7 +6046,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 1,
+     "value": 1, "covers": ["physical", "energy"],
      "label": "Defense I"
     }
    ]
@@ -6070,7 +6080,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 3,
+     "value": 3, "covers": ["physical"],
      "label": "Defense III"
     }
    ]
@@ -6099,7 +6109,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 4,
+     "value": 4, "covers": ["physical"],
      "label": "Defense IV"
     }
    ]
@@ -6133,7 +6143,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 2,
+     "value": 2, "covers": ["physical", "mystic"],
      "label": "Defense II"
     }
    ]
@@ -6196,7 +6206,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 3,
+     "value": 3, "covers": ["physical", "mystic"],
      "label": "Defense III"
     }
    ]
@@ -6230,7 +6240,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 4,
+     "value": 4, "covers": ["physical"],
      "label": "Defense IV"
     }
    ],
@@ -6265,7 +6275,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 2,
+     "value": 2, "covers": ["physical"],
      "label": "Defense II"
     }
    ],
@@ -6295,7 +6305,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 3,
+     "value": 3, "covers": ["physical", "energy"],
      "label": "Defense III"
     }
    ]
@@ -6324,7 +6334,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 3,
+     "value": 3, "covers": ["physical"],
      "label": "Defense III"
     }
    ]
@@ -6353,7 +6363,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 4,
+     "value": 4, "covers": ["physical", "energy"],
      "label": "Defense IV"
     }
    ]
@@ -6387,7 +6397,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 6,
+     "value": 6, "covers": ["physical"],
      "label": "Defense VI"
     },
     {
@@ -6424,7 +6434,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 5,
+     "value": 5, "covers": ["physical"],
      "label": "Defense V"
     }
    ]
@@ -6458,7 +6468,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 3,
+     "value": 3, "covers": ["physical", "mystic"],
      "label": "Defense III"
     }
    ]
@@ -6510,7 +6520,7 @@
    "traits": [
     {
      "type": "defenseClass",
-     "value": 5,
+     "value": 5, "covers": ["physical", "energy"],
      "label": "Defense V"
     },
     {
@@ -6836,6 +6846,7 @@
    "coolhead": 2
   }
  },
+ "damageTypes": {"types": [["physical", "Physical", "fists, blades, bullets, falls, thrown cars"], ["energy", "Energy", "Blast, lightning, lasers, flame, raw power"], ["mystic", "Mystic", "spells, spirits, curses, the Fey and the Mad Forest"], ["mind", "Mind", "telepathy, mind control, fears made real"]], "elements": ["fire", "cold", "electricity", "light", "radiation", "sound"], "powers": {"toughness": ["physical"], "forcefield": ["physical", "energy"]}, "vulnerable": ["energy", "mystic", "mind", "fire", "cold", "electricity", "light", "radiation", "sound", "iron", "silver"]},
  "unstable": {"skill": "Powers", "complication": "unstable", "origins": {"labmade": 2}, "max": 4, "strainLevel": 3, "strainAt": 3, "levels": [["I", "18"], ["II", "17–18"], ["III", "16–18"], ["IV", "15–18"]], "flare": "It hits everyone nearby, or does far more than you meant, and the GM says how. Accept the collateral; a flare can mark Collateral or Backlash.", "labmadeFlare": "Lab-made: mark a box of Strain as well.", "text": "Unstable powers come in levels. On a Powers roll, a natural in the level's range flares: Unstable I on an 18, II on 17–18, III on 16–18, IV on 15–18. Lab-made gives Unstable II; the Unstable Powers complication gives the level chosen with the GM (I to III); together they add, to IV at most. The GM can raise a level for a while (cornered, dosed, a Foundation tag) or lower it (training, treatment). At Strain 3, any power flares on 16–18, whatever its level."},
  "playtest": {
   "name": "Aurora",

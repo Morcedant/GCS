@@ -529,6 +529,21 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack must be at least **one Class above** your Defense to do anything, and then it marks **one box fewer**; one **equal to it or below** does nothing. A bulletproof Operant (Defense II) ignores pistols, rifles and even an Aegis cannon (Class II); a Class III blast gets through, marking one box instead of two.
 
+**Damage types.** Every attack is one of four types, and each Defense says which it covers. Against any other type, a Defense counts **one Class lower**.
+
+| Type | What it is | Covered by |
+|---|---|---|
+| **Physical** | Fists, blades, bullets, falls, thrown cars; telekinetic blows and anything a power hurls | Toughness, Force Field, body armor, an Aegis suit |
+| **Energy** | Blast, lightning, lasers, flame, raw power | Force Field and an Aegis suit; Toughness one Class lower |
+| **Mystic** | Spells, spirits, curses, the Fey and the Mad Forest | Wards and mystic protection; other Defense one Class lower |
+| **Mind** | Telepathy, mind control, fears made real | Mind Defense only (see *Mind powers*): no other Defense helps at all |
+
+An energy attack can also name its **element** (fire, cold, electricity, light, radiation, sound). The type decides which Defense covers it; the element matters for weaknesses, resistances and Energy Absorption. A mind can make force, and force is physical: a telekinetic strike or a thrown car is a physical attack, and a telekinetic shield is a Force Field.
+
+*Example:* Toughness III stops a Class III punch outright. Against a Class III fire blast it counts as Defense II, so the blast gets through and marks one box fewer. With a Force Field III as well, the blast does nothing: when you have two Defenses, the better one for the attack counts.
+
+**Weak, resistant, immune.** A character or a threat can be **weak** to a type, an element or a material (silver, cold iron): its attacks mark **one box more**. **Resistant**: their Defense counts one Class higher against it. **Immune**: nothing of it gets through below Class VI. The **Vulnerability** complication is a weakness chosen with the GM: an energy, the mystic, the mind, or one element or material.
+
 *Defense is not a defense roll.* Your **defense** (Dodge, Parry or Block, one a round) decides whether an attack hits at all. Your **Defense** Class is armor: it applies to whatever hits, every time, at no cost. A Force Field doesn't use up your Dodge.
 
 *Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. The same shot would have marked two boxes on his deputy. A White Hand soldier's Class II Blast is equal to his Defense, so it does nothing either; a Class III blast would get through, marking one box instead of two.
@@ -1790,6 +1805,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 | Secret Identity | You live two lives. Accept the danger when someone gets close to the truth. |
 | Wanted | A warrant has your name or your mask on it. Accept the arrest attempt. |
 | Hunted by a Lab | The Foundation, DIRE or someone worse wants you back. Accept the retrieval team. |
+| Vulnerability | One kind of harm gets to you: an energy, the mystic, the mind, or one element or material (fire, electricity, silver…), chosen with the GM. Its attacks mark one box more. Accept the hurt when your enemies learn it. |
 | Unstable Powers | Your powers flare when you're afraid or angry. Choose how unstable with the GM: Unstable I (a Powers roll flares on a natural 18), II (17–18) or III (16–18). Accept the collateral damage. |
 | Code Against Killing | You don't kill, whatever they've done. Accept the cost of mercy. |
 | Media Darling | The cameras follow you everywhere. Accept the attention at the worst moment. |
