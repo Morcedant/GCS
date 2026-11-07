@@ -7,6 +7,9 @@
  * ("2 - Mercy Springs at noon.png"): the playtest page puts it with that scene, and shows its hex size. Files without a
  * number are listed after the scenes, as extras.
  *
+ * Each picture's link carries its upload time (?v=…), so a picture replaced under the same name gets a new link: browsers
+ * and the GM view's characters pick up the new one instead of keeping the old for a day.
+ *
  *   GET /api/maps?folder=F   → { folder, maps: [{ file, title, scene, bytes, src, download }] }
  *   GET /api/maps            → { folders: { F: count } }
  *   GET /maps/F/FILE         the picture; ?download=1 saves it as a file
@@ -25,12 +28,12 @@ export function validMapKey(key) {
 /** The scene number a file name starts with ("02 - the bridge.png" → 2), or null. @param {string} name */
 export const sceneOf = (name) => { const m = name.match(/^(\d{1,2})(?!\d)/); return m ? +m[1] : null; };
 
-/** A folder's maps, by scene number, then the rest by name. @param {{ key: string, size: number }[]} objects @param {string} folder @param {string} base */
+/** A folder's maps, by scene number, then the rest by name. @param {{ key: string, size: number, uploaded?: number }[]} objects @param {string} folder @param {string} base */
 export function buildMapList(objects, folder, base) {
   const pre = `${MAP_PREFIX}/${folder}/`;
   return objects.filter((o) => validMapKey(o.key) && o.key.startsWith(pre)).map((o) => {
-    const file = o.key.slice(pre.length), src = `${base}/maps/${folder}/${encodeURIComponent(file)}`;
-    return { file, title: titleFrom(file), scene: sceneOf(file), bytes: o.size, src, download: src + "?download=1" };
+    const file = o.key.slice(pre.length), v = (o.uploaded || o.size || 0).toString(36), src = `${base}/maps/${folder}/${encodeURIComponent(file)}?v=${v}`;
+    return { file, title: titleFrom(file), scene: sceneOf(file), bytes: o.size, src, download: src + "&download=1" };
   }).sort((a, b) => (a.scene ?? 999) - (b.scene ?? 999) || a.file.localeCompare(b.file, undefined, { numeric: true }));
 }
 
@@ -38,7 +41,7 @@ async function listAll(/** @type {any} */ bucket, /** @type {string} */ prefix) 
   const out = []; let cursor;
   for (let i = 0; i < 20; i++) {
     const r = await bucket.list({ prefix, cursor, limit: 1000 });
-    out.push(...r.objects.map((/** @type {any} */ o) => ({ key: o.key, size: o.size })));
+    out.push(...r.objects.map((/** @type {any} */ o) => ({ key: o.key, size: o.size, uploaded: o.uploaded ? +new Date(o.uploaded) : 0 })));
     if (!r.truncated) break; cursor = r.cursor;
   }
   return out;
@@ -69,7 +72,8 @@ export async function mapsFetch(req, env, h) {
   const headers = new Headers(h);
   if (obj.writeHttpMetadata) obj.writeHttpMetadata(headers);
   headers.set("Content-Type", imageType(key) || "application/octet-stream");
-  headers.set("Cache-Control", "public, max-age=86400");
+  // A link with ?v= names one upload, so it can be kept; one without it is checked again after five minutes.
+  headers.set("Cache-Control", url.searchParams.get("v") ? "public, max-age=31536000, immutable" : "public, max-age=300");
   if (obj.httpEtag) headers.set("ETag", obj.httpEtag);
   if (url.searchParams.get("download")) headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(rest.split("/")[1])}`);
   if (!("body" in obj)) return new Response(null, { status: 304, headers });

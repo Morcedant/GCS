@@ -717,6 +717,11 @@ def build(pid, docx):
         sys.path.insert(0, str(ROOT / "tools")); import battlemap_scenes
         km = battlemap_scenes.kit_maps(pid)
         if km: pack["playtest"] = {**pack["playtest"], "maps": {**km, "pregens": [{"name": c["name"], "rank": c.get("rank", "")} for c in pack.get("pregens", [])]}}
+        # The adventure as a campaign, for the kit's "Load into the Campaign tab" (tools/playtest_campaigns.py). It holds the
+        # adventure's secrets, so it's in the page only while the GM's Guides are (gm_guides.GM_GUIDES_OPEN).
+        import playtest_campaigns
+        cp = playtest_campaigns.campaign(pid, pack, (pdir / "setting.md").read_text()) if gm_guides.GM_GUIDES_OPEN else None
+        if cp: pack["playtest"] = {**pack["playtest"], "campaign": cp}
     js = "const PACK = " + json.dumps({**with_core_combat(pack), "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = tpl.replace("/* RULES:CORE */", rules_js())

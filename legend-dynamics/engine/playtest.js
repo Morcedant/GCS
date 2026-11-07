@@ -11,8 +11,12 @@
 //   tokens: [{ name, size, look }] }. The pictures are in the table server's bucket (battle-maps/<folder>/): a map named
 //   with its scene's number first, or after the scene its name matches; a token named starting "token".
 //
+// kit.campaign (tools/playtest_campaigns.py): the adventure as a campaign for the Campaign tab: its premise, a step of the
+//   outline for each scene, its people, places and factions, and the first session.
+//
 // mountPlaytest(api) with api: { kit, root, esc, storeKey, toast(m, err), server?, map? (the battle map: useBackgroundUrl,
-//   addPictureToken), showMap?() (opens the battle map) }.
+//   addPictureToken), showMap?() (opens the battle map), givePictures?(name, portrait, token),
+//   loadCampaign?(campaign, label) (into the Campaign tab: true if it did) }.
 // Function declarations only.
 
 function ptWrapRow() {
@@ -41,6 +45,7 @@ function mountPlaytest(api) {
       .pt-acts .btn { font-size: .82rem; padding: 6px 9px; }
       .pt-pcpics { display: grid; grid-template-columns: 3fr 2fr; gap: 2px; background: var(--line); } .pt-pcpics .pt-pic { aspect-ratio: auto; height: 9rem; }
       .pt-pcpics img { object-fit: cover; } .pt-tokpic img { object-fit: contain; }
+      .pt-load { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin: 4px 0 10px; } .pt-load .small { flex: 1 1 16rem; }
       .pt-cut { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }`;
     document.head.appendChild(st);
   }
@@ -53,6 +58,7 @@ function mountPlaytest(api) {
   const sec = (id, title, body, open) => `<details class="pt-sec" data-sec="${id}"${open ? " open" : ""}><summary><b>${esc(title)}</b></summary>${body}</details>`;
   root.innerHTML = `<h3>Playtest kit: ${esc(K.adv)}</h3>
     <p class="small muted">Run a three-hour playtest of this ${esc(K.term)} with people who've never seen the game: prepare, follow the run sheet, and ask the right questions after. The ${esc(K.term)} itself is in the GM's Guide.</p>
+    ${K.campaign && api.loadCampaign ? `<div class="pt-load"><button type="button" class="btn primary" data-pt-campaign>Load ${esc(K.adv)} into the Campaign tab</button><span class="small muted">The whole ${esc(K.term)} in one go: its premise and the truth behind it, a step of the outline for each scene, ${K.campaign.people.length} people, ${K.campaign.places.length} places, ${K.campaign.factions.length} faction${K.campaign.factions.length === 1 ? "" : "s"}, and the first session's plan. Nothing reaches the players until you share it.</span></div>` : ""}
     ${sec("prep", "1. Before the session", `<ul class="pt-check">${K.prep.map((t, i) => `<li><label><input type="checkbox" data-pttick="${i}"${ticks[i] ? " checked" : ""}> <span>${t}</span></label></li>`).join("")}</ul>
       <p class="small"><b>The cast, in one line each</b></p>
       <div class="pt-cast">${K.cast.map(([n, t]) => `<div><b>${esc(n)}</b><span class="small muted">${esc(t)}</span></div>`).join("")}</div>
@@ -83,6 +89,7 @@ function mountPlaytest(api) {
     set("ticks", JSON.stringify(ticks));
   });
   root.addEventListener("click", (e) => {
+    if (e.target.closest("[data-pt-campaign]")) { api.loadCampaign(JSON.parse(JSON.stringify(K.campaign)), `the playtest's (${K.adv})`); return; }
     if (e.target.id === "pt-notes-copy") { copy(notes.value, (ok) => { if (!ok) notes.select(); say(ok ? "Notes copied." : "Selected: copy them yourself.", !ok); }); return; }
     if (e.target.id === "pt-notes-clear") {
       if (!armed) { armed = true; e.target.textContent = "Tap again to clear"; setTimeout(() => { armed = false; e.target.textContent = "Clear"; }, 3000); return; }

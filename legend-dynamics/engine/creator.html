@@ -1432,7 +1432,7 @@ tr.lvl-U td.target { color: var(--muted); }
       equipment: Object.fromEntries(EQUIPMENT.map(([k, , , meta]) => [k, !!(meta && meta.standard)])), // standard issue (a skinsuit) starts ticked
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
-      portrait: "", portraitShape: "token", token: "",
+      portrait: "", portraitShape: "token", token: "", pictureFrom: { portrait: "", token: "" },
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
       play: { injury: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
@@ -1466,6 +1466,9 @@ tr.lvl-U td.target { color: var(--muted); }
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
     // A separate token for the battle map (the playtest kit's character tokens); the portrait stands in without one.
     if (typeof out.token !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.token)) out.token = "";
+    // Where the playtest kit's pictures came from (their links, with the upload time), so a replaced picture is picked up.
+    { const f = out.pictureFrom && typeof out.pictureFrom === "object" ? out.pictureFrom : {}, ok = (u, have) => (have && typeof u === "string" && /^https:\/\/[^\s"<>]{1,400}$/.test(u) ? u : "");
+      out.pictureFrom = { portrait: ok(f.portrait, out.portrait), token: ok(f.token, out.token) }; }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
@@ -3629,16 +3632,30 @@ tr.lvl-U td.target { color: var(--muted); }
   }
   async function givePics(chars, portraitUrl, tokenUrl) {
     const p = portraitUrl ? await pictureData(portraitUrl, MAX_SIDE) : "", t = tokenUrl ? await pictureData(tokenUrl, 256) : "";
-    for (const c of chars) { if (p) { c.portrait = p; c.portraitShape = "portrait"; } if (t) c.token = t; }
+    for (const c of chars) {
+      c.pictureFrom = { portrait: "", token: "", ...(c.pictureFrom || {}) };
+      if (p) { c.portrait = p; c.portraitShape = "portrait"; c.pictureFrom.portrait = portraitUrl; } if (t) { c.token = t; c.pictureFrom.token = tokenUrl; }
+    }
     return chars.length;
   }
-  /** A pregenerated character just loaded: give them their pictures, if the bucket has them and they have none. */
+  /** A pregenerated character just loaded: give them their pictures, if the bucket has them and they have none. A
+   *  character with the kit's pictures already gets any that were replaced since; one the player gave their own keeps it. */
   async function autoPictures(c) {
-    if (!c || c.portrait || c.token) return false;
+    if (!c) return false;
+    const from = c.pictureFrom || {}, fresh = !c.portrait && !c.token;
+    if (!fresh && !from.portrait && !from.token) return false;
     const pics = await ptPictures(), p = pictureFor(pics, "portrait", c.name), t = pictureFor(pics, "token", c.name);
-    if (!p && !t) return false;
-    try { await givePics([c], p && p.src, t && t.src); return true; } catch { return false; }
+    const pu = p && (fresh || from.portrait || !c.portrait) && p.src !== from.portrait ? p.src : "", tu = t && (fresh || from.token || !c.token) && t.src !== from.token ? t.src : "";
+    if (!pu && !tu) return false;
+    try { await givePics([c], pu, tu); return true; } catch { return false; }
   }
+  /** On opening: anyone here with the kit's pictures gets the ones replaced since. */
+  if (PT_MAPS && TABLE_SERVER) setTimeout(async () => {
+    let n = 0;
+    for (const c of gmCrew) if (await autoPictures(c)) n++;
+    if (n) { store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); }
+    if (ch && await autoPictures(ch)) { touch(); render(); store.set(STORE_CURRENT, ch); }
+  }, 1500);
 
   // ---- portrait ----
   // Images are scaled down in the browser so a character stays small enough to save and share as JSON.
@@ -3658,7 +3675,7 @@ tr.lvl-U td.target { color: var(--muted); }
       const keepAlpha = file.type !== "image/jpeg";
       let data = cv.toDataURL(keepAlpha ? "image/webp" : "image/jpeg", 0.85);
       if (keepAlpha && !data.startsWith("data:image/webp")) data = cv.toDataURL("image/png");
-      ch.portrait = data; touch(); render();
+      ch.portrait = data; if (ch.pictureFrom) ch.pictureFrom.portrait = ""; touch(); render();
       const saved = store.set(STORE_CURRENT, ch);
       portraitMsg(saved ? "Image added." : "Image added, but this browser couldn't save it. Save to file to keep it.", !saved);
     };
@@ -3668,7 +3685,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function portraitMsg(m, err) { const el = $("portrait-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); }
   $("f-portrait").addEventListener("change", (e) => { loadPortrait(e.target.files[0]); e.target.value = ""; });
   $("portrait-choose").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("f-portrait").click(); } });
-  $("portrait-remove").onclick = () => { ch.portrait = ""; touch(); render(); portraitMsg("Image removed."); };
+  $("portrait-remove").onclick = () => { ch.portrait = ""; if (ch.pictureFrom) ch.pictureFrom.portrait = ""; touch(); render(); portraitMsg("Image removed."); };
   document.querySelectorAll('input[name="portrait-shape"]').forEach((r) => r.addEventListener("change", () => { ch.portraitShape = r.value; touch(); render(); }));
   const drop = $("portrait-drop");
   ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("dragging"); }));
@@ -3930,7 +3947,8 @@ tr.lvl-U td.target { color: var(--muted); }
       if (chars.includes(ch)) { touch(); render(); store.set(STORE_CURRENT, ch); }
       store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); return n;
     },
-    showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); } }); }
+    showMap: () => { showGmTab("fight"); const m = $("battlemap"); if (m) m.scrollIntoView({ block: "start" }); },
+    loadCampaign: (c, label) => { if (!campaignUI || !campaignUI.load(c, label)) return false; showGmTab("campaign"); const k = $("cp-card"); if (k) k.scrollIntoView({ block: "start" }); return true; } }); }
   // The crew's ship and the setting's tables (frontier.js), for a setting with them.
   if (PACK.crewShip) { $("crewship-card").hidden = false;
     crewShipUI = mountCrewShip({ PACK, root: $("crewship-card"), esc, toast: gmSay, onChange: () => { renderCrewShipView(); pushScene(); } }); renderCrewShipView(); }

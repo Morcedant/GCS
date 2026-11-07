@@ -16,7 +16,8 @@
 //   the GM shares), esc, toast, saveText(text, name, say), onShare() (the shared part changed: send it),
 //   cards() (the cards the group holds: [{ tag, name }]; leave it out in a game without cards, and the outline has no
 //   triggers), words ({ card, cards }: the setting's word for a card) }
-// returns { snapshot() (what the shared table sends players, or null), receive(shared), check() (look at the cards again) }.
+// returns { snapshot() (what the shared table sends players, or null), receive(shared), check() (look at the cards again),
+//   load(campaign, label) (put a whole campaign in, as Open file does, after asking before replacing one: true if it did) }.
 // Function declarations only.
 
 function cpLimits() { return { arc: 40, people: 150, places: 100, factions: 40, sessions: 200 }; }
@@ -353,6 +354,12 @@ function mountCampaign(api) {
   return {
     snapshot: () => cpPublic(c),
     check,
+    /** A whole campaign from elsewhere (the playtest kit's): replaces this browser's, after asking if there is one. */
+    load: (raw, label) => {
+      if (cpCount(c) && !confirm(`Replace this browser's campaign${c.name ? ` (${c.name})` : ""} with ${label || "this one"}? Save it to a file first to keep it.`)) return false;
+      const before = shareOf(); c = cpClean(raw); editing = null; draft = null; store(shareOf() !== before);
+      say(`Campaign loaded${c.name ? `: ${c.name}` : ""}.`); check(); return true;
+    },
     /** The GM's shared campaign, from the shared table (players only). */
     receive: (raw) => {
       const p = cpCleanPublic(raw);

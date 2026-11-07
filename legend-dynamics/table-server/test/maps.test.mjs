@@ -26,3 +26,14 @@ test("the list is by scene, extras last; pictures and downloads are served", asy
   assert.equal((await get("/maps/aurora/../song.mp3")).status, 404);
   assert.equal(await mapsFetch(new Request("https://srv/api/music"), env, h), null);
 });
+
+test("a replaced picture gets a new link, and a versioned link can be kept", async () => {
+  const at = (t) => buildMapList([{ key: "battle-maps/aurora/Token - Bulldog.png", size: 9, uploaded: t }], "aurora", "https://srv")[0];
+  assert.notEqual(at(1000).src, at(2000).src);
+  assert.match(at(1000).download, /\?v=[a-z0-9]+&download=1$/);
+  const env = { MUSIC: bucket({ "battle-maps/aurora/Token - Bulldog.png": "png" }) };
+  const get = (p) => mapsFetch(new Request("https://srv" + p), env, h);
+  assert.match((await get("/maps/aurora/Token%20-%20Bulldog.png?v=abc")).headers.get("Cache-Control"), /immutable/);
+  assert.equal((await get("/maps/aurora/Token%20-%20Bulldog.png")).headers.get("Cache-Control"), "public, max-age=300");
+  const r = await get("/maps/aurora/Token%20-%20Bulldog.png?v=abc&download=1"); assert.match(r.headers.get("Content-Disposition"), /attachment/);
+});
