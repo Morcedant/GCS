@@ -542,6 +542,8 @@ An energy attack can also name its **element** (fire, cold, electricity, light, 
 
 *Example:* Toughness III stops a Class III punch outright. Against a Class III fire blast it counts as Defense II, so the blast gets through and marks one box fewer. With a Force Field III as well, the blast does nothing: when you have two Defenses, the better one for the attack counts.
 
+**Piercing.** Armor-piercing rounds, flechettes and the like. A piercing attack meets a Defense **one Class higher** than it is, but marks the boxes of its own Class: a Class II piercing round gets through Toughness II for a box fewer (1), where a true Class III attack would also knock the target down. Armor with a Defense or Toughness rating (an Aegis suit, warded mail) protects as usual, one Class lower against it; plain **body armor** (a vest, with no rating) doesn't help against a piercing attack at all.
+
 **Weak, resistant, immune.** A character or a threat can be **weak** to a type, an element or a material (silver, cold iron): its attacks mark **one box more**. **Resistant**: their Defense counts one Class higher against it. **Immune**: nothing of it gets through below Class VI. The **Vulnerability** complication is a weakness chosen with the GM: an energy, the mystic, the mind, or one element or material.
 
 *Defense is not a defense roll.* Your **defense** (Dodge, Parry or Block, one a round) decides whether an attack hits at all. Your **Defense** Class is armor: it applies to whatever hits, every time, at no cost. A Force Field doesn't use up your Dodge.

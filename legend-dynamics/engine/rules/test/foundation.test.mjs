@@ -29,7 +29,7 @@ test("the retrieval team carries the hardware", () => {
   assert.match(team.traitText, /kill/);
 });
 
-test("a flechette rifle (Class III) gets through Toughness II, a box fewer", () => {
+test("a flechette rifle (Class II, piercing) gets through Toughness II, a box fewer", () => {
   let seed = 1;
   while (!shoot(fight(seed), "flechette").event.hit) seed++;
   const f = fight(seed), ev = shoot(f, "flechette").event;
@@ -45,6 +45,17 @@ test("a neurogun is a physical stun: Body −4 against no Defense, and Toughness
   assert.ok(!tough.stun); assert.match(tough.outcome, /marks nothing \(Defense II against a Class II stun\)/);
   assert.equal(hit([{ type: "defenseClass", value: 1, covers: ["physical"] }]).stun, true, "Toughness I doesn't stop a Class II stun");
   assert.equal(LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits: [{ type: "defenseClass", value: 2 }] }, weapon: ARMS.taser, band: "close" }, LD.NO_HOOKS, () => [1, 1, 1]).stun, true, "a plain taser, with no Class, is as before");
+});
+
+test("piercing: one Class higher against Defense, its own Class's boxes, and straight through a plain vest", () => {
+  const hit = (weapon, traits) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon, band: "long" }, LD.NO_HOOKS, () => [1, 1, 1]);
+  const T2 = [{ type: "defenseClass", value: 2, covers: ["physical"] }], T3 = [{ type: "defenseClass", value: 3, covers: ["physical"] }];
+  assert.equal(hit(ARMS.flechette, T2).damage.boxes, 1, "Class II piercing through Toughness II: 2 boxes, one fewer");
+  assert.equal(hit(ARMS.flechette, T3).damage, null, "Toughness III stops it");
+  assert.equal(hit({ ...ARMS.flechette, piercing: false }, T2).damage, null, "without Piercing, Toughness II stops a Class II rifle");
+  const vest = [{ type: "armor", minBoxes: 1, reduce: 1, label: "Body armor" }];
+  assert.equal(hit(ARMS.flechette, vest).damage.boxes, 2, "a plain vest does nothing against it");
+  assert.equal(hit({ ...ARMS.flechette, piercing: false }, vest).damage.boxes, 1, "but stops a box from an ordinary round");
 });
 
 test("a stun grenade marks no box", () => {

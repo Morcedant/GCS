@@ -204,7 +204,7 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | Street gang (minor) | Firearms 11 | 7 | 1 | Pistols (I) | — | **Numbers.** Three or four of them; they scatter when half are down. |
 | Morcain enforcer (Operant) | Brawling 14 | 9 | 3 | Strength I, SMG (I) | I | **Connected.** Arresting one makes the Morcain notice you (Scrutiny). |
 | White Hand soldier | Firearms 13 | 9 | 2 | Blast II | — | **Fanatic.** Never surrenders, never talks. |
-| Foundation retrieval team (minor) | Firearms 13 | 9 | 1 each | Tranquilizer rifles, neuroguns (II), flechette rifles (III), stun grenades; a dampening net (Power Negation II) | — | **Recovery.** They want the target alive, and leave no witnesses: they will kill to keep it quiet. |
+| Foundation retrieval team (minor) | Firearms 13 | 9 | 1 each | Tranquilizer rifles, neuroguns (II), flechette rifles (II, Piercing), stun grenades; a dampening net (Power Negation II) | — | **Recovery.** They want the target alive, and leave no witnesses: they will kill to keep it quiet. |
 | Rogue Aegis suit | Piloting 14 | 8 | 3 | Arm cannon (II) | II | **Pilot.** Hit the pilot (−4) or the power pack (−2) to end it fast. |
 | Lab escapee | Powers 13 | 10 | 3 | One wild power, Class II–III | II | **Unstable III.** On a natural 16–18 with Powers, the power hits everyone nearby. |
 | Shadow Earth duplicate | As the original | As the original | 3 | As the original | As the original | **Mirror.** Knows what the original knows; Mystic Sight reveals it. |
@@ -220,7 +220,7 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 |---|---|---|---|
 | Tranquilizer rifle | Medium | — | No box: the target rolls Body −2; failure, out for the scene |
 | Neurogun | Short | II | An advanced taser built for Operants. No box: the target rolls Body −4; failure, out for the scene; success, −2 on their next action. A physical attack: Defense II or better stops it |
-| Flechette rifle | Long | III | Armor-piercing darts: 2 boxes and knocked down, through Toughness II and a riot shield alike |
+| Flechette rifle | Long | II, Piercing | Armor-piercing darts: 2 boxes. Piercing, so it meets Defense as Class III: through Toughness II (a box fewer) and through a body armor vest |
 | Stun grenade | Close (thrown) | — | No box: everyone nearby rolls Body −2 or loses their next action, and an Operant is −2 to Powers next round either way |
 | Dampening net | Close | — | Power Negation II on whoever it wraps, until they're cut out |
 

@@ -274,7 +274,7 @@ export function resolveAttack(input, hooks, roll) {
   // A stun weapon (a stunner, a taser) marks no box: the target rolls Body −2, or what the weapon says (weapon.stunMod: a
   // neurogun's −4). One with a Class is a physical attack like any other: a Defense that stops its Class stops it.
   if (weapon.stun) {
-    const R = ["", "I", "II", "III", "IV", "V", "VI"], sm = weapon.stunMod || -2, scls = weapon.class || 0, sdt = weapon.dtype || "physical";
+    const R = ["", "I", "II", "III", "IV", "V", "VI"], sm = weapon.stunMod || -2, scls = (weapon.class || 0) + (weapon.class && weapon.piercing ? 1 : 0), sdt = weapon.dtype || "physical";
     if (scls) {
       const dv = Math.max(0, ...liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value).map((/** @type {any} */ t) => t.value - (Array.isArray(t.covers) && !t.covers.includes(sdt) ? 1 : 0)));
       if (dv && scls <= dv) return { ...out, outcome: `hit, marks nothing (Defense ${R[dv]} against a Class ${R[scls]} stun)`, hit: true, damage: null, shrugged: "Defense" };
@@ -318,7 +318,8 @@ export function resolveAttack(input, hooks, roll) {
   const dcv = (best ? best.v : 0) + resist;
   const dc = dcv > 0 ? { value: dcv, label: best ? best.t.label : "Resistant" } : null;
   if (dc) {
-    const cls = weapon.class || 1;
+    // Piercing (armor-piercing rounds): it meets a Defense one Class higher than it is, and marks its own Class's boxes.
+    const cls = (weapon.class || 1) + (weapon.piercing ? 1 : 0);
     const R = ["", "I", "II", "III", "IV", "V", "VI"], why = [best && best.v < best.t.value ? `${best.t.label || "Defense"} is one Class lower against ${dtype}` : "", resist ? `resistant to ${dtype}` : ""].filter(Boolean).join("; ");
     const D = `Defense ${R[dc.value] || dc.value}${why ? ` (${why})` : ""}`, C = `Class ${R[cls] || cls}${dtype !== "physical" ? " " + dtype : ""}`;
     if (cls <= dc.value) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
@@ -329,7 +330,8 @@ export function resolveAttack(input, hooks, roll) {
   // Armour can say what it works against: "melee", "missile" (bows, slings, thrown) or "firearm". No list: everything.
   const kind = weapon.firearm ? "firearm" : weapon.reach === "melee" ? "melee" : "missile";
   // Armour that a material gets past (except: Tough, "except silver") does nothing against it.
-  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)) && (!t.maxClass || (weapon.class || 1) <= t.maxClass) && !made(t.except));
+  // A piercing attack goes through plain armour (a vest with no Defense rating); armour with a rating is a Defense, above.
+  const armour = !weapon.piercing && liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)) && (!t.maxClass || (weapon.class || 1) <= t.maxClass) && !made(t.except));
   if (armour) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - (armour.reduce || 1)) }; out.armorUsed = armour.label || "Armour"; }
   if (!dmg.boxes) return { ...out, outcome: `hit, stopped by ${out.armorUsed}`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
