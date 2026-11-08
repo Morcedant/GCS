@@ -687,7 +687,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="ee58ddb" data-version-date="2026.11.07" title="The code changes whenever this page changes.">Version 2026.11.07 · ee58ddb</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="4868b36" data-version-date="2026.11.08" title="The code changes whenever this page changes.">Version 2026.11.08 · 4868b36</span><!-- VERSION:END --></div>
   </header>
 
   <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
@@ -5290,8 +5290,16 @@ function resolveAttack(input, hooks, roll) {
     if (dg.success) return { ...out, dodgeMods: dmods, outcome: DEFENDED[def.kind] || "defended", hit: false };
   }
   out.dodgeMods = dmods;
-  // A stun weapon (a stunner, a taser) marks no box: the target rolls Body −2 (setting data: weapon.stun).
-  if (weapon.stun) return { ...out, outcome: "hit, stunned: the target rolls Body −2; on a failure they're out for the scene, on a success −2 on their next action", hit: true, damage: null, stun: true };
+  // A stun weapon (a stunner, a taser) marks no box: the target rolls Body −2, or what the weapon says (weapon.stunMod: a
+  // neurogun's −4). One with a Class is a physical attack like any other: a Defense that stops its Class stops it.
+  if (weapon.stun) {
+    const R = ["", "I", "II", "III", "IV", "V", "VI"], sm = weapon.stunMod || -2, scls = weapon.class || 0, sdt = weapon.dtype || "physical";
+    if (scls) {
+      const dv = Math.max(0, ...liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value).map((/** @type {any} */ t) => t.value - (Array.isArray(t.covers) && !t.covers.includes(sdt) ? 1 : 0)));
+      if (dv && scls <= dv) return { ...out, outcome: `hit, marks nothing (Defense ${R[dv]} against a Class ${R[scls]} stun)`, hit: true, damage: null, shrugged: "Defense" };
+    }
+    return { ...out, outcome: `hit, stunned: the target rolls Body ${String(sm).replace("-", "−")}; on a failure they're out for the scene, on a success −2 on their next action`, hit: true, damage: null, stun: true };
+  }
   let dmg = weaponDamage(weapon, band);
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }

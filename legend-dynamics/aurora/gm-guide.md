@@ -39,7 +39,7 @@ A starter case for three to seven, for one or two sessions. A teenager wakes up 
 
 When the Identify phase is done, they know what her power is and why it's out of control. The tag is the trigger; take it out and she calms down.
 
-**4. The retrieval.** A **Foundation retrieval team** hits the bridge: four of them, in unmarked gear, with a jammer that blinds the Aegis suit's sensors. They want Lupe alive and no witnesses, and they've come equipped to kill an Operant: neuroguns that go through the nerves, flechette rifles that go through Toughness II, and stun grenades for the crowd and the cameras (see *Foundation hardware*). This is the big fight, and a good place for a **team-up**: Bulldog's suit and Subject 19's lightning, or Daybreak and anyone. The Foundation's file on Subject 19 gives the team +2 against them when it applies: they know Subject 19's habits.
+**4. The retrieval.** A **Foundation retrieval team** hits the bridge: four of them, in unmarked gear, with a jammer that blinds the Aegis suit's sensors. They want Lupe alive and no witnesses, and they've come equipped to kill an Operant: neuroguns that drop an Operant a taser wouldn't, flechette rifles that go through Toughness II, and stun grenades for the crowd and the cameras (see *Foundation hardware*). This is the big fight, and a good place for a **team-up**: Bulldog's suit and Subject 19's lightning, or Daybreak and anyone. The Foundation's file on Subject 19 gives the team +2 against them when it applies: they know Subject 19's habits.
 
 **5. Grachyov.** When the team breaks, **Sergei Grachyov** walks out of the dark, unhurried. He isn't here to fight. He offers a trade: Subject 19 for the girl. Hand Subject 19 over and he leaves, and Lupe is free. Refuse, and he shrugs, and goes; the Foundation will try again. He's Class V: nobody should try to arrest him tonight.
 
@@ -219,7 +219,7 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | Weapon | Range | Class | Effect |
 |---|---|---|---|
 | Tranquilizer rifle | Medium | — | No box: the target rolls Body −2; failure, out for the scene |
-| Neurogun | Short | II | A pulse through the nerves: a Firearms roll against the target's Will, marking the Mind track. Toughness, Force Field and armor don't help; Mind Defense does |
+| Neurogun | Short | II | An advanced taser built for Operants. No box: the target rolls Body −4; failure, out for the scene; success, −2 on their next action. A physical attack: Defense II or better stops it |
 | Flechette rifle | Long | III | Armor-piercing darts: 2 boxes and knocked down, through Toughness II and a riot shield alike |
 | Stun grenade | Close (thrown) | — | No box: everyone nearby rolls Body −2 or loses their next action, and an Operant is −2 to Powers next round either way |
 | Dampening net | Close | — | Power Negation II on whoever it wraps, until they're cut out |

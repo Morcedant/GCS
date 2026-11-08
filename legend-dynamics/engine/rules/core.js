@@ -271,8 +271,16 @@ export function resolveAttack(input, hooks, roll) {
     if (dg.success) return { ...out, dodgeMods: dmods, outcome: DEFENDED[def.kind] || "defended", hit: false };
   }
   out.dodgeMods = dmods;
-  // A stun weapon (a stunner, a taser) marks no box: the target rolls Body −2 (setting data: weapon.stun).
-  if (weapon.stun) return { ...out, outcome: "hit, stunned: the target rolls Body −2; on a failure they're out for the scene, on a success −2 on their next action", hit: true, damage: null, stun: true };
+  // A stun weapon (a stunner, a taser) marks no box: the target rolls Body −2, or what the weapon says (weapon.stunMod: a
+  // neurogun's −4). One with a Class is a physical attack like any other: a Defense that stops its Class stops it.
+  if (weapon.stun) {
+    const R = ["", "I", "II", "III", "IV", "V", "VI"], sm = weapon.stunMod || -2, scls = weapon.class || 0, sdt = weapon.dtype || "physical";
+    if (scls) {
+      const dv = Math.max(0, ...liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value).map((/** @type {any} */ t) => t.value - (Array.isArray(t.covers) && !t.covers.includes(sdt) ? 1 : 0)));
+      if (dv && scls <= dv) return { ...out, outcome: `hit, marks nothing (Defense ${R[dv]} against a Class ${R[scls]} stun)`, hit: true, damage: null, shrugged: "Defense" };
+    }
+    return { ...out, outcome: `hit, stunned: the target rolls Body ${String(sm).replace("-", "−")}; on a failure they're out for the scene, on a success −2 on their next action`, hit: true, damage: null, stun: true };
+  }
   let dmg = weaponDamage(weapon, band);
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }

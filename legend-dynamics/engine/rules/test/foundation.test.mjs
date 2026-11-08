@@ -1,5 +1,5 @@
-// Aurora's Foundation hardware, from the pack's own data: neuroguns go through the nerves (a Will contest on the Mind
-// track, past Toughness), flechette rifles are Class III and get through Toughness II, and stun grenades mark no box.
+// Aurora's Foundation hardware, from the pack's own data: a neurogun is an advanced taser (a Class II physical stun,
+// Body −4), flechette rifles are Class III and get through Toughness II, and stun grenades mark no box.
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
@@ -37,15 +37,14 @@ test("a flechette rifle (Class III) gets through Toughness II, a box fewer", () 
   assert.equal(f.hero.injury, 1);
 });
 
-test("a neurogun ignores Toughness: a Will contest that marks the Mind track", () => {
-  let hits = 0;
-  for (let s = 1; s <= 60; s++) {
-    const f = fight(s), ev = shoot(f, "neurogun").event;
-    assert.equal(ev.mind, true);
-    assert.equal(f.hero.injury, 0, "never the injury track");
-    if (ev.hit) { hits++; assert.equal(f.hero.mind, 2, "Class II: two Mind boxes"); }
-  }
-  assert.ok(hits > 0, "it lands sometimes, Toughness or not");
+test("a neurogun is a physical stun: Body −4 against no Defense, and Toughness II stops it", () => {
+  const hit = (traits) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon: ARMS.neurogun, band: "close" }, LD.NO_HOOKS, () => [1, 1, 1]);
+  const bare = hit([]);
+  assert.equal(bare.stun, true); assert.equal(bare.damage, null); assert.match(bare.outcome, /Body −4/);
+  const tough = hit([{ type: "defenseClass", value: 2, covers: ["physical"] }]);
+  assert.ok(!tough.stun); assert.match(tough.outcome, /marks nothing \(Defense II against a Class II stun\)/);
+  assert.equal(hit([{ type: "defenseClass", value: 1, covers: ["physical"] }]).stun, true, "Toughness I doesn't stop a Class II stun");
+  assert.equal(LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits: [{ type: "defenseClass", value: 2 }] }, weapon: ARMS.taser, band: "close" }, LD.NO_HOOKS, () => [1, 1, 1]).stun, true, "a plain taser, with no Class, is as before");
 });
 
 test("a stun grenade marks no box", () => {
