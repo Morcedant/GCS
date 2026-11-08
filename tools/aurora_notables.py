@@ -48,6 +48,16 @@ META = {
 }
 
 
+# Those who transform: the form's name, their normal shape, and the powers that work only in the form.
+FORMS = {
+    "op-marvel": ("Mr. Marvel", "Hector Gonzalez", ["strength", "toughness", "flight", "blast"]),
+    "op-uathach": ("Uathach", "Ciara Byrne", ["strength", "toughness", "blast", "leaping"]),
+    "op-icereaper": ("the Ice Reaper", "Hyun Wang", ["natural", "toughness", "elemental", "phasing"]),
+}
+# Attacks that come from a power: the sheet's powers give them (and only while the power works), so the threat's copy goes.
+POWER_ARM = re.compile(r"^(?:op|pw)-(strength|blast|speed|natural|tk|elemental|weather|gravity|shadow|manifest)\d$")
+
+
 def _blocks(md):
     sec = md[md.index("# Notable Operants"):md.index("## The first case:")]
     return re.findall(r"^\*\*(.+?)\*\*(.*?)\n\n\*Class ([IV]+)\.\* (.*?)$", sec, re.M | re.S)
@@ -69,7 +79,7 @@ def _powers(text, plist, cls):
     """'Strength IV, Toughness IV, Flight IV; Transformation (the form)' → [{id, cl}], by the setting's power names."""
     names = sorted(((x[1].split(" / ")[0].lower(), x[0]) for x in plist), key=lambda t: -len(t[0]))
     out = []
-    for part in re.split(r"[,;] ?", text):
+    for part in re.split(r"[,;:] ?", text):
         low = part.lower().strip()
         pid = next((i for n, i in names if low.startswith(n)), None)
         if not pid or any(x["id"] == pid for x in out): continue
@@ -108,14 +118,21 @@ def notables(pack, md):
         for sk, target in _skills(_field(stats, "Attacks") + "; " + _field(stats, "Skills"), skills):
             got = attrs[skills[sk]] + LEVELS[lv[sk]]
             if got != target and sk not in adj: adj[sk] = target - got
+        pws = _powers(_field(stats, "Powers"), pack["powers"]["list"], cls)
         rule = re.search(r"\*\*([^*]+)\.\*\* ([^*]+?)$", stats.strip())
         first = re.split(r"(?<=\.) ", bio.strip())
         out.append({
             "name": name, "rank": f"Class {cls} · {role}", "dept": role, "path": "rounded", "species": origins.get(origin, ""), "speciesId": origin,
             "role": " ".join(first[:2])[:400], "reason": "", "connection": "", "contact": "", "status": status, "allegiance": allegiance,
-            "attrs": attrs, "skills": lv, "skillAdj": adj, "powers": [], "powersLearned": _powers(_field(stats, "Powers"), pack["powers"]["list"], cls),
+            "attrs": attrs, "skills": lv, "skillAdj": adj, "powers": [], "powersLearned": pws,
             "sadv": {"id": ""}, "adv": {"id": ""}, "comp": {"id": ""}, "edges": {}, "equipment": {}, "notable": True, "threat": t["id"],
-            "npcBoxes": t.get("boxes", 3), "npcTraits": t.get("traits", []), "npcWeapons": t.get("weapons", []), "foe": foe,
+            "npcBoxes": t.get("boxes", 3), "foe": foe,
+            # Defense from Toughness or a Force Field comes with the power; only a Defense no power gives stays (wards, a body of myth).
+            # (Someone who transforms has their Defense and attacks from the form's powers only, so none come from the threat.)
+            "npcTraits": [x for x in t.get("traits", []) if not (x.get("type") == "defenseClass" and (t["id"] in FORMS or (set(x.get("covers") or ["physical"]) <= {"physical", "energy"}
+                                                                  and any(pw["id"] in ("toughness", "forcefield") for pw in pws))))],
+            "npcWeapons": [] if t["id"] in FORMS else [w for w in t.get("weapons", []) if not (POWER_ARM.match(w) and any(pw["id"] == {"tk": "telekinesis"}.get(POWER_ARM.match(w).group(1), POWER_ARM.match(w).group(1)) for pw in pws))],
+            **({"altForm": {"name": FORMS[t["id"]][0], "human": FORMS[t["id"]][1], "attrs": {}, "dodge": 0, "speed": 0, "powers": FORMS[t["id"]][2], "note": ""}} if t["id"] in FORMS else {}),
             "npcNote": (f"{rule.group(1)}: {rule.group(2).strip()}" if rule else "")[:1000],
         })
     return out

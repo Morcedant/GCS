@@ -689,7 +689,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d141e02" data-version-date="2026.11.08" title="The code changes whenever this page changes.">Version 2026.11.08 · d141e02</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="2744790" data-version-date="2026.11.08" title="The code changes whenever this page changes.">Version 2026.11.08 · 2744790</span><!-- VERSION:END --></div>
   </header>
 
   <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
@@ -893,6 +893,9 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide" id="pure-wrap" hidden><div class="checks"><label><input type="checkbox" id="f-pure"> <span id="pure-label"></span></label></div></div>
             <div class="field wide" id="pboost-wrap" hidden><span class="small muted" id="pboost-note"></span>
               <div class="checks"><label><input type="checkbox" id="f-gm4"> GM's approval for Class IV</label></div></div>
+            <details class="field wide" id="altform-wrap"><summary class="label">Alternate form <span class="small muted" id="altform-sum"></span></summary>
+              <p class="small muted">For a character who transforms (a Transformation, a litany, a bonded spirit): what changes in the form. The sheet, the table card and the Encounter panel use these numbers while they're in it; the powers ticked work only in the form.</p>
+              <div class="fields" id="altform-fields"></div></details>
             <details class="field wide" id="powers-adv"><summary class="label">Powers grown in play (with the GM's approval)</summary>
               <div class="fields" id="powers-adv-list"></div>
               <div class="btn-row"><button type="button" class="linkish" id="plearn-add">Add a power learned in play</button></div></details>
@@ -6116,7 +6119,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label>
             <label><input type="checkbox" id="f-fright"> Frightened: −2 against its source; roll Will at the end of each turn to shake it</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
-            <label id="form-wrap" hidden><input type="checkbox" id="f-form"> In alternate form</label></div>
+            <label id="form-wrap" hidden><input type="checkbox" id="f-form"> <span id="form-toggle-label">In alternate form</span></label></div>
           <div class="gritty-box" id="gritty-box" hidden>
             <label class="gritty-toggle"><input type="checkbox" id="f-gritty"> <b>Gritty combat</b> <span class="muted small">Optional rule: your GM decides. Grievous wounds, limbs lost.</span></label>
             <div id="gritty-body" hidden>
@@ -8451,7 +8454,11 @@ return { mountLab };
   const SPECIES_TRAITS = Object.fromEntries(HERITAGES.map((h) => [h.id, h.traits]));
   const heritageOf = (c = ch) => HERITAGES.find((h) => h.id === c.speciesId);
   // A shapechanger's form (its origin's form profile): its numbers apply only while the character is in it (play.form).
-  const formOf = (c = ch) => (FORMED.has(c.speciesId) ? heritageOf(c)?.form || null : null);
+  const formOf = (c = ch) => (c.altForm ? { name: c.altForm.name, human: c.altForm.human, attrs: c.altForm.attrs || {}, dodge: c.altForm.dodge || 0, speed: c.altForm.speed || 0,
+      traits: c.altForm.note ? [c.altForm.note] : [], drawbacks: [], own: true } : FORMED.has(c.speciesId) ? heritageOf(c)?.form || null : null);
+  // What the form and the normal shape are called: the character's own names, else the setting's words.
+  const formLabel = (c = ch) => (c.altForm ? c.altForm.name : T.formName);
+  const humanLabel = (c = ch) => (c.altForm && c.altForm.human ? c.altForm.human : T.formHuman || "human form");
   const inForm = (c = ch) => !!(c.play && c.play.form && formOf(c));
   const formAttr = (a, c = ch) => (inForm(c) ? formOf(c).attrs[a] || 0 : 0);
   const formDodge = (c = ch) => (inForm(c) ? (formOf(c).dodge || 0) + (formOf(c).attrs.Agility || 0) : 0);
@@ -8633,6 +8640,12 @@ return { mountLab };
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     out.generic = out.generic === true; // a generic NPC: the GM view takes more than one of them
     out.notable = out.notable === true; // a notable Operant's sheet (the GM's character)
+    // A character's own alternate form (a Transformation, a litany, a bonded spirit): what changes when they take it.
+    { const f = out.altForm && typeof out.altForm === "object" ? out.altForm : null, n = (v, lo, hi) => Math.max(lo, Math.min(hi, parseInt(v, 10) || 0));
+      out.altForm = f && String(f.name || "").trim() ? { name: String(f.name).trim().slice(0, 60), human: String(f.human || "").trim().slice(0, 60),
+        attrs: Object.fromEntries(["Body", "Agility", "Intellect", "Presence", "Will"].map((a) => [a, n((f.attrs || {})[a], -4, 8)]).filter(([, v]) => v)),
+        dodge: n(f.dodge, -4, 4), speed: n(f.speed, -2, 6), powers: (Array.isArray(f.powers) ? f.powers : []).filter((x) => typeof x === "string").slice(0, 12),
+        note: String(f.note || "").slice(0, 600) } : null; }
     out.skillAdj = (out.notable || out.extra) && out.skillAdj && typeof out.skillAdj === "object"
       ? Object.fromEntries(Object.entries(out.skillAdj).filter(([k, v]) => SKILLS.some((x) => x[0] === k) && Number.isInteger(v) && Math.abs(v) <= 6)) : {};
     // An extra: someone the characters meet, kept by the GM as a full character (tagged Extra). Their own number of boxes,
@@ -8883,7 +8896,7 @@ return { mountLab };
   ].filter((x) => x.id) : [
     ...powerSlots(c).map((base, i) => ({ id: c.powers[i] || "", base, cl: CLASS_NAMES[Math.max(classIndex(base), classIndex(c.powerRaise?.[c.powers[i]] || base))] })),
     ...(c.powersLearned || []).map((x) => ({ id: x.id, base: "I", cl: x.cl, learned: true })),
-  ].filter((x) => x.id);
+  ].filter((x) => x.id).filter((x) => !(c.altForm && c.altForm.powers.includes(x.id) && !inForm(c))); // a form's own powers, only in the form
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   // The GM's characters (a notable Operant's sheet, an NPC) can carry a correction per skill, so every skill lands on the
   // number in their stat block (skillAdj); player characters never have one.
@@ -9426,7 +9439,7 @@ return { mountLab };
         ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill) + formSkill(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill) + formSkill(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
-      ${formOf() ? (() => { const f = formOf(), on = inForm(), human = capFirst(T.formHuman || "human form"), fname = capFirst(T.formName);
+      ${formOf() ? (() => { const f = formOf(), on = inForm(), human = capFirst(humanLabel()), fname = capFirst(formLabel());
         const bits = [...ATTRS.filter(([n]) => f.attrs[n]).map(([n]) => `${n} ${signed(f.attrs[n])}`), ...(f.dodge ? [`Dodge ${signed(f.dodge)}`] : [])];
         return `<div class="form-switch no-print-btns"><span class="label">Form</span><div class="seg-btns" role="group" aria-label="Which form">
           <button type="button" class="btn ${on ? "" : "on"}" data-sheetform="0" aria-pressed="${!on}">${esc(human)}</button><button type="button" class="btn ${on ? "on" : ""}" data-sheetform="1" aria-pressed="${on}">${esc(fname)}</button></div>
@@ -9481,7 +9494,8 @@ return { mountLab };
     if (inj < 3 && !gritty) ch.play.dying = false; // clearing a box ends Dying (a grievous wound can leave you Dying with boxes to spare)
     $("dying-wrap").hidden = inj < 3 && !ch.play.dying;
     renderGritty();
-    $("form-wrap").hidden = !FORMED.has(ch.speciesId);
+    $("form-wrap").hidden = !formOf();
+    if (ch.altForm) $("form-toggle-label").textContent = `As ${ch.altForm.name}`;
     $("f-dying").checked = !!ch.play.dying;
     $("duty-count").textContent = ch.play.duty;
     $("spells-wrap").hidden = !canCast();
@@ -9524,7 +9538,8 @@ return { mountLab };
     }
     if (POWERS) {
       const sl = powerSlots();
-      $("powers-wrap").hidden = !sl.length;
+      $("powers-wrap").hidden = !sl.length && !allPowers().length;
+      renderAltForm();
       if (sl.length) {
         const opts = powerOptions(), boosts = edgeN("power"), sig = sl.join(",") + "|" + opts.map((p) => p[0]).join(",") + "|" + boosts;
         if ($("power-slots").dataset.sig !== sig) {
@@ -9656,7 +9671,7 @@ return { mountLab };
     // An ability like Know its weakness: no called-shot penalty against a creature the character has identified.
     if (!$("r-called-wrap").hidden && +$("r-called").value && !($("r-weak").checked && !$("r-weak-wrap").hidden)) parts.push(+$("r-called").value);
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
-    const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
+    const w = inForm() && formOf();
     if (w) {
       const sk = isParry(name) ? name.slice(6) : isBlock(name) ? T.meleeSkill : name;
       const attr = name === "Dodge" || name === "Dodge+" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
@@ -9703,7 +9718,7 @@ return { mountLab };
     const t = base + total;
     const incap = ch.play.injury >= 3;
     $("r-target").textContent = incap ? "Incapacitated: you can't act until treatment clears a box."
-      : `${name} ${base} ${total ? signed(total) + " " : ""}→ target ${t} · ${pct(t)} chance${ch.play.form && FORMED.has(ch.speciesId) ? ` (${T.formName} included)` : ""}`;
+      : `${name} ${base} ${total ? signed(total) + " " : ""}→ target ${t} · ${pct(t)} chance${inForm() ? ` (${formLabel()} included)` : ""}`;
     $("r-roll").disabled = incap;
   }
 
@@ -9890,7 +9905,7 @@ return { mountLab };
       const edgesCleared = setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
       if (edgesCleared) toast(`This ${T.originLower} has ${edgesAvail()} Edge${edgesAvail() === 1 ? "" : "s"}, fewer than you had taken, so your Edges were cleared. Choose again in step 2.`);
       if (had && !ch.sadv.id) toast(`${had} belongs to another ${T.originLower}, so your advantage was cleared. Choose a new one in step 4.`);
-      if (!FORMED.has(ch.speciesId)) ch.play.form = false;
+      if (!formOf()) ch.play.form = false;
     }
     else if (t.id === "f-adv") {
       // One advantage: picking an origin advantage clears the regular one, and vice versa.
@@ -13225,12 +13240,12 @@ function ptMaps(api, root) {
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
           <span class="small muted">${esc((c.extra ? [c.rank, c.foe ? "NPC · enemy" : "NPC"] : [c.rank, c.species, c.dept]).filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
-        ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
+        ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? formLabel(c) : humanLabel(c)))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (c.altForm ? humanLabel(c) : humanLabel(c).toLowerCase()) : formLabel(c))}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power covers this far instead of the move on foot"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> <b class="num">${k.powerMove.yards.toLocaleString()} yd</b> a move</div>` : ""}
         <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: nb }, (_, j) => j + 1).map((i) => `<button class="box ${i <= mk ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span></span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
-        ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
+        ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${inForm(c) ? ` · <b style="color:var(--bad)">${esc(formLabel(c))}</b>` : ""}</div>` : inForm(c) && !c.altForm ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
         ${MTRACK ? `<div class="gm-row small"><span class="muted">${esc(MTRACK.name)}</span><span class="boxes">${Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.mind || 0) ? "on" : ""}" data-gm="${c.id}" data-gmmind="${i + 1}" aria-label="${esc(c.name)} ${esc(MTRACK.name)} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(MTRACK.effects[Math.min(MTRACK.boxes, c.play.mind || 0)].split(":")[0])}</span></div>` : ""}
         ${hasXT(c) ? `<div class="gm-row small"><span class="muted">${esc(XTRACK.name)}</span><span class="boxes">${Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.xtrack || 0) ? "on" : ""}" data-gm="${c.id}" data-gmxt="${i + 1}" aria-label="${esc(c.name)} ${XTRACK.name} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(XTRACK.effects[Math.min(XTRACK.boxes, c.play.xtrack || 0)].split(":")[0])}</span></div>${XKNOWN ? `<div class="gm-row small"><span class="muted">${esc(XKNOWN.label)}</span><span>${knownList(c).map(esc).join(", ") || "no one"}</span></div>` : ""}` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
@@ -13372,7 +13387,7 @@ function ptMaps(api, root) {
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
       injuryNames: INJURY.map((x) => x[0]),
-      formOf: (c) => { const f = formOf(c); return f ? { name: T.formName, human: T.formHuman || "human form", on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [], originRules: heritageOf(c)?.core || [] } : null; } });
+      formOf: (c) => { const f = formOf(c); return f ? { name: formLabel(c), human: humanLabel(c), on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [], originRules: heritageOf(c)?.core || [] } : null; } });
   } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;
@@ -13534,6 +13549,37 @@ function ptMaps(api, root) {
     if (ch && await autoPictures(ch)) { touch(); render(); store.set(STORE_CURRENT, ch); }
   }, 1500);
 
+  // ---- the character's own alternate form (Powers step) ----
+  function renderAltForm() {
+    const w = $("altform-fields"); if (!w || w.contains(document.activeElement)) { if ($("altform-sum")) $("altform-sum").textContent = ch.altForm ? `: ${ch.altForm.name}` : ""; return; }
+    const f = ch.altForm, own = POWERS ? [...powerSlots().map((_, i) => ch.powers[i]).filter(Boolean), ...(ch.powersLearned || []).map((x) => x.id)].filter((id, i, a) => id && a.indexOf(id) === i && id !== "transform") : [];
+    $("altform-sum").textContent = f ? `: ${f.name}` : "";
+    const num = (k, v, lo, hi) => `<select data-af="${k}">${Array.from({ length: hi - lo + 1 }, (_, i) => lo + i).map((n) => `<option value="${n}"${n === (v || 0) ? " selected" : ""}>${n > 0 ? "+" + n : n}</option>`).join("")}</select>`;
+    w.innerHTML = !f ? `<div class="btn-row field wide"><button type="button" class="btn" data-afdo="add">Give this character an alternate form</button></div>`
+      : `<div class="field"><label>The form's name</label><input type="text" data-af="name" maxlength="60" value="${esc(f.name)}"></div>
+        <div class="field"><label>Their normal shape</label><input type="text" data-af="human" maxlength="60" value="${esc(f.human)}" placeholder="e.g. Hector Gonzalez"></div>
+        ${ATTRS.map(([a]) => `<div class="field"><label>${a} in the form</label>${num("attr-" + a, (f.attrs || {})[a], -4, 8)}</div>`).join("")}
+        <div class="field"><label>Dodge</label>${num("dodge", f.dodge, -4, 4)}</div><div class="field"><label>Move (speed)</label>${num("speed", f.speed, -2, 6)}</div>
+        ${own.length ? `<fieldset class="field wide"><legend class="label">Powers that work only in the form</legend><div class="checks">${own.map((id) => `<label><input type="checkbox" data-afp="${id}"${f.powers.includes(id) ? " checked" : ""}> ${esc(powerDef(id) ? powerDef(id)[1] : id)}</label>`).join("")}</div></fieldset>` : ""}
+        <div class="field wide"><label>What else changes</label><textarea data-af="note" rows="2" maxlength="600">${esc(f.note)}</textarea></div>
+        <div class="btn-row field wide"><button type="button" class="linkish danger" data-afdo="rm">Remove the form</button></div>`;
+  }
+  $("altform-fields").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-afdo]"); if (!b) return;
+    if (b.dataset.afdo === "add") ch.altForm = normalize({ ...ch, altForm: { name: "Alternate form", human: ch.name || "", attrs: {}, powers: [] } }).altForm;
+    else { ch.altForm = null; ch.play.form = false; }
+    touch(); render(); renderAltForm();
+  });
+  $("altform-fields").addEventListener("change", (e) => {
+    if (!ch.altForm) return;
+    const t = e.target, k = t.dataset.af, f = { ...ch.altForm, attrs: { ...ch.altForm.attrs }, powers: ch.altForm.powers.slice() };
+    if (t.dataset.afp) { f.powers = t.checked ? [...f.powers, t.dataset.afp] : f.powers.filter((x) => x !== t.dataset.afp); }
+    else if (!k) return;
+    else if (k.startsWith("attr-")) f.attrs[k.slice(5)] = +t.value;
+    else if (k === "dodge" || k === "speed") f[k] = +t.value;
+    else f[k] = t.value;
+    ch.altForm = normalize({ ...ch, altForm: f }).altForm || ch.altForm; touch(); render();
+  });
   // ---- portrait ----
   // Images are scaled down in the browser so a character stays small enough to save and share as JSON.
   const MAX_SIDE = 480;
