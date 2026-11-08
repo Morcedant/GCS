@@ -604,6 +604,38 @@ Ages are as of 2025. Each comes with a stat block, and each is in the GM view's 
 
 *Class VI.* **Attacks** Powers 17 (will made force, Class VI). **Dodge** 12 (a second defense each round). **Boxes** 8. **Defense** V (Force Field). **Powers** Telekinesis VI, Force Field V, Portals V (the 2012 breach), Flight IV, Mind Control III (his fanatics). **Skills** Leadership 17, Deception 15, Occult 14, Persuasion 15. **Master of the White Hand.** Never met alone: White Hand soldiers die for him without a word. He has escaped ExLAW three times; he always has a door open behind him.
 
+**Herbert Unler, as he was in 1938.** An American occult scholar from Boston, and the first non-Briton the **Shadow Knights** ever recruited, after he banished a demon in the Back Bay that June: the first mystical creature seen in more than a century. Unler spent the war hunting the SS's occult orders across Europe and wrote half of what the Knights still teach about Otherworld. He died in 1971; his notebooks are in the Order's vault, and some of them still answer questions.
+
+*Class II.* **Attacks** Firearms 12 (a .38 revolver, Class I); Occult 16 (a banishing, see *Rituals*). **Dodge** 9. **Boxes** 3. **Defense** —. **Powers** Warding III, Mystic Sight III, Cantrips II. **Skills** Occult 16, Investigation 14, Read People 13, Persuasion 12. **The first American Knight.** Knows the true name of one demon, and the demon knows his.
+
+**Zarloff the Elder.** The thing that appeared to a cell of SS initiates in Berlin in August 1938, promising them the new world order Hitler had dreamed of. An entity of Otherworld wearing the shape of a white-bearded mystic, he speaks into dreams, takes followers' bodies when he needs hands, and has outlived every order that served him. The Shadow Knights believe he has a new cult in Europe; ExLAW has a file, and no photograph.
+
+*Class V.* **Attacks** Powers 16 (fears made real, Illusion V; Will resists). **Dodge** 11. **Boxes** 6. **Defense** IV (not quite here). **Powers** Mind Control V, Illusion V, Possession IV, Astral Projection V, Summoning IV. **Skills** Deception 17, Occult 17, Persuasion 16, Read People 15. **Not quite here.** His body is a projection: his Defense covers physical, energy and mystic harm alike, and killing it only sends him home. Banish him with a ritual, or with his true name.
+
+**The Ivory Phoenix, age unknown.** An immortal who fought for the Allies in the Second World War and destroyed the first Steel Falcon, the Reich's flying war machine, over the Channel in 1943. She burns white when she flies, and when she dies she burns entirely, and comes back from the ashes a day later. She has had other names in other wars. She works with no one for long, and appears where she's needed.
+
+*Class IV.* **Attacks** Powers 15 (white fire, Blast IV). **Dodge** 12. **Boxes** 5. **Defense** II (Toughness). **Powers** Blast IV, Flight III, Regeneration V, Immortality IV, Toughness II. **Skills** Melee 15, Athletics 14, Read People 14, Persuasion 12. **Rebirth.** Taken out, she burns to ash and rises again at the next dawn, remembering everything.
+
+**Charlie Swift, as he was in 1954.** The "fastest man alive", a radio personality and a popular critic of the government. The only warrant ever issued under the Human Powers Control Act was for him: he was shot during the botched arrest, spent a year in a coma, lost his powers and drank himself out of public life. He died in 1988. What's below is the man at his height, for a game set in the public years.
+
+*Class III.* **Attacks** Brawling 13 (blows at speed, Class II). **Dodge** 14 (a second defense each round). **Boxes** 4. **Defense** —. **Powers** Speed III. **Skills** Athletics 15, Persuasion 15, Media 14, Streetwise 12. **Faster than the law.** Once a scene he can act twice in a round; he never stays to explain.
+
+**Warlord I, as he was in 1973.** One of the first masked heroes to take Reserve Agent status under Director Hamilton, and the first to pay for it. In 1973 he fought the criminal **Armageddon** in an apartment block; Armageddon's charges brought the building down and killed hundreds. Warlord was convicted of reckless endangerment and died in a prison riot two years later. Masked heroes still argue over whether he was a scapegoat.
+
+*Class III.* **Attacks** Brawling 15 (Strength III). **Dodge** 10. **Boxes** 5. **Defense** III (Toughness). **Powers** Strength III, Toughness III, Super Leaping II. **Skills** Brawling 15, Athletics 14, Leadership 13, Streetwise 12. **Never backs down.** He can't walk away from a fight he started; a Will roll at −2 to let one go.
+
+**Armageddon.** The criminal whose charges brought down an apartment block in 1973 during his fight with Warlord I, killing hundreds. He charges anything he touches with explosive energy: a coin, a car, a wall. He was caught a year later and became one of the first prisoners of **Raster Seven**, where he still is, unless someone has let him out.
+
+*Class IV.* **Attacks** Powers 15 (charged objects, Blast IV, everyone nearby takes 1 box). **Dodge** 10. **Boxes** 5. **Defense** I (Toughness). **Powers** Blast IV (charged objects, thrown or touched), Toughness I. **Skills** Streetwise 14, Athletics 13, Deception 13, Stealth 12. **Collateral.** Every fight with him marks Collateral; the GM decides what comes down.
+
+**Johnny Vanroy (Mr. Power), 72.** Director Hamilton's protégé and ExLAW's golden boy, until 1977, when he was arrested for the murder of heiress Lita Weston. He was cleared, but left ExLAW in 1978, and the EPAOC never stopped accusing Hamilton of favoritism. Born with his powers, he still has them, and runs a security firm in Phoenix. He never talks about Lita Weston.
+
+*Class IV.* **Attacks** Brawling 15 (Strength IV). **Dodge** 10. **Boxes** 5. **Defense** III (Toughness). **Powers** Strength IV, Toughness III, Flight II. **Skills** Law 14, Leadership 14, Investigation 13, Media 12. **Old scandal.** Anyone who digs into Lita Weston's murder finds something that was never in the file.
+
+**John Marcus Mars Jr., 61.** Merlin's chosen heir. In 1985 he defeated **Mordred** and **Morgan le Fay** in a final battle he barely survived, just before the Second Wave of awakenings. He has spent the forty years since keeping the old powers of Britain asleep, and teaching very few people why. He lives in Cornwall, travels more than he admits, and owes the Shadow Knights nothing.
+
+*Class V.* **Attacks** Powers 16 (Merlin's fire, Blast IV). **Dodge** 11. **Boxes** 5. **Defense** III (wards, against physical and mystic harm). **Powers** Cantrips V, Warding V, Mystic Sight IV, Blast IV, Teleport III. **Skills** Occult 17, Investigation 15, Read People 14, Persuasion 13. **The heir's burden.** Using Cantrips V or Warding V draws something old to the place; it comes a day later.
+
 ## The first case: Dead Air
 
 A starter case for three to seven, for one or two sessions. A teenager wakes up an Operant in the middle of a Chicago blackout, and everyone wants her: ExLAW, the cameras, and the lab that made her. It shows off the law and its tracks, a dossier and the Escalation clock, secret identities and Exposure, a team-up, and the files a villain keeps on a hero. It's written for the seven pregenerated characters, and works with any.

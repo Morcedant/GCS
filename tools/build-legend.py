@@ -726,6 +726,11 @@ def build(pid, docx):
         import playtest_campaigns
         cp = playtest_campaigns.campaign(pid, pack, (pdir / "setting.md").read_text()) if gm_guides.GM_GUIDES_OPEN else None
         if cp: pack["playtest"] = {**pack["playtest"], "campaign": cp, "setup": playtest_campaigns.setup(pid)}
+    # Aurora's notable Operants as ready-made sheets (tools/aurora_notables.py), from the GM's Guide's stat blocks: in the
+    # page only while the GM's Guides are.
+    if pid == "aurora" and gm_guides.GM_GUIDES_OPEN:
+        sys.path.insert(0, str(ROOT / "tools")); import aurora_notables
+        pack = {**pack, "notables": aurora_notables.notables(pack, (pdir / "setting.md").read_text())}
     js = "const PACK = " + json.dumps({**with_core_combat(pack), "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = tpl.replace("/* RULES:CORE */", rules_js())

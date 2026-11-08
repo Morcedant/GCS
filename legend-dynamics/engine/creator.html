@@ -1392,6 +1392,9 @@ tr.lvl-U td.target { color: var(--muted); }
   const CONNECTION_TEXTS = new Set(CONNECTIONS.map((r) => r[1]));
   const TRIGGERS = PACK.triggers;
   const PREGENS = PACK.pregens;
+  // The setting's notable people as ready-made sheets (Aurora's named Operants): the GM's characters, in their own list.
+  const NOTABLES = PACK.notables || [];
+  const notableOpts = () => NOTABLES.length ? `<optgroup label="Notable Operants: the GM's characters">${NOTABLES.map((c, i) => `<option value="n:${i}">${esc(c.name)}: ${esc(c.rank)}</option>`).join("")}</optgroup>` : "";
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   const sTraitList = () => SPECIES_TRAITS[ch.speciesId] || [];
   const sTraitDef = () => sTraitList().find((t) => t[0] === ch.sadv.id);
@@ -1493,6 +1496,9 @@ tr.lvl-U td.target { color: var(--muted); }
       out.pictureFrom = { portrait: ok(f.portrait, out.portrait), token: ok(f.token, out.token) }; }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     out.generic = out.generic === true; // a generic NPC: the GM view takes more than one of them
+    out.notable = out.notable === true; // a notable Operant's sheet (the GM's character)
+    out.skillAdj = (out.notable || out.extra) && out.skillAdj && typeof out.skillAdj === "object"
+      ? Object.fromEntries(Object.entries(out.skillAdj).filter(([k, v]) => SKILLS.some((x) => x[0] === k) && Number.isInteger(v) && Math.abs(v) <= 6)) : {};
     // An extra: someone the characters meet, kept by the GM as a full character (tagged Extra). Their own number of boxes,
     // the threat they came from, its fight traits and weapons, a note, and which side they're on.
     out.extra = out.extra === true;
@@ -1631,7 +1637,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /** Keep a character within the rules: nothing below its base (an older file made under origins that lowered
    *  attributes), and no more points spent than the pool, taking back from the highest bought attribute first. */
   function fitPool(c) {
-    if (c.extra) return false; // an extra (the GM's character for someone met) isn't held to the creation rules
+    if (c.extra || c.notable) return false; // the GM's characters (an NPC, a notable Operant's sheet) aren't held to the creation rules
     const saved = ch; ch = c;
     try {
       let changed = false;
@@ -1743,7 +1749,10 @@ tr.lvl-U td.target { color: var(--muted); }
     ...(c.powersLearned || []).map((x) => ({ id: x.id, base: "I", cl: x.cl, learned: true })),
   ].filter((x) => x.id);
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
-  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name) + hbBonus("skill", ch, name); };
+  // The GM's characters (a notable Operant's sheet, an NPC) can carry a correction per skill, so every skill lands on the
+  // number in their stat block (skillAdj); player characters never have one.
+  const skillAdj = (c, name) => ((c.notable || c.extra) && c.skillAdj ? c.skillAdj[name] || 0 : 0);
+  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name) + hbBonus("skill", ch, name) + skillAdj(ch, name); };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge) + hbBonus("dodge");
   // Move in yards, in the current form (a form's Agility and Body count while in it).
   // Powers that move you (powers.fight.move: Speed, Flight, Leaping): a move covers their distance by Class, if that's farther.
@@ -1896,7 +1905,7 @@ tr.lvl-U td.target { color: var(--muted); }
   $("f-connpick").innerHTML = `<option value="">Top 10 connections: quick pick…</option>` +
     CONNECTIONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
   $("f-pregen").innerHTML = `<option value="">Load a ready-made character…</option>` +
-    PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}, ${esc(c.species)}</option>`).join("");
+    (NOTABLES.length ? `<optgroup label="Player characters">` : "") + PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}, ${esc(c.species)}</option>`).join("") + (NOTABLES.length ? "</optgroup>" : "") + notableOpts();
   $("ph-type").innerHTML = `<option value="">None carried</option>` + Object.entries(GUNS).map(([id, [n, cap]]) => `<option value="${id}">${esc(n)} (${cap})</option>`).join("");
   $("horror-wrap").hidden = !HERITAGES.some((h) => h.restricted);
   $("log-books-wrap").hidden = !T.journalExtraLabel;
@@ -2734,7 +2743,8 @@ tr.lvl-U td.target { color: var(--muted); }
     }
     else if (t.id === "f-pregen" && t.value !== "") {
       // A fresh copy with its own id, so saving it never overwrites another character.
-      load({ ...JSON.parse(JSON.stringify(PREGENS[+t.value])), id: uid(), example: false });
+      const src = t.value.startsWith("n:") ? NOTABLES[+t.value.slice(2)] : PREGENS[+t.value];
+      load({ ...JSON.parse(JSON.stringify(src)), id: uid(), example: false, extra: false });
       t.value = ""; selectTab("create");
       toast(`Loaded ${ch.name}. Save to file to keep your copy.`);
       { const c = ch; autoPictures(c).then((ok) => { if (ok && ch === c) { touch(); render(); store.set(STORE_CURRENT, ch); } }); }
@@ -3253,7 +3263,8 @@ tr.lvl-U td.target { color: var(--muted); }
   function addExtra(threatId, quiet, asName) {
     const t = threatId ? extraThreats().find((x) => x.id === threatId) : null;
     if (threatId && !t) return null;
-    const c = t ? threatToCharacter(t) : normalize({ ...blank(), id: uid(), name: asName || "New extra", extra: true, foe: false, npcBoxes: 3 });
+    const nb = t && NOTABLES.find((x) => x.threat === t.id);
+    const c = nb ? notableNPC(nb) : t ? threatToCharacter(t) : normalize({ ...blank(), id: uid(), name: asName || "New extra", extra: true, foe: false, npcBoxes: 3 });
     if (t && asName) { c.name = asName; c.generic = false; }
     if (!t) c.play.duty = 0;
     const base = (n) => String(n || "").replace(/\s+\d+$/, "").toLowerCase(), same = gmCrew.filter((x) => base(x.name) === base(c.name));
@@ -3261,6 +3272,17 @@ tr.lvl-U td.target { color: var(--muted); }
     if (same.length) { c.generic = true; c.name = `${c.name} ${same.length + 1}`; }
     gmCrew.push(c); saveGM(); renderGM();
     if (!quiet) gmSay(`${c.name} is at the table, under NPCs. Open them in the creator to fill in more.`);
+    autoPictures(c).then((ok) => { if (ok) { saveGM(); renderGM(); } }).catch(() => {});
+    return c;
+  }
+  /** A notable's ready-made sheet as an NPC in the GM view. */
+  const notableNPC = (n) => { const c = normalize({ ...blank(), ...JSON.parse(JSON.stringify(n)), id: uid(), extra: true, example: false }); c.play.duty = 0; return c; };
+  function addNotable(n) {
+    const t = n.threat ? n.threat : null;
+    if (t) return addExtra(t);
+    const c = notableNPC(n);
+    if (gmCrew.some((x) => x.extra && x.name === c.name)) { gmSay(`${c.name} is already at the table.`, true); return null; }
+    gmCrew.push(c); saveGM(); renderGM(); gmSay(`${c.name} is at the table, under NPCs.`);
     autoPictures(c).then((ok) => { if (ok) { saveGM(); renderGM(); } }).catch(() => {});
     return c;
   }
@@ -3559,7 +3581,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved character…" : "No characters saved in this browser"}</option>` +
       roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed character")}</option>`).join("");
     $("gm-add-pregen").innerHTML = `<option value="">Choose a ready-made character…</option>` +
-      PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}</option>`).join("");
+      (NOTABLES.length ? `<optgroup label="Player characters">` : "") + PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}</option>`).join("") + (NOTABLES.length ? "</optgroup>" : "") + notableOpts();
     // Turn order: Agility, highest first; ties flagged for the players to settle.
     // In the first round of a gunfight, a calling with Quick draw acts first, whatever its Agility.
     const QD = anyFx("firstInGunfight") ? PACK.roles.find((r) => (r.abilityFx || []).includes("firstInGunfight")) : null;
@@ -3666,6 +3688,8 @@ tr.lvl-U td.target { color: var(--muted); }
   $("gm-open").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("gm-files").click(); } });
   $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { const r = gmAdd([c]); if (r.added || r.updated) gmSay(`${r.updated ? "Updated" : "Added"} ${c.name || "character"}.`); } e.target.value = ""; });
   $("gm-add-pregen").addEventListener("change", (e) => {
+    // A notable Operant joins as an NPC (the GM's character), with their own boxes and fight traits.
+    if (e.target.value.startsWith("n:")) { const n = NOTABLES[+e.target.value.slice(2)]; e.target.value = ""; if (n) addNotable(n); return; }
     const c = PREGENS[+e.target.value];
     if (e.target.value !== "" && c) {
       const id = uid(), r = gmAdd([{ ...JSON.parse(JSON.stringify(c)), id }]);
