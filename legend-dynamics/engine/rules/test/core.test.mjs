@@ -87,7 +87,7 @@ test("Crown capabilities: margin damage, per-weapon jams, price, Boosts, defende
 });
 
 test("damage types: each Defense covers its own, and a Vulnerability marks a box more", () => {
-  const roll = (/** @type {string} */ k) => (k === "attack" ? [1, 1, 1] : [6, 6, 6]);
+  const roll = (/** @type {string} */ k) => (k === "attack" ? [3, 3, 4] : [6, 6, 6]);
   const atk = { id: "a", skillTarget: 12, injury: 0 };
   const hit = (/** @type {any} */ weapon, /** @type {any[]} */ traits = []) => LD.resolveAttack({ attacker: atk, defender: { id: "d", canDodge: true, dodgeBase: 9, injury: 0, traits }, weapon, band: "close" }, LD.NO_HOOKS, roll);
   const punch3 = { id: "p3", band: "close", class: 3, damage: { any: { boxes: 2 } } }, blast3 = { ...punch3, id: "b3", dtype: "energy" }, fire3 = { ...blast3, element: "fire" };
@@ -107,8 +107,8 @@ test("damage types: each Defense covers its own, and a Vulnerability marks a box
 });
 
 test("stun weapons, Defense Classes and always-on armor", () => {
-  // Attack dice 3 (a natural success), defense dice 18 (a natural failure): every attack lands.
-  const roll = (/** @type {string} */ k) => (k === "attack" ? [1, 1, 1] : [6, 6, 6]);
+  // Attack dice 10 against 12 (an ordinary hit, not a strong one), defense dice 18 (a natural failure): every attack lands.
+  const roll = (/** @type {string} */ k) => (k === "attack" ? [3, 3, 4] : [6, 6, 6]);
   const atk = { id: "a", skillTarget: 12, injury: 0 };
   const def = (/** @type {any[]} */ traits) => ({ id: "d", canDodge: true, dodgeBase: 9, injury: 0, traits });
   const hit = (/** @type {any} */ weapon, /** @type {any[]} */ traits = []) => LD.resolveAttack({ attacker: atk, defender: def(traits), weapon, band: weapon.reach === "melee" ? "melee" : "close" }, LD.NO_HOOKS, roll);
@@ -158,4 +158,15 @@ test("special loads: each Trails load's material is one the fight panel knows, a
     defender: { id: "d", canDodge: true, dodgeBase: 9, injury: 0, traits: wraith }, weapon: { id: "shotgun", band: "close", firearm: true, damage: { any: { boxes: 2 } }, materials }, band: "close" }, LD.NO_HOOKS, roll);
   assert.equal(shot([]).damage, null, "an ordinary shell does nothing to a wraith");
   assert.equal(shot(["salt"]).damage.boxes, 2, "rock salt hurts it");
+});
+
+test("a strong hit (made by 5 or more, or a natural 3 or 4) gets 1 box through any Defense", () => {
+  const atk = { id: "a", skillTarget: 12, injury: 0 };
+  const hit = (/** @type {number[]} */ dice, /** @type {any} */ weapon, /** @type {any[]} */ traits) => LD.resolveAttack({ attacker: atk, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon, band: "close" }, LD.NO_HOOKS, () => dice);
+  const pistol = { id: "pistol", band: "close", class: 1, damage: { any: { boxes: 2 } } }, D5 = [{ type: "defenseClass", value: 5, label: "Toughness V" }];
+  assert.equal(hit([3, 3, 4], pistol, D5).damage, null, "made by 2: Defense V stops a Class I pistol");
+  assert.equal(hit([2, 2, 3], pistol, D5).damage.boxes, 1, "made by 5: a strong hit finds the gap, 1 box");
+  assert.match(hit([2, 2, 3], pistol, D5).defenseClass, /strong hit gets through for 1 box/);
+  assert.equal(hit([1, 1, 2], { ...pistol, class: 3 }, [{ type: "defenseClass", value: 2 }]).damage.boxes, 1, "a Class above, strong or not: one box fewer");
+  assert.equal(hit([1, 1, 1], { ...pistol, damage: { any: { boxes: 1 } }, class: 3 }, [{ type: "defenseClass", value: 2 }]).damage.boxes, 1, "a 1-box strong hit a Class above still marks 1");
 });

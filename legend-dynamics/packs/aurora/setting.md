@@ -26,7 +26,7 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 | Fall, by height (see *Falling*) | — | I to V | 1 from a story or two (I); 2 from a rooftop (II); 3 from a tower (IV); higher, certain death without Defense (V) | A sprain, a fracture, or worse |
 | Fire | — | — | 1 each round in the flames | Burns |
 
-**Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack must be at least **one Class above** your Defense to do anything, and then it marks **one box fewer**; one **equal to it or below** does nothing. A bulletproof Operant (Defense II) ignores pistols, rifles and even an Aegis cannon (Class II); a Class III blast gets through, marking one box instead of two.
+**Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack must be at least **one Class above** your Defense to do anything, and then it marks **one box fewer**; one **equal to it or below** does nothing, unless it's a **strong hit**: made by **5 or more**, or a natural 3 or 4. A strong hit finds the gap (the eye, the joint, the moment the field flickers) and marks **1 box** whatever the Classes. A bulletproof Operant (Defense II) shrugs off most pistol, rifle and Aegis cannon (Class II) hits, but a well-placed shot still hurts; a Class III blast gets through, marking one box instead of two.
 
 **Damage types.** Every attack is one of four types, and each Defense says which it covers. Against any other type, a Defense counts **one Class lower**.
 
@@ -47,7 +47,7 @@ An energy attack can also name its **element** (fire, cold, electricity, light, 
 
 *Defense is not a defense roll.* Your **defense** (Dodge, Parry or Block, one a round) decides whether an attack hits at all. Your **Defense** Class is armor: it applies to whatever hits, every time, at no cost. A Force Field doesn't use up your Dodge.
 
-*Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. The same shot would have marked two boxes on his deputy. A White Hand soldier's Class II Blast is equal to his Defense, so it does nothing either; a Class III blast would get through, marking one box instead of two.
+*Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. The same shot would have marked two boxes on his deputy. A White Hand soldier's Class II Blast is equal to his Defense, so it does nothing either; a Class III blast would get through, marking one box instead of two. Had the gang member rolled a 6 against Firearms 12, making it by 6, the shot would have been a strong hit: the bullet finds the gap, and Collier marks 1 box.
 
 A submachine gun can fire a **burst** (three rounds, +1 to hit). Firearms jam on a natural 18. To take someone down without killing them, use fists, a taser, dampening cuffs, or a power used with care.
 
@@ -223,7 +223,7 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 
 - **Rolling.** Roll **Powers** to aim a power at someone, or to use it with skill: precisely, at a distance, around bystanders. Passive powers (Toughness, Regeneration, Speed and the like) just work. Targets resist with **Dodge** (things you can dodge), **Body** (things that work on the body) or **Will** (things that work on the mind).
 - **Damage.** A power marks boxes by its Class: Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3. Ordinary weapons mark the boxes in their table (see *Personal combat*).
-- **Defense.** Armor, not a defense roll: an attack must be at least one Class above your Defense to do anything, and then marks a box fewer; an equal or lower one does nothing. It applies after your Dodge, Parry or Block.
+- **Defense.** Armor, not a defense roll: an attack must be at least one Class above your Defense to do anything, and then marks a box fewer; an equal or lower one does nothing, except a strong hit (made by 5 or more, or a natural 3 or 4), which always marks 1 box. It applies after your Dodge, Parry or Block.
 - **Range.** Unless a power says otherwise, a ranged power's effective band (see *Range* in Personal combat) is **Short at Class I, Long at Class II, Extreme at Class III**, and miles at Class IV and above, out to the horizon. Mind powers keep the reach their descriptions give: touch, a room, sight or a city.
 - **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
 - **Team-ups.** Two heroes combine their powers into one action: one makes the roll, the other adds their power to it (a lightning bolt through a water spout, a thrown car carried by telekinesis). The attack counts **one Class higher** than the rolling hero's power, marking boxes and meeting Defense as that Class. Both heroes mark a box of **Strain**, and the helper gives up their own action that round. Describe how the powers fit together; the GM can refuse a team-up that makes no sense.

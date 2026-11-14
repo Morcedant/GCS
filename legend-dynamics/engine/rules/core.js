@@ -309,7 +309,8 @@ export function resolveAttack(input, hooks, roll) {
   // Immune to the type or element: nothing gets through below Class VI.
   const cls0 = weapon.class || 1, immune = liveTraits(defender).find((/** @type {any} */ t) => t.type === "immuneType" && made([t.dtype]));
   if (immune && cls0 < 6) return { ...out, outcome: `hit, marks nothing (${immune.label || "immune to " + immune.dtype})`, hit: true, damage: null, shrugged: immune.label || "immune" };
-  // A Defense Class (Aurora): an attack must be at least one Class above it to do anything, and then marks a box fewer.
+  // A Defense Class (Aurora): an attack must be at least one Class above it to do anything, and then marks a box fewer;
+  // a strong hit always gets 1 box through.
   // Each Defense says which damage types it covers (Toughness: physical; a force field: physical and energy); against
   // any other it counts one Class lower. With several, the best one for this attack counts. Resistant to a type: +1.
   const dcs = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
@@ -322,9 +323,15 @@ export function resolveAttack(input, hooks, roll) {
     const cls = (weapon.class || 1) + (weapon.piercing ? 1 : 0);
     const R = ["", "I", "II", "III", "IV", "V", "VI"], why = [best && best.v < best.t.value ? `${best.t.label || "Defense"} is one Class lower against ${dtype}` : "", resist ? `resistant to ${dtype}` : ""].filter(Boolean).join("; ");
     const D = `Defense ${R[dc.value] || dc.value}${why ? ` (${why})` : ""}`, C = `Class ${R[cls] || cls}${dtype !== "physical" ? " " + dtype : ""}`;
-    if (cls <= dc.value) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
-    dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`;
-    if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
+    // A strong hit (made by 5 or more, or a natural 3 or 4) finds the gap: whatever the Classes, it marks at least 1 box.
+    const strong = atk.margin >= 5 || atk.auto === "success";
+    if (cls <= dc.value) {
+      if (!strong) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
+      dmg = { ...dmg, boxes: 1 }; out.defenseClass = `${D} against a ${C} attack: a strong hit gets through for 1 box`;
+    } else {
+      dmg = { ...dmg, boxes: Math.max(strong ? 1 : 0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`;
+      if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
+    }
   }
   // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".
   // Armour can say what it works against: "melee", "missile" (bows, slings, thrown) or "firearm". No list: everything.

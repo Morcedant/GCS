@@ -22,7 +22,7 @@ const shot = (f, teamUp) => E.attack(f.enc, rules, LD, { attacker: f.volt.pid, d
 
 test("a team-up raises the Class by one against Defense, and logs the partner", () => {
   let seed = 1;
-  while (!shot(fight(seed)).event.hit) seed++;
+  for (let ev; !(ev = shot(fight(seed)).event).hit || ev.damage; ) seed++;  // an ordinary hit: a strong one gets 1 box through anyway
   const alone = shot(fight(seed)).event;
   assert.ok(!alone.damage, "Class II against Defense II does nothing");
   const f = fight(seed), together = shot(f, f.tide.pid).event;

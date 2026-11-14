@@ -31,14 +31,14 @@ test("the retrieval team carries the hardware", () => {
 
 test("a flechette rifle (Class II, piercing) gets through Toughness II, a box fewer", () => {
   let seed = 1;
-  while (!shoot(fight(seed), "flechette").event.hit) seed++;
+  for (let ev; !(ev = shoot(fight(seed), "flechette").event).hit || ev.damage !== 1; ) seed++;  // an ordinary hit, not a strong one
   const f = fight(seed), ev = shoot(f, "flechette").event;
   assert.equal(ev.damage, 1, "2 boxes, one fewer through Defense II");
   assert.equal(f.hero.injury, 1);
 });
 
 test("a neurogun is a physical stun: Body −4 against no Defense, and Toughness II stops it", () => {
-  const hit = (traits) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon: ARMS.neurogun, band: "close" }, LD.NO_HOOKS, () => [1, 1, 1]);
+  const hit = (traits) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon: ARMS.neurogun, band: "close" }, LD.NO_HOOKS, () => [3, 3, 4]);
   const bare = hit([]);
   assert.equal(bare.stun, true); assert.equal(bare.damage, null); assert.match(bare.outcome, /Body −4/);
   const tough = hit([{ type: "defenseClass", value: 2, covers: ["physical"] }]);
@@ -48,7 +48,7 @@ test("a neurogun is a physical stun: Body −4 against no Defense, and Toughness
 });
 
 test("piercing: one Class higher against Defense, its own Class's boxes, and straight through a plain vest", () => {
-  const hit = (weapon, traits) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon, band: "long" }, LD.NO_HOOKS, () => [1, 1, 1]);
+  const hit = (weapon, traits) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 13, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon, band: "long" }, LD.NO_HOOKS, () => [3, 3, 4]);
   const T2 = [{ type: "defenseClass", value: 2, covers: ["physical"] }], T3 = [{ type: "defenseClass", value: 3, covers: ["physical"] }];
   assert.equal(hit(ARMS.flechette, T2).damage.boxes, 1, "Class II piercing through Toughness II: 2 boxes, one fewer");
   assert.equal(hit(ARMS.flechette, T3).damage, null, "Toughness III stops it");
