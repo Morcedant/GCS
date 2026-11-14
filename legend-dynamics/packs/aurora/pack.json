@@ -3004,7 +3004,7 @@
   ],
   [
    "Defense",
-   "Roll Powers to aim a power. An attack must be at least one Class above your Defense to do anything, and then marks one box fewer; equal or lower does nothing, except a strong hit (made by 5+, or a natural 3-4), which always marks 1 box. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."
+   "Roll Powers to aim a power. An attack must be at least one Class above your Defense to do anything, and then marks one box fewer; equal or lower does nothing, except a telling hit (made by 5+, or a natural 3-4), which always marks 1 box. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."
   ],
   [
    "Strain",
@@ -6853,6 +6853,17 @@
   },
   "resistAdvantages": {
    "coolhead": 2
+  }
+ },
+ "defenseBoxes": true,
+ "gearDefense": {
+  "aegis": {
+   "value": 2,
+   "covers": [
+    "physical",
+    "energy"
+   ],
+   "label": "Aegis suit (Toughness II)"
   }
  },
  "damageTypes": {"types": [["physical", "Physical", "fists, blades, bullets, falls, thrown cars"], ["energy", "Energy", "Blast, lightning, lasers, flame, raw power"], ["mystic", "Mystic", "spells, spirits, curses, the Fey and the Mad Forest"], ["mind", "Mind", "telepathy, mind control, fears made real"]], "elements": ["fire", "cold", "electricity", "light", "radiation", "sound"], "powers": {"toughness": ["physical"], "forcefield": ["physical", "energy"]}, "vulnerable": ["energy", "mystic", "mind", "fire", "cold", "electricity", "light", "radiation", "sound", "iron", "silver"]},

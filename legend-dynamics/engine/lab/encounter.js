@@ -250,8 +250,8 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     lasting: clone(d.lasting || []), conditions: clone(d.conditions || []), takenOut: !!d.takenOut, limbTradedRound: d.limbTradedRound },
     attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
-    attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, traits: a.traits || [] },
-    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
+    attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, extraBoxes: a.extraBoxes || 0, traits: a.traits || [] },
+    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, extraBoxes: d.extraBoxes || 0, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
     defense: chosen ? { kind: chosen.kind, label: chosen.label, base: chosen.base, mods: chosen.mods.filter((/** @type {any} */ m) => !m.preview) } : null,
     weapon, band: cmd.band, mode: cmd.mode || null, aimed, boosts: cmd.boosts || 0, ammo: cmd.ammo || null, cover: cmd.cover || "none",
     situational: (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ source: "situation", label: m.label || "Situation", value: +m.value, scope: "situation" })),
@@ -310,7 +310,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, classHarm: res.classHarm || 0, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
     teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
     strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
     dive: dive ? { cls: dive, hurts: Math.max(0, ...(a.traits || []).filter((/** @type {any} */ t) => t.type === "defenseClass").map((/** @type {any} */ t) => t.value)) < dive } : null,
@@ -400,7 +400,7 @@ export function showdown(enc, rules, core, cmd) {
   const n = enc.events.filter((/** @type {any} */ e) => e.type === "showdown").length;
   const roll = (/** @type {string} */ kind, /** @type {number} */ target) => core.resolve(core.diceFor(enc.seed, `sd${n}|${a.pid}>${d.pid}|${kind}`), target);
   const sum = (/** @type {any[]} */ l) => l.reduce((t, m) => t + m.value, 0);
-  const wound = (/** @type {any} */ p) => { const v = core.INJURY_PENALTY[p.injury || 0] || 0; return v ? [{ label: "Wounds", value: v }] : []; };
+  const wound = (/** @type {any} */ p) => { const v = core.INJURY_PENALTY[core.woundLevel(p)] || 0; return v ? [{ label: "Wounds", value: v }] : []; };
   const pair = (/** @type {any} */ e) => (e.a.pid === a.pid && e.d.pid === d.pid) || (e.a.pid === d.pid && e.d.pid === a.pid);
   if (cmd.phase === "stare") {
     const ma = wound(a), md = wound(d), ta = (a.will ?? 10) + sum(ma), td = (d.will ?? 10) + sum(md);

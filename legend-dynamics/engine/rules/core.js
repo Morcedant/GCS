@@ -136,6 +136,9 @@ export function weaponAccuracy(weapon, ctx) {
 export const INJURY_MAX = 3;
 /** Physical-action penalty for each injury level; null means Incapacitated. */
 export const INJURY_PENALTY = [0, -1, -2, null];
+/** The injury level a character's penalties come from: Toughness boxes (extraBoxes, Aurora's heroes) are marked first and carry none.
+ * @param {{ injury?: number, extraBoxes?: number }} p */
+export const woundLevel = (p) => Math.max(0, (p.injury || 0) - (p.extraBoxes || 0));
 
 /**
  * Apply a hit that got through, under the published injury and Dying rules.
@@ -235,7 +238,7 @@ export function resolveAttack(input, hooks, roll) {
   const ench = (attacker.traits || []).filter((/** @type {any} */ t) => t.type === "weaponBonus" && (!t.weapon || t.weapon === weapon.id));
   for (const t of ench) if (t.accuracy) mods.push({ source: "enchantment", label: t.label || "Enchantment", value: t.accuracy, scope: "setting" });
   if (input.cover === "partial") mods.push({ source: "cover", label: "Partial cover", value: -2, scope: "core" });
-  const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
+  const atkInj = INJURY_PENALTY[woundLevel(attacker)] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
   for (const m of input.situational || []) if (m.value) mods.push(m);
   for (const t of liveTraits(defender)) if (t.type === "attackPenalty" && t.value) mods.push({ source: "defender", label: t.label || "Defender", value: t.value, scope: "setting" });
@@ -261,7 +264,7 @@ export function resolveAttack(input, hooks, roll) {
     for (const m of def.mods || []) if (m.value) dmods.push(m);
     // Published gear: a shield's +1 to Dodge against attacks you can see.
     if (def.kind === "dodge") for (const t of liveTraits(defender)) if (t.type === "dodgeBonus" && t.value) dmods.push({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting" });
-    const defInj = INJURY_PENALTY[defender.injury || 0] || 0;
+    const defInj = INJURY_PENALTY[woundLevel(defender)] || 0;
     if (defInj) dmods.push({ source: "injury", label: "Defender's injury", value: defInj, scope: "core" });
     for (const h of hooks.dodgeModifiers) for (const m of h({ ...dctx, defense: def.kind })) if (m.value) dmods.push(m);
     const eff = def.base + sumMods(dmods);
@@ -285,6 +288,9 @@ export function resolveAttack(input, hooks, roll) {
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
   if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
+  // Above Class IV, Class means harm: +1 box per Class over IV, against anyone with more than 3 boxes (Aurora's heroes with
+  // Toughness boxes, the big villains); a 3-box target is out to any Class IV hit already.
+  if (dmg && dmg.boxes && (weapon.class || 0) > 4 && (defender.boxes || INJURY_MAX) > INJURY_MAX) { dmg = { ...dmg, boxes: dmg.boxes + weapon.class - 4 }; out.classHarm = weapon.class - 4; }
   // Personal-scale magic marks at most 3 boxes on one target, whatever its Boosts (core magic's harm limit).
   if (dmg && weapon.spell && dmg.boxes > MAGIC_HARM_CAP) { dmg = { ...dmg, boxes: MAGIC_HARM_CAP }; out.harmCapped = true; }
   const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
@@ -310,7 +316,7 @@ export function resolveAttack(input, hooks, roll) {
   const cls0 = weapon.class || 1, immune = liveTraits(defender).find((/** @type {any} */ t) => t.type === "immuneType" && made([t.dtype]));
   if (immune && cls0 < 6) return { ...out, outcome: `hit, marks nothing (${immune.label || "immune to " + immune.dtype})`, hit: true, damage: null, shrugged: immune.label || "immune" };
   // A Defense Class (Aurora): an attack must be at least one Class above it to do anything, and then marks a box fewer;
-  // a strong hit always gets 1 box through.
+  // a telling hit always gets 1 box through (Aurora's exception to the core's "a telling hit never adds boxes").
   // Each Defense says which damage types it covers (Toughness: physical; a force field: physical and energy); against
   // any other it counts one Class lower. With several, the best one for this attack counts. Resistant to a type: +1.
   const dcs = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
@@ -323,11 +329,11 @@ export function resolveAttack(input, hooks, roll) {
     const cls = (weapon.class || 1) + (weapon.piercing ? 1 : 0);
     const R = ["", "I", "II", "III", "IV", "V", "VI"], why = [best && best.v < best.t.value ? `${best.t.label || "Defense"} is one Class lower against ${dtype}` : "", resist ? `resistant to ${dtype}` : ""].filter(Boolean).join("; ");
     const D = `Defense ${R[dc.value] || dc.value}${why ? ` (${why})` : ""}`, C = `Class ${R[cls] || cls}${dtype !== "physical" ? " " + dtype : ""}`;
-    // A strong hit (made by 5 or more, or a natural 3 or 4) finds the gap: whatever the Classes, it marks at least 1 box.
+    // A telling hit (made by 5 or more, or a natural 3 or 4) finds the gap: whatever the Classes, it marks at least 1 box.
     const strong = atk.margin >= 5 || atk.auto === "success";
     if (cls <= dc.value) {
       if (!strong) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
-      dmg = { ...dmg, boxes: 1 }; out.defenseClass = `${D} against a ${C} attack: a strong hit gets through for 1 box`;
+      dmg = { ...dmg, boxes: 1 }; out.defenseClass = `${D} against a ${C} attack: a telling hit gets through for 1 box`;
     } else {
       dmg = { ...dmg, boxes: Math.max(strong ? 1 : 0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`;
       if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };

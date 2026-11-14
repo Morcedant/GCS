@@ -220,6 +220,10 @@ tr.lvl-U td.target { color: var(--muted); }
 .box { width: 64px; height: 26px; border: 1px solid var(--chrome-dim); border-radius: 4px; background: transparent; transform: skewX(-20deg); font-size: 0; }
 .box:hover { border-color: var(--chrome); }
 .box.on { background: var(--bad); border-color: var(--bad); box-shadow: 0 0 12px rgba({{theme.badRgb}}, .55); }
+.boxes .box.tough { border-style: dashed; border-color: var(--accent); }
+.boxes .box.tough.on { background: var(--accent); border-color: var(--accent); box-shadow: none; }
+.boxes .box.tough + .box:not(.tough) { margin-left: 8px; }
+.tough-sep { display: inline-block; width: 10px; }
 .condition { font-family: var(--display); letter-spacing: .1em; text-transform: uppercase; }
 .duty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .duty .count { font: 400 2.2rem/1 var(--mono); min-width: 2ch; text-align: center; color: var(--accent); text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); }
@@ -1470,7 +1474,7 @@ tr.lvl-U td.target { color: var(--muted); }
       portrait: "", portraitShape: "token", token: "", pictureFrom: { portrait: "", token: "" },
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
-      play: { unstable: 0, injury: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
+      play: { unstable: 0, injury: 0, tough: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -1524,6 +1528,8 @@ tr.lvl-U td.target { color: var(--muted); }
       out.npcWeapons = (Array.isArray(out.npcWeapons) ? out.npcWeapons : []).filter((w) => typeof w === "string").slice(0, 12);
       out.npcNote = String(out.npcNote || "").slice(0, 1000); out.threat = typeof out.threat === "string" ? out.threat : null; out.foe = out.foe !== false;
       out.play.marks = Math.max(0, Math.min(out.npcBoxes, parseInt(out.play.marks, 10) || 0));
+    }
+    { out.play.tough = Math.max(0, Math.min(6, parseInt(out.play.tough, 10) || 0));
     }
     out.comp.level = Math.max(1, Math.min(3, parseInt(out.comp.level, 10) || 1)); // how unstable (PACK.unstable), I to III
     out.comp.vuln = PACK.damageTypes && (PACK.damageTypes.vulnerable || []).includes(out.comp.vuln) ? out.comp.vuln : ""; // a Vulnerability's type
@@ -2355,7 +2361,9 @@ tr.lvl-U td.target { color: var(--muted); }
 
     // condition
     const inj = ch.play.injury;
-    $("boxes").innerHTML = [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
+    const tb = toughOf(ch), tm = Math.min(tb, ch.play.tough || 0);
+    $("boxes").innerHTML = (tb ? Array.from({ length: tb }, (_, j) => j + 1).map((i) => `<button class="box tough ${i <= tm ? "on" : ""}" data-tbox="${i}" aria-label="Toughness box ${i}${i <= tm ? ", marked" : ""}" title="Toughness box (from Defense ${CLASS_NAMES[tb - 1]}): marked before your Injury boxes, no penalty, clears after the fight"></button>`).join("") + '<span class="tough-sep" aria-hidden="true"></span>' : "")
+      + [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
     $("cond").textContent = INJURY[inj][0] + ".";
     $("cond-effect").textContent = ch.play.dying ? `Dying: needs stabilizing (one action, Medicine roll, ${T.medkit}) before the scene ends.` : INJURY[inj][1];
     if (inj < 3 && !gritty) ch.play.dying = false; // clearing a box ends Dying (a grievous wound can leave you Dying with boxes to spare)
@@ -2666,14 +2674,14 @@ tr.lvl-U td.target { color: var(--muted); }
   }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [],
+    const o = { injury: p.injury || 0, tough: p.tough || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [],
       ...(PACK.wanted ? { wanted: p.wanted || null } : {}) };
     // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
     // the player's page passes on what it was sent.
     if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "frightened", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "tough", "dying", "duty", "stunned", "frightened", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if (PACK.wanted && "wanted" in q) c.play.wanted = wantedClean(q.wanted);
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
@@ -3148,7 +3156,7 @@ tr.lvl-U td.target { color: var(--muted); }
         stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...(k.powerMove ? [`${k.powerMove.name} ${k.powerMove.yards.toLocaleString()} yd`] : []), ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
-      if ("injury" in patch) { if (c.extra) setMarks(c, patch.injury); else { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; } }
+      if ("injury" in patch) setHurt(c, patch.injury);
       if ("dying" in patch) c.play.dying = !!patch.dying;
       if ("stunned" in patch) c.play.stunned = !!patch.stunned;
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
@@ -3261,14 +3269,29 @@ tr.lvl-U td.target { color: var(--muted); }
       default: return t && t.label ? t.label : "";
     }
   }
-  function boxesOf(c) { return c.extra ? c.npcBoxes || 3 : 3; } // hoisted: the battle map asks as it mounts
+  // Toughness boxes (the setting's defenseBoxes, Aurora): a hero gets one for each Class of their best Defense (Toughness,
+  // a Force Field, an Aegis suit). They're marked before the three Injury boxes, carry no penalty, and clear after the fight.
+  function defenseOf(c) {
+    const DP = (PACK.damageTypes || {}).powers || { toughness: 1, forcefield: 1 }, GD = PACK.gearDefense || {};
+    return Math.max(0, ...(POWERS ? allPowers(c).filter((x) => DP[x.id]).map((x) => classIndex(x.cl) + 1) : []),
+      ...Object.entries(GD).filter(([k]) => (c.equipment || {})[k]).map(([, d]) => d.value));
+  }
+  function toughOf(c) { return PACK.defenseBoxes && !c.extra ? defenseOf(c) : 0; }
+  function boxesOf(c) { return c.extra ? c.npcBoxes || 3 : 3 + toughOf(c); } // hoisted: the battle map asks as it mounts
+  /** A hero's boxes marked, Toughness first: what's left after Toughness goes on the Injury track. */
+  function setHurt(c, m) {
+    if (c.extra) return setMarks(c, m);
+    const t = toughOf(c); m = Math.max(0, Math.min(t + 3, m));
+    c.play.tough = Math.min(t, m); c.play.injury = m - c.play.tough;
+    if (c.play.injury < 3 && !gritty) c.play.dying = false;
+  }
   /** An extra's boxes marked: their injury level follows (the last box: out; the one before: seriously hurt). */
   function setMarks(c, m) {
     const nb = boxesOf(c); m = Math.max(0, Math.min(nb, m)); c.play.marks = m;
     c.play.injury = m >= nb ? 3 : m <= 0 ? 0 : nb - m === 1 ? 2 : 1;
     if (c.play.injury < 3) c.play.dying = false;
   }
-  function marksOf(c) { return c.extra ? c.play.marks || 0 : c.play.injury || 0; }
+  function marksOf(c) { return c.extra ? c.play.marks || 0 : Math.min(toughOf(c), c.play.tough || 0) + (c.play.injury || 0); }
   /** A threat's stat block as a character: Dodge gives Agility, each attack a skill at its target (the attribute raised as
    *  far as it needs), attack powers and protection powers at their Class, and the rest as fight traits and a note. */
   function threatToCharacter(t) {
@@ -3638,7 +3661,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? formLabel(c) : humanLabel(c)))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (c.altForm ? humanLabel(c) : humanLabel(c).toLowerCase()) : formLabel(c))}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power covers this far instead of the move on foot"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> <b class="num">${k.powerMove.yards.toLocaleString()} yd</b> a move</div>` : ""}
-        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: nb }, (_, j) => j + 1).map((i) => `<button class="box ${i <= mk ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span></span>
+        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: nb }, (_, j) => j + 1).map((i) => `<button class="box ${i <= mk ? "on" : ""}${i <= toughOf(c) ? " tough" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} ${i <= toughOf(c) ? "Toughness" : "injury"} box ${i}" title="${i <= toughOf(c) ? "Toughness box: marked first, no penalty, clears after the fight" : "Injury box"}"></button>`).join("")}</span></span>
           ${c.extra ? "" : `<span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span>`}</div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${inForm(c) ? ` · <b style="color:var(--bad)">${esc(formLabel(c))}</b>` : ""}</div>` : inForm(c) && !c.altForm ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
         ${MTRACK ? `<div class="gm-row small"><span class="muted">${esc(MTRACK.name)}</span><span class="boxes">${Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.mind || 0) ? "on" : ""}" data-gm="${c.id}" data-gmmind="${i + 1}" aria-label="${esc(c.name)} ${esc(MTRACK.name)} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(MTRACK.effects[Math.min(MTRACK.boxes, c.play.mind || 0)].split(":")[0])}</span></div>` : ""}
@@ -3667,7 +3690,7 @@ tr.lvl-U td.target { color: var(--muted); }
   for (const gid of ["gm-grid", "gm-extras"]) $(gid).addEventListener("click", (e) => {
     const el = e.target.closest("[data-gm]"); if (!el || el.matches("input")) return;
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
-    if (el.dataset.gmbox) { const i = +el.dataset.gmbox; if (c.extra) setMarks(c, marksOf(c) === i ? i - 1 : i); else { c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; } }
+    if (el.dataset.gmbox) { const i = +el.dataset.gmbox; setHurt(c, marksOf(c) === i ? i - 1 : i); }
     else if ("gmopen" in el.dataset) { openExtra(c); return; }
     else if ("gmmap" in el.dataset) { battleMap.addCrew(c.id); showGmTab("fight"); gmSay(`${c.name} is on the battle map: their card and token share boxes.`); return; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
@@ -3771,6 +3794,7 @@ tr.lvl-U td.target { color: var(--muted); }
       traitsFor: (c) => [...hbEdgeTraits(PACK, (k) => edgeN(k, c)), // homebrew Edges' fight traits
         // Each protection power is its own Defense, covering its damage types (Toughness: physical; Force Field: physical and energy).
         ...(DT && POWERS ? allPowers(c).filter((x) => DT.powers[x.id]).map((x) => ({ type: "defenseClass", value: classIndex(x.cl) + 1, covers: DT.powers[x.id], label: `${powerDef(x.id)[1]} ${x.cl}` })) : []),
+        ...Object.entries(PACK.gearDefense || {}).filter(([k]) => (c.equipment || {})[k]).map(([, d]) => ({ type: "defenseClass", ...d })), // an Aegis suit's Toughness
         ...(vulnOf(c) ? [{ type: "weakness", material: vulnOf(c), extra: 1, label: `Vulnerability: ${vulnOf(c)}` }] : []),
         ...(c.extra ? c.npcTraits || [] : [])], // an extra's own fight traits (from their threat)
       mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
@@ -3784,7 +3808,7 @@ tr.lvl-U td.target { color: var(--muted); }
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
-      injuryNames: INJURY.map((x) => x[0]),
+      injuryNames: INJURY.map((x) => x[0]), boxesOf, marksOf, toughOf, setHurt,
       formOf: (c) => { const f = formOf(c); return f ? { name: formLabel(c), human: humanLabel(c), on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [], originRules: heritageOf(c)?.core || [] } : null; } });
   } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
@@ -4019,6 +4043,8 @@ tr.lvl-U td.target { color: var(--muted); }
   });
 
   $("boxes").addEventListener("click", (e) => {
+    const tb = e.target.closest("[data-tbox]");
+    if (tb) { const i = +tb.dataset.tbox; ch.play.tough = (ch.play.tough || 0) === i ? i - 1 : i; render(); return; }
     const b = e.target.closest("[data-box]"); if (!b) return;
     const i = +b.dataset.box;
     const before = ch.play.injury;

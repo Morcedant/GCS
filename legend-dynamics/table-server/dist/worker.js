@@ -129,6 +129,7 @@ function cleanPlay(p) {
     if (v !== null) out[k] = v;
   };
   n("injury", 0, 3);
+  n("tough", 0, 6);
   n("duty", 0, 30);
   n("ptrack", 0, 30);
   n("rounds", 0, 200);

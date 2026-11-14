@@ -160,13 +160,33 @@ test("special loads: each Trails load's material is one the fight panel knows, a
   assert.equal(shot(["salt"]).damage.boxes, 2, "rock salt hurts it");
 });
 
-test("a strong hit (made by 5 or more, or a natural 3 or 4) gets 1 box through any Defense", () => {
+test("a telling hit (made by 5 or more, or a natural 3 or 4) gets 1 box through any Defense", () => {
   const atk = { id: "a", skillTarget: 12, injury: 0 };
   const hit = (/** @type {number[]} */ dice, /** @type {any} */ weapon, /** @type {any[]} */ traits) => LD.resolveAttack({ attacker: atk, defender: { id: "d", canDodge: false, injury: 0, traits }, weapon, band: "close" }, LD.NO_HOOKS, () => dice);
   const pistol = { id: "pistol", band: "close", class: 1, damage: { any: { boxes: 2 } } }, D5 = [{ type: "defenseClass", value: 5, label: "Toughness V" }];
   assert.equal(hit([3, 3, 4], pistol, D5).damage, null, "made by 2: Defense V stops a Class I pistol");
-  assert.equal(hit([2, 2, 3], pistol, D5).damage.boxes, 1, "made by 5: a strong hit finds the gap, 1 box");
-  assert.match(hit([2, 2, 3], pistol, D5).defenseClass, /strong hit gets through for 1 box/);
+  assert.equal(hit([2, 2, 3], pistol, D5).damage.boxes, 1, "made by 5: a telling hit finds the gap, 1 box");
+  assert.match(hit([2, 2, 3], pistol, D5).defenseClass, /telling hit gets through for 1 box/);
   assert.equal(hit([1, 1, 2], { ...pistol, class: 3 }, [{ type: "defenseClass", value: 2 }]).damage.boxes, 1, "a Class above, strong or not: one box fewer");
   assert.equal(hit([1, 1, 1], { ...pistol, damage: { any: { boxes: 1 } }, class: 3 }, [{ type: "defenseClass", value: 2 }]).damage.boxes, 1, "a 1-box strong hit a Class above still marks 1");
+});
+
+test("above Class IV, each Class over IV marks a box more, against anyone with more than 3 boxes", () => {
+  const hit = (/** @type {any} */ weapon, /** @type {number} */ boxes) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 12, injury: 0 }, defender: { id: "d", canDodge: false, injury: 0, boxes, traits: [] }, weapon, band: "close" }, LD.NO_HOOKS, () => [3, 3, 4]);
+  const blast = (/** @type {number} */ c) => ({ id: "b" + c, band: "close", class: c, damage: { any: { boxes: 3 } } });
+  assert.equal(hit(blast(4), 8).damage.boxes, 3, "Class IV: 3 boxes");
+  assert.equal(hit(blast(5), 8).damage.boxes, 4, "Class V: 4");
+  assert.equal(hit(blast(6), 8).damage.boxes, 5, "Class VI: 5");
+  assert.equal(hit(blast(6), 3).damage.boxes, 3, "a 3-box target: still 3");
+  assert.equal(hit(blast(6), 8).classHarm, 2);
+});
+
+test("Toughness boxes are marked first and carry no injury penalty", () => {
+  assert.equal(LD.woundLevel({ injury: 2, extraBoxes: 2 }), 0);
+  assert.equal(LD.woundLevel({ injury: 3, extraBoxes: 2 }), 1);
+  assert.equal(LD.woundLevel({ injury: 1 }), 1);
+  const atk = (/** @type {number} */ injury, /** @type {number} */ extraBoxes) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 12, injury, extraBoxes }, defender: { id: "d", canDodge: false, injury: 0, traits: [] }, weapon: { id: "p", band: "close", damage: { any: { boxes: 1 } } }, band: "close" }, LD.NO_HOOKS, () => [3, 3, 4]);
+  assert.ok(!atk(2, 2).attackMods.some((/** @type {any} */ m) => m.source === "injury"), "two Toughness boxes marked: no penalty");
+  assert.ok(atk(3, 2).attackMods.some((/** @type {any} */ m) => m.source === "injury" && m.value === -1), "then the first Injury box: −1");
+  assert.equal(LD.applyHit({ injury: 4, boxes: 5 }, { boxes: 1 }).out, true, "out when every box is marked");
 });

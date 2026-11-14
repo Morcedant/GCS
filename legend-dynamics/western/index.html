@@ -241,6 +241,10 @@ tr.lvl-U td.target { color: var(--muted); }
 .box { width: 64px; height: 26px; border: 1px solid var(--chrome-dim); border-radius: 4px; background: transparent; transform: skewX(-20deg); font-size: 0; }
 .box:hover { border-color: var(--chrome); }
 .box.on { background: var(--bad); border-color: var(--bad); box-shadow: 0 0 12px rgba(163, 38, 26, .55); }
+.boxes .box.tough { border-style: dashed; border-color: var(--accent); }
+.boxes .box.tough.on { background: var(--accent); border-color: var(--accent); box-shadow: none; }
+.boxes .box.tough + .box:not(.tough) { margin-left: 8px; }
+.tough-sep { display: inline-block; width: 10px; }
 .condition { font-family: var(--display); letter-spacing: .1em; text-transform: uppercase; }
 .duty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .duty .count { font: 400 2.2rem/1 var(--mono); min-width: 2ch; text-align: center; color: var(--accent); text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); }
@@ -690,7 +694,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="8c4797c" data-version-date="2026.11.14" title="The code changes whenever this page changes.">Version 2026.11.14 · 8c4797c</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="186bb7e" data-version-date="2026.11.14" title="The code changes whenever this page changes.">Version 2026.11.14 · 186bb7e</span><!-- VERSION:END --></div>
   </header>
 
   <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
@@ -5460,6 +5464,9 @@ function weaponAccuracy(weapon, ctx) {
 const INJURY_MAX = 3;
 /** Physical-action penalty for each injury level; null means Incapacitated. */
 const INJURY_PENALTY = [0, -1, -2, null];
+/** The injury level a character's penalties come from: Toughness boxes (extraBoxes, Aurora's heroes) are marked first and carry none.
+ * @param {{ injury?: number, extraBoxes?: number }} p */
+const woundLevel = (p) => Math.max(0, (p.injury || 0) - (p.extraBoxes || 0));
 
 /**
  * Apply a hit that got through, under the published injury and Dying rules.
@@ -5559,7 +5566,7 @@ function resolveAttack(input, hooks, roll) {
   const ench = (attacker.traits || []).filter((/** @type {any} */ t) => t.type === "weaponBonus" && (!t.weapon || t.weapon === weapon.id));
   for (const t of ench) if (t.accuracy) mods.push({ source: "enchantment", label: t.label || "Enchantment", value: t.accuracy, scope: "setting" });
   if (input.cover === "partial") mods.push({ source: "cover", label: "Partial cover", value: -2, scope: "core" });
-  const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
+  const atkInj = INJURY_PENALTY[woundLevel(attacker)] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
   for (const m of input.situational || []) if (m.value) mods.push(m);
   for (const t of liveTraits(defender)) if (t.type === "attackPenalty" && t.value) mods.push({ source: "defender", label: t.label || "Defender", value: t.value, scope: "setting" });
@@ -5585,7 +5592,7 @@ function resolveAttack(input, hooks, roll) {
     for (const m of def.mods || []) if (m.value) dmods.push(m);
     // Published gear: a shield's +1 to Dodge against attacks you can see.
     if (def.kind === "dodge") for (const t of liveTraits(defender)) if (t.type === "dodgeBonus" && t.value) dmods.push({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting" });
-    const defInj = INJURY_PENALTY[defender.injury || 0] || 0;
+    const defInj = INJURY_PENALTY[woundLevel(defender)] || 0;
     if (defInj) dmods.push({ source: "injury", label: "Defender's injury", value: defInj, scope: "core" });
     for (const h of hooks.dodgeModifiers) for (const m of h({ ...dctx, defense: def.kind })) if (m.value) dmods.push(m);
     const eff = def.base + sumMods(dmods);
@@ -5609,6 +5616,9 @@ function resolveAttack(input, hooks, roll) {
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
   if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
+  // Above Class IV, Class means harm: +1 box per Class over IV, against anyone with more than 3 boxes (Aurora's heroes with
+  // Toughness boxes, the big villains); a 3-box target is out to any Class IV hit already.
+  if (dmg && dmg.boxes && (weapon.class || 0) > 4 && (defender.boxes || INJURY_MAX) > INJURY_MAX) { dmg = { ...dmg, boxes: dmg.boxes + weapon.class - 4 }; out.classHarm = weapon.class - 4; }
   // Personal-scale magic marks at most 3 boxes on one target, whatever its Boosts (core magic's harm limit).
   if (dmg && weapon.spell && dmg.boxes > MAGIC_HARM_CAP) { dmg = { ...dmg, boxes: MAGIC_HARM_CAP }; out.harmCapped = true; }
   const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
@@ -5634,7 +5644,7 @@ function resolveAttack(input, hooks, roll) {
   const cls0 = weapon.class || 1, immune = liveTraits(defender).find((/** @type {any} */ t) => t.type === "immuneType" && made([t.dtype]));
   if (immune && cls0 < 6) return { ...out, outcome: `hit, marks nothing (${immune.label || "immune to " + immune.dtype})`, hit: true, damage: null, shrugged: immune.label || "immune" };
   // A Defense Class (Aurora): an attack must be at least one Class above it to do anything, and then marks a box fewer;
-  // a strong hit always gets 1 box through.
+  // a telling hit always gets 1 box through (Aurora's exception to the core's "a telling hit never adds boxes").
   // Each Defense says which damage types it covers (Toughness: physical; a force field: physical and energy); against
   // any other it counts one Class lower. With several, the best one for this attack counts. Resistant to a type: +1.
   const dcs = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "defenseClass" && t.value);
@@ -5647,11 +5657,11 @@ function resolveAttack(input, hooks, roll) {
     const cls = (weapon.class || 1) + (weapon.piercing ? 1 : 0);
     const R = ["", "I", "II", "III", "IV", "V", "VI"], why = [best && best.v < best.t.value ? `${best.t.label || "Defense"} is one Class lower against ${dtype}` : "", resist ? `resistant to ${dtype}` : ""].filter(Boolean).join("; ");
     const D = `Defense ${R[dc.value] || dc.value}${why ? ` (${why})` : ""}`, C = `Class ${R[cls] || cls}${dtype !== "physical" ? " " + dtype : ""}`;
-    // A strong hit (made by 5 or more, or a natural 3 or 4) finds the gap: whatever the Classes, it marks at least 1 box.
+    // A telling hit (made by 5 or more, or a natural 3 or 4) finds the gap: whatever the Classes, it marks at least 1 box.
     const strong = atk.margin >= 5 || atk.auto === "success";
     if (cls <= dc.value) {
       if (!strong) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
-      dmg = { ...dmg, boxes: 1 }; out.defenseClass = `${D} against a ${C} attack: a strong hit gets through for 1 box`;
+      dmg = { ...dmg, boxes: 1 }; out.defenseClass = `${D} against a ${C} attack: a telling hit gets through for 1 box`;
     } else {
       dmg = { ...dmg, boxes: Math.max(strong ? 1 : 0, dmg.boxes - 1) }; out.defenseClass = `${D} against a ${C} attack: one box fewer`;
       if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${D} against a ${C} attack)`, hit: true, damage: null, shrugged: dc.label || "Defense" };
@@ -5668,7 +5678,7 @@ function resolveAttack(input, hooks, roll) {
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }
 
-return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, moveYards, injuredMove, BAND_YARDS, bandForYards, THREAT_MOVE, reachYards, priceFor, MAGIC_HARM_CAP, NO_HOOKS, resolveAttack };
+return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, woundLevel, applyHit, dodgeBase, moveYards, injuredMove, BAND_YARDS, bandForYards, THREAT_MOVE, reachYards, priceFor, MAGIC_HARM_CAP, NO_HOOKS, resolveAttack };
 })();
   const LAB_DATA = null;
   const LDX = (() => {
@@ -6115,8 +6125,8 @@ function attack(enc, rules, core, cmd, opts = {}) {
     lasting: clone(d.lasting || []), conditions: clone(d.conditions || []), takenOut: !!d.takenOut, limbTradedRound: d.limbTradedRound },
     attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
-    attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, traits: a.traits || [] },
-    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
+    attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, extraBoxes: a.extraBoxes || 0, traits: a.traits || [] },
+    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, extraBoxes: d.extraBoxes || 0, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
     defense: chosen ? { kind: chosen.kind, label: chosen.label, base: chosen.base, mods: chosen.mods.filter((/** @type {any} */ m) => !m.preview) } : null,
     weapon, band: cmd.band, mode: cmd.mode || null, aimed, boosts: cmd.boosts || 0, ammo: cmd.ammo || null, cover: cmd.cover || "none",
     situational: (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ source: "situation", label: m.label || "Situation", value: +m.value, scope: "situation" })),
@@ -6175,7 +6185,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, classHarm: res.classHarm || 0, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
     teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
     strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
     dive: dive ? { cls: dive, hurts: Math.max(0, ...(a.traits || []).filter((/** @type {any} */ t) => t.type === "defenseClass").map((/** @type {any} */ t) => t.value)) < dive } : null,
@@ -6265,7 +6275,7 @@ function showdown(enc, rules, core, cmd) {
   const n = enc.events.filter((/** @type {any} */ e) => e.type === "showdown").length;
   const roll = (/** @type {string} */ kind, /** @type {number} */ target) => core.resolve(core.diceFor(enc.seed, `sd${n}|${a.pid}>${d.pid}|${kind}`), target);
   const sum = (/** @type {any[]} */ l) => l.reduce((t, m) => t + m.value, 0);
-  const wound = (/** @type {any} */ p) => { const v = core.INJURY_PENALTY[p.injury || 0] || 0; return v ? [{ label: "Wounds", value: v }] : []; };
+  const wound = (/** @type {any} */ p) => { const v = core.INJURY_PENALTY[core.woundLevel(p)] || 0; return v ? [{ label: "Wounds", value: v }] : []; };
   const pair = (/** @type {any} */ e) => (e.a.pid === a.pid && e.d.pid === d.pid) || (e.a.pid === d.pid && e.d.pid === a.pid);
   if (cmd.phase === "stare") {
     const ma = wound(a), md = wound(d), ta = (a.will ?? 10) + sum(ma), td = (d.will ?? 10) + sum(md);
@@ -6902,7 +6912,8 @@ function mountLab(api) {
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: c.extra ? c.npcBoxes || 3 : 3, injury: c.extra ? c.play.marks || 0 : c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
+      boxes: api.boxesOf ? api.boxesOf(c) : c.extra ? c.npcBoxes || 3 : 3, injury: api.marksOf ? api.marksOf(c) : c.extra ? c.play.marks || 0 : c.play.injury || 0,
+      ...(api.toughOf && api.toughOf(c) ? { extraBoxes: api.toughOf(c) } : {}), dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
       ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes } : {}), will: c.attrs.Will, ...(SD ? sdTraits(c) : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A character's edge in a showdown: Quick Draw's bonus (an advantage), and an ability that wins a tied draw. @param {any} c */
@@ -6985,7 +6996,7 @@ function mountLab(api) {
     for (const p of en.participants) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
-      if (c.extra && api.setMarks) api.setMarks(c, p.injury); else c.play.injury = Math.min(3, p.injury);
+      if (api.setHurt) api.setHurt(c, p.injury); else if (c.extra && api.setMarks) api.setMarks(c, p.injury); else c.play.injury = Math.min(3, p.injury);
       c.play.dying = p.dying; c.play.duty = p.points;
       c.play.frightened = isFrightened(p);
       if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
@@ -7085,7 +7096,12 @@ function mountLab(api) {
   $("lab-end").onclick = () => {
     const en = enc(); E.endEncounter(en, S.summarize(en));
     lab.history = [en, ...lab.history.filter((/** @type {any} */ h) => h.id !== en.id)].slice(0, 20);
-    pushToCards(); save(); renderAll(); say(`Encounter ended. Its summary is below, and it's kept in ${HISTORY}.`);
+    pushToCards();
+    // Toughness boxes clear when the fight is over (the Injury boxes stay).
+    const cleared = api.toughOf ? api.crew().filter((/** @type {any} */ c) => !c.extra && c.play.tough && api.toughOf(c)) : [];
+    for (const c of cleared) c.play.tough = 0;
+    if (cleared.length) { api.saveCrew(); api.renderCrew(); }
+    save(); renderAll(); say(`Encounter ended. Its summary is below, and it's kept in ${HISTORY}.${cleared.length ? ` Toughness boxes cleared for ${cleared.map((/** @type {any} */ c) => c.name).join(", ")}.` : ""}`);
   };
 
   // ---- actions ----
@@ -7267,6 +7283,7 @@ function mountLab(api) {
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
+    if (ev.classHarm) L.push(`<span class="x">Class ${["", "I", "II", "III", "IV", "V", "VI"][4 + ev.classHarm]} against more than 3 boxes: +${ev.classHarm} box${ev.classHarm > 1 ? "es" : ""}.</span>`);
     if (ev.material) L.push(`<span class="x">Made of ${esc((MATERIALS.find((/** @type {any} */ m) => m[0] === ev.material) || [, ev.material])[1].toLowerCase())}.</span>`);
     if (ev.weakness) L.push(`<span class="x">${esc(ev.weakness)}: one box more.</span>`);
     if (ev.capped) L.push(`<span class="x">${esc(ev.capped)}: only the right weapon marks more.</span>`);
@@ -7670,7 +7687,7 @@ return { mountLab };
       portrait: "", portraitShape: "token", token: "", pictureFrom: { portrait: "", token: "" },
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
-      play: { unstable: 0, injury: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
+      play: { unstable: 0, injury: 0, tough: 0, duty: 2, stunned: false, frightened: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -7724,6 +7741,8 @@ return { mountLab };
       out.npcWeapons = (Array.isArray(out.npcWeapons) ? out.npcWeapons : []).filter((w) => typeof w === "string").slice(0, 12);
       out.npcNote = String(out.npcNote || "").slice(0, 1000); out.threat = typeof out.threat === "string" ? out.threat : null; out.foe = out.foe !== false;
       out.play.marks = Math.max(0, Math.min(out.npcBoxes, parseInt(out.play.marks, 10) || 0));
+    }
+    { out.play.tough = Math.max(0, Math.min(6, parseInt(out.play.tough, 10) || 0));
     }
     out.comp.level = Math.max(1, Math.min(3, parseInt(out.comp.level, 10) || 1)); // how unstable (PACK.unstable), I to III
     out.comp.vuln = PACK.damageTypes && (PACK.damageTypes.vulnerable || []).includes(out.comp.vuln) ? out.comp.vuln : ""; // a Vulnerability's type
@@ -8555,7 +8574,9 @@ return { mountLab };
 
     // condition
     const inj = ch.play.injury;
-    $("boxes").innerHTML = [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
+    const tb = toughOf(ch), tm = Math.min(tb, ch.play.tough || 0);
+    $("boxes").innerHTML = (tb ? Array.from({ length: tb }, (_, j) => j + 1).map((i) => `<button class="box tough ${i <= tm ? "on" : ""}" data-tbox="${i}" aria-label="Toughness box ${i}${i <= tm ? ", marked" : ""}" title="Toughness box (from Defense ${CLASS_NAMES[tb - 1]}): marked before your Injury boxes, no penalty, clears after the fight"></button>`).join("") + '<span class="tough-sep" aria-hidden="true"></span>' : "")
+      + [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
     $("cond").textContent = INJURY[inj][0] + ".";
     $("cond-effect").textContent = ch.play.dying ? `Dying: needs stabilizing (one action, Medicine roll, ${T.medkit}) before the scene ends.` : INJURY[inj][1];
     if (inj < 3 && !gritty) ch.play.dying = false; // clearing a box ends Dying (a grievous wound can leave you Dying with boxes to spare)
@@ -8866,14 +8887,14 @@ return { mountLab };
   }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [],
+    const o = { injury: p.injury || 0, tough: p.tough || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [],
       ...(PACK.wanted ? { wanted: p.wanted || null } : {}) };
     // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
     // the player's page passes on what it was sent.
     if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "frightened", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "tough", "dying", "duty", "stunned", "frightened", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if (PACK.wanted && "wanted" in q) c.play.wanted = wantedClean(q.wanted);
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
@@ -11836,7 +11857,7 @@ function ptMaps(api, root) {
         stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...(k.powerMove ? [`${k.powerMove.name} ${k.powerMove.yards.toLocaleString()} yd`] : []), ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
-      if ("injury" in patch) { if (c.extra) setMarks(c, patch.injury); else { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; } }
+      if ("injury" in patch) setHurt(c, patch.injury);
       if ("dying" in patch) c.play.dying = !!patch.dying;
       if ("stunned" in patch) c.play.stunned = !!patch.stunned;
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
@@ -11949,14 +11970,29 @@ function ptMaps(api, root) {
       default: return t && t.label ? t.label : "";
     }
   }
-  function boxesOf(c) { return c.extra ? c.npcBoxes || 3 : 3; } // hoisted: the battle map asks as it mounts
+  // Toughness boxes (the setting's defenseBoxes, Aurora): a hero gets one for each Class of their best Defense (Toughness,
+  // a Force Field, an Aegis suit). They're marked before the three Injury boxes, carry no penalty, and clear after the fight.
+  function defenseOf(c) {
+    const DP = (PACK.damageTypes || {}).powers || { toughness: 1, forcefield: 1 }, GD = PACK.gearDefense || {};
+    return Math.max(0, ...(POWERS ? allPowers(c).filter((x) => DP[x.id]).map((x) => classIndex(x.cl) + 1) : []),
+      ...Object.entries(GD).filter(([k]) => (c.equipment || {})[k]).map(([, d]) => d.value));
+  }
+  function toughOf(c) { return PACK.defenseBoxes && !c.extra ? defenseOf(c) : 0; }
+  function boxesOf(c) { return c.extra ? c.npcBoxes || 3 : 3 + toughOf(c); } // hoisted: the battle map asks as it mounts
+  /** A hero's boxes marked, Toughness first: what's left after Toughness goes on the Injury track. */
+  function setHurt(c, m) {
+    if (c.extra) return setMarks(c, m);
+    const t = toughOf(c); m = Math.max(0, Math.min(t + 3, m));
+    c.play.tough = Math.min(t, m); c.play.injury = m - c.play.tough;
+    if (c.play.injury < 3 && !gritty) c.play.dying = false;
+  }
   /** An extra's boxes marked: their injury level follows (the last box: out; the one before: seriously hurt). */
   function setMarks(c, m) {
     const nb = boxesOf(c); m = Math.max(0, Math.min(nb, m)); c.play.marks = m;
     c.play.injury = m >= nb ? 3 : m <= 0 ? 0 : nb - m === 1 ? 2 : 1;
     if (c.play.injury < 3) c.play.dying = false;
   }
-  function marksOf(c) { return c.extra ? c.play.marks || 0 : c.play.injury || 0; }
+  function marksOf(c) { return c.extra ? c.play.marks || 0 : Math.min(toughOf(c), c.play.tough || 0) + (c.play.injury || 0); }
   /** A threat's stat block as a character: Dodge gives Agility, each attack a skill at its target (the attribute raised as
    *  far as it needs), attack powers and protection powers at their Class, and the rest as fight traits and a note. */
   function threatToCharacter(t) {
@@ -12326,7 +12362,7 @@ function ptMaps(api, root) {
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? formLabel(c) : humanLabel(c)))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (c.altForm ? humanLabel(c) : humanLabel(c).toLowerCase()) : formLabel(c))}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power covers this far instead of the move on foot"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> <b class="num">${k.powerMove.yards.toLocaleString()} yd</b> a move</div>` : ""}
-        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: nb }, (_, j) => j + 1).map((i) => `<button class="box ${i <= mk ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span></span>
+        <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: nb }, (_, j) => j + 1).map((i) => `<button class="box ${i <= mk ? "on" : ""}${i <= toughOf(c) ? " tough" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} ${i <= toughOf(c) ? "Toughness" : "injury"} box ${i}" title="${i <= toughOf(c) ? "Toughness box: marked first, no penalty, clears after the fight" : "Injury box"}"></button>`).join("")}</span></span>
           ${c.extra ? "" : `<span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span>`}</div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${inForm(c) ? ` · <b style="color:var(--bad)">${esc(formLabel(c))}</b>` : ""}</div>` : inForm(c) && !c.altForm ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
         ${MTRACK ? `<div class="gm-row small"><span class="muted">${esc(MTRACK.name)}</span><span class="boxes">${Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.mind || 0) ? "on" : ""}" data-gm="${c.id}" data-gmmind="${i + 1}" aria-label="${esc(c.name)} ${esc(MTRACK.name)} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(MTRACK.effects[Math.min(MTRACK.boxes, c.play.mind || 0)].split(":")[0])}</span></div>` : ""}
@@ -12355,7 +12391,7 @@ function ptMaps(api, root) {
   for (const gid of ["gm-grid", "gm-extras"]) $(gid).addEventListener("click", (e) => {
     const el = e.target.closest("[data-gm]"); if (!el || el.matches("input")) return;
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
-    if (el.dataset.gmbox) { const i = +el.dataset.gmbox; if (c.extra) setMarks(c, marksOf(c) === i ? i - 1 : i); else { c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; } }
+    if (el.dataset.gmbox) { const i = +el.dataset.gmbox; setHurt(c, marksOf(c) === i ? i - 1 : i); }
     else if ("gmopen" in el.dataset) { openExtra(c); return; }
     else if ("gmmap" in el.dataset) { battleMap.addCrew(c.id); showGmTab("fight"); gmSay(`${c.name} is on the battle map: their card and token share boxes.`); return; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
@@ -12459,6 +12495,7 @@ function ptMaps(api, root) {
       traitsFor: (c) => [...hbEdgeTraits(PACK, (k) => edgeN(k, c)), // homebrew Edges' fight traits
         // Each protection power is its own Defense, covering its damage types (Toughness: physical; Force Field: physical and energy).
         ...(DT && POWERS ? allPowers(c).filter((x) => DT.powers[x.id]).map((x) => ({ type: "defenseClass", value: classIndex(x.cl) + 1, covers: DT.powers[x.id], label: `${powerDef(x.id)[1]} ${x.cl}` })) : []),
+        ...Object.entries(PACK.gearDefense || {}).filter(([k]) => (c.equipment || {})[k]).map(([, d]) => ({ type: "defenseClass", ...d })), // an Aegis suit's Toughness
         ...(vulnOf(c) ? [{ type: "weakness", material: vulnOf(c), extra: 1, label: `Vulnerability: ${vulnOf(c)}` }] : []),
         ...(c.extra ? c.npcTraits || [] : [])], // an extra's own fight traits (from their threat)
       mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
@@ -12472,7 +12509,7 @@ function ptMaps(api, root) {
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
-      injuryNames: INJURY.map((x) => x[0]),
+      injuryNames: INJURY.map((x) => x[0]), boxesOf, marksOf, toughOf, setHurt,
       formOf: (c) => { const f = formOf(c); return f ? { name: formLabel(c), human: humanLabel(c), on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [], originRules: heritageOf(c)?.core || [] } : null; } });
   } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
@@ -12707,6 +12744,8 @@ function ptMaps(api, root) {
   });
 
   $("boxes").addEventListener("click", (e) => {
+    const tb = e.target.closest("[data-tbox]");
+    if (tb) { const i = +tb.dataset.tbox; ch.play.tough = (ch.play.tough || 0) === i ? i - 1 : i; render(); return; }
     const b = e.target.closest("[data-box]"); if (!b) return;
     const i = +b.dataset.box;
     const before = ch.play.injury;

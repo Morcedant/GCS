@@ -152,7 +152,7 @@ export function cleanPlay(p) {
   const out = /** @type {Record<string, any>} */ ({});
   if (!p || typeof p !== "object") return out;
   const n = (/** @type {string} */ k, /** @type {number} */ lo, /** @type {number} */ hi) => { const v = int(p[k], lo, hi); if (v !== null) out[k] = v; };
-  n("injury", 0, 3); n("duty", 0, 30); n("ptrack", 0, 30); n("rounds", 0, 200); n("spares", 0, 50);
+  n("injury", 0, 3); n("tough", 0, 6); n("duty", 0, 30); n("ptrack", 0, 30); n("rounds", 0, 200); n("spares", 0, 50);
   for (const k of ["dying", "stunned", "form"]) if (typeof p[k] === "boolean") out[k] = p[k];
   if (Array.isArray(p.lasting) && p.lasting.length <= 12 && JSON.stringify(p.lasting).length <= 3000) out.lasting = p.lasting;
   return out;

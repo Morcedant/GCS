@@ -237,7 +237,8 @@ export function mountLab(api) {
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: c.extra ? c.npcBoxes || 3 : 3, injury: c.extra ? c.play.marks || 0 : c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
+      boxes: api.boxesOf ? api.boxesOf(c) : c.extra ? c.npcBoxes || 3 : 3, injury: api.marksOf ? api.marksOf(c) : c.extra ? c.play.marks || 0 : c.play.injury || 0,
+      ...(api.toughOf && api.toughOf(c) ? { extraBoxes: api.toughOf(c) } : {}), dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
       ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes } : {}), will: c.attrs.Will, ...(SD ? sdTraits(c) : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A character's edge in a showdown: Quick Draw's bonus (an advantage), and an ability that wins a tied draw. @param {any} c */
@@ -320,7 +321,7 @@ export function mountLab(api) {
     for (const p of en.participants) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
-      if (c.extra && api.setMarks) api.setMarks(c, p.injury); else c.play.injury = Math.min(3, p.injury);
+      if (api.setHurt) api.setHurt(c, p.injury); else if (c.extra && api.setMarks) api.setMarks(c, p.injury); else c.play.injury = Math.min(3, p.injury);
       c.play.dying = p.dying; c.play.duty = p.points;
       c.play.frightened = isFrightened(p);
       if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
@@ -420,7 +421,12 @@ export function mountLab(api) {
   $("lab-end").onclick = () => {
     const en = enc(); E.endEncounter(en, S.summarize(en));
     lab.history = [en, ...lab.history.filter((/** @type {any} */ h) => h.id !== en.id)].slice(0, 20);
-    pushToCards(); save(); renderAll(); say(`Encounter ended. Its summary is below, and it's kept in ${HISTORY}.`);
+    pushToCards();
+    // Toughness boxes clear when the fight is over (the Injury boxes stay).
+    const cleared = api.toughOf ? api.crew().filter((/** @type {any} */ c) => !c.extra && c.play.tough && api.toughOf(c)) : [];
+    for (const c of cleared) c.play.tough = 0;
+    if (cleared.length) { api.saveCrew(); api.renderCrew(); }
+    save(); renderAll(); say(`Encounter ended. Its summary is below, and it's kept in ${HISTORY}.${cleared.length ? ` Toughness boxes cleared for ${cleared.map((/** @type {any} */ c) => c.name).join(", ")}.` : ""}`);
   };
 
   // ---- actions ----
@@ -602,6 +608,7 @@ export function mountLab(api) {
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
+    if (ev.classHarm) L.push(`<span class="x">Class ${["", "I", "II", "III", "IV", "V", "VI"][4 + ev.classHarm]} against more than 3 boxes: +${ev.classHarm} box${ev.classHarm > 1 ? "es" : ""}.</span>`);
     if (ev.material) L.push(`<span class="x">Made of ${esc((MATERIALS.find((/** @type {any} */ m) => m[0] === ev.material) || [, ev.material])[1].toLowerCase())}.</span>`);
     if (ev.weakness) L.push(`<span class="x">${esc(ev.weakness)}: one box more.</span>`);
     if (ev.capped) L.push(`<span class="x">${esc(ev.capped)}: only the right weapon marks more.</span>`);
