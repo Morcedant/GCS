@@ -1,0 +1,3075 @@
+{
+ "id": "uss-pelion",
+ "terms": {
+  "title": "USS Pelion",
+  "eyebrow": "Legend Dynamics · A Star Trek fan game",
+  "guideTitle": "USS Pelion Players' Guide",
+  "guideSubtitle": "Campaign year 2268, for the Legend Dynamics RPG system",
+  "point": "Duty",
+  "role": "Department",
+  "roleLower": "department",
+  "origin": "Species",
+  "originLower": "species",
+  "originPlural": "Species",
+  "originPluralLower": "species",
+  "pathRounded": "Officer",
+  "pathExpert": "Enlisted specialist",
+  "pathExpertPlural": "Enlisted specialists",
+  "reasonLabel": "Why you joined Starfleet",
+  "reasonSheet": "Why I serve",
+  "gear": "Equipment",
+  "gearLower": "equipment",
+  "tabPlay": "Duty station",
+  "readyText": "Ready for duty",
+  "stun": "Stunned",
+  "medkit": "medical kit",
+  "facility": "Sickbay",
+  "titlePlaceholder": "e.g. Lieutenant",
+  "mission": "Mission",
+  "missionLower": "mission",
+  "missionsChapter": "Running missions",
+  "prepareTitle": "Prepare for duty",
+  "journal": "Captain's log",
+  "journalIntro": "Write it together at the end of a mission. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.",
+  "journalTitlePlaceholder": "e.g. The Silence at Corvan II",
+  "journalDateLabel": "Stardate",
+  "journalExtraLabel": "",
+  "journalExtraPlaceholder": "",
+  "weaponsTitle": "Phaser and power",
+  "ammo": "power",
+  "ammoOne": "power",
+  "shot": "Fire",
+  "spent": "drawn",
+  "sparesLabel": "Spare power cells",
+  "reload": "Swap a power cell (one action)",
+  "reloadDone": "Fresh cell in. That took your action.",
+  "restock": "Recharge in the armory",
+  "restockDone": "Recharged in the armory: full power.",
+  "emptyNote": "Drained: it won't fire until you swap a cell or recharge it.",
+  "otherWeapon": "Another weapon (no power drawn)",
+  "tracksTitle": "The USS Pelion and Starfleet Command",
+  "tracksIntro": "Shared by the whole crew: the ship's systems, and how much attention Starfleet Command is paying. A starbase repairs the ship; only the GM says when Command's questions are settled.",
+  "tracksReset": "Clear every track",
+  "exampleName": "example science officer",
+  "formToggle": "In alternate form",
+  "formName": "alternate form",
+  "formProfile": "Alternate form",
+  "formCoreSummary": "",
+  "rangedSkill": "Phasers",
+  "meleeSkill": "Unarmed Combat",
+  "unarmedSkill": "Unarmed Combat",
+  "chaseSkill": "Helm",
+  "fontsHref": "https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&family=Exo+2:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap",
+  "party": "crew"
+ },
+ "theme": {
+  "comment": "USS Pelion, plain: a Starfleet technical manual.",
+  "css": "--space: #e6eaee; --glass: #f3f5f7; --glass-hi: #f9fafb; --well: #ffffff; --fg: #142033; --muted: #4f5d72; --line: rgba(20, 32, 51, .2); --chrome: #1f5fa8; --chrome-dim: rgba(31, 95, 168, .55); --gold: #1f5fa8; --blue: #2d6e8e; --red: #b0352a; --good: #237a4b; --bad: #b0352a; --warn: #9a6512; --on-accent: #f3f5f7; --display: \"Exo 2\", \"Segoe UI\", system-ui, sans-serif; --title: \"Oxanium\", \"Arial Narrow\", sans-serif; --body: \"Exo 2\", \"Segoe UI\", system-ui, sans-serif; --mono: \"Exo 2\", \"Segoe UI\", system-ui, sans-serif; --numbers: \"Oxanium\", \"Exo 2\", sans-serif; --radius: 4px;",
+  "particles": null,
+  "plain": true,
+  "glow": "31, 95, 168",
+  "line": "20, 32, 51",
+  "highlight": "255, 255, 255",
+  "wash1": "0, 0, 0, 0",
+  "wash2": "0, 0, 0, 0",
+  "optionBg": "#f3f5f7",
+  "barBg": "230, 234, 238, .97",
+  "text2": "#2b3a52",
+  "goodRgb": "35, 122, 75",
+  "badRgb": "176, 53, 42",
+  "placeholder": "rgba(79, 93, 114, .6)"
+ },
+ "docxColors": [
+  "1B2A4A",
+  "E9EEF6"
+ ],
+ "groups": [
+  {
+   "id": "command",
+   "name": "Command",
+   "color": "--gold",
+   "emblem": "M50.0 68.0 L53.8 78.7 L65.2 79.1 L56.2 86.0 L59.4 96.9 L50.0 90.5 L40.6 96.9 L43.8 86.0 L34.8 79.1 L46.2 78.7 Z",
+   "stroke": false
+  },
+  {
+   "id": "sciences",
+   "name": "Sciences",
+   "color": "--blue",
+   "emblem": "M50 78 a6 6 0 1 0 0.01 0 Z M35 90 C32 78 60 68 65 76 C69 86 44 100 35 90 Z",
+   "stroke": true
+  },
+  {
+   "id": "operations",
+   "name": "Operations",
+   "color": "--red",
+   "emblem": "M50.0 86.0 L49.6 86.1 L49.2 86.2 L48.8 86.2 L48.4 86.1 L47.9 85.9 L47.5 85.6 L47.1 85.3 L46.8 84.8 L46.6 84.3 L46.4 83.7 L46.3 83.1 L46.4 82.4 L46.5 81.8 L46.8 81.1 L47.3 80.5 L47.8 80.0 L48.4 79.5 L49.2 79.1 L50.0 78.9 L50.8 78.8 L51.7 78.9 L52.6 79.1 L53.5 79.4 L54.3 80.0 L55.0 80.6 L55.7 81.4 L56.2 82.4 L56.5 83.4 L56.7 84.5 L56.7 85.6 L56.5 86.7 L56.1 87.9 L55.5 88.9 L54.7 89.9 L53.8 90.7 L52.7 91.4 L51.4 91.9 L50.1 92.2 L48.8 92.2 L47.4 92.1 L46.0 91.7 L44.7 91.1 L43.5 90.2 L42.4 89.1 L41.5 87.9 L40.9 86.5 L40.4 85.0 L40.2 83.4 L40.3 81.8 L40.6 80.1 L41.3 78.6 L42.2 77.1 L43.3 75.8 L44.7 74.6 L46.2 73.7 L47.9 73.1 L49.7 72.7 L51.6 72.7 L53.5 73.0 L55.3 73.5 L57.1 74.4 L58.7 75.6 L60.1 77.0 L61.2 78.7 L62.1 80.6 L62.6 82.6 L62.9 84.7 L62.7 86.8 L62.2 89.0 L61.4 91.0 L60.2 92.9 L58.7 94.6 L57.0 96.0 L55.0 97.1 L52.8 97.9 L50.5 98.3 L48.1 98.4 L45.7 98.0 L43.4 97.3 L41.2 96.1",
+   "stroke": true
+  },
+  {
+   "id": "services",
+   "name": "General Services",
+   "color": "--good",
+   "emblem": "M50 74 a10 10 0 1 0 0.01 0 Z",
+   "stroke": false
+  }
+ ],
+ "roles": [
+  {
+   "name": "Command",
+   "group": "command",
+   "text": "Command officer: coordinates the crew with Leadership and negotiates with Diplomacy when orders and circumstances collide.",
+   "skills": [
+    "Leadership",
+    "Diplomacy",
+    "Psychology",
+    "Phasers"
+   ]
+  },
+  {
+   "name": "Helm",
+   "group": "command",
+   "text": "Helm officer: flies the Pelion and her shuttles, evading, pursuing, or gaining position when it counts.",
+   "skills": [
+    "Helm",
+    "Navigation",
+    "Sensors",
+    "Phasers"
+   ]
+  },
+  {
+   "name": "Navigation",
+   "group": "command",
+   "text": "Navigator: plots safe courses, fixes the ship's position, and finds the way out when the way in has closed.",
+   "skills": [
+    "Navigation",
+    "Sensors",
+    "Helm",
+    "Computers"
+   ]
+  },
+  {
+   "name": "Science",
+   "group": "sciences",
+   "text": "Ship's sciences officer: first to read an anomaly and the one who explains it to the captain.",
+   "skills": [
+    "Sensors",
+    "Physical Sciences",
+    "Life Sciences",
+    "Computers"
+   ]
+  },
+  {
+   "name": "Medical",
+   "group": "sciences",
+   "text": "Medical officer: diagnoses, stabilizes, and treats the crew, from field kits on an away mission to surgery in sickbay.",
+   "skills": [
+    "Medicine",
+    "Life Sciences",
+    "Psychology",
+    "Sensors"
+   ]
+  },
+  {
+   "name": "Engineering",
+   "group": "operations",
+   "text": "Engineer: keeps the Pelion's machinery and power running, and improvises repairs when the parts run out.",
+   "skills": [
+    "Engineering",
+    "Electronics",
+    "Computers",
+    "Physical Sciences"
+   ]
+  },
+  {
+   "name": "Security",
+   "group": "operations",
+   "text": "Security officer: protects the away team, secures the ship, and decides when a phaser stays on stun.",
+   "skills": [
+    "Phasers",
+    "Unarmed Combat",
+    "Athletics",
+    "Stealth"
+   ]
+  },
+  {
+   "name": "Communications",
+   "group": "operations",
+   "text": "Communications officer: establishes contact, cuts through interference, and hears what a signal is really saying.",
+   "skills": [
+    "Communications",
+    "Electronics",
+    "Computers",
+    "Diplomacy"
+   ]
+  },
+  {
+   "name": "General Services",
+   "group": "services",
+   "text": "Enlisted crew: keeps the records, carries orders and reports, and handles the ship's daily business so every department can do its job.",
+   "skills": [
+    "Computers",
+    "Electronics",
+    "Athletics",
+    "Communications"
+   ]
+  }
+ ],
+ "skills": [
+  [
+   "Leadership",
+   "Presence",
+   "Coordinate people and give clear direction"
+  ],
+  [
+   "Diplomacy",
+   "Presence",
+   "Negotiate and resolve disputes"
+  ],
+  [
+   "Psychology",
+   "Intellect",
+   "Interpret behavior and emotional state"
+  ],
+  [
+   "Sensors",
+   "Intellect",
+   "Operate ship sensors or a tricorder"
+  ],
+  [
+   "Physical Sciences",
+   "Intellect",
+   "Analyze energy, matter, space, and geology"
+  ],
+  [
+   "Life Sciences",
+   "Intellect",
+   "Analyze organisms and ecosystems"
+  ],
+  [
+   "Medicine",
+   "Intellect",
+   "Diagnose, treat, and perform medical procedures"
+  ],
+  [
+   "Engineering",
+   "Intellect",
+   "Diagnose and repair mechanical and power systems"
+  ],
+  [
+   "Electronics",
+   "Intellect",
+   "Repair circuitry, controls, and electronic devices"
+  ],
+  [
+   "Computers",
+   "Intellect",
+   "Retrieve data, program, and examine software"
+  ],
+  [
+   "Helm",
+   "Agility",
+   "Pilot a starship or shuttle"
+  ],
+  [
+   "Navigation",
+   "Intellect",
+   "Plot courses and determine position"
+  ],
+  [
+   "Communications",
+   "Intellect",
+   "Operate signals and overcome interference"
+  ],
+  [
+   "Phasers",
+   "Agility",
+   "Use hand phasers or ship weapons"
+  ],
+  [
+   "Unarmed Combat",
+   "Agility",
+   "Strike, grapple, or restrain"
+  ],
+  [
+   "Athletics",
+   "Body",
+   "Climb, swim, jump, and exert yourself"
+  ],
+  [
+   "Stealth",
+   "Agility",
+   "Move quietly and avoid notice"
+  ],
+  [
+   "Survival",
+   "Intellect",
+   "Find shelter and manage wilderness hazards"
+  ]
+ ],
+ "physical": [
+  "Helm",
+  "Phasers",
+  "Unarmed Combat",
+  "Athletics",
+  "Stealth",
+  "Survival"
+ ],
+ "edgePoints": 3,
+ "formCore": [],
+ "formPenalties": {},
+ "origins": [
+  {
+   "id": "human",
+   "name": "Human",
+   "tier": 0,
+   "adj": {},
+   "desc": "Adaptable and widespread across Starfleet. No adjustments; spend your points wherever you like.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "h-spirit",
+     "Indomitable Spirit",
+     "+2 to Will when refusing to abandon a crewmate or give up on a rescue. It does not help against alien compulsion.",
+     "Will",
+     true,
+     "Reckless Hope",
+     "You keep going after the odds have clearly turned. When the GM shows the cost of pressing on, accept the danger, delay, or lost resource."
+    ],
+    [
+     "h-gut",
+     "Gut Instinct",
+     "+2 to Psychology when judging, face to face, whether someone is lying to you. It does not reveal what the truth is.",
+     "Psychology",
+     true,
+     "Acts on Hunches",
+     "You act on an unverified feeling when procedure says wait. Accept the consequence when the hunch costs time, trust, or position."
+    ]
+   ]
+  },
+  {
+   "id": "vulcan",
+   "name": "Vulcan",
+   "tier": 0,
+   "adj": {
+    "Body": 1,
+    "Will": 1
+   },
+   "desc": "Physically stronger than humans and trained from childhood in logic and emotional control. Their reserve can read as cold to other species.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "v-meld",
+     "Vulcan Mind Meld",
+     "By touch, with a willing or restrained subject, roll Will to share thoughts or memories. The GM sets what can be learned before the roll. A resisting mind uses an opposed Will contest, and a meld never reveals what the subject does not know.",
+     "Will",
+     false,
+     "Meld Echoes",
+     "After a meld, fragments of the other mind linger. Accept −2 on your next Will roll, or an uncharacteristic emotional moment, at a time that matters."
+    ],
+    [
+     "v-pinch",
+     "Vulcan Nerve Pinch",
+     "+2 to Unarmed Combat to render a humanoid unconscious when you reach an unaware or restrained target. Unfamiliar anatomy needs study first.",
+     "Unarmed Combat",
+     true,
+     "Logic Before Feeling",
+     "You dismiss an emotional appeal or a colleague's intuition at a key moment. Accept the strained relationship or the missed warning."
+    ],
+    [
+     "v-recall",
+     "Eidetic Recall",
+     "+2 to Intellect rolls to recall exactly something you have read, heard, or seen. It does not supply knowledge you never encountered.",
+     "Intellect",
+     true,
+     "Suppressed Emotion",
+     "Under severe strain, an emotion you have held down breaks through. Accept a visible loss of control at an inconvenient moment."
+    ]
+   ]
+  },
+  {
+   "id": "andorian",
+   "name": "Andorian",
+   "tier": 0,
+   "adj": {
+    "Agility": 1
+   },
+   "desc": "Blue-skinned, antennaed people from the icy moon Andoria. Quick and fiercely loyal, with a passionate, sometimes volatile temper.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "a-antennae",
+     "Antennae Sense",
+     "+2 to Intellect rolls to sense movement nearby, in darkness, or behind you. It does not detect anything shielded or perfectly still.",
+     "Intellect",
+     true,
+     "Born on Ice",
+     "Andoria is a frozen moon. When heat is a real factor, accept −2 on physical actions for the scene or a forced rest."
+    ],
+    [
+     "a-loyalty",
+     "Fierce Loyalty",
+     "+2 to Will against fear or intimidation while a sworn friend or crewmate is in danger.",
+     "Will",
+     true,
+     "Code of Honor",
+     "An insult to you or your clan demands an answer. Accept the consequences of a challenge, a public quarrel, or a duel you cannot refuse."
+    ]
+   ]
+  },
+  {
+   "id": "tellarite",
+   "name": "Tellarite",
+   "tier": 0,
+   "adj": {
+    "Body": 1,
+    "Will": 1
+   },
+   "desc": "Stocky, stubborn, and fond of argument as a form of respect. Hard to move once they have made up their minds.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "t-debate",
+     "Tireless Debater",
+     "+2 to Diplomacy when arguing a position in a formal negotiation or debate where argument is expected. It does not help when quiet persuasion is needed.",
+     "Diplomacy",
+     true,
+     "Argumentative",
+     "You challenge an order or a colleague's claim at an awkward moment. Accept the delay or the bruised relationship."
+    ],
+    [
+     "t-nose",
+     "Keen Nose",
+     "+2 to Intellect rolls to notice or identify something by smell, such as a gas leak, a chemical, or someone hiding nearby.",
+     "Intellect",
+     true,
+     "Blunt to a Fault",
+     "Your honesty offends someone whose cooperation matters. Accept the lost goodwill rather than softening the truth."
+    ]
+   ]
+  },
+  {
+   "id": "aenar",
+   "name": "Aenar",
+   "tier": 0,
+   "adj": {
+    "Will": 1,
+    "Intellect": 1
+   },
+   "desc": "A blind, pale subspecies of Andorian with strong telepathic gifts and a pacifist culture. Hemmer served as the Enterprise's chief engineer. Telepathy needs a GM-approved package.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "ae-telepathy",
+     "Aenar Telepathy",
+     "Roll Will to sense the emotions and surface thoughts of a nearby mind. The GM sets the limits before the roll. A resisting or shielded mind uses an opposed Will contest, and distance or unfamiliar minds may make it impossible.",
+     "Will",
+     false,
+     "Blind",
+     "You navigate by telepathy and your other senses. When telepathy is blocked or you must read a display, writing, or other visual information unaided, accept a delay or need a crewmate's help."
+    ],
+    [
+     "ae-empath",
+     "Perceptive Mind",
+     "+2 to Psychology when reading the emotional state of someone you can sense nearby.",
+     "Psychology",
+     true,
+     "Pacifist Conviction",
+     "You refuse to harm a living being even when it costs the team. Accept the setback your refusal causes."
+    ]
+   ]
+  },
+  {
+   "id": "illyrian",
+   "name": "Illyrian",
+   "tier": 0,
+   "adj": {
+    "Body": 1
+   },
+   "desc": "A people who reshape themselves through genetic modification. Federation law bars augmented officers, so Illyrians in Starfleet, like Una Chin-Riley, have faced suspicion and secrecy.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "i-adaptive",
+     "Adaptive Physiology",
+     "+2 to Body when resisting cold, toxins, or thin atmosphere. It does not protect against vacuum, radiation, or weapons.",
+     "Body",
+     true,
+     "Hidden Augmentation",
+     "Federation law bars augmented officers, so you hide what you are. When a medical scan or inquiry could expose you, accept the lie, the risk, or a revealing choice."
+    ],
+    [
+     "i-endurance",
+     "Enhanced Endurance",
+     "+2 to Athletics when pushing through prolonged exertion: long swims, forced marches, or enduring extreme conditions.",
+     "Athletics",
+     true,
+     "Prejudice Against Augments",
+     "Someone who knows or suspects your heritage treats you with suspicion. Accept the obstruction or lost trust when it matters."
+    ]
+   ]
+  },
+  {
+   "id": "lanthanite",
+   "name": "Lanthanite",
+   "tier": 0,
+   "adj": {
+    "Intellect": 1
+   },
+   "desc": "Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying.",
+   "core": [
+    "Unhurried: Move −1 yard."
+   ],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "l-history",
+     "Centuries of Experience",
+     "+2 to Intellect rolls to recall a historical event, old custom, or obsolete technology you could plausibly have lived through.",
+     "Intellect",
+     true,
+     "Secret Age",
+     "You keep your true age quiet. When your history threatens to show, accept a lie, a slip, or a revealing consequence."
+    ],
+    [
+     "l-antique",
+     "Old Hand",
+     "+2 to Engineering when repairing antique, obsolete, or improvised equipment. It does not apply to current Starfleet systems.",
+     "Engineering",
+     true,
+     "Rules Are Temporary",
+     "After millennia, regulations seem fleeting. You skip a procedure and accept the consequences when it matters."
+    ]
+   ],
+   "speed": -1
+  },
+  {
+   "id": "caitian",
+   "name": "Caitian",
+   "tier": 0,
+   "adj": {
+    "Agility": 1
+   },
+   "desc": "A feline species with keen senses and quick reflexes; Lt. M'Ress served aboard the Enterprise in this era.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "c-reflex",
+     "Feline Reflexes",
+     "+2 to Athletics when jumping, climbing, or landing safely from a fall.",
+     "Athletics",
+     true,
+     "Chase Instinct",
+     "Sudden movement or a fleeing creature triggers a pursuit reflex. Accept a momentary distraction or a rash move."
+    ],
+    [
+     "c-hearing",
+     "Keen Hearing",
+     "+2 to Intellect rolls to hear faint or distant sounds.",
+     "Intellect",
+     true,
+     "Sensitive Ears",
+     "Loud noise disorients you. When an alarm, explosion, or sonic weapon goes off nearby, accept −2 on your next action."
+    ]
+   ]
+  },
+  {
+   "id": "aurelian",
+   "name": "Aurelian",
+   "tier": 0,
+   "adj": {
+    "Agility": 1,
+    "Intellect": 1
+   },
+   "desc": "A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "au-flight",
+     "Flight",
+     "You can fly short distances in normal gravity and breathable air. Roll Athletics for difficult flying. It does not work in low pressure, high gravity, or cramped spaces.",
+     "Athletics",
+     false,
+     "Fragile Bones",
+     "Your light bones break easily. When a fall, crush, or heavy blow hits you, accept the GM marking one extra injury box."
+    ],
+    [
+     "au-scholar",
+     "Scholar's Memory",
+     "+2 to Intellect rolls to recall the history, legends, or cultural records of another world.",
+     "Intellect",
+     true,
+     "Lost in History",
+     "A historical find tempts you to stop and study it. Accept the lost time or the danger of lingering."
+    ]
+   ]
+  },
+  {
+   "id": "orion",
+   "name": "Orion",
+   "tier": 0,
+   "adj": {
+    "Body": 1,
+    "Presence": 1
+   },
+   "desc": "Green-skinned people whose homeworld is better known for the Orion Syndicate's smugglers and pirates than for Starfleet service. Orions in uniform are rare in this era and often have to prove themselves.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "o-pheromones",
+     "Orion Pheromones",
+     "+2 to Diplomacy when persuading someone face to face in close quarters, if their species is affected by Orion pheromones. Many species, including Vulcans, are not.",
+     "Diplomacy",
+     true,
+     "Pheromone Suspicion",
+     "Crewmates who know about Orion pheromones question whether they were persuaded or manipulated. Accept the distrust or a formal complaint when it matters."
+    ],
+    [
+     "o-savvy",
+     "Syndicate Savvy",
+     "+2 to Psychology when spotting a con, a bribe, a smuggler's trick, or a pirate's bluff.",
+     "Psychology",
+     true,
+     "Syndicate Ties",
+     "Someone from the Orion Syndicate knows you and wants something. Accept the obligation, the threat, or the suspicion that follows."
+    ]
+   ]
+  },
+  {
+   "id": "denobulan",
+   "name": "Denobulan",
+   "tier": 0,
+   "adj": {
+    "Intellect": 1,
+    "Presence": 1
+   },
+   "desc": "Cheerful, sociable people with large extended families. They need little sleep most of the year, then hibernate for several days. Dr. Phlox served aboard Enterprise NX-01 a century earlier.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "d-remedies",
+     "Denobulan Pharmacopoeia",
+     "+2 to Medicine when treating a patient with an unconventional remedy, including medicinal organisms kept in sickbay.",
+     "Medicine",
+     true,
+     "Unorthodox Methods",
+     "Patients and crewmates balk at your strange remedies. Accept a refusal, a delay, or a complaint to the captain."
+    ],
+    [
+     "d-wakeful",
+     "Wakeful",
+     "+2 to Body when resisting fatigue or going without sleep for days.",
+     "Body",
+     true,
+     "Hibernation Cycle",
+     "Once a year you must hibernate for several days. When the cycle comes due at a bad moment, accept your absence or −2 on Intellect rolls until you rest."
+    ]
+   ]
+  },
+  {
+   "id": "trill",
+   "name": "Trill",
+   "tier": 0,
+   "adj": {
+    "Intellect": 1
+   },
+   "desc": "A spotted humanoid people, some of whom are joined with a long-lived symbiont that carries the memories of its earlier hosts. In this era the Trill keep joining a closely guarded secret from outsiders, Starfleet included.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "tr-memories",
+     "Memories of Past Hosts",
+     "Joined Trill only. +2 to Intellect rolls to recall something a previous host of your symbiont knew or lived through: a place, a person, an old technique.",
+     "Intellect",
+     true,
+     "The Secret of Joining",
+     "Joining is a secret your people guard from outsiders. When a medical scan, a transporter reading, or a curious crewmate could reveal your symbiont, accept the lie, the risk, or a revealing choice."
+    ],
+    [
+     "tr-pastlife",
+     "A Past Life's Trade",
+     "Joined Trill only. Agree with the GM on one previous host's profession. +2 to the matching skill for tasks that profession knew well, such as a former freighter pilot's Helm in hazardous atmospheric flight.",
+     "",
+     true,
+     "Conflicting Memories",
+     "A past host's habit, loyalty, or old grudge surfaces at a bad moment. Accept the distraction or the trouble it brings."
+    ]
+   ]
+  },
+  {
+   "id": "saurian",
+   "name": "Saurian",
+   "tier": 0,
+   "adj": {
+    "Body": 1,
+    "Intellect": 1
+   },
+   "desc": "A reptilian people with tough scaled skin and large, dark eyes, known across the quadrant for Saurian brandy. Lt. Linus served aboard USS Discovery in the 2250s.",
+   "core": [],
+   "form": null,
+   "skills": [],
+   "traits": [
+    [
+     "sa-hide",
+     "Scaled Hide",
+     "+2 to Body when resisting heat, harsh sunlight, or a toxic atmosphere. It does not protect against weapons, vacuum, or radiation.",
+     "Body",
+     true,
+     "Cold-Blooded",
+     "Cold slows you down. When cold is a real factor, accept −2 on physical actions for the scene or stop to warm up."
+    ],
+    [
+     "sa-eyes",
+     "Low-Light Eyes",
+     "+2 to Intellect rolls to notice movement or detail in dim light or near-darkness.",
+     "Intellect",
+     true,
+     "Glare Sensitivity",
+     "Sudden bright light dazzles you. When a flare, a phaser flash in the dark, or harsh sunlight hits, accept −2 on your next action."
+    ]
+   ]
+  }
+ ],
+ "allegiances": [],
+ "reasons": [
+  [
+   "Explore the unknown",
+   "To see what's out there: strange new worlds and phenomena no one has charted yet."
+  ],
+  [
+   "Family tradition",
+   "Starfleet runs in my family, and I mean to live up to the name."
+  ],
+  [
+   "Science and discovery",
+   "The best laboratory in the galaxy is a starship on the frontier."
+  ],
+  [
+   "Protect others",
+   "To protect the Federation and the people who can't protect themselves."
+  ],
+  [
+   "Inspired by a hero",
+   "A Starfleet officer once saved my home, and I want to be that person for someone else."
+  ],
+  [
+   "Believe in the ideals",
+   "I believe in what the Federation stands for and want to serve it."
+  ],
+  [
+   "Prove myself",
+   "To prove I'm good enough, to everyone who doubted me and to myself."
+  ],
+  [
+   "Leave the past behind",
+   "To leave behind a past, a world, or a life that was too small for me."
+  ],
+  [
+   "Make amends",
+   "To make up for a mistake I can't undo."
+  ],
+  [
+   "Build bridges",
+   "To build bridges between my people and the rest of the Federation."
+  ]
+ ],
+ "connections": [
+  [
+   "Academy roommates",
+   "We shared quarters at Starfleet Academy and still look out for each other."
+  ],
+  [
+   "They saved my life",
+   "They pulled me out of a burning shuttle, and I owe them my life."
+  ],
+  [
+   "I saved theirs",
+   "I saved their life on a past posting, and they haven't forgotten it."
+  ],
+  [
+   "Mentor",
+   "They took me under their wing when I first came aboard."
+  ],
+  [
+   "Friendly rivals",
+   "We competed for the same posting, and the rivalry is still mostly friendly."
+  ],
+  [
+   "Same homeworld",
+   "We grew up on the same world and know each other's families."
+  ],
+  [
+   "An unpaid favor",
+   "I owe them a favor I haven't repaid yet."
+  ],
+  [
+   "A shared secret",
+   "We share a secret from a mission neither of us talks about."
+  ],
+  [
+   "Off-duty friends",
+   "We meet every week in the rec room for chess, cards, or music."
+  ],
+  [
+   "Unfinished business",
+   "They blame me for something that went wrong on a past mission."
+  ]
+ ],
+ "advantages": [
+  [
+   "steady",
+   "Steady Hands",
+   "+2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment.",
+   "Medicine"
+  ],
+  [
+   "emergency",
+   "Emergency Physician",
+   "+2 to Medicine for emergency stabilization of an injured patient. It does not apply to subsequent field healing or sickbay recovery.",
+   "Medicine"
+  ],
+  [
+   "alienphys",
+   "Alien Physiology Specialist",
+   "Choose one species or narrow biological group. Gain +2 to Medicine when diagnosing or treating that group. Unknown organisms do not qualify merely because they are alien.",
+   "Medicine",
+   "Species or biological group"
+  ],
+  [
+   "subspace",
+   "Subspace Specialist",
+   "+2 to Physical Sciences when analyzing subspace phenomena. Operating sensors and repairing warp machinery use their own skills.",
+   "Physical Sciences"
+  ],
+  [
+   "observer",
+   "Astute Observer",
+   "+2 to Intellect rolls to notice a concealed physical clue during a deliberate examination. It does not improve every perception roll or automatically detect invisible threats.",
+   "Intellect"
+  ],
+  [
+   "signal",
+   "Signal Analyst",
+   "+2 to Communications when separating a meaningful transmission from interference or identifying a disguised signal.",
+   "Communications"
+  ],
+  [
+   "forensics",
+   "Computer Forensics Expert",
+   "+2 to Computers when tracing unauthorized changes or recovering deliberately concealed data. Access and suitable tools are still required.",
+   "Computers"
+  ],
+  [
+   "improv",
+   "Improvisational Engineer",
+   "+2 to Engineering when making a temporary repair with inadequate but workable materials. The repair has limits agreed with the GM.",
+   "Engineering"
+  ],
+  [
+   "precision",
+   "Precision Technician",
+   "+2 to Electronics when repairing a delicate control circuit or sensor component. It does not apply to general Engineering.",
+   "Electronics"
+  ],
+  [
+   "ace",
+   "Shuttle Ace",
+   "+2 to Helm for hazardous shuttle maneuvers. It does not improve piloting the Pelion or ordinary Navigation.",
+   "Helm"
+  ],
+  [
+   "diplo",
+   "Diplomatic Insight",
+   "+2 to Diplomacy when negotiating across a cultural misunderstanding you have identified. It does not apply to every disagreement.",
+   "Diplomacy"
+  ],
+  [
+   "crisis",
+   "Crisis Leader",
+   "+2 to Leadership when coordinating an immediate response to a sudden emergency. It does not improve routine orders or direct combat rolls.",
+   "Leadership"
+  ],
+  [
+   "discipline",
+   "Mental Discipline",
+   "+2 to Will to maintain concentration despite pain or severe distraction. It does not improve resistance to fear or mental intrusion.",
+   "Will"
+  ],
+  [
+   "courage",
+   "Unshakable Courage",
+   "+2 to Will against overwhelming fear. It does not protect against alien compulsion or guarantee sensible decisions.",
+   "Will"
+  ],
+  [
+   "guarded",
+   "Guarded Mind",
+   "+2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source.",
+   "Will"
+  ],
+  [
+   "marksman",
+   "Careful Marksman",
+   "+2 to Phasers when you aim (with Aim's +1, +3 in all) at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. A called shot is 1 easier for you.",
+   "Phasers"
+  ],
+  [
+   "restricted",
+   "Restricted Files",
+   "Three library records to start, each a secret from your department or your species that isn't in Starfleet's open databases or published reports. No +2 to rolls.",
+   ""
+  ]
+ ],
+ "complications": [
+  [
+   "mystery",
+   "Cannot Leave a Mystery Alone",
+   "An unexplained reading or strange discovery tempts you to delay departure, spend a scarce resource, or pursue a risky investigation. Accept a specific cost rather than receiving points merely for asking questions."
+  ],
+  [
+   "protects",
+   "Protects Others at Personal Risk",
+   "You can shield someone, stay behind, or volunteer for a hazardous rescue at a real cost to yourself. This does not automatically prevent their injury."
+  ],
+  [
+   "duty",
+   "Duty Before Self",
+   "You prioritize your assignment despite exhaustion, injury, or a conflicting personal need. Accept a concrete setback; ordinary professionalism earns no point."
+  ],
+  [
+   "conscience",
+   "Conscience Above Orders",
+   "A particular order conflicts with your ethical convictions. Accept a meaningful delay, formal challenge, or consequence of refusing it. The Complication does not determine what your captain orders."
+  ],
+  [
+   "book",
+   "By the Book",
+   "You insist on an established procedure when improvisation would be faster. Accept a genuine loss of time or opportunity, rather than penalizing every roll."
+  ],
+  [
+   "distrust",
+   "Distrusts Command Decisions",
+   "A troubling order makes you demand clarification or independent verification at a critical moment. Agree on the resulting delay or strain; it is not permission to disrupt every scene."
+  ],
+  [
+   "reputation",
+   "Reputation to Uphold",
+   "Pride in your record tempts you to conceal uncertainty, refuse help, or accept a task beyond your readiness. Take a real consequence when that choice matters."
+  ],
+  [
+   "haunted",
+   "Haunted by a Previous Mission",
+   "A specific reminder of an earlier loss or disaster causes hesitation, distraction, or a difficult choice. Define the reminder and effect together; avoid a penalty whenever danger appears."
+  ],
+  [
+   "telepathy",
+   "Uneasy Around Telepathy",
+   "You hesitate to cooperate with a mind meld or another mental procedure, complicating a situation where it could help. This grants neither mental resistance nor knowledge of someone's intentions."
+  ],
+  [
+   "culture",
+   "Cultural Friction",
+   "An established custom or expectation clashes with a local practice. Accept a misunderstanding, difficult negotiation, or lost opportunity. Species identity alone is not a Complication."
+  ],
+  [
+   "rival",
+   "Old Rival",
+   "An agreed recurring rival challenges your credibility or complicates your assignment. The rival's intervention must create a concrete problem, not merely an unpleasant conversation."
+  ],
+  [
+   "home",
+   "Someone Back Home",
+   "A personal obligation or concern conflicts with mission demands. Establish who matters to you and what kinds of conflict are welcome before using this Complication."
+  ],
+  [
+   "medical",
+   "Medical Restriction",
+   "An agreed condition or treatment requirement becomes relevant under particular circumstances. Define its trigger and consequence; it does not impose a blanket penalty or entitle the GM to invent new symptoms."
+  ],
+  [
+   "experimental",
+   "Experimental Enthusiasm",
+   "You are tempted to use an unproven technique before adequate testing. Accept a specific risk, resource cost, or troublesome side effect agreed before attempting it."
+  ],
+  [
+   "secret",
+   "Keeps a Dangerous Secret",
+   "An agreed secret threatens trust, reputation, or an assignment. Earn a point when protecting or revealing it creates an actual consequence. Establish the secret with the GM rather than inventing it to avoid a problem."
+  ],
+  [
+   "nonlethal",
+   "Reluctant to Use Lethal Force",
+   "You seek a nonlethal approach even when it costs time or tactical position. Ordinary Starfleet restraint earns no point; there must be a meaningful additional difficulty."
+  ]
+ ],
+ "triggers": {
+  "mystery": [
+   "An unexplained reading appears while the team is ordered to withdraw",
+   "A derelict ship or ruin no one has catalogued",
+   "Sensor data that contradicts known science"
+  ],
+  "protects": [
+   "A crewmate is pinned down or injured under fire",
+   "Civilians are caught in the danger",
+   "Someone volunteers for a deadly task in your place"
+  ],
+  "duty": [
+   "You're hurt or exhausted, but your station needs you",
+   "A personal message arrives in the middle of a crisis",
+   "Your relief is late and the work can't wait"
+  ],
+  "conscience": [
+   "An order would harm civilians or prisoners",
+   "You're ordered to leave someone behind",
+   "Command hides the truth from the people it affects"
+  ],
+  "book": [
+   "A shortcut skips a safety protocol",
+   "An improvised plan breaks regulations",
+   "A superior asks you to bend a rule just this once"
+  ],
+  "distrust": [
+   "An order comes with no explanation",
+   "A visiting or new officer takes command",
+   "Orders from Starfleet Command ignore what's happening on the ground"
+  ],
+  "reputation": [
+   "Someone questions your competence in front of others",
+   "A task in your field is beyond what you're ready for",
+   "Getting help means admitting a mistake"
+  ],
+  "haunted": [
+   "Sights or sounds like the old disaster",
+   "Meeting a survivor or relative from that mission",
+   "Facing the same enemy or hazard again"
+  ],
+  "telepathy": [
+   "A mind meld or telepathic scan is proposed",
+   "A telepath joins the away team",
+   "A mental intrusion affects the crew"
+  ],
+  "culture": [
+   "A local custom clashes with your own",
+   "A formal ceremony where every gesture matters",
+   "Negotiating with a people your own distrust"
+  ],
+  "rival": [
+   "Your rival is assigned to the same mission",
+   "Your rival takes credit for your work",
+   "Your rival needs your help"
+  ],
+  "home": [
+   "A message from home arrives",
+   "The mission passes near your homeworld",
+   "Someone you love is in danger"
+  ],
+  "medical": [
+   "Your treatment runs out away from the ship",
+   "An environmental hazard aggravates your condition",
+   "A mission requires a full medical scan"
+  ],
+  "experimental": [
+   "An untested device or technique could solve the problem",
+   "Engineering says it's probably safe",
+   "A colleague dares you to try it"
+  ],
+  "secret": [
+   "Someone starts asking the wrong questions",
+   "Evidence that could expose you turns up",
+   "Keeping the secret means lying to a friend"
+  ],
+  "nonlethal": [
+   "A hostile refuses to surrender",
+   "Phasers on kill are ordered",
+   "The only fast solution would kill someone"
+  ]
+ },
+ "equipment": [
+  [
+   "communicator",
+   "Communicator",
+   "Talks to the ship and the away team within range, and gives the transporter a lock. Interference, shielding or distance can cut it off."
+  ],
+  [
+   "tricorder",
+   "Tricorder",
+   "Scans life signs, energy, materials and atmosphere at short range and records the data. Field Sensors rolls need one; without it most scans are impossible."
+  ],
+  [
+   "medscanner",
+   "Medical scanner",
+   "Identifies ordinary injuries automatically. Diagnosing unfamiliar physiology or disease without one is very difficult (−4) or impossible."
+  ],
+  [
+   "medkit",
+   "Medical kit",
+   "Hyposprays, drugs and dressings. Needed for emergency stabilization and field treatment."
+  ],
+  [
+   "engkit",
+   "Engineering kit",
+   "Hand tools, spare parts and test gear. Needed for most Engineering and Electronics repairs in the field."
+  ],
+  [
+   "phaser",
+   "Hand phaser",
+   "Type 1 (8 power) or Type 2 (16). Settings and power costs are under Phaser power."
+  ],
+  [
+   "translator",
+   "Universal translator",
+   "Lets you talk with speakers of known languages. A new language takes time to learn; a Communications roll can speed it up."
+  ],
+  [
+   "envsuit",
+   "Environmental suit",
+   "Several hours in vacuum, toxic air, cold or radiation. −2 to Agility-based actions and Stealth while worn."
+  ],
+  [
+   "fieldkit",
+   "Field kit",
+   "Rations, water, light, rope and climbing gear for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that."
+  ],
+  [
+   "beacon",
+   "Emergency transponder",
+   "Broadcasts your position to the ship and helps a transporter lock through light interference."
+  ],
+  [
+   "sled",
+   "Anti-grav sled",
+   "Carries heavy loads or a casualty at walking pace. Hard to move quietly (−2 Stealth)."
+  ]
+ ],
+ "weapons": {
+  "skill": "Phasers",
+  "jamOn18": false,
+  "defaultSpares": 1,
+  "items": {
+   "phaser": [
+    "Hand phaser (Type 2)",
+    16
+   ]
+  },
+  "equipLinked": [
+   "phaser"
+  ],
+  "modes": [
+   [
+    "stun",
+    "Stun",
+    1,
+    null,
+    0
+   ],
+   [
+    "heat",
+    "Heat or cut",
+    1,
+    null,
+    0
+   ],
+   [
+    "kill",
+    "Kill",
+    2,
+    null,
+    0
+   ],
+   [
+    "wide",
+    "Wide-beam stun",
+    3,
+    null,
+    0
+   ],
+   [
+    "disintegrate",
+    "Disintegrate",
+    4,
+    null,
+    0
+   ]
+  ]
+ },
+ "tracks": [
+  {
+   "name": "Starfleet Command",
+   "boxes": 4,
+   "effects": [
+    "Command isn't asking",
+    "Questions in the next report",
+    "A formal inquiry: an admiral wants a full account",
+    "Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials",
+    "A board of inquiry: start a Hearing clock"
+   ]
+  },
+  {
+   "name": "Shields",
+   "boxes": 5,
+   "effects": [
+    "Full",
+    "4 of 5 left",
+    "3 of 5 left",
+    "2 of 5 left",
+    "1 of 5 left",
+    "Down: hits go to the Hull"
+   ]
+  },
+  {
+   "name": "Hull",
+   "boxes": 5,
+   "effects": [
+    "Intact",
+    "Scarred",
+    "Minor breaches, sealed",
+    "Serious breaches, decks lost",
+    "Serious breaches, decks lost",
+    "Breaking up: start an Abandon ship clock"
+   ]
+  },
+  {
+   "name": "Weapons",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Engines",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Sensors",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Communications",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Transporters",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Life support",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  }
+ ],
+ "seeds": {
+  "mission": [
+   "Mission",
+   [
+    "Answer a call from a ship lost a century ago",
+    "Ferry a delegation to a world that left the Federation",
+    "Answer a distress call",
+    "Survey an uncharted system",
+    "Make first contact",
+    "Escort a diplomatic delegation",
+    "Find a missing ship or outpost",
+    "Deliver urgent medical supplies",
+    "Evacuate a colony",
+    "Patrol the Neutral Zone border",
+    "Recover a lost probe or artifact",
+    "Mediate a dispute between two worlds",
+    "Test experimental technology",
+    "Shore leave that goes wrong",
+    "Carry a message across the Neutral Zone",
+    "Host a first contact aboard the Pelion"
+   ]
+  ],
+  "place": [
+   "Place",
+   [
+    "The edge of the galaxy",
+    "Inside a living starship",
+    "A storm-wracked ocean world",
+    "A dead world with ancient ruins",
+    "A struggling frontier colony",
+    "An asteroid mining station",
+    "A drifting derelict starship",
+    "An ice-covered moon of a gas giant",
+    "A pre-warp civilization's world",
+    "A nebula that blinds the sensors",
+    "A starbase in crisis",
+    "A world that seems too perfect",
+    "A jungle planet thick with life",
+    "Deep space between the stars",
+    "A Klingon prison world",
+    "A Romulan listening post"
+   ]
+  ],
+  "strange": [
+   "Something strange",
+   [
+    "The crew's past selves",
+    "A dead star that sings",
+    "A subspace anomaly that distorts time",
+    "A non-corporeal life form",
+    "An ancient machine that still works",
+    "Duplicates of the crew",
+    "A signal repeating a crew member's name",
+    "A planet-wide illusion",
+    "A rift into another universe",
+    "A disease no one recognizes",
+    "A gravity well that traps ships",
+    "A godlike being testing the crew",
+    "An alien probe draining power",
+    "Memories that aren't the crew's own",
+    "A crossing into a mirror universe",
+    "A machine that remembers the Pelion"
+   ]
+  ],
+  "twist": [
+   "Twist",
+   [
+    "The captain has been replaced",
+    "The enemy is a Federation colony",
+    "Klingons arrive with their own claim",
+    "The people asking for help are lying",
+    "A crew member's complication comes into play",
+    "Orders conflict with doing the right thing",
+    "The Prime Directive forbids interfering",
+    "A cloaked Romulan ship is watching",
+    "Orion pirates want the same prize",
+    "The Pelion's systems start failing",
+    "A respected visitor has a hidden agenda",
+    "The 'threat' is only defending itself",
+    "Contact with Starfleet is cut off",
+    "A civilian is trapped out of reach",
+    "The mission was a test",
+    "History must not change"
+   ]
+  ],
+  "clock": [
+   "Ticking clock",
+   [
+    [
+     "The time loop resets",
+     4
+    ],
+    [
+     "The ship's power drains",
+     6
+    ],
+    [
+     "Orbit decays",
+     6
+    ],
+    [
+     "Warp core breach",
+     4
+    ],
+    [
+     "Klingon battle cruiser arrives",
+     6
+    ],
+    [
+     "The disease reaches the ship",
+     8
+    ],
+    [
+     "The storm closes the beam-out window",
+     4
+    ],
+    [
+     "Life support fails on the station",
+     6
+    ],
+    [
+     "The anomaly collapses",
+     6
+    ],
+    [
+     "Peace talks break down",
+     8
+    ],
+    [
+     "The hostages' air runs out",
+     4
+    ],
+    [
+     "The star goes nova",
+     8
+    ],
+    [
+     "Shields fail under bombardment",
+     4
+    ],
+    [
+     "The away team is discovered",
+     6
+    ],
+    [
+     "The duel at dawn",
+     4
+    ],
+    [
+     "The Klingon ultimatum",
+     6
+    ]
+   ]
+  ],
+  "who": [
+   "Key character",
+   [
+    "A crew member's future self",
+    "A legend thought dead",
+    "An idealistic Federation ambassador",
+    "A Klingon captain with a grudge",
+    "A stranded Orion trader",
+    "A brilliant, reckless scientist",
+    "A colony leader hiding a secret",
+    "A former Starfleet officer gone rogue",
+    "A local child who has seen too much",
+    "A disapproving Vulcan observer",
+    "An old friend of one of the crew",
+    "A Romulan who wants to defect",
+    "A Starfleet admiral with sealed orders",
+    "An android that wants to be free",
+    "A godlike child",
+    "An admiral's spy aboard"
+   ]
+  ]
+ },
+ "journal": {
+  "mode": "stardate",
+  "start": 5000,
+  "outcomes": [
+   "Done",
+   "Partly done",
+   "Failed",
+   "Ongoing"
+  ]
+ },
+ "restricted": null,
+ "quickRef": [
+  [
+   "Damage",
+   "Fists, clubs, knives, arrows: 1 box. Heavy melee weapons: 2. Phaser on kill, disruptor, phaser rifle: 3 and Dying. Phaser on stun: Body −2 roll, no box."
+  ],
+  [
+   "Phasers",
+   "Type 1: 8 power; Type 2: 16; rifle: 30. Stun 1, heat or cut 1, kill 2, wide-beam stun 3, disintegrate 4. Firing spends power, hit or miss. Swap a cell: one action. Phasers don't jam."
+  ],
+  [
+   "Bridge",
+   "Each officer works a station with its own skill: Helm, Navigation, Sensors, Communications, Engineering, Phasers. The captain gives one order an exchange."
+  ],
+  [
+   "Ship",
+   "Shields 5, Hull 5, six systems of 3. A hit on the Hull rolls 3d6 for concussive system damage. Power 5 an exchange; 40 torpedoes."
+  ],
+  [
+   "Starfleet Command",
+   "4 boxes: questions, an inquiry, orders to stand down (−2 with Starfleet officials), a board of inquiry. Only the GM clears it."
+  ]
+ ],
+ "example": {
+  "name": "Lt. Asha Mbeki",
+  "species": "Human",
+  "speciesId": "human",
+  "rank": "Lieutenant",
+  "dept": "Science",
+  "attrs": {
+   "Body": 10,
+   "Agility": 10,
+   "Intellect": 13,
+   "Presence": 12,
+   "Will": 11
+  },
+  "skills": {
+   "Leadership": "U",
+   "Diplomacy": "T",
+   "Psychology": "U",
+   "Sensors": "S",
+   "Physical Sciences": "T",
+   "Life Sciences": "T",
+   "Medicine": "T",
+   "Engineering": "T",
+   "Electronics": "T",
+   "Computers": "T",
+   "Helm": "U",
+   "Navigation": "T",
+   "Communications": "T",
+   "Phasers": "T",
+   "Unarmed Combat": "U",
+   "Athletics": "U",
+   "Stealth": "U",
+   "Survival": "U"
+  },
+  "adv": {
+   "id": "subspace"
+  },
+  "sadv": {
+   "id": ""
+  },
+  "comp": {
+   "id": "mystery",
+   "trigger": "An unexplained reading just as the ship is due to leave"
+  },
+  "reason": "To see what's out there: strange new worlds and phenomena no one has charted yet.",
+  "connection": "We shared quarters at Starfleet Academy and still look out for each other.",
+  "equipment": {
+   "communicator": true,
+   "tricorder": true,
+   "phaser": true
+  },
+  "edges": {
+   "attr": 1,
+   "skill": 1,
+   "gear": 1
+  },
+  "path": "rounded",
+  "gear": {
+   "item": "A tricorder refit by hand",
+   "skill": "Sensors",
+   "use": "scanning a phenomenon no one has catalogued"
+  },
+  "play": {
+   "gun": {
+    "type": "phaser",
+    "rounds": 16,
+    "spares": 1
+   }
+  },
+  "role": "Ship's sciences officer: first to read an anomaly and the one who explains it to the captain."
+ },
+ "pregens": [
+  {
+   "name": "Thelan sh'Vari",
+   "rank": "Lieutenant Commander",
+   "dept": "Command",
+   "species": "Andorian",
+   "speciesId": "andorian",
+   "role": "First officer: keeps the crew moving when the captain's plan meets reality, and keeps the captain honest.",
+   "reason": "Starfleet runs in my family, and I mean to live up to the name.",
+   "connection": "Took Yeoman Rrinn under their wing when Rrinn first came aboard.",
+   "attrs": {
+    "Body": 10,
+    "Agility": 13,
+    "Intellect": 10,
+    "Presence": 13,
+    "Will": 10
+   },
+   "skills": {
+    "Leadership": "S",
+    "Diplomacy": "T",
+    "Psychology": "T",
+    "Sensors": "T",
+    "Physical Sciences": "U",
+    "Life Sciences": "U",
+    "Medicine": "U",
+    "Engineering": "U",
+    "Electronics": "U",
+    "Computers": "U",
+    "Helm": "T",
+    "Navigation": "T",
+    "Communications": "T",
+    "Phasers": "T",
+    "Unarmed Combat": "T",
+    "Athletics": "T",
+    "Stealth": "U",
+    "Survival": "T"
+   },
+   "adv": {
+    "id": "crisis"
+   },
+   "sadv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "reputation",
+    "trigger": "Someone questions your competence in front of others"
+   },
+   "equipment": {
+    "communicator": true,
+    "tricorder": false,
+    "phaser": true,
+    "medkit": false,
+    "engkit": false
+   },
+   "edges": {
+    "attr": 1,
+    "skill": 1,
+    "grit": 1
+   },
+   "path": "rounded",
+   "play": {
+    "gun": {
+     "type": "phaser",
+     "rounds": 16,
+     "spares": 1
+    }
+   }
+  },
+  {
+   "name": "Sevek",
+   "rank": "Lieutenant",
+   "dept": "Science",
+   "species": "Vulcan",
+   "speciesId": "vulcan",
+   "role": "Ship's sciences officer: reads the anomaly, names the risk, and calculates the odds no one asked for.",
+   "reason": "The best laboratory in the galaxy is a starship on the frontier.",
+   "connection": "Friendly rivals with Lt. Grath: they argue every engineering theory, and both enjoy it.",
+   "attrs": {
+    "Body": 11,
+    "Agility": 10,
+    "Intellect": 13,
+    "Presence": 10,
+    "Will": 12
+   },
+   "skills": {
+    "Leadership": "T",
+    "Diplomacy": "U",
+    "Psychology": "T",
+    "Sensors": "T",
+    "Physical Sciences": "S",
+    "Life Sciences": "T",
+    "Medicine": "U",
+    "Engineering": "T",
+    "Electronics": "T",
+    "Computers": "T",
+    "Helm": "U",
+    "Navigation": "T",
+    "Communications": "U",
+    "Phasers": "U",
+    "Unarmed Combat": "T",
+    "Athletics": "T",
+    "Stealth": "U",
+    "Survival": "U"
+   },
+   "adv": {
+    "id": ""
+   },
+   "sadv": {
+    "id": "v-recall"
+   },
+   "comp": {
+    "id": "mystery",
+    "trigger": "Sensor data that contradicts known science"
+   },
+   "equipment": {
+    "communicator": true,
+    "tricorder": true,
+    "phaser": true,
+    "medkit": false,
+    "engkit": false
+   },
+   "edges": {
+    "attr": 1,
+    "skill": 1,
+    "gear": 1
+   },
+   "path": "rounded",
+   "gear": {
+    "item": "A tricorder refit by hand",
+    "skill": "Sensors",
+    "use": "scanning a phenomenon no one has catalogued"
+   },
+   "play": {
+    "gun": {
+     "type": "phaser",
+     "rounds": 16,
+     "spares": 1
+    }
+   }
+  },
+  {
+   "name": "Dr. Vessik",
+   "rank": "Lieutenant Commander",
+   "dept": "Medical",
+   "species": "Denobulan",
+   "speciesId": "denobulan",
+   "role": "Chief medical officer: patches up the crew, argues with the captain, and keeps an alarming menagerie of medicinal creatures in sickbay.",
+   "reason": "To protect the Federation and the people who can't protect themselves.",
+   "connection": "Pulled Lt. Reyes out of a burning shuttle on a survey mission; Reyes has never let the doctor pay for a drink since.",
+   "attrs": {
+    "Body": 10,
+    "Agility": 10,
+    "Intellect": 13,
+    "Presence": 11,
+    "Will": 12
+   },
+   "skills": {
+    "Leadership": "T",
+    "Diplomacy": "T",
+    "Psychology": "T",
+    "Sensors": "T",
+    "Physical Sciences": "T",
+    "Life Sciences": "T",
+    "Medicine": "S",
+    "Engineering": "U",
+    "Electronics": "T",
+    "Computers": "T",
+    "Helm": "U",
+    "Navigation": "U",
+    "Communications": "T",
+    "Phasers": "U",
+    "Unarmed Combat": "U",
+    "Athletics": "U",
+    "Stealth": "U",
+    "Survival": "T"
+   },
+   "adv": {
+    "id": ""
+   },
+   "sadv": {
+    "id": "d-remedies"
+   },
+   "comp": {
+    "id": "protects",
+    "trigger": "Civilians are caught in the danger"
+   },
+   "equipment": {
+    "communicator": true,
+    "tricorder": true,
+    "medscanner": true,
+    "phaser": false,
+    "medkit": true,
+    "engkit": false
+   },
+   "edges": {
+    "attr": 1,
+    "skill": 1,
+    "gear": 1
+   },
+   "path": "rounded",
+   "gear": {
+    "item": "A Denobulan field surgery kit",
+    "skill": "Medicine",
+    "use": "surgery on an unfamiliar physiology"
+   }
+  },
+  {
+   "name": "Grath",
+   "rank": "Lieutenant",
+   "dept": "Engineering",
+   "species": "Tellarite",
+   "speciesId": "tellarite",
+   "role": "Engineer: keeps the Pelion's power flowing and will tell you, at length, exactly why your idea won't work.",
+   "reason": "To prove I'm good enough, to everyone who doubted me and to myself.",
+   "connection": "Off-duty friends with Commander sh'Vari: a weekly game of Andorian chess in which both of them cheat.",
+   "attrs": {
+    "Body": 12,
+    "Agility": 10,
+    "Intellect": 13,
+    "Presence": 10,
+    "Will": 11
+   },
+   "skills": {
+    "Leadership": "T",
+    "Diplomacy": "U",
+    "Psychology": "U",
+    "Sensors": "T",
+    "Physical Sciences": "T",
+    "Life Sciences": "U",
+    "Medicine": "U",
+    "Engineering": "S",
+    "Electronics": "T",
+    "Computers": "T",
+    "Helm": "T",
+    "Navigation": "U",
+    "Communications": "T",
+    "Phasers": "U",
+    "Unarmed Combat": "T",
+    "Athletics": "T",
+    "Stealth": "U",
+    "Survival": "T"
+   },
+   "adv": {
+    "id": "improv"
+   },
+   "sadv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "experimental",
+    "trigger": "An untested device or technique could solve the problem"
+   },
+   "equipment": {
+    "communicator": true,
+    "tricorder": false,
+    "phaser": true,
+    "medkit": false,
+    "engkit": true
+   },
+   "edges": {
+    "attr": 1,
+    "skill": 1,
+    "gear": 1
+   },
+   "path": "rounded",
+   "gear": {
+    "item": "A Tellarite multi-spanner older than the ship",
+    "skill": "Engineering",
+    "use": "coaxing a damaged warp system back online"
+   },
+   "play": {
+    "gun": {
+     "type": "phaser",
+     "rounds": 16,
+     "spares": 1
+    }
+   }
+  },
+  {
+   "name": "Marisol Reyes",
+   "rank": "Lieutenant (j.g.)",
+   "dept": "Security",
+   "species": "Human",
+   "speciesId": "human",
+   "role": "Security officer: first through the door on every away mission, and the last to set a phaser to kill.",
+   "reason": "A Starfleet officer once saved my home, and I want to be that person for someone else.",
+   "connection": "Owes Dr. Vessik their life after a shuttle crash, and never lets the doctor forget it.",
+   "attrs": {
+    "Body": 13,
+    "Agility": 13,
+    "Intellect": 10,
+    "Presence": 10,
+    "Will": 10
+   },
+   "skills": {
+    "Leadership": "T",
+    "Diplomacy": "T",
+    "Psychology": "U",
+    "Sensors": "T",
+    "Physical Sciences": "U",
+    "Life Sciences": "U",
+    "Medicine": "T",
+    "Engineering": "U",
+    "Electronics": "U",
+    "Computers": "U",
+    "Helm": "T",
+    "Navigation": "U",
+    "Communications": "T",
+    "Phasers": "S",
+    "Unarmed Combat": "T",
+    "Athletics": "T",
+    "Stealth": "T",
+    "Survival": "T"
+   },
+   "adv": {
+    "id": "marksman"
+   },
+   "sadv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "nonlethal",
+    "trigger": "A hostile refuses to surrender"
+   },
+   "equipment": {
+    "communicator": true,
+    "tricorder": false,
+    "phaser": true,
+    "medkit": false,
+    "engkit": false
+   },
+   "edges": {
+    "attr": 1,
+    "skill": 1,
+    "extradefense": 1
+   },
+   "path": "rounded",
+   "play": {
+    "gun": {
+     "type": "phaser",
+     "rounds": 16,
+     "spares": 1
+    }
+   }
+  },
+  {
+   "name": "Rrinn",
+   "rank": "Yeoman 2nd Class",
+   "dept": "General Services",
+   "species": "Caitian",
+   "speciesId": "caitian",
+   "role": "Captain's yeoman: keeps the records, carries the orders, and hears everything said on the bridge.",
+   "reason": "To leave behind a past, a world, or a life that was too small for me.",
+   "connection": "Shares a secret with Lt. Sevek from a mission neither of them talks about.",
+   "attrs": {
+    "Body": 10,
+    "Agility": 12,
+    "Intellect": 13,
+    "Presence": 11,
+    "Will": 10
+   },
+   "skills": {
+    "Leadership": "T",
+    "Diplomacy": "T",
+    "Psychology": "T",
+    "Sensors": "T",
+    "Physical Sciences": "U",
+    "Life Sciences": "U",
+    "Medicine": "U",
+    "Engineering": "U",
+    "Electronics": "T",
+    "Computers": "S",
+    "Helm": "U",
+    "Navigation": "U",
+    "Communications": "T",
+    "Phasers": "U",
+    "Unarmed Combat": "U",
+    "Athletics": "T",
+    "Stealth": "T",
+    "Survival": "U"
+   },
+   "adv": {
+    "id": ""
+   },
+   "sadv": {
+    "id": "c-hearing"
+   },
+   "comp": {
+    "id": "home",
+    "trigger": "A message from home arrives"
+   },
+   "equipment": {
+    "communicator": true,
+    "tricorder": true,
+    "phaser": false,
+    "medkit": false,
+    "engkit": false
+   },
+   "edges": {
+    "attr": 1,
+    "skill": 1,
+    "contact": 1
+   },
+   "path": "hand",
+   "contact": "Chief Petty Officer Andrea Moss at Starbase 12's records office, who still owes Rrinn a favor"
+  }
+ ],
+ "protection": [],
+ "extraEdges": [],
+ "gritty": {
+  "table": [
+   {
+    "from": 3,
+    "to": 4,
+    "id": "limb",
+    "name": "Lost limb",
+    "text": "A hand, an arm or a leg is gone; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.",
+    "dying": true,
+    "heal": "never (a prosthetic, at a starbase)",
+    "complication": true,
+    "down": "bone"
+   },
+   {
+    "from": 5,
+    "to": 6,
+    "id": "eye",
+    "name": "Lost eye",
+    "text": "−2 to Phasers and to spotting things.",
+    "heal": "never",
+    "complication": true,
+    "down": "concussion"
+   },
+   {
+    "from": 7,
+    "to": 9,
+    "id": "bone",
+    "name": "Broken bone",
+    "text": "The limb is useless until a bone-knitter sets it in sickbay.",
+    "heal": "a day in sickbay; several weeks without",
+    "down": "muscle"
+   },
+   {
+    "from": 10,
+    "to": 12,
+    "id": "muscle",
+    "name": "Torn muscle",
+    "text": "−1 to physical tasks.",
+    "heal": "a few days with sickbay care; several weeks without",
+    "down": null
+   },
+   {
+    "from": 13,
+    "to": 15,
+    "id": "concussion",
+    "name": "Concussion",
+    "text": "Stunned, and −2 to thinking tasks for the scene.",
+    "dazed": true,
+    "heal": "after the scene",
+    "down": null
+   },
+   {
+    "from": 16,
+    "to": 18,
+    "id": "internal",
+    "name": "Internal injury or severe burns",
+    "text": "Dying even with boxes to spare; it needs sickbay.",
+    "dying": true,
+    "heal": "a week after sickbay",
+    "down": "muscle"
+   }
+  ],
+  "enemy": {
+   "gun": [
+    "The slug shatters {name}'s knee; they won't stand again today.",
+    "{name} takes it center mass and slides down the bulkhead.",
+    "A round through the shoulder spins {name} to the deck, weapon gone."
+   ],
+   "energy": [
+    "The beam cuts {name}'s arm off at the shoulder, cauterized.",
+    "{name} goes down with a smoking hole through the armor.",
+    "The bolt blows {name} back through the hatch, burning."
+   ],
+   "blade": [
+    "The blade finds the gap in {name}'s armor.",
+    "{name} folds around the vibroblade and doesn't get up.",
+    "A cut across the visor blinds {name}, who stumbles off screaming."
+   ],
+   "blunt": [
+    "The blow caves in {name}'s ribs.",
+    "{name}'s helmet cracks, and so does the skull inside.",
+    "{name} hits the deck and doesn't get up."
+   ],
+   "claw": [
+    "Claws open {name} from collar to hip.",
+    "{name} is dragged into the vents and goes quiet."
+   ],
+   "missile": [
+    "The dart takes {name} in the neck; they're down in a heartbeat.",
+    "{name} catches the spike through the thigh and goes down."
+   ]
+  }
+ },
+ "rangeTrack": {
+  "title": "Ship fight",
+  "us": "The Pelion",
+  "vehicleTrack": "Hull",
+  "threats": "Enemy ships",
+  "startLane": 3,
+  "kmBands": [
+   [
+    "Close",
+    10
+   ],
+   [
+    "Short",
+    1000
+   ],
+   [
+    "Medium",
+    10000
+   ],
+   [
+    "Long",
+    100000
+   ],
+   [
+    "Extreme",
+    300000
+   ]
+  ],
+  "bands": [
+   [
+    "Close",
+    "under 10 km"
+   ],
+   [
+    "Short",
+    "up to 1,000 km"
+   ],
+   [
+    "Medium",
+    "up to 10,000 km"
+   ],
+   [
+    "Long",
+    "up to 100,000 km"
+   ],
+   [
+    "Extreme",
+    "about a light-second"
+   ]
+  ],
+  "note": "Each lane is a range band from the Pelion. At the start of each exchange, Helm rolls against the enemy's helm; the winner may move the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond. Winning at Extreme by 5 or more lets a ship go to warp.",
+  "help": "for starships closing or opening the range. Each lane is a range band from the Pelion."
+ },
+ "arms": [
+  {
+   "id": "fists",
+   "name": "Punch, kick, headbutt",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": [],
+   "reachYards": 1
+  },
+  {
+   "id": "club",
+   "name": "Club, rifle butt or thrown rock",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": [],
+   "reachYards": 1,
+   "reachNote": "rifle butt 2"
+  },
+  {
+   "id": "knife",
+   "name": "Knife or dagger (a Klingon d'k tahg)",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": [],
+   "reachYards": 1
+  },
+  {
+   "id": "heavy",
+   "name": "Heavy melee weapon (a lirpa, a sword, an axe)",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "traits": [],
+   "rows": [],
+   "reachYards": 2,
+   "reachNote": "lirpa 3"
+  },
+  {
+   "id": "primitive",
+   "name": "Arrow, spear or primitive firearm",
+   "skill": "Phasers",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "wound": "missile",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "phaser-stun",
+   "name": "Hand phaser on stun",
+   "skill": "Phasers",
+   "band": "short",
+   "stun": true,
+   "equip": [
+    "phaser"
+   ],
+   "damage": {
+    "any": {
+     "boxes": 0
+    }
+   },
+   "traits": [],
+   "rows": [],
+   "telling": {
+    "add": [
+     "knockdown"
+    ]
+   },
+   "ammo": "phaser"
+  },
+  {
+   "id": "phaser-kill",
+   "name": "Hand phaser on kill",
+   "skill": "Phasers",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "equip": [
+    "phaser"
+   ],
+   "wound": "energy",
+   "traits": [],
+   "rows": [],
+   "ammo": "phaser"
+  },
+  {
+   "id": "phaser-rifle",
+   "name": "Phaser rifle",
+   "skill": "Phasers",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "wound": "energy",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "disruptor",
+   "name": "Disruptor",
+   "skill": "Phasers",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "wound": "energy",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "grenade",
+   "name": "Explosion (a thrown grenade)",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 2 at the centre. Dodge means diving clear."
+    }
+   ],
+   "rows": []
+  },
+  {
+   "id": "gorn",
+   "name": "Gorn's crushing blows",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "traits": [],
+   "rows": [],
+   "reachYards": 1
+  },
+  {
+   "id": "bite",
+   "name": "Venomous bite and horn",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "natural": true,
+   "traits": [],
+   "rows": [],
+   "reachYards": 1
+  },
+  {
+   "id": "grip",
+   "name": "Crushing grip",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "unarmed": true,
+   "traits": [],
+   "rows": [],
+   "reachYards": 1
+  }
+ ],
+ "threats": [
+  {
+   "id": "guard",
+   "name": "Security guard",
+   "label": "Security guard (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 11
+    }
+   ],
+   "dodge": 7,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Hand weapon",
+   "weapons": [
+    "phaser-stun",
+    "disruptor"
+   ],
+   "trait": "Numbers",
+   "traitText": "Usually two or three; they surrender or flee when half are down."
+  },
+  {
+   "id": "klingon",
+   "name": "Klingon warrior",
+   "label": "Klingon warrior",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 12
+    },
+    {
+     "skill": "Unarmed Combat",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor (kill), d'k tahg",
+   "weapons": [
+    "disruptor",
+    "knife"
+   ],
+   "trait": "Relentless",
+   "traitText": "Ignores the Wounded penalty; only Seriously wounded slows them."
+  },
+  {
+   "id": "klingon-officer",
+   "name": "Klingon officer",
+   "label": "Klingon officer",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 12
+    },
+    {
+     "skill": "Leadership",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor (kill)",
+   "weapons": [
+    "disruptor"
+   ],
+   "trait": "Battle commander",
+   "traitText": "Once per round, gives one ally +1 on an attack."
+  },
+  {
+   "id": "romulan",
+   "name": "Romulan centurion",
+   "label": "Romulan centurion",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 12
+    },
+    {
+     "skill": "Stealth",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor (kill)",
+   "weapons": [
+    "disruptor"
+   ],
+   "trait": "Ambush",
+   "traitText": "+2 on the first attack from hiding; prefers to withdraw rather than be captured."
+  },
+  {
+   "id": "orion",
+   "name": "Orion pirate",
+   "label": "Orion pirate",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 11
+    },
+    {
+     "skill": "Unarmed Combat",
+     "target": 12
+    },
+    {
+     "skill": "Stealth",
+     "target": 12
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor, knife",
+   "weapons": [
+    "disruptor",
+    "knife"
+   ],
+   "trait": "Dirty fighter",
+   "traitText": "Winning a grapple also disarms the target."
+  },
+  {
+   "id": "gorn",
+   "name": "Gorn warrior",
+   "label": "Gorn warrior",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Unarmed Combat",
+     "target": 14
+    }
+   ],
+   "dodge": 6,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Claws, thrown rocks",
+   "weapons": [
+    "gorn",
+    "club"
+   ],
+   "trait": "Immense strength",
+   "traitText": "Unarmed hits mark 2 boxes; slow, so it acts last in a round."
+  },
+  {
+   "id": "mugato",
+   "name": "Mugato",
+   "label": "Mugato",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Unarmed Combat",
+     "target": 13
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Venomous bite",
+   "weapons": [
+    "bite"
+   ],
+   "trait": "Venom",
+   "traitText": "A bite that marks a box also poisons: without Medicine before the scene ends, mark another box."
+  },
+  {
+   "id": "android",
+   "name": "Rogue android",
+   "label": "Rogue android",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Unarmed Combat",
+     "target": 13
+    },
+    {
+     "skill": "Computers",
+     "target": 15
+    }
+   ],
+   "dodge": 7,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Crushing grip",
+   "weapons": [
+    "grip"
+   ],
+   "trait": "Logic trap",
+   "traitText": "A Diplomacy or Psychology contest that presents a paradox stuns it for the scene."
+  }
+ ],
+ "gmGuide": {
+  "title": "USS Pelion GM's Guide",
+  "subtitle": "Running the Pelion's missions: threats, enemy ships and the GM's tools",
+  "intro": "This book is for whoever runs the game. It opens with a first mission, ready to run, and gathers what the GM reaches for at the table: mission seeds, the threats and enemy ships, making library records, and the GM view's tools.",
+  "playersNote": "The material for running the game (the first mission, mission seeds, threats and enemy ships, and the GM's tools) is in a companion book, the **USS Pelion GM's Guide**.",
+  "chapters": [
+   {
+    "title": "Your first mission",
+    "intro": "A ready-to-run mission to start a campaign with. Everything it needs is here, and the ready-made crew in the creator is written into it.",
+    "take": [
+     "## The first mission: The Silence at Corvan II"
+    ]
+   },
+   {
+    "title": "Running missions",
+    "take": [
+     "## Mission seeds"
+    ]
+   },
+   {
+    "take": [
+     "# Threats"
+    ]
+   },
+   {
+    "title": "Library records",
+    "intro": "Running investigations and recording what the crew learns. The rules players use are in the *Library records* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and records.",
+    "take": [
+     "## Making library records",
+     "## Example library records",
+     "## Rival clocks",
+     "## The Discovery panel"
+    ]
+   },
+   {
+    "title": "The GM's tools",
+    "take": [
+     "## The battle map",
+     "## The Encounter panel"
+    ]
+   }
+  ],
+  "replace": []
+ },
+ "discovery": {
+  "card": "library record",
+  "cards": "library records",
+  "collection": "library file",
+  "subject": "an alien species, a lifeform, a piece of technology, a phenomenon, or what a power intends",
+  "uncover": "how it is beaten, or how it is used",
+  "kinds": [
+   [
+    "weakness",
+    "How it is beaten: a predator's or a hostile system's weakness"
+   ],
+   [
+    "permission",
+    "How it is used: a species' customs that allow negotiation, a derelict's systems that allow operating it"
+   ]
+  ],
+  "phases": [
+   [
+    "Confront the unknown",
+    "Effects without a cause: a signal no one can read, a dead world with power readings, a crew that won't answer. You may suspect, but nothing is confirmed."
+   ],
+   [
+    "Identify",
+    "Name it: the species, the lifeform, the technology, the phenomenon, the power's aim. This is the gate: until it's confirmed, what you know about a kind of thing doesn't yet apply to this one."
+   ],
+   [
+    "Uncover",
+    "Learn how it is stopped, or how it is used. Filling this phase fills the clock and earns a library record for what you established."
+   ]
+  ],
+  "threat": {
+   "name": "Countdown",
+   "repeat": false,
+   "onFill": "the situation hits",
+   "text": "The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. Routine discovery runs without one. When a failed investigation roll or a success at a cost puts real stakes in play, the GM may start a **Countdown** of 4, 6 or 8 segments. From then on it's a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.",
+   "count": "",
+   "startsOnFailure": true
+  },
+  "costs": [
+   [
+    "Starfleet Command",
+    "anything that draws Command's eye",
+    "contact the Prime Directive frowns on, a risky deal with a power, orders bent to get the answer"
+   ],
+   [
+    "Sensors",
+    "strain on the ship",
+    "sensors pushed past their limits, a transporter used on something unknown, communications held open to a hostile signal"
+   ]
+  ],
+  "methods": [
+   [
+    "Scan it",
+    "Sensors",
+    "Sciences, Operations",
+    "Confront, Identify",
+    "Tricorder or ship's sensors; passive first, active if you must."
+   ],
+   [
+    "Analyze it",
+    "Physical Sciences, Life Sciences, Medicine",
+    "Sciences",
+    "Identify, Uncover",
+    "Samples, spectra, biology, the physics of it."
+   ],
+   [
+    "Open the systems",
+    "Computers, Electronics, Engineering",
+    "Operations",
+    "Identify, Uncover",
+    "An alien computer, a power core, a derelict's controls."
+   ],
+   [
+    "Hear the signal",
+    "Communications",
+    "Operations",
+    "Confront, Identify",
+    "A transmission, a language, a pattern in the noise."
+   ],
+   [
+    "Talk to it",
+    "Diplomacy, Psychology",
+    "Command",
+    "Identify, Uncover",
+    "First contact, an interrogation, a negotiation."
+   ],
+   [
+    "Search the library",
+    "Computers",
+    "Services",
+    "Identify",
+    "Starfleet's library computer and old survey reports."
+   ]
+  ],
+  "groups": {
+   "command": "people, powers and orders",
+   "sciences": "science, medicine and the unknown itself",
+   "operations": "systems, signals and security",
+   "services": "records, stores and the ship's daily business"
+  },
+  "origins": "A crew member's species can suit a method: an Aenar's telepathy, a Vulcan's mind meld, a Trill's memories. A species ability can advance a phase, at the GM's call.",
+  "subjects": [
+   [
+    "corvan-machine-mind",
+    "The machine-mind of a dead colony",
+    "It still follows its last order, and treats the crew as the threat that order named.",
+    "Issuing orders it will accept, or shutting it down without tripping its failsafes."
+   ],
+   [
+    "silicon-miner",
+    "A silicon-based lifeform in the mines",
+    "It tunnels with acid, and it is guarding something, not attacking.",
+    "Talking to it through a mind-meld or a modified translator; moving its young to safety."
+   ],
+   [
+    "pulsar-rift",
+    "A rift that opens with a pulsar's beat",
+    "It folds space in a cycle tied to the pulsar.",
+    "Plotting a safe course through it on each cycle."
+   ],
+   [
+    "unknown-derelict",
+    "A derelict of unknown origin",
+    "Its systems wake to a power signature like a starship's.",
+    "Waking or powering it down on the crew's terms."
+   ],
+   [
+    "klingon-house",
+    "A Klingon house's intentions",
+    "The house wants the colony's dilithium, not a war.",
+    "Opening talks the house will listen to."
+   ]
+  ],
+  "scoped": true,
+  "chapter": "Library records",
+  "datePlaceholder": "Stardate",
+  "routes": [
+   [
+    "investigation",
+    "A discovery clock",
+    "filled to the end of Uncover",
+    []
+   ],
+   [
+    "experience",
+    "Scanned or tested firsthand",
+    "your own tricorder readings and samples, or a careful field test",
+    []
+   ],
+   [
+    "account",
+    "A reliable record",
+    "Starfleet's library computer, another ship's logs, a species' own historians. A source's reputation alone doesn't make it right",
+    [
+     "Starfleet Command"
+    ]
+   ],
+   [
+    "creature",
+    "Its own word, backed up",
+    "what an alien, an AI or a faction tells you, supported by evidence",
+    []
+   ]
+  ],
+  "anyway": "Whatever is actually true works whether or not anyone holds a record for it: a frequency that disrupts a lifeform disrupts it for whoever finds it. Operating unfamiliar technology, or dealing with a people by their own customs, still needs the right procedure, the knowledge and the skill.",
+  "basis": "starbase talk and rumor, old survey reports, tricorder scans, testimony, the crew's own experience, or a suspicion they can explain",
+  "startCards": {
+   "adv": "restricted",
+   "n": 3,
+   "label": "Restricted Files",
+   "secret": "isn't in Starfleet's open databases or published reports",
+   "note": "Each record is a secret from your department (something you were trained in or saw on duty) or your species (something your people know), agreed with the GM."
+  },
+  "clockExample": "What is draining the colony's power on Theta Kiri II",
+  "cardExample": {
+   "subject": "The machine-mind of Corvan II",
+   "finding": "It still follows its last order, and treats the crew as the threat that order named",
+   "limits": "Read from one exchange of signals; not what the order was",
+   "evidence": "Sevek's sensor logs and the colony's last transmission",
+   "route": "experience",
+   "cost": "Countdown +1 (the hours spent listening)"
+  },
+  "skillSkip": "A crew member trained in the skill whose field squarely covers the subject (an engineer before an alien power core, a doctor before a new disease) recognizes at once that it's something new: the clock starts at Identify, skipping Confront the unknown."
+ },
+ "heroFiles": {
+  "title": "Files on the crew",
+  "intro": "What a power, a rival captain or an alien intelligence has learned about a crew member: a weakness, a habit, a family on Earth, the people they love. When it applies, it gets the file's bonus against them. A crew member who finds out sees it on their sheet; when they destroy it, the bonus is gone.",
+  "mine": "Files kept on you",
+  "knowsExample": "Takes shore leave on Wrigley's Pleasure Planet every year",
+  "gives": "+2 against them when it applies"
+ },
+ "mounts": [],
+ "campaign": {
+  "names": {
+   "first": [
+    "Thelan",
+    "Sevek",
+    "Marisol",
+    "Rrinn",
+    "Grath",
+    "T'Lara",
+    "Jim",
+    "Nyota",
+    "Hikaru",
+    "Leonard",
+    "Christine",
+    "Zara",
+    "Kenji",
+    "Amara",
+    "Sorel",
+    "Th'Ress",
+    "Vessa",
+    "Dmitri",
+    "Priya",
+    "Owen",
+    "Ilsa",
+    "Tomas",
+    "Aditi",
+    "Keth"
+   ],
+   "last": [
+    "Reyes",
+    "Okafor",
+    "Novak",
+    "Sato",
+    "Mbeki",
+    "Lindqvist",
+    "Ramirez",
+    "Chen",
+    "O'Brien",
+    "Kowalski",
+    "Haddad",
+    "Petrov",
+    "Nakamura",
+    "Abara",
+    "Delacroix",
+    "Varga",
+    "Singh",
+    "Moreau",
+    "Kirby",
+    "Osei"
+   ]
+  }
+ },
+ "playtest": {
+  "name": "USS Pelion",
+  "short": "USS Pelion",
+  "adv": "The Silence at Corvan II",
+  "term": "mission",
+  "fan": true,
+  "feedback": "your fan-games site, /playtest/",
+  "prep": [
+   "Read <i>The Silence at Corvan II</i> in the GM's Guide (USS Pelion creator → Guide tab → GM's Guide → Your first mission). It's about two pages.",
+   "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+   "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+   "In the Discovery tab, prepare a library record on the thing in the ruins, and be ready to start a Countdown of 6 when the Pelion scans them.",
+   "Have the Orion raider's line from <i>Enemy ships</i> to hand, and the Pelion's Power and Shields on its status card.",
+   "In <i>Map and fight</i>, check you can add three Orion pirates and a Rogue android (the caretaker's shell).",
+   "The day before: send everyone the time, the table link, and the Playtest page, <code>your fan-games site, /playtest/</code>. Tell them there's nothing to read.",
+   "Have a timer or clock in view. The run sheet below has the times."
+  ],
+  "cast": [
+   [
+    "Thelan sh'Vari",
+    "First officer, in command with the captain away. Every word goes in the log."
+   ],
+   [
+    "Sevek",
+    "Vulcan science officer. The readings contradict known physics."
+   ],
+   [
+    "Dr. Vessik",
+    "Denobulan doctor. Eight scientists and a village of civilians."
+   ],
+   [
+    "Grath",
+    "Tellarite engineer. Helped rig the dampener that woke it."
+   ],
+   [
+    "Marisol Reyes",
+    "Security. Orions mean phasers; Reyes would rather they were on stun."
+   ],
+   [
+    "Rrinn",
+    "Caitian yeoman. Their sister is on the outpost's supply run."
+   ]
+  ],
+  "castNote": "With fewer players, keep Sevek (the paradox) and sh'Vari (the command decision). Grath buys time on the Countdown.",
+  "run": [
+   [
+    "0:00",
+    "Welcome and the crew",
+    "<p>Pitch it in one breath: <i>The captain's away, the outpost's silent, and you have the conn.</i> Each player takes a crew member and reads their role and connection aloud. Explain only the roll: <b>3d6, at or under your number</b>.</p>"
+   ],
+   [
+    "0:15",
+    "Arrival and the raider",
+    "<p>The Orion raider hails: legitimate salvagers, they say. A couple of exchanges of ship combat, or a bluff and a warning. It runs when its Shields are down.</p>",
+    "Have the raider break orbit as soon as the Pelion arrives."
+   ],
+   [
+    "0:35",
+    "The pull",
+    "<p>The sensors sweep the ruins and the lights flicker. One less Power each exchange, and the orbit begins to decay: start the Countdown (6). Grath's Engineering roll clears a segment once.</p>"
+   ],
+   [
+    "0:45",
+    "The outpost",
+    "<p>An empty outpost. Start the library record. Clues: the logs (Computers), the untouched bunks (Medicine), the field that reads them (Physical Sciences), the village through the duck blind. <b>Three clues are enough.</b></p>"
+   ],
+   [
+    "1:20",
+    "The Ketari",
+    "<p>Warriors with Orion phasers. Contact marks Starfleet Command unless they're careful; doing nothing leaves a war. Let the crew argue the Prime Directive.</p>"
+   ],
+   [
+    "1:45",
+    "The Orions in the ruins",
+    "<p>Three Orion pirates cutting toward the machine's core. The big fight; stun keeps the record clean, a kill marks Starfleet Command.</p>"
+   ],
+   [
+    "2:15",
+    "The caretaker",
+    "<p>The machine speaks through its android shell. A paradox (Diplomacy or Psychology) stuns it; or they talk to it as equals. Sevek's moment.</p>"
+   ],
+   [
+    "2:35",
+    "The choice",
+    "<p>Shut it down, bargain for the scientists, or leave it and take the phasers back. Rrinn's sister is among the sleepers. The Countdown decides how long they have.</p>"
+   ]
+  ]
+ },
+ "companion": {
+  "title": "USS Pelion: Frontier",
+  "href": "frontier/",
+  "text": "A turn-based strategy game for the same campaign: command the Pelion through a fifty-week tour of the Corvan Sector, against the Klingons, the Romulans and the Tholians. Free, in your browser."
+ },
+ "out": "uss-pelion",
+ "legacyStores": {
+  "current.v1": "pelion.current.v1",
+  "roster.v1": "pelion.roster.v1",
+  "clocks.v1": "pelion.clocks.v1",
+  "seed.v1": "pelion.seed.v1",
+  "discovery.v1": "pelion.disc.v1",
+  "gm.v1": "pelion.gmcrew.v1",
+  "journal.v1": "pelion.log.v1",
+  "tracks.v1": "pelion.ship.v1",
+  "playtest.ticks": "pelion.playtest.ticks",
+  "playtest.notes": "pelion.playtest.notes"
+ },
+ "roleAliases": {},
+ "shipResources": [
+  {
+   "id": "power",
+   "label": "Power",
+   "start": 5,
+   "refill": "Each exchange",
+   "note": "Refills at the start of each exchange of a ship fight."
+  },
+  {
+   "id": "torps",
+   "label": "Torpedoes",
+   "start": 40,
+   "note": "From the ship's load until a starbase restocks them."
+  }
+ ],
+ "shipRolls": [
+  {
+   "id": "concussive",
+   "title": "Concussive system damage",
+   "dice": 3,
+   "when": "Roll whenever a hit reaches the Hull.",
+   "rows": [
+    [
+     3,
+     3,
+     "Warp core offline",
+     "Emergency power only: Power 1 until repaired."
+    ],
+    [
+     4,
+     4,
+     "Bridge station explodes",
+     "A crew member at a station (an NPC, if there is one) dies; a character there marks 2 Injury boxes unless they Dodge."
+    ],
+    [
+     5,
+     5,
+     "Impulse engine offline",
+     "Mark Engines Offline: thrusters only, no evading and no range shifts."
+    ],
+    [
+     6,
+     6,
+     "Computer offline",
+     "Minimum flight controls: −2 to every ship roll."
+    ],
+    [
+     7,
+     7,
+     "Deflector offline",
+     "−2 to Helm, and the ship can't go to warp."
+    ],
+    [
+     8,
+     8,
+     "Warp drive offline",
+     "Impulse only: the ship can't break away to warp."
+    ],
+    [
+     9,
+     10,
+     "Hull breach",
+     "Mark one more Hull box; 3d6 × 5 crew are lost or hurt."
+    ],
+    [
+     11,
+     12,
+     "Shield emitter damaged",
+     "Mark one Shields box."
+    ],
+    [
+     13,
+     13,
+     "Conduits damaged",
+     "Power −1."
+    ],
+    [
+     14,
+     14,
+     "Impulse engine damaged",
+     "Mark one Engines box, and Maneuverability −1."
+    ],
+    [
+     15,
+     16,
+     "Bridge station sparks",
+     "A crew member at a station marks 1 Injury box unless they Dodge."
+    ],
+    [
+     17,
+     18,
+     "Life support failure",
+     "Mark Life support Offline: start a 4-segment Air clock, a segment every 15 minutes."
+    ]
+   ]
+  }
+ ],
+ "rankOptions": [
+  [
+   "Officers",
+   [
+    "Ensign",
+    "Lieutenant (j.g.)",
+    "Lieutenant",
+    "Lieutenant Commander",
+    "Commander",
+    "Captain"
+   ]
+  ],
+  [
+   "Enlisted (General Services)",
+   [
+    "Crewman 3rd Class",
+    "Crewman 2nd Class",
+    "Crewman 1st Class",
+    "Crewman",
+    "Yeoman 3rd Class",
+    "Yeoman 2nd Class",
+    "Yeoman 1st Class",
+    "Yeoman"
+   ]
+  ]
+ ],
+ "combatRules": {}
+}

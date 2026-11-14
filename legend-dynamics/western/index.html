@@ -250,6 +250,11 @@ tr.lvl-U td.target { color: var(--muted); }
 .ship-row .box.on.kind-2 { background: var(--warn, #b8860b); border-color: var(--warn, #b8860b); }
 .ship-row .box.kind-0 > *, .ship-row .box.kind-1 > *, .ship-row .box.kind-2 > * { transform: skewX(20deg); }
 .kind-pick select { width: auto; font-size: 13px; padding: 2px 4px; }
+.ship-res { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 10px; }
+.ship-res .res { display: inline-flex; align-items: center; gap: 6px; }
+.ship-res .res .btn { min-width: 2em; padding: 2px 8px; }
+.ship-rolls { margin-top: 10px; display: grid; gap: 6px; }
+.ship-roll { display: grid; gap: 4px; }
 .condition { font-family: var(--display); letter-spacing: .1em; text-transform: uppercase; }
 .duty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .duty .count { font: 400 2.2rem/1 var(--mono); min-width: 2ch; text-align: center; color: var(--accent); text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); }
@@ -699,7 +704,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="5119bc9" data-version-date="2026.11.13" title="The code changes whenever this page changes.">Version 2026.11.13 · 5119bc9</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="c158865" data-version-date="2026.11.13" title="The code changes whenever this page changes.">Version 2026.11.13 · c158865</span><!-- VERSION:END --></div>
   </header>
 
   <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
@@ -724,7 +729,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field" id="custom-role-wrap" hidden><label for="f-customrole">Custom role name</label><input type="text" id="f-customrole" placeholder="e.g. Smuggler"></div>
             <div class="field" id="custom-group-wrap" hidden><label for="f-customgroup">Group (sets your colors and emblem)</label><select id="f-customgroup"></select></div>
             <div class="field"><label for="f-rank">Title (optional)</label>
-              <input type="text" id="f-rank" placeholder="e.g. Deputy U.S. Marshal"></div>
+              <input type="text" id="f-rank" placeholder="e.g. Deputy U.S. Marshal" list="rank-options"><datalist id="rank-options"></datalist></div>
             <div class="field wide"><label for="f-path">Training</label>
               <select id="f-path"><option value="rounded">Well-rounded: Specialty +3, nine Trained</option><option value="hand">Old hand: Expert +5, seven Trained</option></select></div>
             <div class="field wide"><label for="f-role">What you bring</label>
@@ -5298,6 +5303,8 @@ tr.lvl-U td.target { color: var(--muted); }
           <div id="crew-ship-view" hidden></div>
           <p class="small muted">Shared by all the characters. A killing in the street, a monster seen by townsfolk, or magic worked in the open can mark a box. Lying low between jobs can clear one.</p>
           <div class="ship" id="ship"></div>
+          <div class="ship-res" id="ship-res" hidden></div>
+          <div class="ship-rolls" id="ship-rolls" hidden></div>
           <button class="linkish" id="ship-reset">Clear all Trouble</button>
         </div>
         <div class="card hud" id="card-ref">
@@ -7821,6 +7828,11 @@ return { mountLab };
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
   };
+  // A game rebuilt on this creator keeps what its old page saved in this browser (PACK.legacyStores: new key's suffix →
+  // the old page's key, e.g. USS Pelion's "pelion.gmcrew.v1"), copied over once while the new key is still empty.
+  for (const [suffix, old] of Object.entries(PACK.legacyStores || {})) {
+    try { const k = PACK.id + "." + suffix; if (localStorage.getItem(k) === null && localStorage.getItem(old) !== null) localStorage.setItem(k, localStorage.getItem(old)); } catch {}
+  }
   const validAl = (a) => Array.isArray(a) && a.length === 4 && a.every((x) => typeof x === "string") && /^c-/.test(a[0]) && a[1].trim();
   campaignAllegiances = (store.get(CAMPAIGN_AL_KEY, []) || []).filter(validAl);
   let gritty = !!GRITTY && store.get(GRITTY_KEY, false) === true;
@@ -7884,7 +7896,8 @@ return { mountLab };
     try {
       let changed = false;
       for (const [n] of ATTRS) if (c.attrs[n] < baseOf(n)) { c.attrs[n] = baseOf(n); changed = true; }
-      while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => c.attrs[a] > baseOf(a)).sort((x, y) => (c.attrs[y] - baseOf(y)) - (c.attrs[x] - baseOf(x)) || c.attrs[y] - c.attrs[x])[0]; if (!n) break; c.attrs[n]--; changed = true; }
+      // Over the pool: trim the smallest extras first, so the character keeps their defining attribute.
+      while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => c.attrs[a] > baseOf(a)).sort((x, y) => (c.attrs[x] - baseOf(x)) - (c.attrs[y] - baseOf(y)) || c.attrs[x] - c.attrs[y])[0]; if (!n) break; c.attrs[n]--; changed = true; }
       return changed;
     } finally { ch = saved; }
   }
@@ -9165,6 +9178,8 @@ return { mountLab };
   $("ph-recharge").onclick = () => { const g = gunOf(); g.rounds = GUNS[g.type][1]; render(); toast(T.restockDone); };
 
   const SHIP_TRACKS = PACK.tracks.map((t) => [t.name, t.boxes]);
+  // A setting's ranks (PACK.rankOptions: [[group, [rank, …]], …]) as suggestions for the title field.
+  $("rank-options").innerHTML = (PACK.rankOptions || []).flatMap(([g, list]) => list.map((r) => `<option value="${esc(r)}" label="${esc(g)}"></option>`)).join("");
   let ship = store.get(STORE_SHIP, {});
   if (!ship || typeof ship !== "object") ship = {};
   // A track with kinds of mark (Aurora's Fallout: Collateral, Scrutiny, Backlash): each mark keeps its kind, and what
@@ -9200,7 +9215,23 @@ return { mountLab };
     const sh = sharedCrewShip || crewShipUI.snapshot();
     el.hidden = !sh; el.innerHTML = sh ? crewShipUI.html(sh) : "";
   }
+  // A setting's ship resources (PACK.shipResources: the USS Pelion's Power and Torpedoes) and its ship rolls
+  // (PACK.shipRolls: concussive system damage on 3d6), beside the shared tracks.
+  const SHIP_RES = PACK.shipResources || [], SHIP_ROLLS = PACK.shipRolls || [];
+  const resOf = (r) => (Number.isFinite(ship["@" + r.id]) ? ship["@" + r.id] : Number.isFinite(ship[r.id]) ? ship[r.id] : r.start); // (an old page kept them by id)
+  function renderShipExtras() {
+    $("ship-res").hidden = !SHIP_RES.length; $("ship-rolls").hidden = !SHIP_ROLLS.length;
+    $("ship-res").innerHTML = SHIP_RES.map((r) => `<span class="res" title="${esc(r.note || "")}"><span class="label">${esc(r.label)}</span><button class="btn" data-res="${r.id}" data-d="-1" aria-label="Spend 1 ${esc(r.label)}">−</button><b class="num">${resOf(r)}</b><button class="btn" data-res="${r.id}" data-d="1" aria-label="1 more ${esc(r.label)}">+</button>${r.refill ? `<button class="linkish" data-res="${r.id}" data-refill>${esc(r.refill)}: back to ${r.start}</button>` : ""}</span>`).join("");
+    $("ship-rolls").innerHTML = SHIP_ROLLS.map((t) => `<div class="ship-roll"><button class="btn" data-shiproll="${t.id}">Roll ${esc(t.title.toLowerCase())} (${t.dice}d6)</button><span class="small muted">${esc(t.when || "")}</span><div class="small" data-shiproll-out="${t.id}">${ship["@roll:" + t.id] ? esc(ship["@roll:" + t.id]) : ""}</div></div>`).join("");
+  }
+  $("ship-res").addEventListener("click", (e) => { const b = e.target.closest("[data-res]"); if (!b) return; const r = SHIP_RES.find((x) => x.id === b.dataset.res); if (!r) return;
+    ship["@" + r.id] = "refill" in b.dataset ? r.start : Math.max(0, resOf(r) + +b.dataset.d); store.set(STORE_SHIP, ship); renderShipExtras(); });
+  $("ship-rolls").addEventListener("click", (e) => { const b = e.target.closest("[data-shiproll]"); if (!b) return; const t = SHIP_ROLLS.find((x) => x.id === b.dataset.shiproll); if (!t) return;
+    const dice = Array.from({ length: t.dice }, () => 1 + Math.floor(Math.random() * 6)), n = dice.reduce((a, x) => a + x, 0);
+    const row = t.rows.find((r) => n >= r[0] && n <= r[1]);
+    ship["@roll:" + t.id] = `${t.title}: rolled ${n} (${dice.join(" + ")}). ${row ? `${row[2]}: ${row[3]}` : ""}`; store.set(STORE_SHIP, ship); renderShipExtras(); });
   function renderShip() {
+    renderShipExtras();
     if (ptUI) ptUI.threatChanged(); // a track that is the adventure's threat (Doom) may bring more to the map
     if (wantedUI) wantedUI.render(); // the poster's reward follows the law's track
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
@@ -12627,7 +12658,7 @@ function ptMaps(api, root) {
   function renderLogBook() {
     $("log-entries").innerHTML = missionLog.slice().reverse().map((e) => `<li><span class="meta">${esc(e.stardate)} · ${esc(e.outcome)}</span>
       <p><b>${esc(e.title || T.mission)}</b></p>${e.notes ? `<p>${esc(e.notes)}</p>` : ""}${e.books ? `<p class="small"><i>${esc(T.journalExtraLabel)}:</i> ${esc(e.books)}</p>` : ""}${e.commend ? `<p class="small">Who stood out: ${esc(e.commend)}</p>` : ""}
-      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => a.points ? `${esc(a.name)} +${a.points} point${a.points > 1 ? "s" : ""}` : `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
+      ${(e.advances || []).length ? `<p class="small muted">Advancement: ${e.advances.map((a) => a.points ? `${esc(a.name)} +${a.points} point${a.points > 1 ? "s" : ""}` : `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
       <button class="linkish danger" data-rmlog="${e.id}">Remove entry</button></li>`).join("");
     $("log-copy").disabled = !missionLog.length;
   }

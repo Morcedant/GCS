@@ -1,9 +1,10 @@
 ---
 title: "USS Pelion GM's Guide"
-subtitle: "Running the campaign: missions, threats, enemy ships and the GM's tools"
+subtitle: "Running the Pelion's missions: threats, enemy ships and the GM's tools"
+author: "Don Smallwood"
 ---
 
-This book is for whoever runs the game. It opens with a first adventure, ready to run, and gathers what the GM reaches for at the table: mission seeds, the threats and enemy ships with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+This book is for whoever runs the game. It opens with a first mission, ready to run, and gathers what the GM reaches for at the table: mission seeds, the threats and enemy ships, making library records, and the GM view's tools.
 
 # Your first mission
 
@@ -53,7 +54,7 @@ When the Identify phase is done, the crew knows what it is: a caretaker, not a w
 
 ## Mission seeds
 
-Short of a plot? Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like. Read the results together: a *mission* in a *place*, made strange by *something strange*, turned by a *twist*, against a *ticking clock*, with a *key character* at its heart. The GM view in the creator rolls these for you and can start the clock.
+Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.
 
 | 3d6 | Mission | Place | Something strange |
 |---|---|---|---|
@@ -93,8 +94,6 @@ Short of a plot? Roll 3d6 on each table and read the total; middle results come 
 | 17 | The mission was a test | The duel at dawn (4) | A godlike child |
 | 18 | History must not change | The Klingon ultimatum (6) | An admiral's spy aboard |
 
-*Example:* 3, 9, 5, 10, 2, 4 gives **first contact** at **a starbase in crisis**, where **a signal repeats a crew member's name**; **the "threat" is only defending itself**, a **warp core breach** clock (4) is ticking, and **a brilliant, reckless scientist** is in the middle of it.
-
 # Threats
 
 Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.
@@ -114,17 +113,6 @@ Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in *The USS Pelion*; its *Enemy ships* table gives the common ones.
 
-## Your own threats, weapons and advantages
-
-A GM can add their own. Keep them in line with the book's:
-
-- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play: toughness, a weakness or armor works as in *Armor, toughness and weaknesses*.
-- **Weapons.** Hits mark 1 box for fists, knives and primitive weapons; 2 for heavy blades; 3, and Dying, for anything on kill. Give a weapon a reach (melee) or a range band.
-- **Advantages.** Worth about as much as one of the book's: a narrow, useful benefit, often once per session or per mission. Say exactly what it does.
-- **Records.** One subject, what's true about it and what that permits: as narrow as a record earned in play.
-
-**In the creator.** The GM view's **Homebrew** tab keeps your threats, weapons, advantages, species and records. They then work like the book's, marked *homebrew*: threats in the Encounter panel and on the battle map, weapons in characters' gear and the roller. Save them to a file to keep them or share them with another GM.
-
 ## Enemy ships
 
 The ships the Pelion meets most, built on the registry's classes. The GM keeps their tracks the same way as the Pelion's.
@@ -139,34 +127,28 @@ The ships the Pelion meets most, built on the registry's classes. The GM keeps t
 
 # Library records
 
-The rules for library records are in the Players' Guide (*Library records*). This chapter is about making them.
+Running investigations and recording what the crew learns. The rules players use are in the *Library records* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and records.
 
-## Making a library record
+## Making library records
 
-A library record holds **one finding**, never a subject's whole story. Write it in the crew's words, from what they actually did:
+For the GM: when a library record is earned, and how to write one. A library record is a record of what the characters established, so writing it well matters more than how often you hand one out.
 
-- **What they established.** One sentence: "It answers only in prime-number sequences", not everything the GM knows about the machine-mind.
-- **Limits.** What it doesn't tell them: "Seen once; not what it wants." Limits keep a record honest and leave room for the next discovery.
-- **Evidence or source.** What they scanned, tested, read or were told, and by whom.
-- **How it was learned, and what it cost.** A discovery clock, or one of the direct routes with its price.
-- **What it permits (optional).** What the finding lets them attempt that they couldn't before: hailing it in a way it answers, shutting it down cleanly, crossing a rift safely. Permission only, never a bonus.
+1. **Decide that something is established.** A library record is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn't established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the library record once they've confirmed it.
+2. **Write the finding narrowly.** One fact, in the words the characters would use, and no more than they found out: "bright light drove it back", not "it fears light". Two separate facts make two library records. Never write the subject's whole truth onto a library record; later discoveries add more library records.
+3. **Write its limits.** What the finding doesn't show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.
+4. **Note the evidence or source.** What they saw, tested, read or were told, and by whom. A source's reputation doesn't make it right: if it was only probably true, the limits say so.
+5. **Charge the price.** A library record from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see *Earning a library record*): choose the one that fits how they learned it, and mark it.
+6. **Choose the owner and the recipients.** Whoever did the finding owns the library record. Everyone who was there, or heard it from a reliable source, gets a shared copy.
+7. **Record it.** In the GM view's **Discovery** panel: **Mint** a full clock's library record, or use **Record a finding without a clock**, which marks the price for you. Then save everyone's characters to file, so the players' sheets carry it. A player can also write a library record on their own sheet, when you agree it's been earned.
 
-**Keep the truth separate.** Decide what's really true of a subject before play, and let the crew find it piece by piece. A record can be wrong if its evidence was thin; reality wins at the table, and the next record corrects the last.
+*Example:* **The machine-mind of Corvan II.** Established: *It still follows its last order, and treats the crew as the threat that order named*. Limits: *Read from one exchange of signals; not what the order was*. Source: Sevek's sensor logs and the colony's last transmission (scanned or tested firsthand). Cost: Countdown +1 (the hours spent listening).
 
-**Restricted Files.** Approve each starting secret before play. A good one is specific, belongs to the character's department or species, and wouldn't be in Starfleet's open files: what a Vulcan elder taught about a forbidden discipline, what an engineer saw in a classified refit. Turn down anything that would solve a mission you have planned, or ask the player to narrow it.
+- **When a later finding disagrees.** Write a new library record that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.
+- **A library record is never proof of identity.** Holding a library record about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.
+- **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the library record: if they try it, it works.
+- **Restricted Files.** Agree each starting library record with its player before play: it must come from the character's department or species, be narrow, and be a real secret: something that isn't in Starfleet's open databases or published reports. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it.
 
-## Choosing the cost
-
-Information is never free. Choose the price from how the crew went about it:
-
-- **Starfleet Command +1** for anything that draws Command's eye: contact the Prime Directive frowns on, a risky deal with a power, orders bent to get the answer.
-- **A Duty point** when the owner pushes themselves: a sleepless night in the lab, a personal favor called in.
-- **A ship's system** when the ship carries the strain: Sensors pushed past their limits, a transporter used on something unknown, Communications held open to a hostile signal.
-- **A danger clock or the Countdown** when it takes time the crew doesn't have.
-
-Don't start a Countdown for routine discovery. Start one when a failed roll or a success at a cost puts something real at stake, and show it to the players.
-
-## Example subjects
+## Example library records
 
 | Subject | What a record might establish | What it might permit |
 |---|---|---|
@@ -176,26 +158,33 @@ Don't start a Countdown for routine discovery. Start one when a failed roll or a
 | A derelict of unknown origin | Its systems wake to a power signature like a starship's | Waking or powering it down on the crew's terms |
 | A Klingon house's intentions | The house wants the colony's dilithium, not a war | Opening talks the house will listen to |
 
+## Rival clocks
+
+When nothing threatens yet, give the discovery a rival instead: an ordinary danger clock named for someone racing the crew to the same find (a Klingon science vessel, an Orion salvager, a Federation survey team with other orders). It ticks on delays, noisy methods and open digging; when it fills, the rival gets there first.
+
+## The Discovery panel
+
+The GM view's **Discovery** panel runs discovery clocks and the Countdown they race (it stays idle until you **Start the Countdown** after a failed roll or a success at a cost). Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every library record the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging. When a clock fills, **Mint** gives the primary investigator the library record and everyone you tick as present a shared copy. **Record a finding without a clock** gives a library record for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick, and marks its price: the track or the Countdown that source costs. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.
+
 # The GM's tools
 
 ## The battle map
 
-The GM view of the creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in the Players' Guide, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
+The GM view of the character creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this chapter, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
 
-**Three kinds of map.**
+**Two kinds of map.**
 
-- **A hex map** for an away team's fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range tables. A token can have a height (a shuttle overhead, a sniper on a ridge), and the distance counts it.
-- **A ship fight** on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. **Add the Pelion** places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship's tracks, and the other way round. Enemy ships come from the *Enemy ships* table with their Hull boxes.
-- **A range track** for an away team's chase or a running fight where only distance matters.
+- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table above. A token can have a height (a flier, a sniper on a roof), and the distance counts it.
+- **A range track** for fights where only distance matters: a chase, a running fight across open country. It has a lane for the crew and one for each range band. Moving a token into the next lane moves it one band in or out.
 
-**Tokens.** The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
+**Tokens.** The GM places the crew with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Duty point on a token marks it on the character, and the other way round. Opponents come from the setting's threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
 
-**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.
 
-## The Discovery panel
-
-The GM view's **Discovery: library records** panel runs discovery clocks. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), mark segments as the crew succeeds, name the subject at the gate, and choose the primary investigator. When the clock fills, write what they established and **mint** it: the primary investigator owns the record and everyone present gets a shared copy. **Record a finding without a clock** does the same for a direct finding, and marks the cost you choose. The **Countdown** stays idle until you start it after a failed roll or a success at a cost. Save the crew's files afterwards so the players get their records.
+**Ship fight.** In this setting the range track is for ship fights, with the bands Close (under 10 km), Short (up to 1,000 km), Medium (up to 10,000 km), Long (up to 100,000 km), Extreme (about a light-second). **Add the Pelion** places a token linked to the crew's Hull track, so damage marked on the map is marked on the sheet. Enemy ships come from the Enemy ships table with their Hull boxes. Each lane is a range band from the Pelion. At the start of each exchange, Helm rolls against the enemy's helm; the winner may move the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond. Winning at Extreme by 5 or more lets a ship go to warp.
 
 ## The Encounter panel
 
-The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), whether the attacker is in reach or in range on the battle map, the boxes marked and any telling hit, offering Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
+The GM view also has an **Encounter** panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
+
+**The shared table.** The GM can start a shared table from the GM view and give the players its code; each player joins from their character's Duty station tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Duty station tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's Duty station tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.

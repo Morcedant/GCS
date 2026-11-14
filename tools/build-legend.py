@@ -110,7 +110,8 @@ def char_block(c, pack, t, heading):
     o, skills, target, dodge, expert = char_numbers(c, pack)
     tier = o["tier"] if o else c.get("customTier", 1)
     edge_names = {"attr": "+1 attribute point", "skill": "Extra Trained skill", "adv2": "Second advantage",
-                  "grit": f"Extra {t['point']}", "contact": "A friend", "gear": "A fine weapon or tool"}
+                  "grit": f"Extra {t['point']}", "contact": "A friend", "gear": "A fine weapon or tool",
+                  "extradefense": "Additional Defense", "survivor": "Hard to put down"}
     edge_names.update({e[0]: e[1] for e in pack.get("extraEdges", [])})
     edges = [edge_names[k] + (f" ×{v}" if v > 1 else "") for k, v in c.get("edges", {}).items() if v]
     top = [n for n in skills if skills[n] == "S"]
@@ -677,9 +678,19 @@ def check_calling_recipe(pack):
         assert 1 <= k <= rec.get("max", {}).get(n, rec.get("maxOther", 4)), (n, "is core for", k, "callings")
 
 
+# The fan games (USS Pelion, Grimm): setting packs kept apart from the public ones, in fan-games/packs/<id>/. Each names
+# its own folder ("out", from the repo's root); they stay off the public site and out of the public Discord bot.
+FAN_PACKS = ROOT / "fan-games" / "packs"
+
+
+def pack_dir(pid):
+    return LD / "packs" / pid if (LD / "packs" / pid / "pack.json").exists() else FAN_PACKS / pid
+
+
 def build(pid, docx):
-    pdir = LD / "packs" / pid
+    pdir = pack_dir(pid)
     pack = json.loads((pdir / "pack.json").read_text())
+    fan = pdir.parent == FAN_PACKS
     check_calling_recipe(pack)
     t = terms_of(pack)
     sections = pack_sections((pdir / "setting.md").read_text())
@@ -689,7 +700,7 @@ def build(pid, docx):
     gm_md = None
     if pack.get("gmGuide"):
         md, gm_md = split_gm(md, pack["gmGuide"])
-    out = LD / pid
+    out = ROOT / pack["out"] if pack.get("out") else LD / pid
     out.mkdir(exist_ok=True)
     (out / "players-guide.md").write_text(md)
     to_html = lambda m, prefix: subprocess.run(["pandoc", "-f", "markdown", "-t", "html", f"--id-prefix={prefix}", "--wrap=none"], input=m, capture_output=True, text=True, check=True).stdout
@@ -759,11 +770,12 @@ def build(pid, docx):
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     tpl = stamp(tpl, out / "index.html")  # the version footer: a fingerprint of the page, and the day it last changed
     (out / "index.html").write_text(tpl)
-    g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])
-    if pack.get("discovery"):
-        d = pack["discovery"]
-        g["discovery"] = {**d, "example": (d.get("subjects") or [[None, {"aurora": "Lord Marrow", "spaceopera": "Vael"}.get(pid, "Werewolf")]])[0][1]}
-    HANDOUTS.append((g, out))
+    if not fan:  # the fan games' handouts come from discord_handout.main(), with the fan-games bot
+        g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])
+        if pack.get("discovery"):
+            d = pack["discovery"]
+            g["discovery"] = {**d, "example": (d.get("subjects") or [[None, {"aurora": "Lord Marrow", "spaceopera": "Vael"}.get(pid, "Werewolf")]])[0][1]}
+        HANDOUTS.append((g, out))
     print(f"built {out.relative_to(ROOT)}/index.html and players-guide.md")
     if docx:
         name = re.sub(r"[^A-Za-z0-9]+", "_", t["guideTitle"]).strip("_") + ".docx"
@@ -853,7 +865,8 @@ def main():
     ap.add_argument("--docx", action="store_true")
     ap.add_argument("packs", nargs="*")
     a = ap.parse_args()
-    packs = a.packs or sorted(p.name for p in (LD / "packs").iterdir() if (p / "pack.json").exists())
+    packs = a.packs or (sorted(p.name for p in (LD / "packs").iterdir() if (p / "pack.json").exists())
+                        + (sorted(p.name for p in FAN_PACKS.iterdir() if (p / "pack.json").exists()) if FAN_PACKS.exists() else []))
     for pid in packs:
         build(pid, a.docx)
     core_rules(a.docx)

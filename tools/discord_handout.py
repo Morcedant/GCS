@@ -369,7 +369,8 @@ def legacy_games():
     for gid in FAN_GAMES:
         d = json.loads((GAMES_DIR / f"{gid}.json").read_text())
         page = fan_sources.read_text(d["seedsFrom"])
-        seeds = json.loads(re.search(r"const SEEDS = (\{.*?\});\n", page).group(1))
+        fan_pack = ROOT / "fan-games" / "packs" / {"pelion": "uss-pelion", "grimm": "grimm-west"}.get(gid, gid) / "pack.json"  # a fan game rebuilt as a setting pack keeps its seeds there
+        seeds = json.loads(fan_pack.read_text())["seeds"] if fan_pack.exists() else json.loads(re.search(r"const SEEDS = (\{.*?\});\n", page).group(1))
         yield gid, game_info(gid, d["title"], d["point"], d["tracks"], seeds, d["trackTitle"]), page
 
 
