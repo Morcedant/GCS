@@ -3,7 +3,7 @@
  * Battle maps for the playtest adventures, from the same R2 bucket as the music (bound as MUSIC).
  *
  * Upload pictures in the Cloudflare dashboard into battle-maps/<setting>/ (the settings' folders as for music:
- * trails-of-blood-and-dust, fracture-lines, the-shattered-crown, aurora). Start each file's name with its scene's number
+ * trails-of-blood-and-dust, fracture-lines, the-shattered-crown, aurora; the fan games uss-pelion and grimm). Start each file's name with its scene's number
  * ("2 - Mercy Springs at noon.png"): the playtest page puts it with that scene, and shows its hex size. Files without a
  * number are listed after the scenes, as extras.
  *
@@ -14,7 +14,7 @@
  *   GET /api/maps            → { folders: { F: count } }
  *   GET /maps/F/FILE         the picture; ?download=1 saves it as a file
  */
-import { MUSIC_FOLDERS, titleFrom } from "./music.js";
+import { MUSIC_FOLDERS, PUBLIC_FOLDERS, titleFrom } from "./music.js";
 
 export const MAP_PREFIX = "battle-maps";
 export const IMAGE_TYPES = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", avif: "image/avif", gif: "image/gif" };
@@ -62,7 +62,7 @@ export async function mapsFetch(req, env, h) {
       return json({ folder, maps: buildMapList(await listAll(bucket, `${MAP_PREFIX}/${folder}/`), folder, url.origin) }, 200, { "Cache-Control": "public, max-age=60" });
     }
     const all = await listAll(bucket, MAP_PREFIX + "/");
-    return json({ folders: Object.fromEntries(MUSIC_FOLDERS.map((f) => [f, all.filter((o) => validMapKey(o.key) && o.key.startsWith(`${MAP_PREFIX}/${f}/`)).length])) }, 200, { "Cache-Control": "public, max-age=60" });
+    return json({ folders: Object.fromEntries(PUBLIC_FOLDERS.map((f) => [f, all.filter((o) => validMapKey(o.key) && o.key.startsWith(`${MAP_PREFIX}/${f}/`)).length])) }, 200, { "Cache-Control": "public, max-age=60" });
   }
   let rest; try { rest = decodeURIComponent(path.slice("/maps/".length)); } catch { rest = ""; }
   const key = `${MAP_PREFIX}/${rest}`;

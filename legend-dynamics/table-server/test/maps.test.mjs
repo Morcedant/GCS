@@ -11,6 +11,7 @@ const h = { "Access-Control-Allow-Origin": "*" };
 
 test("map keys and scene numbers", () => {
   assert.ok(validMapKey("battle-maps/aurora/1 - the bridge.png"));
+  assert.ok(validMapKey("battle-maps/uss-pelion/token - Orion pirate.png") && validMapKey("battle-maps/grimm/portrait - Eliza Kessler.webp"), "the fan games' folders");
   for (const k of ["battle-maps/aurora/notes.txt", "aurora/1.png", "battle-maps/elsewhere/1.png", "battle-maps/aurora/x/1.png"]) assert.ok(!validMapKey(k), k);
   assert.equal(sceneOf("02 - Mercy Springs.png"), 2); assert.equal(sceneOf("7.webp"), 7); assert.equal(sceneOf("extra cave.png"), null); assert.equal(sceneOf("2026 map.png"), null);
 });

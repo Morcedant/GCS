@@ -25,6 +25,7 @@ test("titles come from file names; only audio in the settings' folders is served
   assert.equal(titleFrom("saloon_at_midnight.ogg"), "Saloon at Midnight");
   assert.equal(titleFrom("BOSS theme.mp3"), "BOSS Theme");
   assert.ok(validKey("aurora/main-theme.mp3"));
+  assert.ok(validKey("uss-pelion/01 - red alert.mp3") && validKey("grimm/the-woge.ogg"), "the fan games' folders");
   for (const k of ["aurora/notes.txt", "elsewhere/x.mp3", "aurora/sub/x.mp3", "aurora/.hidden.mp3", "../x.mp3", "aurora/"]) assert.ok(!validKey(k), k);
 });
 
@@ -41,7 +42,7 @@ test("the routes: a folder's list, the counts, a track, a range of it, a downloa
   const get = (p, headers = {}) => musicFetch(new Request("https://srv" + p, { headers }), env, h);
   let r = await get("/api/music?folder=aurora"); let b = await r.json();
   assert.equal(r.status, 200); assert.equal(b.intro, "Hero music."); assert.deepEqual(b.tracks.map((t) => t.title), ["Dawn"]);
-  r = await get("/api/music"); b = await r.json(); assert.deepEqual(b.folders, { "trails-of-blood-and-dust": 0, "fracture-lines": 1, "the-shattered-crown": 0, aurora: 1 });
+  r = await get("/api/music"); b = await r.json(); assert.deepEqual(b.folders, { "trails-of-blood-and-dust": 0, "fracture-lines": 1, "the-shattered-crown": 0, aurora: 1 }, "the fan games aren't in the public counts");
   r = await get("/music/aurora/01%20dawn.mp3"); assert.equal(r.status, 200); assert.equal(r.headers.get("Content-Type"), "audio/mpeg"); assert.equal(await r.text(), "0123456789");
   r = await get("/music/aurora/01%20dawn.mp3", { Range: "bytes=2-5" }); assert.equal(r.status, 206); assert.equal(r.headers.get("Content-Range"), "bytes 2-5/10"); assert.equal(await r.text(), "2345");
   r = await get("/music/aurora/01%20dawn.mp3?download=1"); assert.match(r.headers.get("Content-Disposition"), /attachment/);

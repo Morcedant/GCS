@@ -68,6 +68,24 @@ ADVENTURES = [
    ("3. Under the tracks: the retrieval", "2 yards", "about 50 by 28 yards",
     "The street under the elevated train tracks at night: steel pillars in rows, parked cars, the shuttered fronts of a taqueria and a laundromat, an alley mouth, a vacant lot behind a chain-link fence, and an unmarked white van with its side door open. Deep shadows between the pillars; one working light far off."),
   ]},
+ # The fan games (fan-games/packs/): their pictures go in the bucket's battle-maps/uss-pelion/ and battle-maps/grimm/.
+ {"id": "uss-pelion", "folder": "uss-pelion", "setting": "USS Pelion", "title": "The Silence at Corvan II",
+  "style": "Painted 1960s-style starship science fiction: bold saturated gold, blue and red, painted alien skies in ochre and violet, studio-like rock formations, clean geometric Federation outpost modules with rounded corners.",
+  "scenes": [
+   ("1. Arrival: the raider in orbit", "ship scale (use the range track, or a large hex size)", "many kilometers across",
+    "High orbit over Corvan II, a green-and-ochre world with one small grey moon: the planet's curve filling one side, the moon's limb on the other, a drift of debris from an old survey satellite for cover, and open space between."),
+   ("2. The outpost", "2 yards", "about 40 by 22 yards",
+    "A small Federation research outpost on a hillside: three prefabricated modules in a row (a lab, a bunkhouse, a comms shack with a dish), a transporter pad, crates of survey gear, an empty shuttle landing pad; lights on, doors open, nobody there. At one edge, a camouflaged observation blind looking down into a valley."),
+   ("3. The Ketari village", "2 yards", "about 50 by 28 yards",
+    "A bronze-age village in a river valley: round mud-brick houses with thatched roofs, a central fire pit, a forge with bronze tools, drying racks, a palisade of sharpened stakes with a gate, a stone shrine at one end, and a path leading up the hill toward ruins."),
+   ("4. The ruins: the Orions dig", "2 yards", "about 40 by 22 yards",
+    "An ancient alien ruin half-buried in the hillside: tilted monoliths of smooth dark stone carved with geometric patterns, a sunken plaza, fallen pillars for cover, and a fresh excavation trench cut into the center, with a cutting rig, salvage crates and work lights around a glowing seam in the stone."),
+   ("5. The caretaker's chamber", "1 yard", "about 24 by 14 yards",
+    "A vaulted chamber deep inside the ruins: walls of the same dark stone lit by lines of soft blue light, eight stasis alcoves in an arc, each a shimmering field of pale light, and at the center a pedestal where the caretaker's machine core glows."),
+  ]},
+ {"id": "grimm-west", "folder": "grimm", "setting": "Grimm", "title": "Grimm",
+  "style": "Hand-painted gothic horror illustration of the American West in the 1880s, with old-country German touches: lamplight and long shadows, weathered timber, iron and brass, oxblood, bone white and lamp amber, like a hand-colored engraving.",
+  "scenes": []},
 ]
 MASTER = """I'm running a tabletop RPG adventure and need a series of battle maps, one image per scene. Make them one at a time, in the order below, and keep the same art style across the whole series so they look like a set.
 
@@ -116,6 +134,26 @@ TOKENS = {
     ("Ssethra, the serpent-priest", "3 hexes", "a huge serpent-priest of the old kings, a man's torso on a coiled snake's body, wet and scaled, a crown of gold on its hood", [7]),
     ("Ysolde Varr, the merchant princess", "1 hex", "a merchant princess in silks and gold, a fan in one hand", [1]),
   ]},
+  "uss-pelion": {"rim": "brushed gold", "tokens": [
+    ("USS Pelion", "ship", "a Federation starship: a saucer hull, a slim secondary hull and two long warp nacelles on pylons, white hull with pale grey panel lines", [1]),
+    ("Orion raider", "ship", "a lean, predatory green-hulled raider with swept-forward wings and mismatched salvaged plating", [1]),
+    ("Orion pirate", "1 hex", "a green-skinned pirate in leather and scavenged armor plates, a disruptor pistol in hand", [4]),
+    ("Ketari warrior", "1 hex", "a bronze-age warrior in leather armor with a bronze-tipped spear and a stolen energy pistol tucked in the belt", [3, 4]),
+    ("The Ketari chieftain", "1 hex", "a proud chieftain in a feathered cloak and a bronze torc, holding a stolen energy pistol like a talisman", [3]),
+    ("The caretaker", "1 hex", "a tall, smooth android shell of dark stone veined with soft blue light, faceless but courteous", [5]),
+  ]},
+  "grimm-west": {"rim": "tarnished silver", "tokens": [
+    ("Hired gun", "1 hex", "a hard-faced hired gun in a duster and flat-brimmed hat, a revolver drawn", []),
+    ("Outlaw", "1 hex", "a scarred outlaw with a bandana over the face and a lever-action rifle", []),
+    ("Blutbad", "1 hex", "a Wesen in full woge, half man, half wolf: a lupine face with fangs and burning red eyes, in a workman's shirt and suspenders", []),
+    ("Siegbarste", "1 hex", "a huge, hulking Wesen in full woge, with a heavy brow, thick grey skin and a wooden club", []),
+    ("Mauvais Dentes", "1 hex", "a feline Wesen in full woge with long saber teeth and a sleek black coat, crouched to spring", []),
+    ("Hexenbiest", "1 hex", "a woman in a dark Victorian dress mid-woge, half her face decayed to the skull, eyes clouded, one hand raised", []),
+    ("Hundjager", "1 hex", "a dog-like Wesen hunter in full woge, in a long grey coat with a crossbow", []),
+    ("Wendigo", "1 hex", "a gaunt, ravenous Wesen in full woge with sunken eyes, long fingers and torn clothes", []),
+    ("Order of the Holy Knife assassin", "1 hex", "a hooded assassin in a dark robe with a curved dagger and a cross on a chain", []),
+    ("Brotherhood druid", "1 hex", "a robed druid with a staff of twisted oak and roots curling around the feet", []),
+  ]},
   "aurora": {"rim": "chrome", "tokens": [
     ("Lupe Herrera", "1 hex", "a frightened fifteen-year-old girl in a hoodie, wreathed in crackling electric-blue lightning", [1, 2, 3]),
     ("Foundation retrieval agent", "1 hex", "an agent in unmarked black tactical gear and a faceless helmet, carrying a flechette rifle, a stubby neurogun holstered at the hip and stun grenades on the vest", [3]),
@@ -140,6 +178,8 @@ FIGHTS = {
               "Dask, the sellsword captain": {"threat": "Sellsword captain", "foe": {1: False}}, "Guardsman": {"threat": "Guardsman or bandit", "count": {6: 2}},
               "Tomb-dead": {"threat": "Ghoul or tomb-dead", "count": {6: 2}, "plus": [6]}, "Ssethra, the serpent-priest": {"threat": "Serpent-priest"},
               "Ysolde Varr, the merchant princess": {"foe": False}},
+  "uss-pelion": {"USS Pelion": {"foe": False}, "Orion raider": {"threat": "Orion raider"}, "Orion pirate": {"threat": "Orion pirate", "count": {4: 3}},
+                 "Ketari warrior": {"threat": "Security guard", "count": {3: 3, 4: 2}}, "The Ketari chieftain": {"foe": False}, "The caretaker": {"threat": "Rogue android", "foe": False}},
   "aurora": {"Lupe Herrera": {"threat": "Lab escapee", "foe": False}, "Foundation retrieval agent": {"threat": "Foundation retrieval team", "count": {3: 4}},
              "Sergei Grachyov": {"threat": "Sergei Grachyov", "foe": False}},
 }
@@ -179,6 +219,9 @@ def pregen_subject(pack, c):
     items = [eq.get(k, k) for k, v in (c.get("equipment") or {}).items() if v and eq.get(k, k) not in ("Skinsuit", "Travel papers", "Badge and ID", "Radio and phone")
              and not any(w in eq.get(k, k).lower() for w in ("horse", "camel", "sea chest", "kit"))]   # nothing that isn't in their hands
     dept = " ".join(w if w.isupper() else w.lower() for w in c.get("dept", "").split())
+    # A setting whose roles are departments names the person (terms.rolePerson: "{} officer"; enlisted crew: crewman).
+    rp = pack.get("terms", {}).get("rolePerson")
+    if rp: dept = f"{dept} crewman" if c.get("path") == "hand" else rp.format(dept)
     first = f"{c['name']}, {c.get('rank', '')}: {'an' if dept[:1].upper() in 'AEIOU' else 'a'} {dept}, {c.get('species', '')}"
     return (f"{first} ({people[0].lower() + people[1:]})" if people else first) + f". {c.get('role', '')}" + (f" Carrying: {', '.join(items).lower()}." if items else "")
 
@@ -191,3 +234,47 @@ def pregen_prompts(gid, pack):
         style = a["style"].split(" The colony ship")[0]   # the places' notes aren't for people
         out.append((c["name"], f"{subj} {style} {PORTRAIT_RULES}", f"{subj} {style} " + TOKEN_RULES.format(rim=TOKENS[gid]["rim"])))
     return out
+
+
+def prompts_md(gid, pack):
+    """An adventure's section of a prompts document: the series prompt and each scene's, the characters' portraits and
+    tokens, and the tokens for everyone else, as in legend-dynamics/battlemap-prompts.md."""
+    a = next(x for x in ADVENTURES if x["id"] == gid)
+    fence = lambda t: f"```\n{t}\n```"
+    out = [f"## {a['setting']}" + (f": {a['title']}" if a["title"] != a["setting"] else ""), "",
+           f"Upload every picture into the table server's bucket, in **battle-maps/{a['folder']}/**. The GM view finds them there.", ""]
+    if a["scenes"]:
+        scenes = "\n".join(f"{n} ({ar}): {d}" for n, _h, ar, d in a["scenes"])
+        out += ["**Series prompt**", "", fence(MASTER.format(rules=RULES, style=a["style"], scenes=scenes)), ""]
+        for n, h, _ar, d in a["scenes"]:
+            out += [f"### {n}", "", f"Battle map setting: **{h} a hex**." if h.split()[0].isdigit() else f"Battle map setting: {h}.", "",
+                    f"Name the picture starting with its number, e.g. `{n.split('.')[0]} - {n.split('. ', 1)[1].split(':')[0].lower()}.png`.", "",
+                    fence(f"{d} {a['style']} {RULES}"), ""]
+    pre = pregen_prompts(gid, pack)
+    if pre:
+        out += ["### The characters", "", "A portrait (for the sheet) and a token (for the battle map) for each ready-made character, named `portrait - <name>` and `token - <name>`.", ""]
+        for name, portrait, token in pre:
+            out += [f"#### {name}", "", "Portrait:", "", fence(portrait), "", "Token:", "", fence(token), ""]
+    toks = TOKENS.get(gid, {}).get("tokens", [])
+    if toks:
+        out += [f"### Tokens{' for ' + a['title'] if a['title'] != a['setting'] else ''}", "",
+                "Everyone and everything else that fights or moves in a scene, made apart from the maps. Name each starting `token`, for example `token - " + toks[0][0].lower() + ".png`.", ""]
+        sc = {k + 1: n for k, (n, *_r) in enumerate(a["scenes"])}
+        for name, size, look, scenes in toks:
+            where = "; ".join(sc[k] for k in scenes if k in sc)
+            rules = SHIP_RULES if size == "ship" else TOKEN_RULES.format(rim=TOKENS[gid]["rim"])
+            out += [f"#### {name}", "", f"On the map: {size}" + (f" · {where}." if where else "."), "", fence(f"{look[0].upper() + look[1:]}. {a['style']} {rules}"), ""]
+    return "\n".join(out)
+
+
+if __name__ == "__main__":
+    # The fan games' prompts: fan-games/battlemap-prompts.md (python3 tools/battlemap_scenes.py fan).
+    import json, pathlib, sys
+    if sys.argv[1:] == ["fan"]:
+        root = pathlib.Path(__file__).resolve().parent.parent
+        parts = ["# Battle map, portrait and token prompts for the fan games", "",
+                 "Prompts for an image tool (ChatGPT, Midjourney, Gemini, or similar). Maps have no grid: the GM view's battle map draws its own hexes over the picture. Upload the pictures into the table server's bucket (**legend-music**, in the Cloudflare dashboard: R2), in each game's folder below; the GM view picks them up by name.", ""]
+        for gid in ("uss-pelion", "grimm-west"):
+            parts.append(prompts_md(gid, json.loads((root / "fan-games" / "packs" / gid / "pack.json").read_text())))
+        (root / "fan-games" / "battlemap-prompts.md").write_text("\n".join(parts).rstrip() + "\n")
+        print("wrote fan-games/battlemap-prompts.md")

@@ -704,7 +704,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="c158865" data-version-date="2026.11.13" title="The code changes whenever this page changes.">Version 2026.11.13 · c158865</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="1ae5639" data-version-date="2026.11.14" title="The code changes whenever this page changes.">Version 2026.11.14 · 1ae5639</span><!-- VERSION:END --></div>
   </header>
 
   <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
@@ -12690,10 +12690,13 @@ function ptMaps(api, root) {
 
   // ---- the playtest's pictures: the pregenerated characters' portraits and tokens, from the table server's bucket ----
   const PT_MAPS = PACK.playtest && PACK.playtest.maps;
+  // The game's folder in the bucket: its playtest kit's, or the pack's own (PACK.bucketFolder: a game with no kit, like
+  // Grimm). Portraits and tokens there ("Portrait - name", "Token - name") go to the characters they name.
+  const PIC_FOLDER = (PT_MAPS && PT_MAPS.folder) || PACK.bucketFolder || "";
   let ptPics = null;
   function ptPictures() {
-    if (!PT_MAPS || !TABLE_SERVER) return Promise.resolve([]);
-    if (!ptPics) ptPics = fetch(`${TABLE_SERVER}/api/maps?folder=${encodeURIComponent(PT_MAPS.folder)}`).then((r) => r.json()).then((b) => b.maps || []).catch(() => { ptPics = null; return []; });
+    if (!PIC_FOLDER || !TABLE_SERVER) return Promise.resolve([]);
+    if (!ptPics) ptPics = fetch(`${TABLE_SERVER}/api/maps?folder=${encodeURIComponent(PIC_FOLDER)}`).then((r) => r.json()).then((b) => b.maps || []).catch(() => { ptPics = null; return []; });
     return ptPics;
   }
   /** The best "portrait …" or "token …" picture for a character's name, by the words they share. */
@@ -12738,7 +12741,7 @@ function ptMaps(api, root) {
     try { await givePics([c], pu, tu); return true; } catch { return false; }
   }
   /** On opening: anyone here with the kit's pictures gets the ones replaced since. */
-  if (PT_MAPS && TABLE_SERVER) setTimeout(async () => {
+  if (PIC_FOLDER && TABLE_SERVER) setTimeout(async () => {
     let n = 0;
     for (const c of gmCrew) if (await autoPictures(c)) n++;
     if (n) { store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); }

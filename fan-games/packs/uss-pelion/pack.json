@@ -60,7 +60,8 @@
   "unarmedSkill": "Unarmed Combat",
   "chaseSkill": "Helm",
   "fontsHref": "https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&family=Exo+2:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap",
-  "party": "crew"
+  "party": "crew",
+  "rolePerson": "{} officer"
  },
  "theme": {
   "comment": "USS Pelion, plain: a Starfleet technical manual.",
@@ -2934,6 +2935,7 @@
   "href": "frontier/",
   "text": "A turn-based strategy game for the same campaign: command the Pelion through a fifty-week tour of the Corvan Sector, against the Klingons, the Romulans and the Tholians. Free, in your browser."
  },
+ "bucketFolder": "uss-pelion",
  "out": "uss-pelion",
  "legacyStores": {
   "current.v1": "pelion.current.v1",

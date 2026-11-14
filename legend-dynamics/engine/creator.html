@@ -3989,10 +3989,13 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- the playtest's pictures: the pregenerated characters' portraits and tokens, from the table server's bucket ----
   const PT_MAPS = PACK.playtest && PACK.playtest.maps;
+  // The game's folder in the bucket: its playtest kit's, or the pack's own (PACK.bucketFolder: a game with no kit, like
+  // Grimm). Portraits and tokens there ("Portrait - name", "Token - name") go to the characters they name.
+  const PIC_FOLDER = (PT_MAPS && PT_MAPS.folder) || PACK.bucketFolder || "";
   let ptPics = null;
   function ptPictures() {
-    if (!PT_MAPS || !TABLE_SERVER) return Promise.resolve([]);
-    if (!ptPics) ptPics = fetch(`${TABLE_SERVER}/api/maps?folder=${encodeURIComponent(PT_MAPS.folder)}`).then((r) => r.json()).then((b) => b.maps || []).catch(() => { ptPics = null; return []; });
+    if (!PIC_FOLDER || !TABLE_SERVER) return Promise.resolve([]);
+    if (!ptPics) ptPics = fetch(`${TABLE_SERVER}/api/maps?folder=${encodeURIComponent(PIC_FOLDER)}`).then((r) => r.json()).then((b) => b.maps || []).catch(() => { ptPics = null; return []; });
     return ptPics;
   }
   /** The best "portrait …" or "token …" picture for a character's name, by the words they share. */
@@ -4037,7 +4040,7 @@ tr.lvl-U td.target { color: var(--muted); }
     try { await givePics([c], pu, tu); return true; } catch { return false; }
   }
   /** On opening: anyone here with the kit's pictures gets the ones replaced since. */
-  if (PT_MAPS && TABLE_SERVER) setTimeout(async () => {
+  if (PIC_FOLDER && TABLE_SERVER) setTimeout(async () => {
     let n = 0;
     for (const c of gmCrew) if (await autoPictures(c)) n++;
     if (n) { store.set(STORE_GM, gmCrew); renderGM(); battleMap.refresh(); }

@@ -30,3 +30,20 @@ Rebuild with `python3 tools/build-fansite.py --zip <path>` and upload the zip to
 - Share the site's address only with your players, and keep them on the Access list.
 - The site tells search engines to stay away (`robots.txt`, `noindex`), but Access is what actually keeps people out.
 - Don't link it from the Legend Dynamics site, bot or Discord handouts.
+
+## Music, battle maps, portraits and tokens
+
+The fan games keep their pictures and music in the table server's bucket, **legend-music** (Cloudflare dashboard → R2),
+beside the public settings'. R2 has no empty folders: a folder appears with the first file you upload into it, so type
+the folder into the upload's path the first time.
+
+| What | Folder | Names |
+|---|---|---|
+| USS Pelion's music | `uss-pelion/` | Any audio file; `01 - title.mp3` sets the order. A `tracks.json` can add titles and moods (see `legend-dynamics/table-server/src/music.js`). |
+| Grimm's music | `grimm/` | The same. |
+| USS Pelion's battle maps, portraits and tokens | `battle-maps/uss-pelion/` | A map starts with its scene's number (`2 - the outpost.png`); a portrait with `portrait - ` and a token with `token - ` and the character's name. |
+| Grimm's portraits, tokens and maps | `battle-maps/grimm/` | The same. |
+
+The music shows at once on each game's **Music** page on this site. In the creators' GM view, portraits and tokens go
+to the characters they name, and USS Pelion's playtest kit places each scene's map and token. The prompts for every
+picture are in `battlemap-prompts.md` (`python3 tools/battlemap_scenes.py fan` rebuilds it).

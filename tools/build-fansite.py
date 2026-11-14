@@ -8,7 +8,7 @@ get them from the table server, as on the main site.
 
   python3 tools/build-fansite.py [--zip PATH]
 """
-import argparse, html, re, shutil, sys, zipfile
+import argparse, html, json, re, shutil, sys, zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -66,6 +66,38 @@ button { font: inherit; background: var(--accent); color: #f7f6f2; border: 0; bo
 .hp { position: absolute; left: -10000px; }
 .bad { color: #8a1c1c; }
 ul.how { padding-left: 1.2rem; } ul.how li { margin-bottom: 6px; }"""
+
+
+def music_page(slug, title):
+    """A game's music: what the table server's bucket holds in its folder (<slug>/), listed when the page opens, so a
+    track uploaded in the Cloudflare dashboard shows at once. Each track plays here and downloads."""
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{html.escape(title)} · Music</title><meta name="robots" content="noindex, nofollow"><style>{CSS}
+.tracks {{ list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }}
+.tracks li {{ background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 6px; }}
+.tracks b {{ font-size: 1.05rem; }} .tracks small {{ color: var(--muted); }} .tracks audio {{ width: 100%; }}
+.tracks a {{ color: var(--accent); font-size: .9rem; }}</style></head>
+<body><main>
+<p><a href="/" style="color:var(--muted)">← Fan games</a></p>
+<h1>{html.escape(title)}: music</h1>
+<p class="lede" id="intro">Tracks for the table: play them here while you play, or download them.</p>
+<ul class="tracks" id="tracks"><li><small>Loading the tracks…</small></li></ul>
+</main>
+<script>
+(async () => {{
+  const el = document.getElementById("tracks"), esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({{ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }})[c]);
+  try {{
+    const r = await fetch({json.dumps(SERVER)} + "/api/music?folder={slug}"), b = await r.json();
+    if (b.intro) document.getElementById("intro").textContent = b.intro;
+    const ts = b.tracks || [];
+    el.innerHTML = ts.length ? ts.map((t) => `<li><b>${{esc(t.title)}}</b>${{[t.mood, t.use].filter(Boolean).length ? `<small>${{esc([t.mood, t.use].filter(Boolean).join(" · "))}}</small>` : ""}}
+      <audio controls preload="none" src="${{esc(t.src)}}"${{t.loop ? " loop" : ""}}></audio><a href="${{esc(t.download)}}">Download (${{(t.bytes / 1048576).toFixed(1)}} MB)</a>${{t.credit ? `<small>${{esc(t.credit)}}</small>` : ""}}</li>`).join("")
+      : "<li><small>No tracks yet. Upload them into the music bucket's <b>{slug}/</b> folder, and they show here at once.</small></li>";
+  }} catch (e) {{ el.innerHTML = "<li><small>The music server didn't answer. Try again in a moment.</small></li>"; }}
+}})();
+</script></body></html>
+"""
 
 
 def playtest():
@@ -136,7 +168,8 @@ def main():
         write(f"{slug}/index.html", creator(fan_sources.read_text(f"{folder}/index.html")))
         write(f"{slug}/{guide}", fan_sources.read_bytes(f"{folder}/{guide}"))
         write(f"{slug}/discord-commands.html", (ROOT / folder / "discord-commands.html").read_text())
-        extra = ""
+        write(f"{slug}/music/index.html", music_page(slug, title))  # its tracks in the bucket's <slug>/ folder
+        extra = f'\n  <a href="/{slug}/music/">Music</a>'
         # USS Pelion: Frontier, the strategy game (pelion-frontier/, built by its own build.mjs).
         frontier = ROOT / "pelion-frontier" / "dist" / "play.html"
         if slug == "uss-pelion" and frontier.exists():
@@ -144,7 +177,7 @@ def main():
             tokens = ROOT / "pelion-frontier" / "dist" / "tokens.html"
             if tokens.exists():
                 write(f"{slug}/frontier/tokens.html", tokens.read_text())
-            extra = f'\n  <a href="/{slug}/frontier/">Frontier (strategy game)</a>' + (f'\n  <a href="/{slug}/frontier/tokens.html">Ship tokens (printable)</a>' if tokens.exists() else "")
+            extra += f'\n  <a href="/{slug}/frontier/">Frontier (strategy game)</a>' + (f'\n  <a href="/{slug}/frontier/tokens.html">Ship tokens (printable)</a>' if tokens.exists() else "")
         cards.append(f"""<section class="game"><h2>{html.escape(title)}</h2><p>{html.escape(tagline)}</p>
   <div class="links"><a class="primary" href="/{slug}/">Open the creator</a><a href="/{slug}/{guide}" download>Players' Guide (Word)</a>
   <a href="/{slug}/discord-commands.html">Discord commands</a>{extra}</div></section>""")

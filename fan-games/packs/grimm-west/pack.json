@@ -4253,6 +4253,7 @@
    "outlaw": 2
   }
  },
+ "bucketFolder": "grimm",
  "out": "grimm-west",
  "legacyStores": {
   "current.v1": "grimm.current.v1",

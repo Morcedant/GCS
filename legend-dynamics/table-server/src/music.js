@@ -7,6 +7,8 @@
  *
  *   trails-of-blood-and-dust/   fracture-lines/   the-shattered-crown/   aurora/
  *
+ * and the fan games, named as on the fan-games site: uss-pelion/   grimm/
+ *
  * The music pages list what's there, at once, with no rebuild. A track's title comes from its file name
  * ("01 - the-long-road.mp3" → "The Long Road"; a leading number sets the order). To give titles, moods and the like,
  * put a tracks.json in the folder (optional): { "intro": "…", "tracks": [{ "file", "title", "mood", "use", "credit",
@@ -16,7 +18,10 @@
  *   GET /api/music            → { folders: { F: count } }   how many tracks each setting has
  *   GET /music/F/FILE         the track (Range requests work, so the player can seek); ?download=1 saves it as a file
  */
-export const MUSIC_FOLDERS = ["trails-of-blood-and-dust", "fracture-lines", "the-shattered-crown", "aurora"];
+export const MUSIC_FOLDERS = ["trails-of-blood-and-dust", "fracture-lines", "the-shattered-crown", "aurora", "uss-pelion", "grimm"];
+/** The private fan games' folders: served by name, but left out of the public counts. */
+export const FAN_FOLDERS = ["uss-pelion", "grimm"];
+export const PUBLIC_FOLDERS = MUSIC_FOLDERS.filter((f) => !FAN_FOLDERS.includes(f));
 export const AUDIO_TYPES = { mp3: "audio/mpeg", m4a: "audio/mp4", aac: "audio/aac", ogg: "audio/ogg", oga: "audio/ogg", opus: "audio/ogg", wav: "audio/wav", flac: "audio/flac", webm: "audio/webm" };
 
 const SMALL = new Set(["a", "an", "and", "at", "by", "for", "in", "of", "on", "or", "the", "to", "with"]);
@@ -88,7 +93,7 @@ export async function musicFetch(req, env, h) {
       return json({ folder, intro: typeof manifest?.intro === "string" ? manifest.intro.slice(0, 600) : "", tracks: buildList(objects, manifest, folder, url.origin) }, 200, { "Cache-Control": "public, max-age=60" });
     }
     const all = await listAll(bucket, "");
-    const folders = Object.fromEntries(MUSIC_FOLDERS.map((f) => [f, all.filter((o) => validKey(o.key) && o.key.startsWith(f + "/")).length]));
+    const folders = Object.fromEntries(PUBLIC_FOLDERS.map((f) => [f, all.filter((o) => validKey(o.key) && o.key.startsWith(f + "/")).length]));
     return json({ folders }, 200, { "Cache-Control": "public, max-age=60" });
   }
   // A track.
