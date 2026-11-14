@@ -1,8 +1,97 @@
 {
   "_about": "The one place for the core rules' version and change history. tools/build-website.py reads it for the core-rules page and the changelog. rulesVersion and rulesUpdated change only when the rules (mechanics) change; a website or wording update adds a 'site' entry and leaves them alone. rulesVersion is null until the author picks a numbering scheme.",
   "rulesVersion": null,
-  "rulesUpdated": "2026-10-28",
+  "rulesUpdated": "2026-11-07",
   "changes": [
+    {
+      "date": "2026-11-08",
+      "kind": "site",
+      "title": "Alternate forms with their own numbers",
+      "items": [
+        "Any character can have their own alternate form (Powers step): its name and their normal shape's, attribute, Dodge and Move changes, the powers that work only in the form, and a note.",
+        "The sheet's and the table card's form switch, skills, Dodge, Move and the Encounter panel all use the form's numbers while the character is in it; a form-only power gives no attack, Defense or move outside it."
+      ]
+    },
+    {
+      "date": "2026-11-08",
+      "kind": "setting",
+      "title": "Aurora: every notable Operant as a ready-made sheet",
+      "items": [
+        "Eight supers the history names now have stat blocks: Herbert Unler, Zarloff the Elder, the Ivory Phoenix, Charlie Swift, Warlord I, Armageddon, Johnny Vanroy (Mr. Power) and John Marcus Mars Jr.",
+        "All 30 named Operants are ready-made sheets for the GM, built from their stat blocks; the GM view adds them as NPCs. Mr. Marvel, Uathach and the Ice Reaper come with their alternate forms."
+      ]
+    },
+    {
+      "date": "2026-11-08",
+      "kind": "setting",
+      "title": "Aurora: Piercing, and the neurogun",
+      "items": [
+        "Piercing (armor-piercing rounds): a piercing attack meets a Defense one Class higher than it is, but marks its own Class's boxes. Armor with a Defense rating protects as usual; a plain body armor vest doesn't help against it.",
+        "The flechette rifle is Class II, Piercing. The neurogun is an advanced taser: a Class II physical stun, Body −4 to stay up, which Defense II stops. A stun weapon with a Class now meets Defense like any other attack."
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "kind": "setting",
+      "title": "Aurora: damage types and the Vulnerability complication",
+      "items": [
+        "Four damage types: physical, energy, mystic and mind. Each Defense covers its own (Toughness physical; Force Field physical and energy); against another type it counts one Class lower. No Defense but Mind Defense helps against the mind, and force made by the mind is physical.",
+        "Weak (a box more), resistant (Defense +1) and immune (nothing below Class VI) to a type, element or material. The Vulnerability complication is a weakness chosen with the GM."
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "kind": "setting",
+      "title": "Aurora: Defense takes an attack one Class above it",
+      "items": [
+        "An attack must be at least one Class above a Defense to do anything, and then marks one box fewer; an equal or lower one does nothing (before, an equal attack marked a box fewer and a higher one hit in full). Falls follow: Toughness II walks away from a rooftop, IV from a tower, V from a fall from a plane."
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "kind": "setting",
+      "title": "Aurora: unstable powers come in levels",
+      "items": [
+        "Unstable I flares on a natural 18 with Powers, II on 17–18, III on 16–18, IV on 15–18. Lab-made gives Unstable II; the Unstable Powers complication gives the level chosen (I to III); the two add, to IV. The GM can raise or lower a level in play, and Strain 3 flares any power on 16–18."
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "kind": "setting",
+      "title": "Aurora: the Foundation's retrieval teams, and Dead Air",
+      "items": [
+        "Retrieval teams carry neuroguns, flechette rifles and stun grenades besides their tranquilizers and dampening net, and will kill to leave no witnesses (a Foundation hardware table in the GM's Guide).",
+        "The first case is now Dead Air, and Subject 19 has no codename."
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "kind": "rules",
+      "title": "No one starts below 10",
+      "items": [
+        "Origins only raise attributes, and their bonuses come out of the five attribute points, so every origin starts with the same total. Custom and homebrew origins: 0 to +2 each, +3 at most.",
+        "Ordinary people: 10 in every attribute, Dodge 8, Move 5 yards, 6 in anything untrained. An attribute drops below 10 only for a reason in play: an injury, a curse, a form.",
+        "The pregenerated characters are rebalanced to match, and older characters are put right when they're opened."
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "kind": "site",
+      "title": "The GM view: NPCs, powers on the cards, and the playtests in one click",
+      "items": [
+        "NPCs (the people the characters meet) are full characters in the GM view, from any threat or written in: their own boxes, portrait and token, linked to their battle map token, and on their own side in the Encounter panel.",
+        "Table cards list powers by Class and spells, show a power's move apart from the move on foot, and label the injury boxes; the same character isn't added twice unless they're a generic NPC.",
+        "A playtest loads in one click: its campaign, the ready-made characters, its NPCs, clocks and files, and each scene's map with its enemies (who grow with the adventure's threat)."
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "kind": "site",
+      "title": "Music, battle maps and character pictures",
+      "items": [
+        "Music for each setting, to play at the table or download; battle maps, tokens and portraits for the playtests, from the table server, with replaced pictures picked up."
+      ]
+    },
     {
       "date": "2026-10-28",
       "kind": "rules",
