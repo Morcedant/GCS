@@ -5,6 +5,17 @@
   "changes": [
     {
       "date": "2026-11-14",
+      "kind": "setting",
+      "title": "Aurora's playtest: good guys against bad guys",
+      "items": [
+        "Dead Air is rewritten as a clear heroes-against-villains case, to teach the game: save a terrified girl and forty commuters on a stalled train, find out who's behind the blackout, and stop him.",
+        "A new villain, Overcharge (Class IV), the Foundation's enforcer, sets the trap for Subject 19. The investigation pays off in the fight: take out the girl's tag and his force field drops from IV to III.",
+        "Sergei Grachyov no longer offers a trade; he watches from the platform at the end, a hook for later. The case ends with the girl home and the villain in cuffs.",
+        "The run sheet, the Campaign tab's outline, people and places, and the battle map's tokens (with a prompt for Overcharge's) follow the new story."
+      ]
+    },
+    {
+      "date": "2026-11-14",
       "kind": "site",
       "title": "Dominion: sieges work, and a targeted barrage",
       "items": [

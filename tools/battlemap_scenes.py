@@ -65,7 +65,7 @@ ADVENTURES = [
     "A city street bridge at night in a blackout, with an elevated train line running beside it. A two-car commuter train stands stalled on the elevated track, doors open. Dead streetlights, a scorched utility pole and a blown transformer throwing sparks, abandoned cars at angles across the lanes, a police cordon with barricades at one end, a TV news van at the other."),
    ("2. The bridge, after the surges", "2 yards", "about 60 by 34 yards",
     "The same bridge after the power surges: the train's front car burning, a downed power line across the road, sparking; a car on fire; scorch marks across the asphalt. (If your image tool can edit, start from the first bridge map and change it, so the layout matches.)"),
-   ("3. Under the tracks: the retrieval", "2 yards", "about 50 by 28 yards",
+   ("3. Under the tracks: the trap", "2 yards", "about 50 by 28 yards",
     "The street under the elevated train tracks at night: steel pillars in rows, parked cars, the shuttered fronts of a taqueria and a laundromat, an alley mouth, a vacant lot behind a chain-link fence, and an unmarked white van with its side door open. Deep shadows between the pillars; one working light far off."),
   ]},
  # The fan games (fan-games/packs/): their pictures go in the bucket's battle-maps/uss-pelion/ and battle-maps/grimm/.
@@ -157,6 +157,7 @@ TOKENS = {
   "aurora": {"rim": "chrome", "tokens": [
     ("Lupe Herrera", "1 hex", "a frightened fifteen-year-old girl in a hoodie, wreathed in crackling electric-blue lightning", [1, 2, 3]),
     ("Foundation retrieval agent", "1 hex", "an agent in unmarked black tactical gear and a faceless helmet, carrying a flechette rifle, a stubby neurogun holstered at the hip and stun grenades on the vest", [3]),
+    ("Overcharge", "1 hex", "a lean, sneering man in a black Foundation tactical suit with a high collar, lightning crawling over his arms and crackling between his fingers, eyes glowing white-blue", [3]),
     ("Sergei Grachyov", "1 hex", "a calm, broad man in a long dark coat, hands in his pockets, faint distortion in the air around him", [3]),
   ]},
 }
@@ -181,7 +182,7 @@ FIGHTS = {
   "uss-pelion": {"USS Pelion": {"foe": False}, "Orion raider": {"threat": "Orion raider"}, "Orion pirate": {"threat": "Orion pirate", "count": {4: 3}},
                  "Ketari warrior": {"threat": "Security guard", "count": {3: 3, 4: 2}}, "The Ketari chieftain": {"foe": False}, "The caretaker": {"threat": "Rogue android", "foe": False}},
   "aurora": {"Lupe Herrera": {"threat": "Lab escapee", "foe": False}, "Foundation retrieval agent": {"threat": "Foundation retrieval team", "count": {3: 4}},
-             "Sergei Grachyov": {"threat": "Sergei Grachyov", "foe": False}},
+             "Overcharge": {"threat": "Overcharge (Mason Rourke)"}, "Sergei Grachyov": {"threat": "Sergei Grachyov", "foe": False}},
 }
 
 

@@ -48,12 +48,14 @@ PEOPLE = {
     ],
     "aurora": [
         ["Lupe Herrera", "Fifteen, from Pilsen", "", "A terrified girl on the Eighteenth Street bridge, made of lightning. Every time someone shouts, it gets worse.",
-         "To go home.", "The Foundation dosed her in a \"free health screening\" van and let her go on purpose: she's bait for Subject 19. A subdermal tag in her neck triggers her surges."],
-        ["Sergei Grachyov", "Foundation troubleshooter", "The Foundation", "Walks out of the dark, unhurried, when the retrieval team breaks.",
-         "Subject 19, in trade for the girl.", "Class V. He isn't here to fight, and nobody should try to arrest him tonight."],
+         "To go home.", "The Foundation dosed her in a \"free health screening\" van and tagged her. Overcharge uses the tag to trigger her surges: she's the bait in his trap for Subject 19."],
+        ["Overcharge (Mason Rourke)", "The Foundation's enforcer, Class IV", "The Foundation", "A man's voice on every radio in Pilsen: \"Subject 19. Come and get her.\" He helped hold Subject 19 in the lab.",
+         "Subject 19 back in the lab, and Lupe too.", "Lupe's tag is his power source: while it transmits, his force field is IV and he can blow up what's around him. Take it out and his field is III."],
+        ["Sergei Grachyov", "Foundation troubleshooter", "The Foundation", "Watches from the train platform when Overcharge falls, nods to Subject 19, and walks away.",
+         "To see what Subject 19's friends can do.", "Class V. He's tonight's hook for later, not a fight."],
         ["Daybreak's producers", "Her sponsor's TV crew", "Daybreak's sponsor", "Already rolling before the cordon is up.",
          "The rescue live, and the shot.", "The sponsor will offer Lupe a clinic and a contract."],
-        ["The retrieval team", "Four Foundation operatives", "The Foundation", "Unmarked gear, and a jammer that blinds the Aegis suit's sensors.",
+        ["The retrieval team", "Four Foundation operatives, Overcharge's", "The Foundation", "Unmarked gear, and a jammer that blinds the Aegis suit's sensors.",
          "Lupe alive, and no witnesses.", "Their file on Subject 19 gives them +2 when it applies: they know Subject 19's habits."],
     ],
 }
@@ -85,6 +87,7 @@ PLACES = {
         ["The Eighteenth Street bridge", "A bridge in Pilsen, Chicago", "Where a girl \"made of lightning\" stands, at 9:40 on a Tuesday night.", ""],
         ["Pilsen", "A Chicago neighborhood", "Half of it dark: transformers blown down a six-block line, and a Pink Line train stopped dead.", ""],
         ["The van", "A \"free health screening\" van", "", "Where the Foundation doses its subjects. Subject 19 has seen one before, from inside."],
+        ["Under the tracks", "The street beneath the Pink Line, two blocks from the bridge", "Where the signal comes from.", "Overcharge's trap: his van, the transmitter, and the retrieval team waiting in the shadows."],
     ],
 }
 
@@ -104,7 +107,7 @@ FACTIONS = {
         ["Cultists of the Burning God", "Zealots of the sands.", "Sorcerers burned, and the tomb with them.", "A band on the road: they try to take Ithrann and Nyx on the second night.", "One of them is blessed."],
     ],
     "aurora": [
-        ["The Foundation", "Nobody admits it exists.", "Subject 19 back.", "Retrieval teams, files on heroes, and Grachyov.",
+        ["The Foundation", "Nobody admits it exists.", "Subject 19 back.", "Retrieval teams, Operants of its own like Overcharge, files on heroes, and Grachyov.",
          "It's dosing kids in Chicago. Lupe is bait: its file says Subject 19 always comes for the young ones."],
         ["ExLAW Chicago", "The law on Operants.", "The subject brought in before anyone gets hurt.", "Agents, cordons and registration.", "Custody means a legal status and a Raster file."],
     ],

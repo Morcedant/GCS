@@ -701,7 +701,7 @@ Art style for this adventure: Painted modern superhero illustration: a Chicago n
 The scenes (each with the area it should show):
 1. The bridge in the blackout (about 60 by 34 yards): A city street bridge at night in a blackout, with an elevated train line running beside it. A two-car commuter train stands stalled on the elevated track, doors open. Dead streetlights, a scorched utility pole and a blown transformer throwing sparks, abandoned cars at angles across the lanes, a police cordon with barricades at one end, a TV news van at the other.
 2. The bridge, after the surges (about 60 by 34 yards): The same bridge after the power surges: the train's front car burning, a downed power line across the road, sparking; a car on fire; scorch marks across the asphalt. (If your image tool can edit, start from the first bridge map and change it, so the layout matches.)
-3. Under the tracks: the retrieval (about 50 by 28 yards): The street under the elevated train tracks at night: steel pillars in rows, parked cars, the shuttered fronts of a taqueria and a laundromat, an alley mouth, a vacant lot behind a chain-link fence, and an unmarked white van with its side door open. Deep shadows between the pillars; one working light far off.
+3. Under the tracks: the trap (about 50 by 28 yards): The street under the elevated train tracks at night: steel pillars in rows, parked cars, the shuttered fronts of a taqueria and a laundromat, an alley mouth, a vacant lot behind a chain-link fence, and an unmarked white van with its side door open. Deep shadows between the pillars; one working light far off.
 
 Start with scene 1. After each one, wait for me to say "next" before making the next. When a scene says it's the same place as an earlier one, keep that earlier map's layout exactly and change only what the scene describes.
 ```
@@ -722,7 +722,7 @@ Battle map setting: **2 yards a hex**.
 The same bridge after the power surges: the train's front car burning, a downed power line across the road, sparking; a car on fire; scorch marks across the asphalt. (If your image tool can edit, start from the first bridge map and change it, so the layout matches.) The map shows an area about 60 by 34 yards. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. Top-down battle map for a tabletop roleplaying game, seen from directly overhead (orthographic, no perspective tilt, no horizon). Fill the whole frame edge to edge: no border, frame, vignette, compass or legend. No grid, no text, no labels, no numbers. Show only the place itself: no people, creatures, animals, figures or tokens, and no ships or vehicles that could take part in a fight (they are separate tokens placed on top of the map); only wrecked, parked or abandoned vehicles that the scene names. Floors and ground read clearly as open, walkable space; walls, furniture, rocks and other cover are easy to tell apart from above, with soft shadows that show their height. Landscape, 16:9.
 ```
 
-### 3. Under the tracks: the retrieval
+### 3. Under the tracks: the trap
 
 Battle map setting: **2 yards a hex**.
 
@@ -838,7 +838,7 @@ Everyone and everything that fights or moves in a scene is a token, made apart f
 
 #### Lupe Herrera
 
-On the map: 1 hex · 1. The bridge in the blackout; 2. The bridge, after the surges; 3. Under the tracks: the retrieval.
+On the map: 1 hex · 1. The bridge in the blackout; 2. The bridge, after the surges; 3. Under the tracks: the trap.
 
 ```
 A frightened fifteen-year-old girl in a hoodie, wreathed in crackling electric-blue lightning. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
@@ -846,15 +846,23 @@ A frightened fifteen-year-old girl in a hoodie, wreathed in crackling electric-b
 
 #### Foundation retrieval agent
 
-On the map: 1 hex · 3. Under the tracks: the retrieval.
+On the map: 1 hex · 3. Under the tracks: the trap.
 
 ```
 An agent in unmarked black tactical gear and a faceless helmet, carrying a flechette rifle, a stubby neurogun holstered at the hip and stun grenades on the vest. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
 ```
 
+#### Overcharge
+
+On the map: 1 hex · 3. Under the tracks: the trap.
+
+```
+A lean, sneering man in a black Foundation tactical suit with a high collar, lightning crawling over his arms and crackling between his fingers, eyes glowing white-blue. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.
+```
+
 #### Sergei Grachyov
 
-On the map: 1 hex · 3. Under the tracks: the retrieval.
+On the map: 1 hex · 3. Under the tracks: the trap.
 
 ```
 A calm, broad man in a long dark coat, hands in his pockets, faint distortion in the air around him. Painted modern superhero illustration: a Chicago neighborhood at night in a blackout. Wet asphalt, dead streetlights, brick and steel, red and blue emergency lights, electric-blue light where power surges. A single round token for a tabletop roleplaying game's battle map, square image (1:1). The subject is seen from directly overhead, the way it would look on the map below it, centered and filling most of a circle with a thin chrome rim. Outside the circle, plain flat white (or transparent, if the tool can), so the token cuts out cleanly. No text, no name, no numbers, no scenery beyond a hint of ground or deck under the subject.

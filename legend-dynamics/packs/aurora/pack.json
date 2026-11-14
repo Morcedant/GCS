@@ -3403,7 +3403,7 @@
    "dept": "Fugitive",
    "path": "rounded",
    "speciesId": "labmade",
-   "role": "Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.",
+   "role": "Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Overcharge, the Foundation's enforcer, is still looking.",
    "reason": "No lab, no registry and no government owns me.",
    "connection": "Saved Daybreak from a Foundation snatch team on live TV, and ran before the cameras turned.",
    "attrs": {"Body": 12, "Agility": 12, "Intellect": 11, "Presence": 10, "Will": 10},
@@ -5638,6 +5638,43 @@
    "traitText": "They want the target alive, and leave no witnesses: anyone who saw is a target, the cameras first. They will kill to keep it quiet."
   },
   {
+   "id": "overcharge",
+   "name": "Overcharge (Mason Rourke)",
+   "label": "Overcharge (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 15
+    },
+    {
+     "skill": "Brawling",
+     "target": 12
+    }
+   ],
+   "dodge": 10,
+   "boxes": 6,
+   "boxesText": "6",
+   "weaponText": "Lightning (Blast IV)",
+   "weapons": [
+    "op-blast4"
+   ],
+   "trait": "Fed by the grid",
+   "traitText": "While Lupe's tag transmits, he draws on her surges: Force Field IV, and once a round he can blow a streetlight, a car or the train's line (everyone next to it marks 1 box unless they Dodge). Take out the tag and his field drops to III, and the surges stop.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 4,
+     "covers": [
+      "physical",
+      "energy"
+     ],
+     "label": "Force Field IV (fed by the grid)"
+    }
+   ]
+  },
+  {
    "id": "aegis",
    "name": "Rogue Aegis suit",
    "label": "Rogue Aegis suit",
@@ -6936,8 +6973,8 @@
    "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
    "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
    "In the Discovery tab, prepare a dossier on Lupe Herrera's power, with the Escalation clock (4).",
-   "In the GM view's files tool, give the Foundation a file on Subject 19 (for example, <i>Always comes for the young ones</i>): it gives the retrieval team +2 when it applies.",
-   "In <i>Map and fight</i>, check you can add four of the Foundation retrieval team, and have Sergei Grachyov's entry to hand (he talks, he doesn't fight).",
+   "In the GM view's files tool, give the Foundation a file on Subject 19 (for example, <i>Always comes for the young ones</i>): it gives Overcharge's team +2 when it applies.",
+   "In <i>Map and fight</i>, check you can add four of the Foundation retrieval team and <b>Overcharge</b>, the villain; Sergei Grachyov only watches from the platform at the end.",
    "The day before: send everyone the time, the table link, and the Playtest page, <code>legenddynamicsrpg.com/playtest</code>. Tell them there's nothing to read.",
    "Have a timer or clock in view. The run sheet below has the times."
   ],
@@ -6948,7 +6985,7 @@
    ],
    [
     "Luis \"Bulldog\" Ortega",
-    "Aegis pilot. His suit logs a signature it's never seen."
+    "Aegis pilot. His suit logs two signatures: a scared girl, and something angry under the tracks."
    ],
    [
     "Naomi Price (Daybreak)",
@@ -6964,7 +7001,7 @@
    ],
    [
     "Subject 19",
-    "Lab escapee. Knows the Foundation made this girl."
+    "Lab escapee. The villain on the radio wants them back."
    ],
    [
     "Maeve Ashgrove",
@@ -6981,40 +7018,40 @@
    [
     "0:15",
     "The blackout",
-    "<p>9:40 on a Tuesday: Pilsen goes dark, a train stops, a girl on the Eighteenth Street bridge is sparking. Go around: how does each of them get there?</p>"
+    "<p>9:40 on a Tuesday: Pilsen goes dark, a train full of commuters stops dead, a girl on the Eighteenth Street bridge is sparking, and a man's voice on every radio says <i>Subject 19. Come and get her.</i> Go around: how does each of them get there?</p>"
    ],
    [
     "0:25",
-    "The bridge",
-    "<p>Lupe is terrified, and shouting makes it worse. Start the dossier and the Escalation clock (4): each time it fills, her next surge is bigger. Talking (Persuasion, Read People, or Subject 19's own sparks) works better than force; force marks Collateral.</p>"
+    "The bridge: the rescue",
+    "<p>Two jobs at once: forty commuters on a stalled train under an arcing line, and Lupe, terrified, getting worse when people shout. Each success gets a car clear. Start the dossier and the Escalation clock (4): each time it fills, her next surge is bigger, and the train burns if anyone's still aboard. Talking calms her (Persuasion, Read People, or Subject 19's own sparks); force marks Collateral. A rescue on live TV clears a box of Backlash.</p>"
    ],
    [
     "0:55",
     "The cameras and the dossier",
-    "<p>Daybreak's producers, Jess, the cordon. Powers on camera may mark Backlash, and risk a secret identity's Exposure. Clues: Lupe's story, the tag in her neck, the triggered surges, Subject 19's memory. <b>Three clues are enough.</b></p>"
+    "<p>Daybreak's producers, Jess, the cordon, and Overcharge taunting them on the radio. Powers on camera may mark Backlash (a rescue never does), and risk a secret identity's Exposure. Clues: Lupe's story, the tag in her neck, the signal from under the tracks, Subject 19's memory of Overcharge. <b>Three clues are enough.</b> A full dossier tells them the tag is his power source: take it out and he's weaker.</p>"
    ],
    [
     "1:40",
-    "The retrieval",
-    "<p>The Foundation team hits: four of them, a jammer blinding the Aegis suit, neuroguns for the Operants and flechette rifles for everyone else. They want Lupe alive and no witnesses, and they will kill for it. The big fight, and the place for a team-up. Their file on Subject 19 gives them +2 when it applies.</p>"
+    "The trap under the tracks",
+    "<p>The Foundation team waits under the tracks: four of them, a jammer blinding the Aegis suit, neuroguns for the Operants and flechette rifles for everyone else. They want Subject 19 and Lupe alive and no witnesses. Then Overcharge steps out of the van and tells them what he's going to do. Their file on Subject 19 gives them +2 when it applies.</p>"
    ],
    [
     "2:20",
-    "Grachyov",
-    "<p>Sergei Grachyov walks out of the dark and offers a trade: Subject 19 for the girl. Let the players feel how dangerous he is, and decide.</p>"
+    "Overcharge",
+    "<p>The big fight. Force Field IV while Lupe's tag transmits, and once a round he blows something next to a hero (1 box unless they Dodge); III if they took the tag out. A team-up raises an attack a Class against his field, and a telling hit always gets 1 box through. Down, he goes in dampening cuffs. As the dust settles, Sergei Grachyov watches from the train platform above, nods to Subject 19, and walks away.</p>"
    ],
    [
     "2:35",
-    "Where Lupe goes",
-    "<p>ExLAW custody and a Raster file, the sponsor's clinic and contract, or Subject 19's underground. And does Jess run the story? Mark Scrutiny or Backlash as it falls.</p>"
+    "Home",
+    "<p>Lupe goes home to her family, the tag out, her name sealed as a minor, with ExLAW looking out for her. The commuters cheer. Jess runs the story, the Foundation dosing kids and the villain in cuffs, and everyone in it marks Scrutiny. Wrap up: what did each hero do that they'll be remembered for?</p>"
    ]
   ]
  },
  "firstAdventure": {
   "title": "Dead Air",
   "kind": "A superhero case",
-  "blurb": "Half of Chicago's Pilsen neighborhood goes dark, and a terrified fifteen-year-old made of lightning stands on a bridge. ExLAW, the TV cameras and someone in an unmarked van all want to reach her first.",
+  "blurb": "A villain blacks out Chicago's Pilsen neighborhood to flush out a hero, using a terrified fifteen-year-old made of lightning as bait. Save her, save the train, and stop Overcharge: good guys against bad guys, built to teach the game.",
   "length": "One or two sessions, for 3 to 7 players, with the ready-made characters",
-    "anchor": "gm-the-first-case-static-on-the-line"
+    "anchor": "gm-the-first-case-dead-air"
  }
 }

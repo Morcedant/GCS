@@ -641,42 +641,42 @@ Ages are as of 2025. Each comes with a stat block, and each is in the GM view's 
 
 ## The first case: Dead Air
 
-A starter case for three to seven, for one or two sessions. A teenager wakes up an Operant in the middle of a Chicago blackout, and everyone wants her: ExLAW, the cameras, and the lab that made her. It shows off the law and its tracks, a dossier and the Escalation clock, secret identities and Exposure, a team-up, and the files a villain keeps on a hero. It's written for the seven pregenerated characters, and works with any.
+A starter case for three to seven, for one or two sessions. A villain blacks out a Chicago neighborhood to flush out a hero, using a frightened teenager as bait, and the heroes have to save her, save the people on a stalled train, and stop him. It's good guys against bad guys, built to teach the game: a rescue, an investigation that pays off in the fight, a villain to beat, and a team-up to do it. It's written for the seven pregenerated characters, and works with any.
 
-**The hook.** At 9:40 on a Tuesday night, half of Pilsen goes dark. Transformers blow down a six-block line, a CTA train stops dead on the Pink Line, and a 911 caller says a girl is "made of lightning" on the Eighteenth Street bridge. Give each of them a reason to be there:
+**The hook.** At 9:40 on a Tuesday night, half of Pilsen goes dark. Transformers blow down a six-block line, a CTA train stops dead on the Pink Line with forty commuters aboard, and a 911 caller says a girl is "made of lightning" on the Eighteenth Street bridge. Then every radio in Pilsen crackles with a man's voice: "Subject 19. Come and get her." Give each of them a reason to be there:
 
-- **Rachel Kwan** catches the case: an unregistered Operant event, Class unknown. ExLAW Chicago wants the subject brought in before anyone gets hurt.
-- **Luis "Bulldog" Ortega** flies cover. His AS-6's sensors light up with a signature they've never logged before, and his new firmware flags it.
-- **Naomi Price (Daybreak)**: her sponsor's producers are already rolling. A live rescue would be the best ratings of the year.
+- **Rachel Kwan** catches the case: an unregistered Operant event, Class unknown, and a threat on the radio. ExLAW Chicago wants the girl safe and whoever is behind this in custody.
+- **Luis "Bulldog" Ortega** flies cover. His AS-6's sensors light up with two signatures: a scared girl on the bridge, and something big and angry under the tracks.
+- **Naomi Price (Daybreak)**: her sponsor's producers are already rolling. A rescue on live TV is what a hero is for.
 - **Dr. Tobias Wren**: Kwan calls him in, because the readings look like the auroras of 1938.
 - **Jess Calloway** hears it on the police scanner and is there before the cordon.
-- **Subject 19**: the girl's power feels like their own. Subject 19 knows what that means: the Foundation made her.
+- **Subject 19**: the voice on the radio is one they know. **Overcharge**, the Foundation's enforcer, helped hold them in the lab. They're the one he wants.
 - **Maeve Ashgrove** is working off her deal at Kwan's side, and the Foundation's people move like Morcain vault guards. Maeve knows the type.
 
-**What's really happening.** The girl is **Lupe Herrera**, fifteen, from Pilsen. Three weeks ago she spent a night in a "free health screening" van, and woke up with a headache and a puncture mark. The Foundation dosed her and let her go on purpose. She's bait: their file on Subject 19 says Subject 19 always comes for the young ones. Their troubleshooter, **Sergei Grachyov**, is waiting for Subject 19 to show.
+**What's really happening.** The villain is **Overcharge** (Mason Rourke), an Operant the Foundation made and kept: cruel, proud, and sure he's untouchable. Three weeks ago the Foundation dosed **Lupe Herrera**, fifteen, from Pilsen, in a "free health screening" van and tagged her. Tonight Overcharge is using the tag to trigger her power, blacking out the neighborhood to draw Subject 19 into a trap: his retrieval team is waiting under the tracks. He wants Subject 19 back in the lab, and Lupe too, and he doesn't care who gets hurt.
 
-**1. The bridge.** Lupe is terrified, sparking, and every time someone shouts, the power gets worse. Start a **dossier** on her power (*Dossiers*, in the Players' Guide), with the **Escalation** clock: each time it fills, her power's next surge is bigger. A blown transformer becomes a stalled train full of commuters, and the train becomes a fire. Talking works better than force: Persuasion, Read People, or Subject 19 showing their own sparks. Force marks **Collateral**.
+**1. The bridge.** Lupe is terrified and sparking, and the stalled train beside the bridge has forty people aboard, with the power line above it arcing. Two jobs at once: get the commuters off the train (Athletics, Leadership, a power used well; each success gets a car clear) and calm Lupe down. Start a **dossier** on her power (*Dossiers*, in the Players' Guide), with the **Escalation** clock: each time it fills, her next surge is bigger, and the train catches fire if anyone is still aboard. Talking calms her (Persuasion, Read People, or Subject 19 showing their own sparks); force marks **Collateral**. Every commuter saved is a hero's moment: on live TV, a good rescue clears a box of **Backlash**.
 
-**2. The cameras.** Daybreak's producers want the rescue live, and the shot. Jess wants the real story. Every time an Operant uses a power on camera, the GM asks: does this mark Backlash? An Operant with a secret identity who uses powers in front of the cameras risks their **Exposure**: Subject 19 especially. Kwan has a cordon to hold.
+**2. The cameras.** Daybreak's producers want the rescue live, and they'll get it. Jess wants the real story. Every time an Operant uses a power on camera, the GM asks whether it marks Backlash (a rescue never does). An Operant with a secret identity who uses powers in front of the cameras risks their **Exposure**: Subject 19 especially. Kwan has a cordon to hold. Overcharge is watching the feed, and taunts them on the radio.
 
 **3. The dossier.** The clues, and who finds them best:
 
 - **Lupe herself** (Read People, Persuasion): the health screening van, the headache, the mark on her neck.
 - **The mark** (Medicine, Science, or Occult for Dr. Wren): a subdermal tag, still transmitting.
-- **The power grid** (Science, Computers): her surges match a pattern. They're being triggered from outside, by the tag.
-- **Subject 19's memory** (Will, at the GM's call): the van. Subject 19 has seen one before, from inside.
+- **The power grid** (Science, Computers): her surges match a pattern. They're being triggered from outside, by a signal from under the elevated tracks two blocks away.
+- **Subject 19's memory** (Will, at the GM's call): the voice, the van, and what Overcharge did to them in the lab.
 
-When the Identify phase is done, they know what her power is and why it's out of control. The tag is the trigger; take it out and she calms down.
+When the Identify phase is done, they know what her power is and why it's out of control. When the dossier is full, they know how to beat him: **the tag is his power source.** Take it out (Medicine or Science, one action, or a careful power) and Lupe calms down, the surges stop, and Overcharge loses the grid's power in the fight to come.
 
-**4. The retrieval.** A **Foundation retrieval team** hits the bridge: four of them, in unmarked gear, with a jammer that blinds the Aegis suit's sensors. They want Lupe alive and no witnesses, and they've come equipped to kill an Operant: neuroguns that drop an Operant a taser wouldn't, flechette rifles that go through Toughness II, and stun grenades for the crowd and the cameras (see *Foundation hardware*). This is the big fight, and a good place for a **team-up**: Bulldog's suit and Subject 19's lightning, or Daybreak and anyone. The Foundation's file on Subject 19 gives the team +2 against them when it applies: they know Subject 19's habits.
+**4. The trap.** Under the tracks, the **Foundation retrieval team** waits: four of them in unmarked gear, with a jammer that blinds the Aegis suit's sensors, neuroguns that drop an Operant a taser wouldn't, flechette rifles that go through Toughness II, and stun grenades for the crowd and the cameras (see *Foundation hardware*). They want Subject 19 and Lupe alive, and no witnesses. When the heroes come for them (or the team comes for Lupe), **Overcharge** steps out of the van, lightning crawling over him, and tells them exactly what he's going to do to them. The Foundation's file on Subject 19 gives his team +2 against them when it applies.
 
-**5. Grachyov.** When the team breaks, **Sergei Grachyov** walks out of the dark, unhurried. He isn't here to fight. He offers a trade: Subject 19 for the girl. Hand Subject 19 over and he leaves, and Lupe is free. Refuse, and he shrugs, and goes; the Foundation will try again. He's Class V: nobody should try to arrest him tonight.
+**5. Overcharge.** The big fight. He's Class IV, with a force field fed by the grid: **Force Field IV** while Lupe's tag transmits, and once a round he blows a streetlight, a car or a pillar beside someone (1 box unless they Dodge). If the heroes took out the tag, his field is **III**, and nothing near him explodes. It's a fight the team can win together: a **team-up** (Bulldog's suit and Subject 19's lightning, or Daybreak and anyone) raises the attack one Class against his field, and a telling hit always gets through it. When he's down, **dampening cuffs** hold him, and ExLAW takes him in. As the dust settles, a broad man in a long coat watches from the train platform above, nods to Subject 19, and walks away: **Sergei Grachyov**. The Foundation has noticed them.
 
-**6. The choice.** Lupe needs somewhere to go. ExLAW custody means registration, a legal status and a Raster file; her family will know where she is. Daybreak's sponsor offers a clinic and a contract. Subject 19's underground can hide her, and she'll never go home. And Jess has the story of the year: the Foundation is dosing kids in Chicago. Running it marks **Scrutiny** for everyone in it; burying it means the Foundation keeps doing it.
+**6. Home.** Lupe goes home to her family, the tag out of her neck, with a card from ExLAW Chicago and a promise that someone is watching out for her (registered as a minor, her name sealed). The commuters cheer the heroes on the bridge. Jess has the story of the year: the Foundation is dosing kids in Chicago, and here's the villain in cuffs. Running it marks **Scrutiny** for everyone in it, and it's worth it: the city knows who the good guys are.
 
-**Rewards.** A dossier on Lupe's power, and a first look at the Foundation's tags. Lupe's thanks, and her family's. If Collateral stayed clear, ExLAW Chicago remembers it. If the story runs, Backlash or Scrutiny marks a box, and the Foundation's file on Subject 19 gets a new line.
+**Rewards.** A dossier on Lupe's power, and a first look at the Foundation's tags. Overcharge in custody. Lupe's thanks, and her family's, and forty commuters'. If Collateral stayed clear, ExLAW Chicago remembers it; a rescue on live TV clears a box of Backlash. The Foundation's file on Subject 19 gets a new line, and Grachyov knows their faces.
 
-**Threats.** Lab escapee (Lupe, if it comes to it: she's Unstable); Foundation retrieval team ×4; Sergei Grachyov (Class V), who talks, not fights.
+**Threats.** Foundation retrieval team ×4; **Overcharge** (Class IV, the villain); Lab escapee (Lupe, only if it comes to it: she's Unstable); Sergei Grachyov (Class V), who only watches tonight.
 
 # Threats
 
@@ -689,6 +689,7 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | White Hand soldier | Firearms 13 | 9 | 2 | Blast II | — | **Fanatic.** Never surrenders, never talks. |
 | Foundation retrieval team (minor) | Firearms 13 | 9 | 1 each | Tranquilizer rifles, neuroguns (II), flechette rifles (II, Piercing), stun grenades; a dampening net (Power Negation II) | — | **Recovery.** They want the target alive, and leave no witnesses: they will kill to keep it quiet. |
 | Rogue Aegis suit | Piloting 14 | 8 | 3 | Arm cannon (II) | II | **Pilot.** Hit the pilot (−4) or the power pack (−2) to end it fast. |
+| Overcharge (Mason Rourke), Class IV | Powers 15, Brawling 12 | 10 | 6 | Lightning (Blast IV) | IV (III without the tag) | **Fed by the grid.** While Lupe's tag transmits: Force Field IV, and once a round he blows something beside a hero (1 box unless they Dodge). Take out the tag and his field is III. |
 | Lab escapee | Powers 13 | 10 | 3 | One wild power, Class II–III | II | **Unstable III.** On a natural 16–18 with Powers, the power hits everyone nearby. |
 | Shadow Earth duplicate | As the original | As the original | 3 | As the original | As the original | **Mirror.** Knows what the original knows; Mystic Sight reveals it. |
 | Dubinsky werewolf | Brawling 15 | 11 | 4 | Claws (II) | I | **Pack.** Comes in threes; silver ignores its Defense. |

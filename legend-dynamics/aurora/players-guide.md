@@ -1452,7 +1452,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 ## Subject 19
 
-*Escaped Foundation subject, Fugitive. Lab-made (tier 2).* Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.
+*Escaped Foundation subject, Fugitive. Lab-made (tier 2).* Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Overcharge, the Foundation's enforcer, is still looking.
 
 - **Attributes:** Body 12, Agility 12, Intellect 11, Presence 10, Will 10. **Dodge** 11.
 - **Skills:** Powers 13 (Specialty). Trained: Athletics 13, Brawling 13, Piloting 13, Stealth 13, Computers 12, Engineering 12, Deception 11, Read People 11, Streetwise 11.
