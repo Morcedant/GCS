@@ -229,6 +229,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .ship-row .box.on.kind-2 { background: var(--warn, #b8860b); border-color: var(--warn, #b8860b); }
 .ship-row .box.kind-0 > *, .ship-row .box.kind-1 > *, .ship-row .box.kind-2 > * { transform: skewX(20deg); }
 .kind-pick select { width: auto; font-size: 13px; padding: 2px 4px; }
+#gm-diff-card { margin-top: 22px; }
+.diff-opts { display: grid; gap: 6px; }
+.diff-opt { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
 .ship-res { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 10px; }
 .ship-res .res { display: inline-flex; align-items: center; gap: 6px; }
 .ship-res .res .btn { min-width: 2em; padding: 2px 8px; }
@@ -1050,6 +1053,12 @@ tr.lvl-U td.target { color: var(--muted); }
       <div class="toast" id="disc-msg" role="status" aria-live="polite"></div>
     </div>
     <div class="card hud no-print" id="files-card" hidden></div>
+    <div class="card hud no-print" id="gm-diff-card">
+      <h3>Difficulty</h3>
+      <p class="small muted">Make the opponents tougher when the group is breezing through. It applies to threats as they're added: in the Encounter panel, on the battle map, and when the playtest sets up a scene. What's already on the map stays as it is.</p>
+      <div class="diff-opts" id="gm-diff" role="radiogroup" aria-label="Difficulty"></div>
+      <p class="small" id="gm-diff-note" role="status" aria-live="polite"></p>
+    </div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
       <p class="small muted">A hex map at any scale, or a range track of bands, for the fight. Tokens for the {{party}} stay linked to the characters, so you can mark injuries and points from the map. Open <b>How to use the map</b> for the steps.</p>
@@ -2964,6 +2973,25 @@ tr.lvl-U td.target { color: var(--muted); }
   $("ph-swap").onclick = () => { const g = gunOf(); if (g.spares > 0) { g.spares--; g.rounds = GUNS[g.type][1]; render(); toast(T.reloadDone); } };
   $("ph-recharge").onclick = () => { const g = gunOf(); g.rounds = GUNS[g.type][1]; render(); toast(T.restockDone); };
 
+  // ---- difficulty: the GM can make the opponents tougher (the core's "for a tougher version, +1 to its targets and one box") ----
+  const DIFFICULTY = [["Standard", "The threats as written."], ["Tough", "+1 to their attack targets, and one more box."],
+    ["Hard", "+2 to their targets and two more boxes, and one more foe in each group."], ["Deadly", "+3 to their targets and three more boxes, and two more foes in each group."]];
+  const DIFF_KEY = PACK.id + ".difficulty.v1";
+  let difficulty = Math.max(0, Math.min(3, parseInt(store.get(DIFF_KEY, 0), 10) || 0));
+  /** A threat at the table's difficulty. A minor foe keeps its one box: it gets harder to put down by numbers, not boxes. */
+  function scaleThreat(t) {
+    if (!difficulty || !t) return t;
+    return { ...t, attacks: (t.attacks || []).map((a) => ({ ...a, target: a.target + difficulty })), boxes: t.minor ? t.boxes : (t.boxes || 3) + difficulty,
+      boxesText: t.minor ? t.boxesText : String((t.boxes || 3) + difficulty), difficulty };
+  }
+  /** How many more foes a group gets at this difficulty (Hard 1, Deadly 2). */
+  const extraFoes = () => Math.max(0, difficulty - 1);
+  function renderDifficulty() {
+    $("gm-diff").innerHTML = DIFFICULTY.map(([n, d], i) => `<label class="diff-opt"><input type="radio" name="gm-diff" value="${i}"${i === difficulty ? " checked" : ""}> <b>${n}</b> <span class="small muted">${esc(d)}</span></label>`).join("");
+    $("gm-diff-note").textContent = difficulty ? `${DIFFICULTY[difficulty][0]}: threats added from now on are tougher.` : "";
+  }
+  $("gm-diff").addEventListener("change", (e) => { const v = +e.target.value; if (!Number.isFinite(v)) return; difficulty = v; store.set(DIFF_KEY, v); renderDifficulty(); gmSay(`Difficulty: ${DIFFICULTY[v][0]}.`); });
+  renderDifficulty();
   const SHIP_TRACKS = PACK.tracks.map((t) => [t.name, t.boxes]);
   // A setting's ranks (PACK.rankOptions: [[group, [rank, …]], …]) as suggestions for the title field.
   $("rank-options").innerHTML = (PACK.rankOptions || []).flatMap(([g, list]) => list.map((r) => `<option value="${esc(r)}" label="${esc(g)}"></option>`)).join("");
@@ -3218,8 +3246,8 @@ tr.lvl-U td.target { color: var(--muted); }
     setGroupTrack: (name, v) => { const t = trackOf(name); if (!t) return; markTrack(t.name, Math.max(0, Math.min(t.boxes, v)) - (ship[t.name] || 0)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun, partyName: T.party,
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
-    threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
-      attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
+    get threats() { return !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map(scaleThreat).map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
+      attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })); },
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
       return { id: c.id, tableKey: c.tableKey || null, name: c.name || "Unnamed", portrait: c.token || c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
@@ -3881,7 +3909,7 @@ tr.lvl-U td.target { color: var(--muted); }
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
-      injuryNames: INJURY.map((x) => x[0]), boxesOf, marksOf, toughOf, setHurt,
+      injuryNames: INJURY.map((x) => x[0]), boxesOf, marksOf, toughOf, setHurt, scaleThreat: (t) => scaleThreat(t),
       formOf: (c) => { const f = formOf(c); return f ? { name: formLabel(c), human: humanLabel(c), on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [], originRules: heritageOf(c)?.core || [] } : null; } });
   } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
@@ -4361,7 +4389,7 @@ tr.lvl-U td.target { color: var(--muted); }
   homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), ritualRoot: $("hb-rituals"), heartInput: $("f-ma-heart"), esc, toast, saveText });
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
   // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
-  if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay,
+  if (PACK.playtest) { $("pt-card").hidden = false; ptUI = mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay, extraFoes,
     server: TABLE_SERVER, map: battleMap, extraFor: (name) => gmCrew.find((x) => x.extra && x.name === name) || null, threat: () => (DISC ? (DISC.threat.track ? ship[DISC.threat.track] || 0 : disc.threat.count || 0) : 0), crew: () => gmCrew.map((c) => ({ name: c.name || "", rank: c.rank || "" })),
     givePictures: async (name, portraitUrl, tokenUrl) => {
       const chars = [...(ch && ch.name === name ? [ch] : []), ...gmCrew.filter((c) => c.name === name || (c.extra && c.name.replace(/\s+\d+$/, "") === name))];
@@ -4470,7 +4498,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   $("extra-bar-done").addEventListener("click", () => closeExtra());
   // ---- the GM view: one group of panels at a time ----
-  const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid", "#gm-extras"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
+  const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid", "#gm-extras"]], ["fight", "Map and fight", ["#gm-diff-card", ".bm-card", "#lab"]],
     ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card", "#files-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools", ...(DISC ? [] : ["#files-card"])]], ["campaign", "Campaign", ["#cp-card"]], ["homebrew", "Homebrew", ["#hb-card"]],
     ...(PACK.playtest ? [["playtest", "Playtest", ["#pt-card"]]] : [])];
   for (const [id, , sels] of GM_GROUPS) for (const q of sels) { const el = document.querySelector("#view-gm " + q); if (el) el.dataset.gmpane = id; }

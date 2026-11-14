@@ -114,7 +114,7 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | Rogue AI | Computers 16 | — | — | Station systems, drones | **Everywhere.** Lives in the network; must be talked down, isolated or erased. |
 | Alien predator | Close Combat 15 | 10 | 5 | Claws (2), spines | **Huge.** Hits marking 1 box mark nothing. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. In the GM view, the **Difficulty** card (in *Map and fight*) does this for every threat at once: **Tough** (+1 and a box), **Hard** (+2 and two boxes, and one more foe in each group) or **Deadly** (+3 and three boxes, and two more in each group). A minor foe keeps its one box.
 
 ## Enemy ships
 

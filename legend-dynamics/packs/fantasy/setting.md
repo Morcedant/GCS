@@ -229,7 +229,7 @@ Opponents use the same rules as the characters. **Minor opponents** (guards, ban
 | Shard-bearer | Melee 15 or Sorcery 15 | 11 | 5 | As the bearer | **Crown shard.** One great power: command, fire, flight, terror. Breaking the bearer's will ends it. |
 | Thing from the Deep | Brawling 16 | 8 | 6 | Tentacles (2) | **Horror.** Once per scene, everyone who sees it rolls Will or is Frightened. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. In the GM view, the **Difficulty** card (in *Map and fight*) does this for every threat at once: **Tough** (+1 and a box), **Hard** (+2 and two boxes, and one more foe in each group) or **Deadly** (+3 and three boxes, and two more in each group). A minor foe keeps its one box.
 
 <!-- SECTION:advantages -->
 

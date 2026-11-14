@@ -249,6 +249,7 @@ export function mountLab(api) {
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
   function fromThreat(t, name) {
+    if (api.scaleThreat) t = api.scaleThreat(t); // the table's difficulty (the GM view's Difficulty card)
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
     // A threat's Strength: the Class of its strength attacks.

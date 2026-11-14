@@ -223,7 +223,7 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 | Order of the Holy Knife assassin | Melee 14, Stealth 14 | 10 | 3 | Consecrated knife (1) | **Ambush.** +2 on the first attack from hiding; poisons blades (Body roll or 1 more box). |
 | Brotherhood druid | Occult 14, Survival 13 | 8 | 3 | Staff, nature rites | **Living ground.** Commands roots, weather or beasts outdoors; powerless on rails and stone. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. In the GM view, the **Difficulty** card (in *Map and fight*) does this for every threat at once: **Tough** (+1 and a box), **Hard** (+2 and two boxes, and one more foe in each group) or **Deadly** (+3 and three boxes, and two more in each group). A minor foe keeps its one box.
 
 <!-- SECTION:advantages -->
 

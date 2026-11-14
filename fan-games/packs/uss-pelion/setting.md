@@ -291,7 +291,7 @@ Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge
 | Mugato | Unarmed (bite and horn) 13 | 8 | 3 | Venomous bite | **Venom.** A bite that marks a box also poisons: without Medicine before the scene ends, mark another box. |
 | Rogue android | Unarmed 13, Computers 15 | 7 | 4 | Crushing grip | **Logic trap.** A Diplomacy or Psychology contest that presents a paradox stuns it for the scene. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in *The USS Pelion*; its *Enemy ships* table gives the common ones.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. In the GM view, the **Difficulty** card (in *Map and fight*) does this for every threat at once: **Tough** (+1 and a box), **Hard** (+2 and two boxes, and one more foe in each group) or **Deadly** (+3 and three boxes, and two more in each group). A minor foe keeps its one box. Starships use the ship registry in *The USS Pelion*; its *Enemy ships* table gives the common ones.
 
 
 

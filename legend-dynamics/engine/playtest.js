@@ -229,7 +229,8 @@ function ptMaps(api, root) {
     if (!api.map || !api.map.setScene) return false;
     await ready;
     const x = M.scenes[i]; if (!x) return false;
-    const th = threatNow(), pieces = piecesOf(x.n, (s) => s.count + (s.plus ? th : 0));
+    // The table's difficulty (the GM view's Difficulty card): Hard and Deadly add foes to each group of them.
+    const th = threatNow(), more = api.extraFoes ? api.extraFoes() : 0, pieces = piecesOf(x.n, (s) => s.count + (s.plus ? th : 0) + (s.count > 1 && s.foe !== false ? more : 0));
     const r = await api.map.setScene({ url: byScene.has(i) ? byScene.get(i).src : "", yards: x.hex, pieces });
     onMap = { n: x.n, threat: th }; set("scene", JSON.stringify(onMap));
     say(`${x.name.replace(/^\d+\.\s*/, "")} is on the battle map${r.map ? "" : " (no map picture for it yet: the plain grid)"}${x.hex ? `, ${x.hex} yard${x.hex === 1 ? "" : "s"} a hex` : ""}, with ${r.placed ? `${r.placed} in the scene` : "the characters"}.`);

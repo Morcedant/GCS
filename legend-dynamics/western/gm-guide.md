@@ -242,7 +242,7 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 | Revenant gunslinger | Shooting 15 | 11 | 4 | Two revolvers | **Undying.** Rises at the next midnight unless its grave is salted and burned. |
 | Headless Rider | Melee 14, Shooting 13 | 10 | 4 | Saber (2), revolver | **Hell-ridden.** Its horse never tires: Riding 15 in a chase. No head to stun or aim at. Rises at the next midnight unless its head is laid back in its grave. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. In the GM view, the **Difficulty** card (in *Map and fight*) does this for every threat at once: **Tough** (+1 and a box), **Hard** (+2 and two boxes, and one more foe in each group) or **Deadly** (+3 and three boxes, and two more in each group). A minor foe keeps its one box.
 
 # The GM's tools
 

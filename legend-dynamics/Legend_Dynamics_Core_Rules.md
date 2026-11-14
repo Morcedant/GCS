@@ -702,7 +702,7 @@ If the origin changes shape, give the form attribute bonuses (usually +2 to one 
 
 A GM can add their own threats, weapons and Edges. Keep them in line with the book's:
 
-- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play: toughness, a weakness or armor works as in *Armor, toughness and weaknesses*. For a tougher version of any threat, add +1 to its targets and one box; for a weaker one, subtract.
+- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play: toughness, a weakness or armor works as in *Armor, toughness and weaknesses*. For a tougher version of any threat, add +1 to its targets and one box; for a weaker one, subtract. The GM view's **Difficulty** card does it for every threat at once (Tough, Hard or Deadly), and from Hard adds foes to each group.
 - **Weapons.** Hits mark 1 box for fists, knives and arrows; 2 for swords and guns; 3 for the heavy and the point-blank; 4 only for explosives and the monstrous. Give a weapon a reach (melee) or a range band, and its shots if they run out.
 - **Edges.** An Edge is worth about as much as one of the book's: a narrow, useful benefit, often once per session or per mission. Say exactly what it does.
 - **Cards.** One subject, what's true about it and what that permits: as narrow as a card earned in play.

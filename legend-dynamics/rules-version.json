@@ -5,6 +5,15 @@
   "changes": [
     {
       "date": "2026-11-14",
+      "kind": "site",
+      "title": "A Difficulty setting for the GM",
+      "items": [
+        "The GM view's Map and fight tab has a Difficulty card: Standard, Tough (+1 to the threats' attack targets and one more box), Hard (+2 and two boxes, and one more foe in each group) and Deadly (+3 and three boxes, two more in each group). A minor foe keeps its one box.",
+        "It applies to threats as they're added: in the Encounter panel, on the battle map, and when a playtest sets up a scene. It's the core's rule for a tougher version, for every threat at once, in every setting and both fan games."
+      ]
+    },
+    {
+      "date": "2026-11-14",
       "kind": "setting",
       "title": "Aurora's playtest: good guys against bad guys",
       "items": [
