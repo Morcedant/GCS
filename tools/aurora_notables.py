@@ -36,7 +36,7 @@ META = {
     "op-grachyov": ("aurora", "Enforcer", "nonreg", "", True),
     "op-uathach": ("bonded", "Avenger", "nonreg", "", False),
     "op-magus": ("adept", "Occultist", "civilian", "", False),
-    "op-autuarch": ("aurora", "Activist", "nonreg", "", True),
+    "op-autuarch": ("aurora", "Crusader", "nonreg", "", True),
     "op-unler": ("adept", "Occultist", "civilian", "knights", False),
     "op-zarloff": ("otherworlder", "Occultist", "nonreg", "", True),
     "op-phoenix": ("mythic", "Guardian", "nonreg", "", False),
