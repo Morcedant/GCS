@@ -392,6 +392,37 @@ export function invade(s, fleetId) {
   log(s, f.owner, `The landing on ${sys.name} failed.`, "war");
   return { ok: true, taken: false };
 }
+/**
+ * A targeted barrage: warships holding an enemy world's orbit (its guns down, no warships of its own there) destroy one
+ * of its buildings, once per fleet a turn. The Shipyard takes the ships in its queue with it; the Orbital battery is gone
+ * for good (a capital keeps its own guns). Precise: no population is lost.
+ */
+export function barrageTargets(s, fleetId) {
+  const f = s.fleets[fleetId], sys = f && s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
+  if (!sys || !sys.colony || sys.colony.owner === f.owner || !armed(f) || !atWar(s, f.owner, sys.colony.owner) || guarded(s, sys, f.owner)) return [];
+  return Object.keys(sys.colony.buildings).filter((b) => sys.colony.buildings[b] && BUILDINGS[b] && !BUILDINGS[b].wonder);
+}
+export function barrage(s, fleetId, building) {
+  const f = s.fleets[fleetId];
+  if (!f) return { error: "No such fleet." };
+  if (f.barraged === s.turn) return { error: "This fleet has fired its barrage this turn." };
+  const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
+  if (!sys || !sys.colony || sys.colony.owner === f.owner) return { error: "There's no enemy world here." };
+  if (!armed(f)) return { error: "A barrage needs warships." };
+  if (!atWar(s, f.owner, sys.colony.owner)) return { error: "You're not at war with them." };
+  if (guarded(s, sys, f.owner)) return { error: "Its guns or warships still hold the orbit: win it first (keep warships here through the end of the turn)." };
+  if (!barrageTargets(s, fleetId).includes(building)) return { error: "There's no such building to hit." };
+  const c = sys.colony, owner = c.owner;
+  delete c.buildings[building];
+  let wrecked = 0;
+  if (building === "shipyard") { wrecked = c.queue.filter((q) => q.kind === "ship").length; c.queue = c.queue.filter((q) => q.kind !== "ship"); }
+  if (building === "battery") c.defense = Math.min(c.defense, 0);
+  f.barraged = s.turn;
+  remember(s, owner, f.owner, `bombarded ${sys.name}`, -5);
+  log(s, f.owner, `A barrage from orbit destroyed ${sys.name}'s ${BUILDINGS[building].name.toLowerCase()}${wrecked ? `, and the ${wrecked} ship${wrecked > 1 ? "s" : ""} in its yards` : ""}.`, "war");
+  if (owner !== f.owner) log(s, owner, `${faction(s, f.owner).name} bombarded ${sys.name} from orbit: its ${BUILDINGS[building].name.toLowerCase()} is gone.`, "war");
+  return { ok: true, wrecked };
+}
 function capture(s, sys, by) {
   const was = sys.colony.owner, wasCapital = sys.colony.capital;
   log(s, by, `${faction(s, by).name} took ${sys.name} from ${faction(s, was).name}.`, "war");
@@ -657,6 +688,9 @@ function economy(s, F) {
         q.progress += put; c.stock -= put;
         if (q.progress + 1e-9 < q.cost) break;
         if (q.exotics && F.exotics < q.exotics) { if (!q.waiting) log(s, F.id, `${q.name} at ${sys.name} waits for ${q.exotics} exotics.`, "build"); q.waiting = true; break; }
+        // Under siege, nothing finished leaves the yards and no battery goes up: it waits until the orbit is free.
+        if ((q.kind === "ship" || q.id === "battery") && besieged(s, sys)) { if (!q.blockaded) log(s, F.id, `${q.name} at ${sys.name} is ready, but the siege holds it in the yards.`, "build"); q.blockaded = true; break; }
+        q.blockaded = false;
         F.exotics -= q.exotics || 0;
         c.queue.shift();
         if (q.kind === "ship") {

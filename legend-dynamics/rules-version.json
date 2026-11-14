@@ -6,10 +6,11 @@
     {
       "date": "2026-11-14",
       "kind": "site",
-      "title": "Dominion: sieges work",
+      "title": "Dominion: sieges work, and a targeted barrage",
       "items": [
         "A world's orbital guns used to repair a point at the end of every turn, straight after the battle that knocked them out, so its orbit was never clear and troops could never land on a world with a battery or a capital.",
-        "Now a world under siege (an enemy's warships in its orbit) can't repair its guns: keep your warships in orbit through the end of a turn, and your transports can land the next.",
+        "Now a world under siege (an enemy's warships in its orbit) can't repair its guns, launch the ships it finishes, or raise a new battery: keep your warships in orbit through the end of a turn, and your transports can land the next.",
+        "Targeted barrage: a fleet holding an enemy world's orbit can destroy one of its buildings a turn. The Shipyard takes the ships in its yards with it; no population is lost. The computer powers use it too.",
         "The invasion panel says how."
       ]
     },

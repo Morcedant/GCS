@@ -3,7 +3,7 @@
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS } from "./data.js";
 import { faction, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
   concord: ["xenology", "automation", "sensors", "domes", "commerce", "heavyHulls", "foldDrives", "terraforming", "refining", "orbitalYards"],
@@ -160,6 +160,9 @@ function fleets(s, F) {
     if (armed(f)) {
       const o = invasionOdds(s, f.id);
       if (o && !o.guarded && o.troops >= o.defense && atWar(s, F.id, s.systems[s.sysAt[f.at]].colony.owner)) { invade(s, f.id); continue; }
+      // Holding an enemy's orbit without the troops to take it: a barrage on its shipyard (then its battery), and hold on.
+      const bt = barrageTargets(s, f.id), aim = ["shipyard", "battery"].find((b) => bt.includes(b));
+      if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
       if (enemies.length) {

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds,
+import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS } from "../src/data.js";
@@ -310,12 +310,14 @@ test("a siege: warships in orbit knock out a world's guns, the guns stay down wh
   const s = newGame({ seed: 4, size: "small", player: "hegemony", rivals: 1 });
   const foe = s.factions[1].id, cap = coloniesOf(s, foe).find((x) => x.colony.capital);
   cap.colony.buildings.battery = true; cap.colony.defense = 3;
+  // A capital keeps building: a warship paid for every turn would launch into the orbit after each battle.
   declareWar(s, "hegemony", foe);
   const fleet = spawnFleet(s, "hegemony", cap.at, ["cruiser", "cruiser", "cruiser", "cruiser", "frigate", "frigate"]);
   let open = false;
-  for (let t = 0; t < 6 && !open; t++) { endTurn(s); open = !!fleet.ships.length && s.fleets[fleet.id] && !invasionOdds(s, fleet.id).guarded; }
+  for (let t = 0; t < 6 && !open; t++) { cap.colony.queue.push({ kind: "ship", id: "frigate", name: "Frigate", cost: 1, progress: 1 }); endTurn(s); open = !!fleet.ships.length && s.fleets[fleet.id] && !invasionOdds(s, fleet.id).guarded; }
   assert.ok(open, "the guns are down and stay down at the start of a turn while the fleet holds the orbit");
   assert.equal(cap.colony.defense, 0);
+  assert.ok(!Object.values(s.fleets).some((f) => f.owner === foe && f.at === cap.at && f.ships.some((x) => x.type === "frigate")), "a world under siege launches no warships");
   const t = spawnFleet(s, "hegemony", cap.at, Array(8).fill("transport"));
   const o = invasionOdds(s, t.id);
   assert.ok(!o.guarded && o.troops >= o.defense, `troops ${o.troops} against ${o.defense}`);
@@ -323,4 +325,25 @@ test("a siege: warships in orbit knock out a world's guns, the guns stay down wh
   // Once the fleet leaves (or the siege ends), a world's guns come back a point a turn.
   const w = Object.values(s.systems).find((x) => x.colony && x.colony.owner === "hegemony" && x !== cap);
   if (w) { w.colony.buildings.battery = true; w.colony.defense = 0; endTurn(s); assert.ok(w.colony.defense >= 1, "an unbesieged world repairs its guns"); }
+});
+
+test("a targeted barrage: once the orbit is held, warships destroy a building; the shipyard takes its queued ships with it", () => {
+  const s = newGame({ seed: 4, size: "small", player: "hegemony", rivals: 1 });
+  const foe = s.factions[1].id, cap = coloniesOf(s, foe).find((x) => x.colony.capital);
+  cap.colony.buildings.shipyard = true; cap.colony.queue = [{ kind: "ship", id: "frigate", name: "Frigate", cost: 40, progress: 20 }, { kind: "building", id: "lab", name: "Research lab", cost: 60, progress: 0 }];
+  for (const f of Object.values(s.fleets)) if (f.owner === foe && f.at === cap.at) delete s.fleets[f.id];
+  const fleet = spawnFleet(s, "hegemony", cap.at, ["cruiser", "cruiser"]);
+  assert.ok(barrage(s, fleet.id, "shipyard").error, "not at war");
+  declareWar(s, "hegemony", foe);
+  cap.colony.defense = 2;
+  assert.match(barrage(s, fleet.id, "shipyard").error, /hold the orbit/, "the guns are still up");
+  cap.colony.defense = 0;
+  assert.ok(barrageTargets(s, fleet.id).includes("shipyard"));
+  const r = barrage(s, fleet.id, "shipyard");
+  assert.ok(r.ok && r.wrecked === 1);
+  assert.ok(!cap.colony.buildings.shipyard);
+  assert.deepEqual(cap.colony.queue.map((q) => q.id), ["lab"], "the queued ship is wrecked; the lab stays queued");
+  assert.equal(cap.colony.pop > 0, true);
+  assert.match(barrage(s, fleet.id, "shipyard").error, /this turn/, "once per fleet a turn");
+  assert.ok(!spawnFleet(s, "hegemony", cap.at, ["transport"]) || !barrageTargets(s, Object.values(s.fleets).find((f) => f.ships.every((x) => x.type === "transport")).id).length, "transports alone can't bombard");
 });
