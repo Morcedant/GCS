@@ -47,7 +47,7 @@
   "restockDone": "Resupplied: full load.",
   "emptyNote": "Empty: it won't fire until you reload.",
   "otherWeapon": "Another weapon or a power (nothing spent)",
-  "tracksTitle": "Collateral, Scrutiny and Backlash",
+  "tracksTitle": "Fallout",
   "tracksIntro": "Shared by the whole team. Wrecked property and hurt bystanders, official attention and public anger each mark a box; clean arrests, good press and lying low clear one between cases.",
   "tracksReset": "Clear every track",
   "exampleName": "example sheriff",
@@ -1647,37 +1647,56 @@
  },
  "tracks": [
   {
-   "name": "Collateral",
-   "boxes": 4,
+   "name": "Fallout",
+   "boxes": 6,
+   "kinds": [
+    "Collateral",
+    "Scrutiny",
+    "Backlash"
+   ],
+   "kindText": {
+    "Collateral": "damage",
+    "Scrutiny": "official attention",
+    "Backlash": "public anger"
+   },
    "effects": [
     "Clean so far",
-    "Property damage: insurance claims and angry owners",
-    "Bystanders hurt: −2 to Media and Persuasion with the public",
-    "Lawsuits and charges: someone is held liable",
-    "An EPAOC hearing: start a clock; a team member may lose their status"
-   ]
-  },
-  {
-   "name": "Scrutiny",
-   "boxes": 4,
-   "effects": [
-    "Nobody's looking",
-    "Questions in a report",
-    "Flagged: −2 at checkpoints, cordons and with federal agencies",
-    "Investigated: ExLAW or the FBI opens a file on you",
-    "Hunted: the Foundation or Raster Zero takes an interest; start a clock"
-   ]
-  },
-  {
-   "name": "Backlash",
-   "boxes": 4,
-   "effects": [
-    "The public trusts you",
-    "Talk shows ask hard questions",
-    "Protests: −2 to Media and Leadership with crowds",
-    "Anti-Operant laws proposed; Operant friends blame you",
-    "Riots: the next case starts in a city that wants you gone"
-   ]
+    "Noticed",
+    "Noticed",
+    "Trouble: −2 with the people it touches",
+    "Serious trouble",
+    "Serious trouble",
+    "A crisis: start a clock"
+   ],
+   "kindEffects": {
+    "Collateral": [
+     "Clean so far",
+     "Property damage: insurance claims and angry owners",
+     "Property damage: insurance claims and angry owners",
+     "Bystanders hurt: −2 to Media and Persuasion with the public",
+     "Lawsuits and charges: someone is held liable (and still −2 with the public)",
+     "Lawsuits and charges: someone is held liable (and still −2 with the public)",
+     "An EPAOC hearing: start a clock; a team member may lose their status"
+    ],
+    "Scrutiny": [
+     "Nobody's looking",
+     "Questions in a report",
+     "Questions in a report",
+     "Flagged: −2 at checkpoints, cordons and with federal agencies",
+     "Investigated: ExLAW or the FBI opens a file on you (and still flagged, −2)",
+     "Investigated: ExLAW or the FBI opens a file on you (and still flagged, −2)",
+     "Hunted: the Foundation or Raster Zero takes an interest; start a clock"
+    ],
+    "Backlash": [
+     "The public trusts you",
+     "Talk shows ask hard questions",
+     "Talk shows ask hard questions",
+     "Protests: −2 to Media and Leadership with crowds",
+     "Anti-Operant laws proposed; Operant friends blame you (and still −2 with crowds)",
+     "Anti-Operant laws proposed; Operant friends blame you (and still −2 with crowds)",
+     "Riots: the next case starts in a city that wants you gone"
+    ]
+   }
   }
  ],
  "personalTrack": {
@@ -3020,7 +3039,7 @@
   ],
   [
    "Tracks",
-   "Collateral (damage), Scrutiny (official attention), Backlash (public anger). 4 boxes each; clean arrests, good press and lying low clear them between cases."
+   "Fallout: 6 boxes, each marked as Collateral (damage), Scrutiny (official attention) or Backlash (public anger); what it does follows the kind with the most marks. Clean arrests, good press and lying low clear a mark of their kind between cases."
   ]
  ],
  "example": {
@@ -6866,6 +6885,43 @@
    "label": "Aegis suit (Toughness II)"
   }
  },
+ "rangeTracks": [
+  {},
+  {
+   "id": "superspeed",
+   "title": "Super-speed fight",
+   "us": "The fight",
+   "startLane": 1,
+   "help": "for a fight with speedsters or fliers in it: the first lane is the fight itself (everyone on foot, in reach and gunshot); each lane out is a range band from it, up to anywhere in the scene.",
+   "bands": [
+    [
+     "Close",
+     "up to 10 yd: in the thick of it"
+    ],
+    [
+     "Short",
+     "up to 25 yd"
+    ],
+    [
+     "Medium",
+     "up to 100 yd: Speed, Flight or Leaping I reaches it"
+    ],
+    [
+     "Long",
+     "up to 300 yd: Class II"
+    ],
+    [
+     "Extreme",
+     "up to 1,000 yd: Class III"
+    ],
+    [
+     "Anywhere",
+     "out of sight, anywhere in the scene: Class IV and up"
+    ]
+   ],
+   "note": "Each lane is a range band from the fight. A move with Speed, Flight or Super Leaping crosses any number of lanes up to its Class's band (Class I to Medium, II to Long, III to Extreme, IV and up anywhere). Someone on foot moves one lane with a run, and attacks reach across lanes by their weapon's or power's range."
+  }
+ ],
  "damageTypes": {"types": [["physical", "Physical", "fists, blades, bullets, falls, thrown cars"], ["energy", "Energy", "Blast, lightning, lasers, flame, raw power"], ["mystic", "Mystic", "spells, spirits, curses, the Fey and the Mad Forest"], ["mind", "Mind", "telepathy, mind control, fears made real"]], "elements": ["fire", "cold", "electricity", "light", "radiation", "sound"], "powers": {"toughness": ["physical"], "forcefield": ["physical", "energy"]}, "vulnerable": ["energy", "mystic", "mind", "fire", "cold", "electricity", "light", "radiation", "sound", "iron", "silver"]},
  "unstable": {"skill": "Powers", "complication": "unstable", "origins": {"labmade": 2}, "max": 4, "strainLevel": 3, "strainAt": 3, "levels": [["I", "18"], ["II", "17–18"], ["III", "16–18"], ["IV", "15–18"]], "flare": "It hits everyone nearby, or does far more than you meant, and the GM says how. Accept the collateral; a flare can mark Collateral or Backlash.", "labmadeFlare": "Lab-made: mark a box of Strain as well.", "text": "Unstable powers come in levels. On a Powers roll, a natural in the level's range flares: Unstable I on an 18, II on 17–18, III on 16–18, IV on 15–18. Lab-made gives Unstable II; the Unstable Powers complication gives the level chosen with the GM (I to III); together they add, to IV at most. The GM can raise a level for a while (cornered, dosed, a Foundation tag) or lower it (training, treatment). At Strain 3, any power flares on 16–18, whatever its level."},
  "playtest": {

@@ -27,7 +27,7 @@ EXAMPLES = {
     "fantasy": {"skill": "Melee", "target": 14, "foe": "Serpent-priest", "foeTarget": 13, "contest": "Grapple",
                 "assist": "Force the tomb door", "helperSkill": "Athletics", "track": "doom", "trackFull": "Doom"},
     "aurora": {"skill": "Powers", "target": 13, "foe": "White Hand soldier", "foeTarget": 13, "contest": "Grapple",
-              "assist": "Hold the door", "helperSkill": "Athletics", "track": "collateral", "trackFull": "Collateral"},
+              "assist": "Hold the door", "helperSkill": "Athletics", "track": "fallout", "trackFull": "Fallout"},
     "grimm": {"skill": "Tracking", "target": 13, "foe": "Blutbad", "foeTarget": 14, "contest": "Grapple",
               "assist": "Hold the door", "helperSkill": "Athletics", "track": "exposure", "trackFull": "Exposure",
               "old": ("grimm", "grit")},

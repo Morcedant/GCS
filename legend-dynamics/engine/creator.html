@@ -224,6 +224,11 @@ tr.lvl-U td.target { color: var(--muted); }
 .boxes .box.tough.on { background: var(--accent); border-color: var(--accent); box-shadow: none; }
 .boxes .box.tough + .box:not(.tough) { margin-left: 8px; }
 .tough-sep { display: inline-block; width: 10px; }
+.ship-row .box.kind-0, .ship-row .box.kind-1, .ship-row .box.kind-2 { font-size: 11px; font-weight: 700; color: #fff; line-height: 1; }
+.ship-row .box.on.kind-1 { background: var(--accent); border-color: var(--accent); }
+.ship-row .box.on.kind-2 { background: var(--warn, #b8860b); border-color: var(--warn, #b8860b); }
+.ship-row .box.kind-0 > *, .ship-row .box.kind-1 > *, .ship-row .box.kind-2 > * { transform: skewX(20deg); }
+.kind-pick select { width: auto; font-size: 13px; padding: 2px 4px; }
 .condition { font-family: var(--display); letter-spacing: .1em; text-transform: uppercase; }
 .duty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .duty .count { font: 400 2.2rem/1 var(--mono); min-width: 2ch; text-align: center; color: var(--accent); text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); }
@@ -1783,14 +1788,17 @@ tr.lvl-U td.target { color: var(--muted); }
   const FIGHT = (POWERS && POWERS.fight) || null;
   const powerMove = (c = ch) => { if (!FIGHT || !FIGHT.move) return null;
     let best = null; for (const x of allPowers(c)) { const t = FIGHT.move[x.id]; const y = t && t[Math.min(classIndex(x.cl), t.length - 1)];
-      if (y && (!best || y > best.yards)) best = { yards: y, name: `${powerDef(x.id)[1]} ${x.cl}` }; } return best; };
+      if (y && (!best || y > best.yards)) best = { yards: y, name: `${powerDef(x.id)[1]} ${x.cl}`, band: moveBand(y) }; } return best; };
+  // A power's move goes by range band, never yards on the map: Medium, Long, Extreme, then anywhere in the scene.
+  const moveBand = (y) => y <= 100 ? "a band a move, to Medium (100 yd)" : y <= 300 ? "a band a move, to Long (300 yd)" : y <= 1000 ? "a band a move, to Extreme (1,000 yd)" : "anywhere in the scene in one move";
   // A character's own move, on foot (Agility, Body, Athletics), before any power that moves them.
   const footMoveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c);
   const moveOf = (c = ch) => Math.max(footMoveOf(c), powerMove(c)?.yards || 0);
   // Acting first (powers.fight.actFirst: Speed), for the GM's turn order.
   const powerFirst = (c) => { const f = FIGHT && FIGHT.actFirst; return !!f && allPowers(c).some((x) => x.id === f.power && classIndex(x.cl) + 1 >= f.from); };
   // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
-  const moveNow = (c = ch) => LD.injuredMove(moveOf(c), (c.play && c.play.injury) || 0);
+  // (On foot: a power that moves you goes by range band, shown beside it.)
+  const moveNow = (c = ch) => LD.injuredMove(footMoveOf(c), (c.play && c.play.injury) || 0);
   const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
   // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
@@ -2172,7 +2180,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("checklist").innerHTML = list.map(([ok, t]) => { const f = fieldFor(t);
       return `<li${f ? ` data-goto="${f}" class="goto" title="Go to it"` : ""}><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`; }).join("");
     $("st-dodge").textContent = dodge();
-    $("st-move").textContent = `${moveNow()} yd`;
+    $("st-move").textContent = `${moveNow()} yd${powerMove() ? ` · ${powerMove().name}: ${powerMove().band}` : ""}`;
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
@@ -2312,7 +2320,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge() + formDodge()}</b>${formDodge() ? `<span class="small muted">human ${dodge()}</span>` : ""}${dodgeGearBonus() ? `<span class="small muted">${dodge() + formDodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
-        <div><span class="label">Move</span><b class="num">${moveNow()} yd</b><span class="small muted">${runNow() ? `run ${runNow()} yd` : "no running while seriously wounded"}${moveNow() !== moveOf() ? ` · ${moveOf()} yd unhurt` : ""}${inForm() ? ` · human ${LD.moveYards(ch.attrs.Agility, ch.attrs.Body, LEVELS[ch.skills.Athletics].dodge, speedOf() - (formOf().speed || 0))} yd` : ""}</span></div>
+        <div><span class="label">Move</span><b class="num">${moveNow()} yd</b><span class="small muted">${runNow() ? `run ${runNow()} yd` : "no running while seriously wounded"}${moveNow() !== footMoveOf() ? ` · ${footMoveOf()} yd unhurt` : ""}${powerMove() ? ` · <b>${esc(powerMove().name)}:</b> ${esc(powerMove().band)}` : ""}${inForm() ? ` · human ${LD.moveYards(ch.attrs.Agility, ch.attrs.Body, LEVELS[ch.skills.Athletics].dodge, speedOf() - (formOf().speed || 0))} yd` : ""}</span></div>
         ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill) + formSkill(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill) + formSkill(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -2946,7 +2954,33 @@ tr.lvl-U td.target { color: var(--muted); }
   const SHIP_TRACKS = PACK.tracks.map((t) => [t.name, t.boxes]);
   let ship = store.get(STORE_SHIP, {});
   if (!ship || typeof ship !== "object") ship = {};
-  const shipEffect = (name, n) => (PACK.tracks.find((t) => t.name === name)?.effects || [])[n] || "";
+  // A track with kinds of mark (Aurora's Fallout: Collateral, Scrutiny, Backlash): each mark keeps its kind, and what
+  // the track does follows the kind with the most marks (a tie: the latest). A kind's name stands for its track anywhere
+  // a track is named (a discovery cost, a threat's trait).
+  const KIND_TRACK = Object.fromEntries(PACK.tracks.flatMap((t) => (t.kinds || []).map((k) => [k, t.name])));
+  const trackOf = (name) => PACK.tracks.find((t) => t.name === (KIND_TRACK[name] || name)) || null;
+  const marksKey = (t) => t.name + "@kinds";
+  const kindMarks = (t) => { const m = Array.isArray(ship[marksKey(t)]) ? ship[marksKey(t)].filter((k) => t.kinds.includes(k)) : [];
+    while (m.length < Math.min(t.boxes, ship[t.name] || 0)) m.push(t.kinds[0]); return m.slice(0, Math.min(t.boxes, ship[t.name] || 0)); };
+  const leadKind = (t, marks) => { if (!marks.length) return ""; const n = (k) => marks.filter((x) => x === k).length;
+    const top = Math.max(...t.kinds.map(n)); return [...marks].reverse().find((k) => n(k) === top); };
+  /** Mark a track by its name or a kind's (delta boxes, + or −). */
+  function markTrack(name, delta) {
+    const t = trackOf(name); if (!t) return;
+    if (!t.kinds) { ship[t.name] = Math.max(0, Math.min(t.boxes, (ship[t.name] || 0) + delta)); return; }
+    const m = kindMarks(t), kind = t.kinds.includes(name) ? name : nextKind[t.name] || t.kinds[0];
+    if (delta > 0) for (let i = 0; i < delta && m.length < t.boxes; i++) m.push(kind); else m.splice(Math.max(0, m.length + delta));
+    ship[t.name] = m.length; ship[marksKey(t)] = m;
+  }
+  const nextKind = {};
+  const shipEffect = (name, n) => { const t = trackOf(name); if (!t) return "";
+    if (!t.kinds || !n) return (t.effects || [])[n] || "";
+    const k = leadKind(t, kindMarks(t).slice(0, n)); return k ? `${k}: ${((t.kindEffects || {})[k] || t.effects || [])[n] || ""}` : (t.effects || [])[n] || ""; };
+  // Saved tracks from before a merge (Collateral 2, Scrutiny 1): their marks join the merged track as its kinds.
+  for (const t of PACK.tracks) if (t.kinds && t.kinds.some((k) => ship[k])) {
+    const m = kindMarks(t); for (const k of t.kinds) { for (let i = 0; i < (+ship[k] || 0) && m.length < t.boxes; i++) m.push(k); delete ship[k]; }
+    ship[t.name] = m.length; ship[marksKey(t)] = m; store.set(STORE_SHIP, ship);
+  }
   // The crew's ship above the group's tracks on the play tab: the shared table's, or this browser's own (the GM's).
   function renderCrewShipView() {
     const el = $("crew-ship-view"); if (!PACK.crewShip || !crewShipUI) { el.hidden = true; return; }
@@ -2957,16 +2991,20 @@ tr.lvl-U td.target { color: var(--muted); }
     if (ptUI) ptUI.threatChanged(); // a track that is the adventure's threat (Doom) may bring more to the map
     if (wantedUI) wantedUI.render(); // the poster's reward follows the law's track
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
-      const n = Math.min(max, ship[name] || 0);
+      const n = Math.min(max, ship[name] || 0), t = trackOf(name), m = t && t.kinds ? kindMarks(t) : [];
+      const kindOf = (i) => (i < m.length ? m[i] : ""), ki = (k) => t.kinds.indexOf(k);
       return `<div class="ship-row ${n >= max ? "out" : n ? "hit" : ""}"><span class="label">${name}</span>
-        <span class="boxes">${Array.from({ length: max }, (_, i) => `<button class="box ${i < n ? "on" : ""}" data-track="${name}" data-i="${i + 1}" aria-label="${name} box ${i + 1}${i < n ? ", marked" : ""}"></button>`).join("")}</span>
+        <span class="boxes">${Array.from({ length: max }, (_, i) => `<button class="box ${i < n ? "on" : ""}${kindOf(i) ? ` kind-${ki(kindOf(i))}` : ""}" data-track="${name}" data-i="${i + 1}" aria-label="${name} box ${i + 1}${i < n ? `, marked${kindOf(i) ? " (" + kindOf(i) + ")" : ""}` : ""}"${kindOf(i) ? ` title="${esc(kindOf(i))}"` : ""}>${kindOf(i) ? kindOf(i)[0] : ""}</button>`).join("")}</span>
+        ${t && t.kinds ? `<label class="small kind-pick">Mark as <select data-trackkind="${esc(name)}">${t.kinds.map((k) => `<option value="${esc(k)}"${(nextKind[name] || t.kinds[0]) === k ? " selected" : ""}>${esc(k)}${t.kindText && t.kindText[k] ? ` (${esc(t.kindText[k])})` : ""}</option>`).join("")}</select></label>` : ""}
         <span class="eff">${shipEffect(name, n)}</span></div>`;
     }).join("");
   }
+  $("ship").addEventListener("change", (e) => { const sel = e.target.closest("[data-trackkind]"); if (sel) nextKind[sel.dataset.trackkind] = sel.value; });
   $("ship").addEventListener("click", (e) => {
     const b = e.target.closest("[data-track]"); if (!b) return;
-    const name = b.dataset.track, i = +b.dataset.i;
-    ship[name] = (ship[name] || 0) === i ? i - 1 : i;
+    const name = b.dataset.track, i = +b.dataset.i, n = ship[name] || 0, t = trackOf(name);
+    if (t && t.kinds && i <= n) { const m = kindMarks(t); m.splice(i - 1, 1); ship[t.name] = m.length; ship[marksKey(t)] = m; } // clearing one mark: that kind's
+    else markTrack(name, (n === i ? i - 1 : i) - n);
     store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
   });
   let resetArmed = false;
@@ -3146,7 +3184,7 @@ tr.lvl-U td.target { color: var(--muted); }
     rangeTracks: MAP_TRACKS,
     vehicles: RTRACK.threats ? threatsFromGuide($("guide"), RTRACK.threats, "ship-") : [],
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
-    setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
+    setGroupTrack: (name, v) => { const t = trackOf(name); if (!t) return; markTrack(t.name, Math.max(0, Math.min(t.boxes, v)) - (ship[t.name] || 0)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun, partyName: T.party,
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
@@ -3157,7 +3195,7 @@ tr.lvl-U td.target { color: var(--muted); }
         injury: marksOf(c), boxes: boxesOf(c), extra: !!c.extra, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
         mtrack: MTRACK ? { name: MTRACK.name, max: MTRACK.boxes, value: c.play.mind || 0 } : null,
-        stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...(k.powerMove ? [`${k.powerMove.name} ${k.powerMove.yards.toLocaleString()} yd`] : []), ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+        stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...(k.powerMove ? [`${k.powerMove.name}: ${k.powerMove.band}`] : []), ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
       if ("injury" in patch) setHurt(c, patch.injury);
@@ -3224,7 +3262,7 @@ tr.lvl-U td.target { color: var(--muted); }
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
       // Move on foot, and a power's move apart from it (Flight II: 300 yd), each as their injuries leave it.
       const inj = (c.play && c.play.injury) || 0, pm = powerMove(c), foot = LD.injuredMove(footMoveOf(c), inj);
-      const power = pm && pm.yards > footMoveOf(c) ? { name: pm.name, yards: LD.injuredMove(pm.yards, inj) } : null;
+      const power = pm && pm.yards > footMoveOf(c) ? { name: pm.name, yards: pm.yards, band: pm.band } : null;
       return { skills, dodge: dodge() + formDodge(c), move: foot, powerMove: power, adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
@@ -3399,8 +3437,8 @@ tr.lvl-U td.target { color: var(--muted); }
   // Cards held across the table for a subject tag: one line per card, its holder and its owner.
   const cardsFor = (tag) => gmCrew.flatMap((c) => (c.cards || []).filter((k) => k.tag && k.tag === tag).map((k) => ({ c, k })));
   function setTrack(name, delta) {
-    const t = PACK.tracks.find((x) => x.name === name); if (!t) return;
-    ship[name] = Math.max(0, Math.min(t.boxes, (ship[name] || 0) + delta)); store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
+    if (!trackOf(name)) return;
+    markTrack(name, delta); store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
   }
   function tickThreat(n) {
     const th = disc.threat, T2 = DISC.threat;
@@ -3460,7 +3498,7 @@ tr.lvl-U td.target { color: var(--muted); }
       ${T2.repeat ? `<span class="small">${esc(capFirst(T2.count || "times filled"))}: <b>${th.count}</b></span>` : th.filled >= th.size ? `<span class="small"><b>It has happened.</b></span>` : ""}
       <div class="btn-row"><button class="btn" data-tick="1">${T2.repeat ? "A scene passes (+1)" : "Time passes (+1)"}</button><button class="linkish" data-tick="-1">Undo</button><button class="linkish" data-treset>${T2.startsOnFailure ? "Stop it" : "Reset"}</button></div>`;
     $("disc-costs").innerHTML = `<b>What investigating costs</b><span class="small muted">A failed investigation roll${T2.repeat || T2.track ? ` (which also ticks ${esc(theThreat())})` : ""} or a push ticks one track, chosen by how the ${esc(T.party || "party")} is digging.</span>`
-      + (DISC.costs || []).map(([name, why]) => { const t = PACK.tracks.find((x) => x.name === name); const v = Math.min(t ? t.boxes : 4, ship[name] || 0);
+      + (DISC.costs || []).map(([name, why]) => { const t = trackOf(name); const v = Math.min(t ? t.boxes : 4, ship[t ? t.name : name] || 0);
         return `<div><b>${esc(name)}</b> <span class="small muted">${esc(why)} · ${v}/${t ? t.boxes : 4}: ${esc(shipEffect(name, v))}</span>
           <div class="btn-row"><button class="btn" data-cost="${esc(name)}" data-fail="1">Failed roll</button><button class="btn" data-cost="${esc(name)}">Push</button></div></div>`; }).join("");
     const crewOpts = (sel) => `<option value="">Primary investigator…</option>` + gmCrew.map((c) => `<option value="${c.id}"${c.id === sel ? " selected" : ""}>${esc(c.name || "Unnamed")}</option>`).join("");
@@ -3664,7 +3702,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <span class="small muted">${esc((c.extra ? [c.rank, c.foe ? "NPC · enemy" : "NPC"] : [c.rank, c.species, c.dept]).filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? formLabel(c) : humanLabel(c)))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (c.altForm ? humanLabel(c) : humanLabel(c).toLowerCase()) : formLabel(c))}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
-        ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power covers this far instead of the move on foot"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> <b class="num">${k.powerMove.yards.toLocaleString()} yd</b> a move</div>` : ""}
+        ${k.powerMove ? `<div class="gm-supermove small" title="A move with the power goes by range band (up to ${k.powerMove.yards.toLocaleString()} yd), not by yards on the map: on the battle map, use the Super-speed fight range track"><span class="gm-supermove-tag">${esc(k.powerMove.name)}</span> ${esc(k.powerMove.band)}</div>` : ""}
         <div class="gm-row"><span class="gm-inj"><span class="small muted">Injury</span><span class="boxes">${Array.from({ length: nb }, (_, j) => j + 1).map((i) => `<button class="box ${i <= mk ? "on" : ""}${i <= toughOf(c) ? " tough" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} ${i <= toughOf(c) ? "Toughness" : "injury"} box ${i}" title="${i <= toughOf(c) ? "Toughness box: marked first, no penalty, clears after the fight" : "Injury box"}"></button>`).join("")}</span></span>
           ${c.extra ? "" : `<span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span>`}</div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${inForm(c) ? ` · <b style="color:var(--bad)">${esc(formLabel(c))}</b>` : ""}</div>` : inForm(c) && !c.altForm ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}

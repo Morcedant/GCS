@@ -366,7 +366,20 @@ def gen(name, pack, t):
                     "- **Getting them can cost.** Buying silver is ordinary trade, but if folks learn what it's for (a smith asked to cast bullets, rounds seen in your gun) word gets around (Whispers); taking church silver or buying the makings for fire draws the law (Heat). A character with Tinkering can cast silver, hammer cold iron or mix incendiaries; a preacher, or an Occult working, blesses rounds."]
         return "\n".join(out)
     if name == "tracks":
-        return table(["Track", "Boxes", "As boxes fill"], [[x["name"], x["boxes"], "; ".join(f"{i}: {e}" for i, e in enumerate(x["effects"]) if i)] for x in p["tracks"]])
+        def fills(effects):  # "1–2: Noticed; 3: Trouble": levels with the same effect run together
+            out, i = [], 1
+            while i < len(effects):
+                j = i
+                while j + 1 < len(effects) and effects[j + 1] == effects[i]: j += 1
+                out.append(f"{i}{'–' + str(j) if j > i else ''}: {effects[i]}"); i = j + 1
+            return "; ".join(out)
+        rows = []
+        for x in p["tracks"]:
+            if x.get("kinds"):  # a track with kinds of mark (Fallout): a row per kind, by the kind with the most marks
+                rows += [[f"{x['name']}: {k}" + (f" ({x['kindText'][k]})" if x.get("kindText", {}).get(k) else ""), x["boxes"], fills(x["kindEffects"][k])] for k in x["kinds"]]
+            else:
+                rows.append([x["name"], x["boxes"], fills(x["effects"])])
+        return table(["Track", "Boxes", "As boxes fill"], rows)
     if name == "seeds":
         s = p["seeds"]; k1 = ["mission", "place", "strange"]; k2 = ["twist", "clock", "who"]
         col = lambda k, i: f"{s[k][1][i][0]} ({s[k][1][i][1]})" if k == "clock" else s[k][1][i]

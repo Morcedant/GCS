@@ -5,6 +5,17 @@
   "changes": [
     {
       "date": "2026-11-13",
+      "kind": "setting",
+      "title": "Aurora: super-speed by range band, and one Fallout track",
+      "items": [
+        "Speed, Flight and Super Leaping move by range band, never yards on the battle map: the sheet, the GM's cards and the table show the band (Class I to Medium, II to Long, III to Extreme, IV and up anywhere in the scene) beside the move on foot.",
+        "A new Super-speed fight range track on the battle map: the first lane is the fight itself, and each lane out is a range band from it.",
+        "Collateral, Scrutiny and Backlash are now one shared Fallout track of 6 boxes. Each mark is one of the three kinds; how many boxes are marked sets how bad it is, and the kind with the most marks says what form it takes. Clearing removes a mark of its own kind.",
+        "Tracks saved under the old names join Fallout as marks of their kind."
+      ]
+    },
+    {
+      "date": "2026-11-13",
       "kind": "rules",
       "title": "Consistency pass: core rules and the four settings",
       "items": [

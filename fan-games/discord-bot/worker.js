@@ -21,40 +21,59 @@ export const PACKS = {
   "title": "Aurora",
   "point": "Spark",
   "mission": "Case",
-  "trackTitle": "Collateral, Scrutiny and Backlash",
+  "trackTitle": "Fallout",
   "tracks": [
    {
-    "name": "Collateral",
-    "boxes": 4,
+    "name": "Fallout",
+    "boxes": 6,
+    "kinds": [
+     "Collateral",
+     "Scrutiny",
+     "Backlash"
+    ],
+    "kindText": {
+     "Collateral": "damage",
+     "Scrutiny": "official attention",
+     "Backlash": "public anger"
+    },
     "effects": [
      "Clean so far",
-     "Property damage: insurance claims and angry owners",
-     "Bystanders hurt: −2 to Media and Persuasion with the public",
-     "Lawsuits and charges: someone is held liable",
-     "An EPAOC hearing: start a clock; a team member may lose their status"
-    ]
-   },
-   {
-    "name": "Scrutiny",
-    "boxes": 4,
-    "effects": [
-     "Nobody's looking",
-     "Questions in a report",
-     "Flagged: −2 at checkpoints, cordons and with federal agencies",
-     "Investigated: ExLAW or the FBI opens a file on you",
-     "Hunted: the Foundation or Raster Zero takes an interest; start a clock"
-    ]
-   },
-   {
-    "name": "Backlash",
-    "boxes": 4,
-    "effects": [
-     "The public trusts you",
-     "Talk shows ask hard questions",
-     "Protests: −2 to Media and Leadership with crowds",
-     "Anti-Operant laws proposed; Operant friends blame you",
-     "Riots: the next case starts in a city that wants you gone"
-    ]
+     "Noticed",
+     "Noticed",
+     "Trouble: −2 with the people it touches",
+     "Serious trouble",
+     "Serious trouble",
+     "A crisis: start a clock"
+    ],
+    "kindEffects": {
+     "Collateral": [
+      "Clean so far",
+      "Property damage: insurance claims and angry owners",
+      "Property damage: insurance claims and angry owners",
+      "Bystanders hurt: −2 to Media and Persuasion with the public",
+      "Lawsuits and charges: someone is held liable (and still −2 with the public)",
+      "Lawsuits and charges: someone is held liable (and still −2 with the public)",
+      "An EPAOC hearing: start a clock; a team member may lose their status"
+     ],
+     "Scrutiny": [
+      "Nobody's looking",
+      "Questions in a report",
+      "Questions in a report",
+      "Flagged: −2 at checkpoints, cordons and with federal agencies",
+      "Investigated: ExLAW or the FBI opens a file on you (and still flagged, −2)",
+      "Investigated: ExLAW or the FBI opens a file on you (and still flagged, −2)",
+      "Hunted: the Foundation or Raster Zero takes an interest; start a clock"
+     ],
+     "Backlash": [
+      "The public trusts you",
+      "Talk shows ask hard questions",
+      "Talk shows ask hard questions",
+      "Protests: −2 to Media and Leadership with crowds",
+      "Anti-Operant laws proposed; Operant friends blame you (and still −2 with crowds)",
+      "Anti-Operant laws proposed; Operant friends blame you (and still −2 with crowds)",
+      "Riots: the next case starts in a city that wants you gone"
+     ]
+    }
    }
   ],
   "seeds": {

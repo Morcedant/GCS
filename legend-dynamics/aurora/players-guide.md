@@ -691,14 +691,15 @@ Begin each session with two Spark points (three with Extra Spark); unused points
 
 Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication. You can decline the proposed complication without penalty.
 
-## Collateral, Scrutiny and Backlash
+## Fallout
 
 A track is a row of boxes that fills as consequences catch up with you, and each box means something. **Shared tracks** belong to the whole team (the law noticing, debts, the dark learning your names): deeds, a success at a cost or a failed investigation mark them, and lying low, paying up or a public good clears them. A setting can also give each character a **personal track** of four boxes: the price of their power (Strain, Corruption) or of a secret (Exposure), with what each box does on the sheet.
 
-The team shares three tracks. **Collateral** is the damage your cases leave behind: wrecked property, hurt bystanders, and the lawsuits and hearings that follow, as Warlord I learned in 1973. **Scrutiny** is official attention: ExLAW, the FBI, the EPAOC, and in the end the Foundation and Raster Zero. **Backlash** is the public turning against you, and against Operants in general.
+The team shares one track, **Fallout**: what your cases cost in the world outside the fight. It has **6 boxes**, and every mark is one of three kinds. **Collateral** is the damage your cases leave behind: wrecked property, hurt bystanders, and the lawsuits and hearings that follow, as Warlord I learned in 1973. **Scrutiny** is official attention: ExLAW, the FBI, the EPAOC, and in the end the Foundation and Raster Zero. **Backlash** is the public turning against you, and against Operants in general. Wherever this book says something *marks Collateral*, *Scrutiny* or *Backlash*, it marks a Fallout box of that kind.
 
-- **Marking:** a fight in a crowded street or a collapsed building (Collateral); breaking procedure, using powers illegally or being noticed by the wrong people (Scrutiny); a disaster on camera or a scandal (Backlash). A success at a cost can mark any of them.
-- **Clearing:** paying for the damage or a clean arrest that stands up in court (Collateral); lying low, a friend in the right office (Scrutiny); a rescue on live TV, a good interview (Backlash).
+- **Marking:** a fight in a crowded street or a collapsed building (Collateral); breaking procedure, using powers illegally or being noticed by the wrong people (Scrutiny); a disaster on camera or a scandal (Backlash). A success at a cost can mark any kind.
+- **What it does:** the number of boxes marked sets how bad it is, and **the kind with the most marks** (on a tie, the latest) says what form it takes. At 3 boxes it's −2 with the people it touches: the public (Collateral), checkpoints and federal agencies (Scrutiny), or crowds (Backlash). At 4 it's lawsuits, a federal file or anti-Operant laws. At 6 it's a crisis with its own clock: an EPAOC hearing, the Foundation hunting you, or riots.
+- **Clearing:** clearing removes a mark of its own kind: paying for the damage or a clean arrest that stands up in court (Collateral); lying low, a friend in the right office (Scrutiny); a rescue on live TV, a good interview (Backlash).
 
 Each character also has **Strain**, their own track for pushing powers and fueling rituals (see *Powers*).
 
@@ -723,9 +724,9 @@ Exposure measures the secret getting past the people who already know it:
 
 | Track | Boxes | As boxes fill |
 |---|---|---|
-| Collateral | 4 | 1: Property damage: insurance claims and angry owners; 2: Bystanders hurt: −2 to Media and Persuasion with the public; 3: Lawsuits and charges: someone is held liable; 4: An EPAOC hearing: start a clock; a team member may lose their status |
-| Scrutiny | 4 | 1: Questions in a report; 2: Flagged: −2 at checkpoints, cordons and with federal agencies; 3: Investigated: ExLAW or the FBI opens a file on you; 4: Hunted: the Foundation or Raster Zero takes an interest; start a clock |
-| Backlash | 4 | 1: Talk shows ask hard questions; 2: Protests: −2 to Media and Leadership with crowds; 3: Anti-Operant laws proposed; Operant friends blame you; 4: Riots: the next case starts in a city that wants you gone |
+| Fallout: Collateral (damage) | 6 | 1–2: Property damage: insurance claims and angry owners; 3: Bystanders hurt: −2 to Media and Persuasion with the public; 4–5: Lawsuits and charges: someone is held liable (and still −2 with the public); 6: An EPAOC hearing: start a clock; a team member may lose their status |
+| Fallout: Scrutiny (official attention) | 6 | 1–2: Questions in a report; 3: Flagged: −2 at checkpoints, cordons and with federal agencies; 4–5: Investigated: ExLAW or the FBI opens a file on you (and still flagged, −2); 6: Hunted: the Foundation or Raster Zero takes an interest; start a clock |
+| Fallout: Backlash (public anger) | 6 | 1–2: Talk shows ask hard questions; 3: Protests: −2 to Media and Leadership with crowds; 4–5: Anti-Operant laws proposed; Operant friends blame you (and still −2 with crowds); 6: Riots: the next case starts in a city that wants you gone |
 
 ## Advancement
 
@@ -1012,7 +1013,7 @@ A night's sleep clears one box; a full day's rest clears them all.
 
 Superheroes fight at speeds that make yards meaningless. These rules cover the moves, the extra actions, the air and the ground coming up to meet you.
 
-- **Moving in a fight.** Speed, Flight and Super Leaping cover a range band in one move: **Medium (100 yd) at Class I, Long at Class II, Extreme at Class III**, and anywhere in the scene from Class IV. (Flight only while you're flying; Leaping is one leap.) Your sheet's Move shows it.
+- **Moving in a fight.** Speed, Flight and Super Leaping cover a range band in one move: **Medium (100 yd) at Class I, Long at Class II, Extreme at Class III**, and anywhere in the scene from Class IV. (Flight only while you're flying; Leaping is one leap.) Your sheet's Move shows it beside your move on foot. **A power's move is never counted in yards or hexes on the battle map**: a speedster crosses the map, and a hex grid, in a single move. When one is in the fight, switch the map to the **Super-speed fight** range track: the first lane is the fight itself, each lane out is a range band from it, and a power's move crosses as many lanes as its Class reaches. Everyone on foot stays in the near lanes and moves one lane with a run.
 - **Speed in a fight.** Class I acts first in any round. Class II adds a **second defense each round** (as the Additional Defense Edge; the two don't stack) and blows at speed. Class III: once a scene, two actions in one round. Class IV: two actions every round; Class V, three. Characters who act first go in Agility order among themselves.
 - **Blows at speed.** From Speed II, your unarmed blows hit at **one Class below your Speed**: a hundred punches in a second. Roll Brawling.
 - **Chases.** The core's *clearly faster* rule, by Class. Vehicles have a Class: **a car I, a helicopter or light plane II, a jet III, a fighter IV**. In a chase, a pursuer (or quarry) whose Speed or Flight is a higher Class than the other side's catches up (or gets away) without a roll. Equal Classes run the chase clocks as usual (see *Chases*). A lower Class needs a trick: a shortcut, a trap, a power that isn't speed.
