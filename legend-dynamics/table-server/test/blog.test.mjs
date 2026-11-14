@@ -12,7 +12,7 @@ const memory = () => {
 const call = async (s, path, body) => (await blogFetch(s, new Request("https://t" + path, body ? { method: "POST", body: JSON.stringify(body) } : {}))).json();
 
 test("a post is checked as it's saved", () => {
-  const now = Date.UTC(2026, 9, 25);
+  const now = Date.UTC(2026, 9, 25, 16);
   const p = cleanPost({ title: "  New  Edges!\u0007 ", body: "Hello\r\nworld", tags: ["Rules", "Rules", "Nonsense"] }, null, "DEV", now);
   assert.deepEqual([p.id, p.title, p.body, p.tags, p.author, p.published], ["2026-10-25-new-edges", "New Edges!", "Hello\nworld", ["Rules"], "DEV", now]);
   assert.equal(cleanPost({ title: "No body", body: "  " }, null, "DEV", now), null);
@@ -22,6 +22,7 @@ test("a post is checked as it's saved", () => {
   assert.deepEqual([e.id, e.author, e.created, e.published, e.updated], [p.id, "DEV", now, now, now + 5], "an edit keeps the id, author and dates");
   assert.ok(validId(p.id) && !validId("../x") && !validId("2026-10-25-"));
   assert.equal(postId("!!!", now), "2026-10-25-post");
+  assert.equal(postId("Late", Date.UTC(2026, 9, 26, 2)), "2026-10-25-late", "dated in New York: 10 pm Eastern is still the 25th");
   assert.ok(TAGS.includes("Aurora"));
 });
 
@@ -52,7 +53,7 @@ test("the blog's requests save, show, hide and delete posts", async () => {
 });
 
 test("playtest feedback is checked, kept newest first, limited per sender, and deleted by id", async () => {
-  const now = Date.UTC(2026, 9, 29);
+  const now = Date.UTC(2026, 9, 29, 16);
   const f = cleanFeedback({ game: "Trails of Blood & Dust", rating: 4, again: "Yes", confusing: "  Range\r\nbands ", name: "  Sam\u0007 ", rating2: 9, game2: "x" }, now, "abc123");
   assert.deepEqual([f.id, f.game, f.rating, f.again, f.confusing, f.name], ["2026-10-29-abc123", "Trails of Blood & Dust", 4, "Yes", "Range\nbands", "Sam"]);
   assert.equal(cleanFeedback({ game: "Trails of Blood & Dust", name: "Only a name" }, now, "x"), null, "it has to answer something");

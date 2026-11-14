@@ -19,7 +19,9 @@ export const LIMITS = { title: 120, body: 40_000, posts: 1000 };
 /** Text from the author: no control characters except newlines and tabs. @param {any} v @param {number} max */
 const text = (v, max) => String(v ?? "").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").slice(0, max);
 /** A post's id: its date and its title, as words. @param {string} title @param {number} now */
-export const postId = (title, now) => `${new Date(now).toISOString().slice(0, 10)}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "post"}`;
+/** The day in New York (the site's dates are Eastern time), as YYYY-MM-DD. @param {number} now */
+const easternDay = (now) => new Date(now).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+export const postId = (title, now) => `${easternDay(now)}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "post"}`;
 export const validId = (/** @type {any} */ id) => typeof id === "string" && /^\d{4}-\d{2}-\d{2}-[a-z0-9-]{1,60}$/.test(id);
 
 /**
@@ -61,7 +63,7 @@ export const FEEDBACK_AGAIN = ["Yes", "Maybe", "No"];
 export function cleanFeedback(f, now, rand) {
   const b = f && typeof f === "object" ? f : {}, line = (/** @type {any} */ v) => text(v, FEEDBACK.short).replace(/\s+/g, " ").trim();
   const long = (/** @type {any} */ v) => text(v, FEEDBACK.text).trim();
-  const out = { id: `${new Date(now).toISOString().slice(0, 10)}-${String(rand).replace(/[^a-z0-9]/g, "").slice(0, 8) || "x"}`, at: now,
+  const out = { id: `${easternDay(now)}-${String(rand).replace(/[^a-z0-9]/g, "").slice(0, 8) || "x"}`, at: now,
     game: FEEDBACK_GAMES.includes(b.game) ? b.game : "", role: line(b.role), rating: Number.isInteger(b.rating) && b.rating >= 1 && b.rating <= 5 ? b.rating : null,
     again: FEEDBACK_AGAIN.includes(b.again) ? b.again : "", confusing: long(b.confusing), unused: long(b.unused), best: long(b.best), other: long(b.other),
     name: line(b.name), contact: line(b.contact) };

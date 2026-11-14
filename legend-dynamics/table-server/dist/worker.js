@@ -218,7 +218,8 @@ var BLOG_NAME = "~blog";
 var TAGS = ["News", "Rules", "Trails of Blood & Dust", "Fracture Lines", "The Shattered Crown", "Aurora"];
 var LIMITS = { title: 120, body: 4e4, posts: 1e3 };
 var text = (v, max) => String(v ?? "").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").slice(0, max);
-var postId = (title, now) => `${new Date(now).toISOString().slice(0, 10)}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "post"}`;
+var easternDay = (now) => new Date(now).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+var postId = (title, now) => `${easternDay(now)}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "post"}`;
 var validId = (id) => typeof id === "string" && /^\d{4}-\d{2}-\d{2}-[a-z0-9-]{1,60}$/.test(id);
 function cleanPost(p, old, author, now) {
   const title = text(p && p.title, LIMITS.title).replace(/\s+/g, " ").trim(), body = text(p && p.body, LIMITS.body).trim();
@@ -251,7 +252,7 @@ function cleanFeedback(f, now, rand) {
   const b = f && typeof f === "object" ? f : {}, line = (v) => text(v, FEEDBACK.short).replace(/\s+/g, " ").trim();
   const long = (v) => text(v, FEEDBACK.text).trim();
   const out = {
-    id: `${new Date(now).toISOString().slice(0, 10)}-${String(rand).replace(/[^a-z0-9]/g, "").slice(0, 8) || "x"}`,
+    id: `${easternDay(now)}-${String(rand).replace(/[^a-z0-9]/g, "").slice(0, 8) || "x"}`,
     at: now,
     game: FEEDBACK_GAMES.includes(b.game) ? b.game : "",
     role: line(b.role),

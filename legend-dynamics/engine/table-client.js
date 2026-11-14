@@ -186,7 +186,7 @@ function mountTable(api) {
   }
 
   // ---- what it looks like ----
-  const time = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = (t) => new Date(t).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: "America/New_York", timeZoneName: "short" });
   const who = (e) => esc(e.character || e.name || e.by || "GM");
   function entryHtml(e) {
     const res = e.auto === "success" ? `natural ${e.total}: success` : e.auto === "failure" ? `natural ${e.total}: failure` : e.success ? `success by ${e.margin}` : `failure by ${-e.margin}`;

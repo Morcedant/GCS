@@ -12,7 +12,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var store = { get: function () { try { return localStorage.getItem(KEY) || ""; } catch (e) { return ""; } },
     set: function (v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} } };
-  var day = function (t) { return t ? new Date(t).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : ""; };
+  var day = function (t) { return t ? new Date(t).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "America/New_York" }) : ""; };
 
   // A small Markdown: # ## ### headings, paragraphs, - and 1. lists, > quotes, **bold**, *italic*, `code`, [links](url).
   function inline(s) {

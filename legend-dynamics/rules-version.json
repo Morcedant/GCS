@@ -1,10 +1,10 @@
 {
   "_about": "The one place for the core rules' version and change history. tools/build-website.py reads it for the core-rules page and the changelog. rulesVersion and rulesUpdated change only when the rules (mechanics) change; a website or wording update adds a 'site' entry and leaves them alone. rulesVersion is null until the author picks a numbering scheme.",
   "rulesVersion": null,
-  "rulesUpdated": "2026-11-14",
+  "rulesUpdated": "2026-11-13",
   "changes": [
     {
-      "date": "2026-11-14",
+      "date": "2026-11-13",
       "kind": "rules",
       "title": "Consistency pass: core rules and the four settings",
       "items": [
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "date": "2026-11-14",
+      "date": "2026-11-13",
       "kind": "setting",
       "title": "Aurora: Toughness boxes, and harm above Class IV",
       "items": [
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "date": "2026-11-14",
+      "date": "2026-11-13",
       "kind": "setting",
       "title": "Aurora: a telling hit gets through any Defense",
       "items": [
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "date": "2026-11-08",
+      "date": "2026-11-07",
       "kind": "site",
       "title": "Alternate forms with their own numbers",
       "items": [
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "date": "2026-11-08",
+      "date": "2026-11-07",
       "kind": "setting",
       "title": "Aurora: every notable Operant as a ready-made sheet",
       "items": [
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "date": "2026-11-08",
+      "date": "2026-11-07",
       "kind": "setting",
       "title": "Aurora: Piercing, and the neurogun",
       "items": [
@@ -139,7 +139,7 @@
       ]
     },
     {
-      "date": "2026-10-28",
+      "date": "2026-10-27",
       "kind": "setting",
       "title": "Aurora: mind powers, a Mind track and Mind Defense",
       "items": [
@@ -151,7 +151,7 @@
       ]
     },
     {
-      "date": "2026-10-28",
+      "date": "2026-10-27",
       "kind": "setting",
       "title": "Aurora: speed, flight, height and falling",
       "items": [
@@ -164,7 +164,7 @@
       ]
     },
     {
-      "date": "2026-10-28",
+      "date": "2026-10-27",
       "kind": "setting",
       "title": "Aurora: super strength, and every power's attacks in the Encounter panel",
       "items": [
@@ -175,7 +175,7 @@
       ]
     },
     {
-      "date": "2026-10-28",
+      "date": "2026-10-27",
       "kind": "setting",
       "title": "Aurora: Exposure, villains' files and team-ups",
       "items": [
@@ -186,7 +186,7 @@
       ]
     },
     {
-      "date": "2026-10-26",
+      "date": "2026-10-25",
       "kind": "setting",
       "title": "Aurora: stats for every named character",
       "items": [
@@ -260,7 +260,7 @@
       ]
     },
     {
-      "date": "2026-10-21",
+      "date": "2026-10-20",
       "kind": "rules",
       "title": "Legend cards and the price of information",
       "items": [
@@ -272,7 +272,7 @@
       ]
     },
     {
-      "date": "2026-10-21",
+      "date": "2026-10-20",
       "kind": "setting",
       "title": "Fracture Lines, Aurora and The Shattered Crown: data records, dossiers and tales",
       "items": [
@@ -283,7 +283,7 @@
       ]
     },
     {
-      "date": "2026-10-19",
+      "date": "2026-10-18",
       "kind": "setting",
       "title": "Trails of Blood & Dust: renewing a talisman",
       "items": [

@@ -7,6 +7,9 @@ Rebuilding an unchanged page keeps its stamp, so a rebuild alone never looks lik
 The page marks where the stamp goes with <!-- VERSION:START --><!-- VERSION:END -->.
 """
 import datetime, hashlib, pathlib, re
+from zoneinfo import ZoneInfo
+
+TZ = ZoneInfo("America/New_York")  # the site's dates are Eastern time
 
 START, END = "<!-- VERSION:START -->", "<!-- VERSION:END -->"
 SPAN = re.compile(re.escape(START) + r".*?" + re.escape(END), re.S)
@@ -18,7 +21,7 @@ def stamp(html, old_path=None):
     if START not in html:
         return html
     code = hashlib.sha256(SPAN.sub(START + END, html).encode()).hexdigest()[:7]
-    date = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
+    date = datetime.datetime.now(TZ).strftime("%Y.%m.%d")
     try:
         m = OLD.search(pathlib.Path(old_path).read_text()) if old_path else None
         if m and m.group(1) == code:

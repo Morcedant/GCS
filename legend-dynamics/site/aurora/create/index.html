@@ -696,7 +696,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="3f2ee94" data-version-date="2026.11.14" title="The code changes whenever this page changes.">Version 2026.11.14 · 3f2ee94</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="2f532aa" data-version-date="2026.11.13" title="The code changes whenever this page changes.">Version 2026.11.13 · 2f532aa</span><!-- VERSION:END --></div>
   </header>
 
   <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
@@ -8636,6 +8636,8 @@ return { mountLab };
   const speedOf = (c = ch) => (c.speciesId === "custom" ? c.customSpeed || 0 : heritageOf(c)?.speed || 0) + (inForm(c) ? formOf(c).speed || 0 : 0);
   // Edges: every character has a few points shared between origin tier and Edges.
   const EDGE_POINTS = PACK.edgePoints ?? 3;
+  // Today in New York, as YYYY-MM-DD: the site's dates are Eastern time.
+  const todayET = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
   const EDGE_DEFS = [
     ["attr", "+1 attribute point", "One more point to spend on attributes, within the normal maximum.", 2],
     ["skill", "Extra Trained skill", "One more Trained skill.", 3],
@@ -10335,7 +10337,7 @@ return { mountLab };
   }
   function applyAdvance(c, key, note) {
     const i = key.indexOf(":"), kind = i < 0 ? key : key.slice(0, i), id = i < 0 ? "" : key.slice(i + 1);
-    const rec = { note: note || "", date: new Date().toISOString().slice(0, 10) };
+    const rec = { note: note || "", date: todayET() };
     if (kind === "skill") {
       const from = c.skills[id]; if (!from || from === "S" || !skillOK(id, c)) return false;
       const to = from === "U" ? "T" : "S"; c.skills[id] = to;
@@ -10376,7 +10378,7 @@ return { mountLab };
     $("btn-unadvance").hidden = !ch.advances.length;
     $("btn-unearn").hidden = !ch.xp.log.length;
   }
-  const earn = (n, note) => { pointsAvail(); ch.xp.earned += n; ch.xp.log = [...ch.xp.log, { n, note, date: new Date().toISOString().slice(0, 10) }]; touch(); render(); toast(`+${n} advancement point${n > 1 ? "s" : ""}. Save to file to keep it.`); };
+  const earn = (n, note) => { pointsAvail(); ch.xp.earned += n; ch.xp.log = [...ch.xp.log, { n, note, date: todayET() }]; touch(); render(); toast(`+${n} advancement point${n > 1 ? "s" : ""}. Save to file to keep it.`); };
   $("btn-earn1").onclick = () => earn(1, `significant ${T.missionLower}`);
   $("btn-earn2").onclick = () => earn(2, "milestone");
   $("btn-unearn").onclick = () => { const e = ch.xp.log.pop(); if (e) { ch.xp.earned = Math.max(0, ch.xp.earned - e.n); touch(); render(); toast(`Took back the last award (+${e.n}).`); } };
@@ -11298,7 +11300,7 @@ function mountTable(api) {
   }
 
   // ---- what it looks like ----
-  const time = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = (t) => new Date(t).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: "America/New_York", timeZoneName: "short" });
   const who = (e) => esc(e.character || e.name || e.by || "GM");
   function entryHtml(e) {
     const res = e.auto === "success" ? `natural ${e.total}: success` : e.auto === "failure" ? `natural ${e.total}: failure` : e.success ? `success by ${e.margin}` : `failure by ${-e.margin}`;
@@ -13680,10 +13682,10 @@ function ptMaps(api, root) {
     document.querySelectorAll("[data-logadv]").forEach((sel) => {
       const c = gmCrew.find((x) => x.id === sel.dataset.logadv);
       const n = +sel.value; if (!c || !n) return;
-      pointsAvail(c); c.xp.earned += n; c.xp.log = [...c.xp.log, { n, note: title || $("log-stardate").value, date: new Date().toISOString().slice(0, 10) }];
+      pointsAvail(c); c.xp.earned += n; c.xp.log = [...c.xp.log, { n, note: title || $("log-stardate").value, date: todayET() }];
       advances.push({ name: c.name, points: n });
     });
-    missionLog.push({ id: uid(), stardate: $("log-stardate").value.trim(), title, outcome: $("log-outcome").value, notes, books: $("log-books").value.trim(), commend: $("log-commend").value.trim(), advances, date: new Date().toISOString().slice(0, 10) });
+    missionLog.push({ id: uid(), stardate: $("log-stardate").value.trim(), title, outcome: $("log-outcome").value, notes, books: $("log-books").value.trim(), commend: $("log-commend").value.trim(), advances, date: todayET() });
     store.set(STORE_LOG, missionLog); saveGM();
     ["log-title", "log-notes", "log-books", "log-commend", "log-stardate"].forEach((id) => ($(id).value = ""));
     renderGM(); renderLogBook();
@@ -13873,7 +13875,7 @@ function ptMaps(api, root) {
   function setGritty(on) { gritty = !!GRITTY && !!on; store.set(GRITTY_KEY, gritty); $("f-gritty").checked = $("gm-gritty").checked = gritty; }
   const gwEntry = (id) => GRIEVOUS.find((g) => g.id === id);
   function addWound(g) {
-    const w = { id: g.id, name: g.name, text: g.text, heal: g.heal || "", complication: !!g.complication, date: new Date().toISOString().slice(0, 10), key: uid() };
+    const w = { id: g.id, name: g.name, text: g.text, heal: g.heal || "", complication: !!g.complication, date: todayET(), key: uid() };
     ch.play.lasting = [...ch.play.lasting, w];
     return w;
   }
