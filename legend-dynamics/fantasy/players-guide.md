@@ -342,7 +342,7 @@ Roll Marksmanship for a ranged attack, Melee for a weapon in hand, or Brawling f
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
 
-Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides *what* happens instead.
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage, unless a weapon's own entry says so (a greatsword's ruinous blow, say): a great hit decides *what* happens instead.
 
 ## Telling hits
 

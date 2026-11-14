@@ -1,8 +1,19 @@
 {
   "_about": "The one place for the core rules' version and change history. tools/build-website.py reads it for the core-rules page and the changelog. rulesVersion and rulesUpdated change only when the rules (mechanics) change; a website or wording update adds a 'site' entry and leaves them alone. rulesVersion is null until the author picks a numbering scheme.",
   "rulesVersion": null,
-  "rulesUpdated": "2026-11-07",
+  "rulesUpdated": "2026-11-14",
   "changes": [
+    {
+      "date": "2026-11-14",
+      "kind": "rules",
+      "title": "Consistency pass: core rules and the four settings",
+      "items": [
+        "Core: success margin doesn't increase damage unless a weapon's own entry says so (as the core's homebrew rules and the Shattered Crown's greatweapons already allowed).",
+        "Aurora: its own scale for Operant threats (attacks 14-17, Dodge 9-14, 3-6 boxes, 7-8 for the most powerful), beside the core's guidelines for ordinary foes.",
+        "Aurora: the quick reference gives Class V and VI damage and Toughness boxes.",
+        "The creator no longer shows the creation checklist for the GM's characters (notable Operants and extras), which are built from stat blocks."
+      ]
+    },
     {
       "date": "2026-11-14",
       "kind": "setting",

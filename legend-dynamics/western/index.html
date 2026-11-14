@@ -694,7 +694,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
     <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="186bb7e" data-version-date="2026.11.14" title="The code changes whenever this page changes.">Version 2026.11.14 · 186bb7e</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="5bcc36b" data-version-date="2026.11.14" title="The code changes whenever this page changes.">Version 2026.11.14 · 5bcc36b</span><!-- VERSION:END --></div>
   </header>
 
   <div id="extra-bar" class="example-banner no-print" hidden><span>Editing the NPC <b id="extra-bar-name"></b> for the GM view: changes go to their card.</span> <button type="button" class="btn primary" id="extra-bar-done">Back to the GM view</button></div>
@@ -2110,7 +2110,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Attack quality.</strong> A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.</li>
 <li><strong>Aim.</strong> Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.</li>
 </ul>
-<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides <em>what</em> happens instead.</p>
+<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage, unless a weapon’s own entry says so (a greatsword’s ruinous blow, say): a great hit decides <em>what</em> happens instead.</p>
 <h2 id="g-telling-hits">Telling hits</h2>
 <p>A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.</p>
 <ul>
@@ -8044,6 +8044,8 @@ return { mountLab };
   const division = () => (ch.customRole ? ch.customGroup || PACK.groups[0].id : (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[0])[1]);
 
   function checks() {
+    // The GM's characters (a notable's sheet from their stat block, an extra) aren't built by the creation rules.
+    if (ch.notable || ch.extra) return [[true, `The GM's character, built from ${ch.notable ? "their stat block" : "the GM's own numbers"}: the creation rules don't apply`]];
     const sp = spent(), nS = count("S"), nT = count("T");
     const overMax = ATTRS.filter(([n]) => ch.attrs[n] > maxOf(n) || ch.attrs[n] < baseOf(n)).map(([n]) => n);
     const sAdvOk = ch.sadv.id !== "custom" || (ch.sadv.name.trim() && ch.sadv.text.trim() && ch.sadv.compName.trim() && ch.sadv.compText.trim());

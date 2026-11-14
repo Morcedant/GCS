@@ -1831,6 +1831,8 @@ tr.lvl-U td.target { color: var(--muted); }
   const division = () => (ch.customRole ? ch.customGroup || PACK.groups[0].id : (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[0])[1]);
 
   function checks() {
+    // The GM's characters (a notable's sheet from their stat block, an extra) aren't built by the creation rules.
+    if (ch.notable || ch.extra) return [[true, `The GM's character, built from ${ch.notable ? "their stat block" : "the GM's own numbers"}: the creation rules don't apply`]];
     const sp = spent(), nS = count("S"), nT = count("T");
     const overMax = ATTRS.filter(([n]) => ch.attrs[n] > maxOf(n) || ch.attrs[n] < baseOf(n)).map(([n]) => n);
     const sAdvOk = ch.sadv.id !== "custom" || (ch.sadv.name.trim() && ch.sadv.text.trim() && ch.sadv.compName.trim() && ch.sadv.compText.trim());

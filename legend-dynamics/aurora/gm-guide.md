@@ -274,6 +274,8 @@ A team uses the tranquilizers, neuroguns and the net on the subject, and the fle
 
 Some of them (Steel Hawk, Vanguard, Zephyr) can be enemies or uneasy allies, as the campaign needs.
 
+**Operants on the scale.** Super-powered threats go past the core's limits for ordinary foes (see *Threats, weapons and Edges for your table*). The book's Operants attack at **14 to 17** with Dodge **9 to 12** (13 or 14 for a speedster), and have **3 to 6 boxes**; 7 or 8 belong only to the most powerful people in the world, like Grachyov, Autuarch and the Atomic Man. Their Defense is usually a Class or two below their best power. Their powers can also mark more than the core's 4 boxes: Class V marks 4 and Class VI marks 5 against anyone with more than 3 boxes (see *Damage* in Using powers). The ordinary people around them (police, soldiers, agents) keep the core's numbers.
+
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box, or raise a power one Class; for a weaker one, subtract.
 
 # Dossiers
