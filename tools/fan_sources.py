@@ -1,5 +1,6 @@
-"""Where the fan games' files come from. USS Pelion lives on this branch; Grimm is built on claude/grimm-wild-west,
-so its files are read from that branch (this branch's grimm-west/ is an old copy, used only if the branch is missing).
+"""Where the fan games' files come from. Both are setting packs on this branch (fan-games/packs/), built by
+tools/build-legend.py. Grimm used to be built on claude/grimm-wild-west; its files are read from that branch only if
+its pack isn't here.
 """
 import os
 import subprocess
@@ -11,7 +12,8 @@ BRANCHES = {"grimm-west/": os.environ.get("GRIMM_BRANCH", "origin/claude/grimm-w
 
 def read_bytes(rel):
     for prefix, branch in BRANCHES.items():
-        if rel.startswith(prefix):
+        # Grimm rebuilt as a setting pack (fan-games/packs/grimm-west) is built on this branch: read it here.
+        if rel.startswith(prefix) and not (ROOT / "fan-games" / "packs" / prefix.rstrip("/") / "pack.json").exists():
             r = subprocess.run(["git", "-C", str(ROOT), "show", f"{branch}:{rel}"], capture_output=True)
             if r.returncode == 0:
                 return r.stdout

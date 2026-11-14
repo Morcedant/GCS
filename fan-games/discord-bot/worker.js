@@ -1058,207 +1058,46 @@ export const PACKS = {
     ]
    }
   ],
-  "seeds": {
-   "mission": [
-    "Case",
-    [
-     "A Grimm's grave robbed",
-     "The Wesen Council summons you",
-     "A body torn apart at the edge of town",
-     "A stagecoach that never arrived",
-     "Livestock slaughtered in the night",
-     "A child gone missing",
-     "A miner raving about monsters",
-     "A bounty on a man who isn't a man",
-     "Travelers vanishing on the trail",
-     "A traveling medicine show",
-     "A new preacher packs the church",
-     "A cattle drive spooked by something",
-     "A hanging that went wrong",
-     "A Wesen asks for help",
-     "A Royal's child goes missing",
-     "A town where everyone is Wesen"
-    ]
-   ],
-   "place": [
-    "Place",
-    [
-     "A Royal Family's estate",
-     "A Wesen fight ring under a church",
-     "A silver boomtown",
-     "A logging camp in the deep woods",
-     "A river steamboat",
-     "The railroad's end-of-track camp",
-     "A lonely homestead",
-     "A ghost town",
-     "A mission church",
-     "A saloon and gambling hall",
-     "A frontier fort",
-     "A fog-bound waterfront",
-     "A canyon ranch",
-     "A snowbound mountain pass",
-     "A Grimm's hidden library",
-     "An abandoned asylum"
-    ]
-   ],
-   "strange": [
-    "The hidden world",
-    [
-     "A Hexenbiest queen",
-     "The Wesen Council itself",
-     "A Wendigo that has acquired the taste",
-     "A Blutbad pack that's gone back to the hunt",
-     "A Siegbarste whom bullets barely trouble",
-     "A Mauvais Dentes, sent by a Royal Family",
-     "A Spinnetod keeping herself young",
-     "Geier selling organs to the highest bidder",
-     "A Hexenbiest's curse",
-     "A Ziegevolk swindler with half the town in thrall",
-     "A Löwen fight ring",
-     "A Hässlich demanding tolls at a bridge",
-     "A Brotherhood of the Holy Earth rite against the railroad",
-     "A Golden Dawn magician's working gone wrong",
-     "A Grimm gone bad",
-     "A Zauberbiest's working"
-    ]
-   ],
-   "twist": [
-    "Twist",
-    [
-     "A character has Wesen blood",
-     "The Grimm is the target",
-     "The victim was the monster",
-     "The law is in on it",
-     "Two Wesen clans are feuding",
-     "The Wesen Council wants it hushed up",
-     "A Royal Family's agent is behind it",
-     "A character's complication comes into play",
-     "The Wesen is protecting its family",
-     "A human is using the Wesen",
-     "The town wants a hanging, any hanging",
-     "The Order of the Holy Knife arrives to cleanse",
-     "Another Grimm hunts the same quarry",
-     "The trail leads to someone a character loves",
-     "The Royals want it to happen",
-     "The Council wanted the Grimm to find it"
-    ]
-   ],
-   "clock": [
-    "Ticking clock",
-    [
-     [
-      "The Royals arrive",
-      6
-     ],
-     [
-      "The full moon",
-      4
-     ],
-     [
-      "The mob forms",
-      6
-     ],
-     [
-      "Nightfall",
-      4
-     ],
-     [
-      "The next victim",
-      6
-     ],
-     [
-      "The stage leaves town",
-      4
-     ],
-     [
-      "The Reapers arrive",
-      6
-     ],
-     [
-      "The river floods",
-      8
-     ],
-     [
-      "The trail goes cold",
-      4
-     ],
-     [
-      "The hanging at dawn",
-      4
-     ],
-     [
-      "The newspaper prints the story",
-      8
-     ],
-     [
-      "The fire spreads",
-      4
-     ],
-     [
-      "The Wesen flees the territory",
-      6
-     ],
-     [
-      "The snows close the pass",
-      8
-     ],
-     [
-      "The Reapers' deadline",
-      4
-     ],
-     [
-      "The Council's verdict",
-      6
-     ]
-    ]
-   ],
-   "who": [
-    "Key character",
-    [
-     "A Royal heir in hiding",
-     "A Grimm's long-lost sibling",
-     "A sheriff who wants it simple",
-     "A widow who knows more than she says",
-     "A traveling doctor",
-     "A Pinkerton detective",
-     "A railroad baron",
-     "A frightened Eisbiber family",
-     "A Blutbad trying to stay clean",
-     "A child who saw the woge",
-     "A preacher with a past",
-     "A newspaperman who's close to the truth",
-     "An Incantare who needs protection",
-     "A dying Grimm with a last request",
-     "A Wesen Council judge",
-     "A Hexenbiest who wants out"
-    ]
-   ]
-  }
+  "seeds": {}
  },
  "pelion": {
   "id": "pelion",
   "title": "USS Pelion",
   "point": "Duty",
   "mission": "Mission",
-  "trackTitle": "Ship status",
+  "trackTitle": "The USS Pelion and Starfleet Command",
   "tracks": [
    {
-    "name": "Shields",
-    "boxes": 3,
+    "name": "Starfleet Command",
+    "boxes": 4,
     "effects": [
-     "Up",
-     "Weakened",
-     "Failing",
-     "Down: hits go to Hull and a system"
+     "Command isn't asking",
+     "Questions in the next report",
+     "A formal inquiry: an admiral wants a full account",
+     "Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials",
+     "A board of inquiry: start a Hearing clock"
+    ]
+   },
+   {
+    "name": "Shields",
+    "boxes": 5,
+    "effects": [
+     "Full",
+     "4 of 5 left",
+     "3 of 5 left",
+     "2 of 5 left",
+     "1 of 5 left",
+     "Down: hits go to the Hull"
     ]
    },
    {
     "name": "Hull",
-    "boxes": 4,
+    "boxes": 5,
     "effects": [
      "Intact",
      "Scarred",
-     "Minor breaches",
+     "Minor breaches, sealed",
+     "Serious breaches, decks lost",
      "Serious breaches, decks lost",
      "Breaking up: start an Abandon ship clock"
     ]
@@ -1321,17 +1160,6 @@ export const PACKS = {
      "Damaged: −2",
      "Crippled: −4, basic function only",
      "Offline"
-    ]
-   },
-   {
-    "name": "Starfleet Command",
-    "boxes": 4,
-    "effects": [
-     "Command isn't asking",
-     "Questions in the next report",
-     "A formal inquiry: an admiral wants a full account",
-     "Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials",
-     "A board of inquiry: start a Hearing clock"
     ]
    }
   ],

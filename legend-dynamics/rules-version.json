@@ -5,6 +5,17 @@
   "changes": [
     {
       "date": "2026-11-13",
+      "kind": "site",
+      "title": "USS Pelion and Grimm on the shared rules",
+      "items": [
+        "Both fan games are rebuilt on the shared character creator and the current core rules, like the four settings: what changes in the core now reaches them too.",
+        "Species and heritages follow the core: bonuses only, nobody starts below 10; ready-made characters are refit to match (each keeps their best attribute). USS Pelion's crew now spend 3 Edges.",
+        "Pelion keeps its phaser power and settings, the ship's systems, Power, Torpedoes and the concussive damage roll, its ranks, the Starfleet Command track and library records; Grimm keeps the woge, its Wesen and Lenses, spells, rituals and charms, and its Trouble tracks, and gains lore cards.",
+        "What a player saved in the old pages carries over, and old character files still load."
+      ]
+    },
+    {
+      "date": "2026-11-13",
       "kind": "setting",
       "title": "Aurora: super-speed by range band, and one Fallout track",
       "items": [

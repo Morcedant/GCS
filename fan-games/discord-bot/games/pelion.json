@@ -3,26 +3,40 @@
  "title": "USS Pelion",
  "point": "Duty",
  "mission": "Mission",
- "trackTitle": "Ship status",
+ "trackTitle": "The USS Pelion and Starfleet Command",
  "seedsFrom": "uss-pelion/index.html",
  "tracks": [
   {
-   "name": "Shields",
-   "boxes": 3,
+   "name": "Starfleet Command",
+   "boxes": 4,
    "effects": [
-    "Up",
-    "Weakened",
-    "Failing",
-    "Down: hits go to Hull and a system"
+    "Command isn't asking",
+    "Questions in the next report",
+    "A formal inquiry: an admiral wants a full account",
+    "Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials",
+    "A board of inquiry: start a Hearing clock"
+   ]
+  },
+  {
+   "name": "Shields",
+   "boxes": 5,
+   "effects": [
+    "Full",
+    "4 of 5 left",
+    "3 of 5 left",
+    "2 of 5 left",
+    "1 of 5 left",
+    "Down: hits go to the Hull"
    ]
   },
   {
    "name": "Hull",
-   "boxes": 4,
+   "boxes": 5,
    "effects": [
     "Intact",
     "Scarred",
-    "Minor breaches",
+    "Minor breaches, sealed",
+    "Serious breaches, decks lost",
     "Serious breaches, decks lost",
     "Breaking up: start an Abandon ship clock"
    ]
@@ -85,17 +99,6 @@
     "Damaged: −2",
     "Crippled: −4, basic function only",
     "Offline"
-   ]
-  },
-  {
-   "name": "Starfleet Command",
-   "boxes": 4,
-   "effects": [
-    "Command isn't asking",
-    "Questions in the next report",
-    "A formal inquiry: an admiral wants a full account",
-    "Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials",
-    "A board of inquiry: start a Hearing clock"
    ]
   }
  ],

@@ -4,8 +4,8 @@ With GM_GUIDES_OPEN, each page carries its GM's Guide like the Players' Guide. W
 
 A game's build writes its GM's Guide to <game folder>/gm-guide.json and puts an empty, locked book in the page;
 bundle() gathers every game's gm-guide.json into legend-dynamics/table-server/src/gm-guides.js, which the
-server hands out to a GM whose access code checks out (POST /api/gm/guide). Grimm's guide comes from the
-claude/grimm-wild-west branch, where Grimm is built (tools/fan_sources.py).
+server hands out to a GM whose access code checks out (POST /api/gm/guide). The fan games' guides are built on this
+branch too (fan-games/packs/; tools/fan_sources.py).
 
   python3 tools/gm_guides.py      rebuild the server's bundle from the gm-guide.json files
 """
