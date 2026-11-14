@@ -305,3 +305,22 @@ test("rivals: memory, alliances that pull allies into wars, and messages in thei
   for (let i = 0; i < 120; i++) { u.turn = 10 + i * 4; envoysTurn(u); for (let e; (e = currentEnvoy(u)); seen++) assert.ok(answerEnvoy(u, e.options[i % e.options.length].id).ok); }
   assert.ok(seen >= 5, `messages: ${seen}`);
 });
+
+test("a siege: warships in orbit knock out a world's guns, the guns stay down while the fleet holds the orbit, and the troops land", () => {
+  const s = newGame({ seed: 4, size: "small", player: "hegemony", rivals: 1 });
+  const foe = s.factions[1].id, cap = coloniesOf(s, foe).find((x) => x.colony.capital);
+  cap.colony.buildings.battery = true; cap.colony.defense = 3;
+  declareWar(s, "hegemony", foe);
+  const fleet = spawnFleet(s, "hegemony", cap.at, ["cruiser", "cruiser", "cruiser", "cruiser", "frigate", "frigate"]);
+  let open = false;
+  for (let t = 0; t < 6 && !open; t++) { endTurn(s); open = !!fleet.ships.length && s.fleets[fleet.id] && !invasionOdds(s, fleet.id).guarded; }
+  assert.ok(open, "the guns are down and stay down at the start of a turn while the fleet holds the orbit");
+  assert.equal(cap.colony.defense, 0);
+  const t = spawnFleet(s, "hegemony", cap.at, Array(8).fill("transport"));
+  const o = invasionOdds(s, t.id);
+  assert.ok(!o.guarded && o.troops >= o.defense, `troops ${o.troops} against ${o.defense}`);
+  assert.ok(invade(s, t.id).taken);
+  // Once the fleet leaves (or the siege ends), a world's guns come back a point a turn.
+  const w = Object.values(s.systems).find((x) => x.colony && x.colony.owner === "hegemony" && x !== cap);
+  if (w) { w.colony.buildings.battery = true; w.colony.defense = 0; endTurn(s); assert.ok(w.colony.defense >= 1, "an unbesieged world repairs its guns"); }
+});

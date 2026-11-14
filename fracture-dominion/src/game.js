@@ -369,6 +369,8 @@ export function invasionOdds(s, fleetId) {
   const defense = sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0);
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner) };
 }
+/** An enemy at war with a world's owner has warships in its orbit. */
+export const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && atWar(s, f.owner, sys.colony.owner));
 export function guarded(s, sys, attacker) {
   return (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0
     || fleetsAt(s, sys.at).some((o) => o.owner === sys.colony.owner && armed(o));
@@ -379,7 +381,7 @@ export function invade(s, fleetId) {
   const sys = s.systems[s.sysAt[f.at]], def = sys.colony.owner;
   if (!atWar(s, f.owner, def)) return { error: "You're not at war with them." };
   if (!o.troops) return { error: "This fleet carries no troops." };
-  if (o.guarded) return { error: "Its defenses still hold the orbit: destroy them first." };
+  if (o.guarded) return { error: "Its defenses still hold the orbit: destroy them first. Keep warships in orbit through the end of the turn; under siege, its guns stay down." };
   f.ships = f.ships.filter((x) => x.type !== "transport");
   if (!f.ships.length) dropFleet(s, f);
   if (o.troops >= o.defense) {
@@ -679,7 +681,9 @@ function economy(s, F) {
       else c.growth = 0;
     }
     const maxDef = (c.buildings.battery ? 3 : c.capital ? 2 : 0) + ((c.buildings.battery || c.capital) && proto(s, F.id, "grid") ? 1 : 0);
-    if (c.defense < maxDef) c.defense = Math.min(maxDef, c.defense + 1);
+    // A world under siege (an enemy's warships in its orbit) can't repair its guns: the battle at the end of a turn knocks
+    // them out, and they stay out for the attacker's next turn, so the troops can land.
+    if (c.defense < maxDef && !besieged(s, sys)) c.defense = Math.min(maxDef, c.defense + 1);
   }
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {

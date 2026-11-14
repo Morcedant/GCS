@@ -195,7 +195,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-05 23:08 UTC";
+const BUILD = "2026-11-14 17:46 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -933,6 +933,8 @@ function invasionOdds(s, fleetId) {
   const defense = sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0);
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner) };
 }
+/** An enemy at war with a world's owner has warships in its orbit. */
+const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && atWar(s, f.owner, sys.colony.owner));
 function guarded(s, sys, attacker) {
   return (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0
     || fleetsAt(s, sys.at).some((o) => o.owner === sys.colony.owner && armed(o));
@@ -943,7 +945,7 @@ function invade(s, fleetId) {
   const sys = s.systems[s.sysAt[f.at]], def = sys.colony.owner;
   if (!atWar(s, f.owner, def)) return { error: "You're not at war with them." };
   if (!o.troops) return { error: "This fleet carries no troops." };
-  if (o.guarded) return { error: "Its defenses still hold the orbit: destroy them first." };
+  if (o.guarded) return { error: "Its defenses still hold the orbit: destroy them first. Keep warships in orbit through the end of the turn; under siege, its guns stay down." };
   f.ships = f.ships.filter((x) => x.type !== "transport");
   if (!f.ships.length) dropFleet(s, f);
   if (o.troops >= o.defense) {
@@ -1243,7 +1245,9 @@ function economy(s, F) {
       else c.growth = 0;
     }
     const maxDef = (c.buildings.battery ? 3 : c.capital ? 2 : 0) + ((c.buildings.battery || c.capital) && proto(s, F.id, "grid") ? 1 : 0);
-    if (c.defense < maxDef) c.defense = Math.min(maxDef, c.defense + 1);
+    // A world under siege (an enemy's warships in its orbit) can't repair its guns: the battle at the end of a turn knocks
+    // them out, and they stay out for the attacker's next turn, so the troops can land.
+    if (c.defense < maxDef && !besieged(s, sys)) c.defense = Math.min(maxDef, c.defense + 1);
   }
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {
@@ -2632,7 +2636,7 @@ function fleetHTML() {
     const war = atWar(S, me.id, sys.colony.owner);
     const tr = f.ships.filter((x) => x.type === "transport").length, per = shipStats(S, me.id, "transport").troops;
     const defParts = sys.colony.kind === "outpost" ? "an outpost: 0.5" : `population ${sys.colony.pop} × ${RULES.troopDefensePerPop}${sys.colony.capital ? " + 2 for a capital" : ""}`;
-    h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit." : ""}${!war ? " You're not at war with them." : ""}<\/p>
+    h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit. Keep warships here: the battle at the end of the turn knocks the guns out, and a world under siege can't repair them, so you can land next turn." : ""}${!war ? " You're not at war with them." : ""}<\/p>
       <p class="small muted" style="margin-top:-4px">Troops: ${tr} transport${tr === 1 ? "" : "s"} × ${per} = ${o.troops}. Defense: ${defParts} = ${o.defense}. ${o.troops >= o.defense ? "<b class=\"good\">Enough: the landing takes it.<\/b>" : `<b class="bad">Not enough: ${fmt(o.defense - o.troops)} more troops needed, or the transports are lost.<\/b>`}<\/p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops<\/button>`;
   }
   const others = fleetsAt(S, f.at).filter((o) => o.owner === me.id && o.id !== f.id);
