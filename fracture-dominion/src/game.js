@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, MARKET, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -220,6 +220,8 @@ export function yields(s, sys) {
     ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
     const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
     if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
+    cr += tradeIncome(s, sys);
+    if (besieged(s, sys)) { ind *= SIEGE.industry; cr *= SIEGE.credits; }   // blockaded
   } else cr = 0.5;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
@@ -362,12 +364,51 @@ export function settle(s, fleetId) {
 function noticeSettling(s, fid, sys) {
   for (const o of s.factions) if (o.id !== fid && o.alive && coloniesOf(s, o.id).some((x) => distance(x.at, sys.at) <= 4)) remember(s, o.id, fid, `settled ${sys.name}, close to our worlds`, o.id === "kel" ? -12 : -8);
 }
+// ---- trade ----
+/** A colony's trade partners: other colonies within range, its own power's or a treaty partner's, neither blockaded. */
+export function tradeLinks(s, sys) {
+  const c = sys.colony; if (!c || c.kind !== "colony" || besieged(s, sys)) return [];
+  const F = faction(s, c.owner), ok = (o) => o === c.owner || !!(F.relations[o] && F.relations[o].treaty);
+  return Object.values(s.systems).filter((x) => x !== sys && x.colony && x.colony.kind === "colony" && ok(x.colony.owner)
+    && distance(x.at, sys.at) <= TRADE.range && !besieged(s, x)).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at)).slice(0, TRADE.maxLinks);
+}
+export function tradeIncome(s, sys) {
+  const n = tradeLinks(s, sys).length; if (!n) return 0;
+  return n * TRADE.perLink * (sys.colony.buildings.market ? TRADE.exchange : 1);
+}
+// ---- the exotics market ----
+export const marketPrice = (s) => Math.round(s.market ? s.market.price : MARKET.base);
+export const sellPrice = (s) => Math.max(1, Math.floor(marketPrice(s) * MARKET.sellRate));
+const hasExchange = (s, fid) => coloniesOf(s, fid).some((x) => x.colony.buildings.market);
+/** Buy (n > 0) or sell (n < 0) exotics, one unit at a time: each moves the price. Needs an Exchange somewhere. */
+export function tradeExotics(s, fid, n) {
+  const F = faction(s, fid); s.market = s.market || { price: MARKET.base };
+  if (!hasExchange(s, fid)) return { error: "You need an Exchange on one of your worlds to deal on the market." };
+  let done = 0, credits = 0;
+  for (let i = 0; i < Math.abs(n); i++) {
+    if (n > 0) { const p = marketPrice(s); if (F.credits < p) break; F.credits -= p; F.exotics += 1; credits -= p; s.market.price = Math.min(MARKET.max, s.market.price + MARKET.step); }
+    else { if (F.exotics < 1) break; const p = sellPrice(s); F.exotics -= 1; F.credits += p; credits += p; s.market.price = Math.max(MARKET.min, s.market.price - MARKET.step); }
+    done++;
+  }
+  if (!done) return { error: n > 0 ? "Not enough credits." : "No exotics to sell." };
+  F.credits = round1(F.credits);
+  return { ok: true, units: done, credits };
+}
+// ---- sieges ----
+/** How far a long siege has worn down a world's garrison: 1 at the start, down to SIEGE.garrisonMin. */
+export const garrisonFactor = (sys) => Math.max(SIEGE.garrisonMin, 1 - SIEGE.garrisonPerTurn * ((sys.colony && sys.colony.siege) || 0));
+/** The besieger who would take a world's surrender: the power with the most warships in its orbit. */
+function besiegerOf(s, sys) {
+  const n = {};
+  for (const f of fleetsAt(s, sys.at)) if (armed(f) && atWar(s, f.owner, sys.colony.owner) && f.owner !== "wardens") n[f.owner] = (n[f.owner] || 0) + f.ships.filter((x) => SHIPS[x.type].skill > 0).length;
+  return Object.entries(n).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+}
 export function invasionOdds(s, fleetId) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
   if (!sys || !sys.colony || sys.colony.owner === f.owner) return null;
   const troops = f.ships.filter((x) => x.type === "transport").reduce((t, x) => t + shipStats(s, f.owner, "transport").troops, 0);
-  const defense = sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0);
-  return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner) };
+  const defense = (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0)) * garrisonFactor(sys);
+  return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
 export const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && atWar(s, f.owner, sys.colony.owner));
@@ -639,6 +680,8 @@ export function endTurn(s, aiTurn) {
   moveFleets(s);
   battles(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
+  // The exotics market drifts back toward its usual price.
+  if (s.market) s.market.price += Math.sign(MARKET.base - s.market.price) * Math.min(MARKET.drift, Math.abs(MARKET.base - s.market.price));
   for (const F of s.factions) if (F.alive) updateVision(s, F);
   // Relations drift: borders rub, trade warms, wars wear on everyone.
   for (const A of s.factions) for (const [bid, r] of Object.entries(A.relations)) {
@@ -709,15 +752,29 @@ function economy(s, F) {
         }
       }
       c.stock = Math.min(c.stock, 40); // a world can only stockpile so much
-      // Growth.
+      // Growth (nothing grows under siege).
       const max = maxPop(s, sys);
-      if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
+      if (besieged(s, sys)) { /* the blockade: no growth */ }
+      else if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
       else c.growth = 0;
     }
     const maxDef = (c.buildings.battery ? 3 : c.capital ? 2 : 0) + ((c.buildings.battery || c.capital) && proto(s, F.id, "grid") ? 1 : 0);
     // A world under siege (an enemy's warships in its orbit) can't repair its guns: the battle at the end of a turn knocks
     // them out, and they stay out for the attacker's next turn, so the troops can land.
     if (c.defense < maxDef && !besieged(s, sys)) c.defense = Math.min(maxDef, c.defense + 1);
+    // The siege, counted in turns: hunger every few turns, and at last an ordinary colony's surrender.
+    if (besieged(s, sys)) {
+      c.siege = (c.siege || 0) + 1;
+      const by = besiegerOf(s, sys);
+      if (c.kind === "colony" && c.siege % SIEGE.starveEvery === 0 && c.pop > 1) {
+        c.pop--; log(s, F.id, `${sys.name} is starving under the siege: its population falls to ${c.pop}.`, "war");
+        if (by) log(s, by, `${sys.name} is starving under your siege: its population falls to ${c.pop}.`, "war");
+      }
+      if (by && !c.capital && c.siege >= SIEGE.surrenderAfter && (c.kind !== "colony" || c.pop <= SIEGE.surrenderPop)) {
+        log(s, by, `${sys.name} surrendered after ${c.siege} turns of siege.`, "war");
+        capture(s, sys, by); c.siege = 0;
+      }
+    } else c.siege = 0;
   }
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {

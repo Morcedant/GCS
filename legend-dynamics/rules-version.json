@@ -4,6 +4,17 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-15",
+      "kind": "site",
+      "title": "Dominion: trade, an exotics market, and real sieges",
+      "items": [
+        "Trade: each colony earns credits from trade links, other colonies within 4 hexes that are yours or a treaty partner's; an Exchange doubles it.",
+        "An exotics market (with an Exchange): buy at the price, sell for three quarters of it; every unit moves the price, which drifts back.",
+        "Sieges have a cost: a besieged world makes half its industry and credits, trades and grows nothing, loses a population every 3 turns, and its garrison weakens toward half, so landings get easier. After 10 turns an ordinary colony starved to 3 population surrenders; a capital never does.",
+        "The computer powers send fleets to break sieges of their worlds, and use the market. In all-computer games worlds now change hands (5 to 8 in a typical war), by landings and surrenders."
+      ]
+    },
+    {
       "date": "2026-11-14",
       "kind": "site",
       "title": "A Difficulty setting for the GM",

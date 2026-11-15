@@ -132,6 +132,15 @@ export const STANCES = {
 };
 /** Fleets out of supply (farther than this from every world and outpost of theirs) wear down. */
 export const SUPPLY = { range: 3, graceTurns: 1 };
+// Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
+// partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
+export const TRADE = { range: 4, perLink: 0.5, maxLinks: 4, exchange: 2 };
+// Sieges: an enemy's warships in a world's orbit. Each turn of it the world's industry and credits are halved and it
+// grows nothing; every few turns it loses a population; its garrison weakens; an ordinary colony, starved down to a
+// few millions, surrenders at last.
+export const SIEGE = { industry: 0.5, credits: 0.5, starveEvery: 3, garrisonPerTurn: 0.1, garrisonMin: 0.5, surrenderAfter: 10, surrenderPop: 3 };
+// The exotics market: buy at the price, sell at three quarters of it; each unit moves the price, which drifts back.
+export const MARKET = { base: 12, step: 1, min: 4, max: 30, drift: 1, sellRate: 0.75 };
 /** The late-game crisis: when the Wardens wake, and how hard they come. */
 export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };

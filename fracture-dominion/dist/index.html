@@ -195,7 +195,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-14 17:55 UTC";
+const BUILD = "2026-11-15 16:10 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -397,6 +397,15 @@ const STANCES = {
 };
 /** Fleets out of supply (farther than this from every world and outpost of theirs) wear down. */
 const SUPPLY = { range: 3, graceTurns: 1 };
+// Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
+// partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
+const TRADE = { range: 4, perLink: 0.5, maxLinks: 4, exchange: 2 };
+// Sieges: an enemy's warships in a world's orbit. Each turn of it the world's industry and credits are halved and it
+// grows nothing; every few turns it loses a population; its garrison weakens; an ordinary colony, starved down to a
+// few millions, surrenders at last.
+const SIEGE = { industry: 0.5, credits: 0.5, starveEvery: 3, garrisonPerTurn: 0.1, garrisonMin: 0.5, surrenderAfter: 10, surrenderPop: 3 };
+// The exotics market: buy at the price, sell at three quarters of it; each unit moves the price, which drifts back.
+const MARKET = { base: 12, step: 1, min: 4, max: 30, drift: 1, sellRate: 0.75 };
 /** The late-game crisis: when the Wardens wake, and how hard they come. */
 const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
@@ -784,6 +793,8 @@ function yields(s, sys) {
     ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
     const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
     if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
+    cr += tradeIncome(s, sys);
+    if (besieged(s, sys)) { ind *= SIEGE.industry; cr *= SIEGE.credits; }   // blockaded
   } else cr = 0.5;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
@@ -926,12 +937,51 @@ function settle(s, fleetId) {
 function noticeSettling(s, fid, sys) {
   for (const o of s.factions) if (o.id !== fid && o.alive && coloniesOf(s, o.id).some((x) => distance(x.at, sys.at) <= 4)) remember(s, o.id, fid, `settled ${sys.name}, close to our worlds`, o.id === "kel" ? -12 : -8);
 }
+// ---- trade ----
+/** A colony's trade partners: other colonies within range, its own power's or a treaty partner's, neither blockaded. */
+function tradeLinks(s, sys) {
+  const c = sys.colony; if (!c || c.kind !== "colony" || besieged(s, sys)) return [];
+  const F = faction(s, c.owner), ok = (o) => o === c.owner || !!(F.relations[o] && F.relations[o].treaty);
+  return Object.values(s.systems).filter((x) => x !== sys && x.colony && x.colony.kind === "colony" && ok(x.colony.owner)
+    && distance(x.at, sys.at) <= TRADE.range && !besieged(s, x)).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at)).slice(0, TRADE.maxLinks);
+}
+function tradeIncome(s, sys) {
+  const n = tradeLinks(s, sys).length; if (!n) return 0;
+  return n * TRADE.perLink * (sys.colony.buildings.market ? TRADE.exchange : 1);
+}
+// ---- the exotics market ----
+const marketPrice = (s) => Math.round(s.market ? s.market.price : MARKET.base);
+const sellPrice = (s) => Math.max(1, Math.floor(marketPrice(s) * MARKET.sellRate));
+const hasExchange = (s, fid) => coloniesOf(s, fid).some((x) => x.colony.buildings.market);
+/** Buy (n > 0) or sell (n < 0) exotics, one unit at a time: each moves the price. Needs an Exchange somewhere. */
+function tradeExotics(s, fid, n) {
+  const F = faction(s, fid); s.market = s.market || { price: MARKET.base };
+  if (!hasExchange(s, fid)) return { error: "You need an Exchange on one of your worlds to deal on the market." };
+  let done = 0, credits = 0;
+  for (let i = 0; i < Math.abs(n); i++) {
+    if (n > 0) { const p = marketPrice(s); if (F.credits < p) break; F.credits -= p; F.exotics += 1; credits -= p; s.market.price = Math.min(MARKET.max, s.market.price + MARKET.step); }
+    else { if (F.exotics < 1) break; const p = sellPrice(s); F.exotics -= 1; F.credits += p; credits += p; s.market.price = Math.max(MARKET.min, s.market.price - MARKET.step); }
+    done++;
+  }
+  if (!done) return { error: n > 0 ? "Not enough credits." : "No exotics to sell." };
+  F.credits = round1(F.credits);
+  return { ok: true, units: done, credits };
+}
+// ---- sieges ----
+/** How far a long siege has worn down a world's garrison: 1 at the start, down to SIEGE.garrisonMin. */
+const garrisonFactor = (sys) => Math.max(SIEGE.garrisonMin, 1 - SIEGE.garrisonPerTurn * ((sys.colony && sys.colony.siege) || 0));
+/** The besieger who would take a world's surrender: the power with the most warships in its orbit. */
+function besiegerOf(s, sys) {
+  const n = {};
+  for (const f of fleetsAt(s, sys.at)) if (armed(f) && atWar(s, f.owner, sys.colony.owner) && f.owner !== "wardens") n[f.owner] = (n[f.owner] || 0) + f.ships.filter((x) => SHIPS[x.type].skill > 0).length;
+  return Object.entries(n).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+}
 function invasionOdds(s, fleetId) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
   if (!sys || !sys.colony || sys.colony.owner === f.owner) return null;
   const troops = f.ships.filter((x) => x.type === "transport").reduce((t, x) => t + shipStats(s, f.owner, "transport").troops, 0);
-  const defense = sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0);
-  return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner) };
+  const defense = (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0)) * garrisonFactor(sys);
+  return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
 const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && atWar(s, f.owner, sys.colony.owner));
@@ -1203,6 +1253,8 @@ function endTurn(s, aiTurn) {
   moveFleets(s);
   battles(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
+  // The exotics market drifts back toward its usual price.
+  if (s.market) s.market.price += Math.sign(MARKET.base - s.market.price) * Math.min(MARKET.drift, Math.abs(MARKET.base - s.market.price));
   for (const F of s.factions) if (F.alive) updateVision(s, F);
   // Relations drift: borders rub, trade warms, wars wear on everyone.
   for (const A of s.factions) for (const [bid, r] of Object.entries(A.relations)) {
@@ -1273,15 +1325,29 @@ function economy(s, F) {
         }
       }
       c.stock = Math.min(c.stock, 40); // a world can only stockpile so much
-      // Growth.
+      // Growth (nothing grows under siege).
       const max = maxPop(s, sys);
-      if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
+      if (besieged(s, sys)) { /* the blockade: no growth */ }
+      else if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
       else c.growth = 0;
     }
     const maxDef = (c.buildings.battery ? 3 : c.capital ? 2 : 0) + ((c.buildings.battery || c.capital) && proto(s, F.id, "grid") ? 1 : 0);
     // A world under siege (an enemy's warships in its orbit) can't repair its guns: the battle at the end of a turn knocks
     // them out, and they stay out for the attacker's next turn, so the troops can land.
     if (c.defense < maxDef && !besieged(s, sys)) c.defense = Math.min(maxDef, c.defense + 1);
+    // The siege, counted in turns: hunger every few turns, and at last an ordinary colony's surrender.
+    if (besieged(s, sys)) {
+      c.siege = (c.siege || 0) + 1;
+      const by = besiegerOf(s, sys);
+      if (c.kind === "colony" && c.siege % SIEGE.starveEvery === 0 && c.pop > 1) {
+        c.pop--; log(s, F.id, `${sys.name} is starving under the siege: its population falls to ${c.pop}.`, "war");
+        if (by) log(s, by, `${sys.name} is starving under your siege: its population falls to ${c.pop}.`, "war");
+      }
+      if (by && !c.capital && c.siege >= SIEGE.surrenderAfter && (c.kind !== "colony" || c.pop <= SIEGE.surrenderPop)) {
+        log(s, by, `${sys.name} surrendered after ${c.siege} turns of siege.`, "war");
+        capture(s, sys, by); c.siege = 0;
+      }
+    } else c.siege = 0;
   }
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {
@@ -2224,6 +2290,10 @@ function production(s, F, diff) {
     const i = f.ships.findIndex((y) => y.type === "frigate"); f.ships.splice(i >= 0 ? i : f.ships.findIndex((y) => SHIPS[y.type].skill), 1);
     if (!f.ships.length) dropFleet(s, f);
   }
+  // The exotics market: sell a surplus when short of credits; buy what a waiting build needs when flush.
+  if (F.exotics > 8 && F.credits < 30) tradeExotics(s, F.id, -3);
+  const waitingFor = Math.max(0, ...coloniesOf(s, F.id).flatMap((c) => c.colony.queue.filter((q) => q.waiting).map((q) => (q.exotics || 0) - F.exotics)));
+  if (waitingFor > 0 && F.credits > marketPrice(s) * waitingFor + 40) tradeExotics(s, F.id, waitingFor);
   const cols = coloniesOf(s, F.id).filter((c) => c.colony.kind === "colony");
   const t = totals(s, F.id);
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
@@ -2309,6 +2379,12 @@ function fleets(s, F) {
       if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
+      // Relief: a world of ours under siege, and this fleet strong enough to break it.
+      const mineHull = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
+      const relief = coloniesOf(s, F.id).filter((sys) => besieged(s, sys)).map((sys) => ({ sys, d: distance(f.at, sys.at),
+        foe: fleetsAt(s, sys.at).filter((g) => armed(g) && atWar(s, g.owner, F.id)).reduce((t, g) => t + g.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? x.hull : 0), 0), 0) }))
+        .filter((x) => x.foe <= mineHull * 1.2).sort((a, b) => a.d - b.d)[0];
+      if (relief) { if (relief.sys.at !== f.at) setDestination(s, f.id, relief.sys.at); continue; }
       if (enemies.length) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
@@ -2615,18 +2691,29 @@ function renderPanel() {
   else if (tab === "log") { P.innerHTML = logHTML(); P.scrollTop = P.scrollHeight; }
 }
 const bar = (v, max, color) => `<span class="meter"><span style="width:${Math.max(0, Math.min(100, (v / max) * 100))}%;background:${color || "var(--accent)"}"><\/span><\/span>`;
+/** A world under siege: how long, what it costs it, and how far to its surrender. */
+function siegeHTML(sys, mine) {
+  const c = sys.colony; if (!c || !besieged(S, sys)) return "";
+  const n = c.siege || 0, nextHunger = SIEGE.starveEvery - (n % SIEGE.starveEvery);
+  const fall = c.capital ? "A capital never surrenders." : c.kind === "colony"
+    ? `It surrenders once the siege has lasted ${SIEGE.surrenderAfter} turns and hunger has brought it to ${SIEGE.surrenderPop} population or less${n >= SIEGE.surrenderAfter ? " (it's held out long enough: hunger is all that's left)" : ` (${SIEGE.surrenderAfter - n} more turn${SIEGE.surrenderAfter - n === 1 ? "" : "s"} at the least)`}.`
+    : `It surrenders after ${SIEGE.surrenderAfter} turns.`;
+  return `<p class="small ${mine ? "bad" : "good"}"><b>Under siege${n ? ` for ${n} turn${n === 1 ? "" : "s"}` : ""}.<\/b> ${mine ? "Enemy warships hold the orbit: break them, or it" : "Your warships hold the orbit: it"} makes half its industry and credits, grows nothing, trades with no one, can't repair its guns or launch what it builds${c.kind === "colony" ? `, and starves: the next population lost in ${nextHunger} turn${nextHunger === 1 ? "" : "s"}` : ""}. Its garrison is at ${Math.round(garrisonFactor(sys) * 100)}%. ${fall}<\/p>`;
+}
 function systemHTML() {
   const sys = S.systems[sel.id], me = player(S), w = WORLDS[sys.world], c = sys.colony;
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
   let h = `<h2>${esc(sys.name)}<\/h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit<\/b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins<\/b>" : ""}.<\/p>`;
   if (!c) h += `<p>${w.outpostOnly ? "No one can live here, but an outpost can claim it." : w.needs && !has(S, me.id, w.needs) ? `Needs <b>${esc(TECHS.find((t) => t.id === w.needs).name)}<\/b> to settle; an outpost can claim it now.` : "Unclaimed. A colony ship can settle it."}<\/p>`;
-  else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}<\/b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && (c.buildings.battery || c.capital) ? ` Orbital guns: ${c.defense} hull.` : ""}<\/p>`;
+  else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}<\/b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && (c.buildings.battery || c.capital) ? ` Orbital guns: ${c.defense} hull.` : ""}${seen ? siegeHTML(sys, false) : ""}<\/p>`;
   else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.<\/p>`;
   else {
     const y = yields(S, sys), max = maxPop(S, sys);
     h += `<div class="kv"><span>Population<\/span><b>${c.pop} / ${max}<\/b>${bar(c.pop + c.growth, max, "#7bc47f")}<\/div>
       <div class="yields"><span>Industry <b>${fmt(y.ind)}<\/b><\/span><span>Science <b>${fmt(y.sci)}<\/b><\/span><span>Credits <b>${fmt(y.cr)}<\/b><\/span>${y.exo ? `<span>Exotics <b>${y.exo}<\/b><\/span>` : ""}<\/div>
       <p class="small">${c.capital ? "<b>Capital.<\/b> " : ""}Buildings: ${Object.keys(c.buildings).filter((b) => c.buildings[b]).map((b) => esc(BUILDINGS[b].name)).join(", ") || "none"}.${c.defense ? ` Orbital guns ${c.defense} hull.` : ""}<\/p>
+      ${(() => { const L = tradeLinks(S, sys), inc = tradeIncome(S, sys); return L.length ? `<p class="small"><b>Trade:<\/b> ${L.length} link${L.length === 1 ? "" : "s"} (${L.map((x) => esc(x.name)).join(", ")}): +${fmt(inc)} credits${c.buildings.market ? ", doubled by the Exchange" : ". An Exchange here doubles it"}.<\/p>` : besieged(S, sys) ? "" : `<p class="small muted"><b>Trade:<\/b> no partners within ${TRADE.range} hexes: your own colonies and treaty partners' trade with each other.<\/p>`; })()}
+      ${siegeHTML(sys, true)}
       <h3>Building<\/h3>`;
     if (!c.queue.length) h += `<p class="small muted">Nothing. Industry stockpiles (up to 40). Pick something below.<\/p>`;
     h += `<ol class="queue">${c.queue.map((q, i) => `<li><span>${esc(q.name)}${q.exotics ? ` <i class="exo">${q.exotics}◆<\/i>` : ""}<\/span>${bar(q.progress, q.cost)}<span class="small">${Math.floor(q.progress)}/${q.cost}${i === 0 ? ` · ${y.ind ? Math.max(1, Math.ceil((q.cost - q.progress) / y.ind)) + "t" : "—"}` : ""}<\/span><button class="x" data-deq="${i}" title="Remove">×<\/button><\/li>`).join("")}<\/ol>`;
@@ -2672,7 +2759,7 @@ function fleetHTML() {
   if (o && o.troops) {
     const war = atWar(S, me.id, sys.colony.owner);
     const tr = f.ships.filter((x) => x.type === "transport").length, per = shipStats(S, me.id, "transport").troops;
-    const defParts = sys.colony.kind === "outpost" ? "an outpost: 0.5" : `population ${sys.colony.pop} × ${RULES.troopDefensePerPop}${sys.colony.capital ? " + 2 for a capital" : ""}`;
+    const gf = garrisonFactor(sys), defParts = (sys.colony.kind === "outpost" ? "an outpost: 0.5" : `population ${sys.colony.pop} × ${RULES.troopDefensePerPop}${sys.colony.capital ? " + 2 for a capital" : ""}`) + (gf < 1 ? `, × ${Math.round(gf * 100)}% after ${sys.colony.siege} turns of siege` : "");
     h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit. Keep warships here: the battle at the end of the turn knocks the guns out, and a world under siege can't repair them, so you can land next turn." : ""}${!war ? " You're not at war with them." : ""}<\/p>
       <p class="small muted" style="margin-top:-4px">Troops: ${tr} transport${tr === 1 ? "" : "s"} × ${per} = ${o.troops}. Defense: ${defParts} = ${o.defense}. ${o.troops >= o.defense ? "<b class=\"good\">Enough: the landing takes it.<\/b>" : `<b class="bad">Not enough: ${fmt(o.defense - o.troops)} more troops needed, or the transports are lost.<\/b>`}<\/p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops<\/button>`;
   }
@@ -2840,7 +2927,7 @@ function empireHTML() {
   const cols = coloniesOf(S, me.id).sort((a, b) => (b.colony.pop || 0) - (a.colony.pop || 0));
   let h = `<h2>${esc(me.name)}<\/h2><p class="small muted">${esc(FACTIONS.find((f) => f.id === me.id).trait)}: ${esc(FACTIONS.find((f) => f.id === me.id).traitText)}<\/p>
     <div class="yields"><span>Income <b>${fmt(t.cr)}<\/b><\/span><span>Upkeep <b>${fmt(t.upkeep)}<\/b><\/span><span>Score <b>${score(S, me.id)}<\/b><\/span><span>Fleet power <b>${militaryPower(S, me.id)}<\/b><\/span><\/div>
-    ${focusHTML()}${protosHTML()}
+    ${focusHTML()}${marketHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})<\/h3><table class="tbl"><tr><th>World<\/th><th>Pop<\/th><th>Ind<\/th><th>Sci<\/th><th>Building<\/th><\/tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)<\/i>" : ""}<\/td><td>${sys.colony.pop || "–"}<\/td><td>${fmt(y.ind)}<\/td><td>${fmt(y.sci)}<\/td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}<\/td><\/tr>`; }).join("")}<\/table>
     <h3>Fleets (${fleetsOf(S, me.id).length})<\/h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}<\/span>` : ""}<span class="small muted">${f.path.length ? " · moving" : " · idle"}<\/span><\/button>`).join("")}
@@ -2864,6 +2951,13 @@ function admiralsHTML() {
     ${fallen.length ? `<details class="small"><summary>The fallen (${fallen.length})<\/summary><ul>${fallen.map((x) => `<li>${esc(x.name)}, at ${esc(x.at)} on turn ${x.turn} (${x.wins} win${x.wins === 1 ? "" : "s"})<\/li>`).join("")}<\/ul><\/details>` : ""}`;
 }
 /** The empire's Focus: three points to share between industry, science, credits and defense. */
+/** The exotics market: buy at the price, sell for less; each unit moves the price. */
+function marketHTML() {
+  const me = player(S), ex = coloniesOf(S, me.id).some((x) => x.colony.buildings.market), p = marketPrice(S), sp = sellPrice(S);
+  return `<h3>The exotics market<\/h3><p class="small muted">Buy exotics at ${p} credits, or sell them for ${sp}. Every unit bought puts the price up a credit, every unit sold brings it down; it drifts back toward ${MARKET.base} a credit a turn.${ex ? "" : " <b>You need an Exchange on one of your worlds to deal here.<\/b>"}<\/p>
+    <div class="opts"><button class="opt" data-mkt="1" ${!ex || me.credits < p ? "disabled" : ""}><b>Buy 1<\/b><span>${p} cr<\/span><\/button><button class="opt" data-mkt="5" ${!ex || me.credits < p * 5 ? "disabled" : ""}><b>Buy 5<\/b><\/button>
+    <button class="opt" data-mkt="-1" ${!ex || me.exotics < 1 ? "disabled" : ""}><b>Sell 1<\/b><span>${sp} cr<\/span><\/button><button class="opt" data-mkt="-5" ${!ex || me.exotics < 1 ? "disabled" : ""}><b>Sell 5<\/b><\/button><\/div>`;
+}
 function focusHTML() {
   const me = player(S), fo = focusOf(S, me.id), left = FOCUS.points - focusUsed(S, me.id);
   return `<h3>Focus: ${FOCUS.points - left} of ${FOCUS.points} points<\/h3><p class="small muted">Where the empire puts its effort this turn, 2 points at most to one priority. Change it whenever you like.<\/p>
@@ -2953,6 +3047,7 @@ function bindChrome() {
       else { reportSince(`Invasion of ${nm}`, since); if (report) report.lines.unshift(`Your troops ${o.troops} against their defense ${o.defense}: ${r.taken ? "the landing takes the world." : "the landing fails, and the transports are lost."}`); }
       if (!S.fleets[sel.id]) sel = null;
     }
+    else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
     else if (d.split) { const r = splitFleet(S, sel.id, d.split); if (r.error) toast(r.error, true); else sel = { kind: "fleet", id: r.fleet }; }
@@ -3251,6 +3346,7 @@ const GUIDE = [
   { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "Directives and campaigns", text: "Your people send directives (the Mission tab): each pays credits, and each is a race against a rival. From turn 8, campaigns: three in a row, each against your nearest rival. Your research arm sends field tests that leave a prototype upgrade.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
   { id: "empire", target: '[data-tab="empire"]', tab: "empire", title: "Focus", text: "The Empire tab: share three Focus points between industry, science, credits and defense (2 at most to one). Change it whenever you like. Your prototypes are listed here too.", done: () => S.tutorial.seen && S.tutorial.seen.empire },
   { id: "fleets", read: true, title: "Fleets: stance and supply", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Warships more than 3 hexes from your worlds and outposts are out of supply and wear down: outposts push your supply line out." },
+  { id: "trade", read: true, title: "Trade and sieges", text: "Your colonies trade with each other and with treaty partners' worlds within 4 hexes, for credits (an Exchange doubles it; the Empire tab's market buys and sells exotics). Warships in an enemy's orbit besiege it: half its industry and credits, no trade, no growth, it starves, its garrison weakens, and an ordinary colony starved low enough surrenders. Your own worlds can be besieged too: break the siege with a fleet." },
   { id: "done", read: true, title: "The galaxy is yours", text: "That's the turn: research, build, move, end the turn. Next: a Factory and a Research lab at your capital, two or three frigates at home, and meet your neighbours (Diplomacy). Menu → Restart the guide brings this back any time." },
 ];
 const guideOn = () => S && S.tutorial && S.tutorial.guide && !S.tutorial.guideDone;

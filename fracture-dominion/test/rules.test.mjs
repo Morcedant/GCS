@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets,
+import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS } from "../src/data.js";
@@ -346,4 +346,72 @@ test("a targeted barrage: once the orbit is held, warships destroy a building; t
   assert.equal(cap.colony.pop > 0, true);
   assert.match(barrage(s, fleet.id, "shipyard").error, /this turn/, "once per fleet a turn");
   assert.ok(!spawnFleet(s, "hegemony", cap.at, ["transport"]) || !barrageTargets(s, Object.values(s.fleets).find((f) => f.ships.every((x) => x.type === "transport")).id).length, "transports alone can't bombard");
+});
+
+/** A colony of `owner` at the nearest free system to `near` that it could settle, within `max` hexes. */
+function colonyNear(s, owner, near, max = 4) {
+  const sys = Object.values(s.systems).filter((x) => !x.colony && distance(x.at, near) <= max && canSettle(s, owner, x, "colony")).sort((a, b) => distance(a.at, near) - distance(b.at, near))[0];
+  if (!sys) return null;
+  settle(s, spawnFleet(s, owner, sys.at, ["colony"]).id); return sys;
+}
+
+test("trade: colonies earn from their links, an Exchange doubles it, and a blockade cuts it", () => {
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1 });
+  const cap = coloniesOf(s, "concord")[0], other = colonyNear(s, "concord", cap.at);
+  assert.ok(other, "a second colony in range");
+  assert.ok(tradeLinks(s, cap).includes(other) && tradeLinks(s, other).includes(cap));
+  const plain = tradeIncome(s, cap);
+  assert.equal(plain, 0.5 * tradeLinks(s, cap).length);
+  cap.colony.buildings.market = true;
+  assert.equal(tradeIncome(s, cap), plain * 2, "an Exchange doubles trade");
+  const foe = s.factions[1].id; declareWar(s, foe, "concord");
+  spawnFleet(s, foe, other.at, ["frigate"]);
+  assert.equal(tradeLinks(s, other).length, 0, "a blockaded world has no trade");
+  assert.ok(!tradeLinks(s, cap).includes(other), "and is nobody's partner");
+});
+
+test("a long siege: no growth, hunger every 3 turns, a weaker garrison, and an ordinary colony surrenders", () => {
+  const s = newGame({ seed: 4, size: "small", player: "hegemony", rivals: 1 });
+  const foe = s.factions[1].id, home = coloniesOf(s, foe)[0];
+  const col = colonyNear(s, foe, home.at, 6); assert.ok(col);
+  col.colony.pop = 6; col.colony.buildings = {}; col.colony.defense = 0;
+  declareWar(s, "hegemony", foe);
+  const fleet = spawnFleet(s, "hegemony", col.at, ["cruiser", "cruiser", "cruiser"]);
+  for (const f of Object.values(s.fleets)) if (f.owner === foe && f.at === col.at) delete s.fleets[f.id];
+  endTurn(s); endTurn(s); endTurn(s);
+  assert.equal(col.colony.siege, 3);
+  assert.equal(col.colony.pop, 5, "one population lost to hunger at the third turn");
+  assert.ok(garrisonFactor(col) < 1 && garrisonFactor(col) >= 0.5);
+  const t = spawnFleet(s, "hegemony", col.at, ["transport"]);
+  assert.ok(invasionOdds(s, t.id).defense < 5 * 0.5, "the garrison is weaker than a fresh one");
+  delete s.fleets[t.id];
+  for (let i = 0; i < 10 && col.colony.owner === foe; i++) endTurn(s);
+  assert.equal(col.colony.owner, "hegemony", "it surrenders to the besieger");
+  assert.ok(s.fleets[fleet.id]);
+});
+
+test("a capital never surrenders, however long the siege", () => {
+  const s = newGame({ seed: 4, size: "small", player: "hegemony", rivals: 1 });
+  const foe = s.factions[1].id, cap = coloniesOf(s, foe).find((x) => x.colony.capital);
+  declareWar(s, "hegemony", foe);
+  spawnFleet(s, "hegemony", cap.at, Array(6).fill("cruiser"));
+  for (let i = 0; i < 14; i++) endTurn(s);
+  assert.equal(cap.colony.owner, foe);
+  assert.ok(cap.colony.siege >= 12);
+});
+
+test("the exotics market: an Exchange to deal, buying raises the price, selling lowers it, and it drifts back", () => {
+  const s = newGame({ seed: 4, size: "small", player: "tessan", rivals: 1 });
+  const F = faction(s, "tessan"); F.credits = 200; F.exotics = 0;
+  assert.ok(tradeExotics(s, "tessan", 1).error, "no Exchange yet");
+  coloniesOf(s, "tessan")[0].colony.buildings.market = true;
+  const p0 = marketPrice(s), r = tradeExotics(s, "tessan", 3);
+  assert.equal(r.units, 3); assert.equal(F.exotics, 3);
+  assert.equal(r.credits, -(p0 + p0 + 1 + p0 + 2), "each unit bought costs one more");
+  assert.equal(marketPrice(s), p0 + 3);
+  const before = F.credits, sp = sellPrice(s), q = tradeExotics(s, "tessan", -1);
+  assert.equal(q.credits, sp); assert.equal(F.credits, before + sp);
+  assert.ok(sellPrice(s) < marketPrice(s), "selling pays less than buying: no free money");
+  endTurn(s); assert.equal(marketPrice(s), p0 + 1, "drifts back a step a turn");
+  F.credits = 0; assert.match(tradeExotics(s, "tessan", 1).error, /credits/);
 });

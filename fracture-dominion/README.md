@@ -15,6 +15,13 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Victory:** conquest, the Corridor Engine (a great work), or the highest score at turn 200. Or an **open game**
   with no end: retire when you choose. After a win, **Keep ruling** carries the game on in open rule.
 - **Focus:** three points a turn to share between industry, science, credits and defense (2 at most to one).
+- **Trade and the market:** each colony earns credits from trade links (other colonies within 4 hexes, your own or a
+  treaty partner's; an Exchange doubles it). With an Exchange you can buy exotics, or sell them for less, on a market
+  whose price moves with every unit and drifts back.
+- **Sieges:** warships in an enemy world's orbit besiege it. Its guns don't repair, what its yards finish waits, its
+  industry and credits are halved, it trades and grows nothing, it loses a population every 3 turns, and its garrison
+  weakens (down to half). After 10 turns an ordinary colony starved to 3 population surrenders; a capital never does.
+  A fleet holding the orbit can fire a **targeted barrage**: one building a turn (the Shipyard takes its queued ships).
 - **Supply and stances:** warships more than 3 hexes from every world and outpost of theirs wear down a hull point a
   turn after the first (Vael fleets feed themselves). Each fleet fights balanced, aggressive (+1 to its rolls and to
   theirs against it) or defensive (−1 to both).
