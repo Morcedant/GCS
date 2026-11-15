@@ -6,6 +6,16 @@
     {
       "date": "2026-11-15",
       "kind": "site",
+      "title": "Dominion: fuel tankers, and supply lines to defend",
+      "items": [
+        "Fuel tankers (any shipyard, 50): they carry 12 units of fuel. Travelling with a fleet, one tops up the tank when it runs dry, so the fleet reaches farther. Parked, it's a supply point: your fleets within 2 hexes stay in supply, a unit of its fuel each a turn. It fills up again in supply at home.",
+        "Supply lines can be cut: enemy warships in a supply point's system (a parked tanker, a fuel depot, a besieged colony) stop it giving supply. Tankers are unarmed, so escort them.",
+        "Tankers have their own muster point, and the computer powers bring one behind their main war fleet."
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "kind": "site",
       "title": "Dominion: fuel and fuel depots",
       "items": [
         "Fleets carry fuel: their thirstiest ship's tank, in turns of travel beyond supply (scouts 10, frigates and colony ships 6, cruisers and transports 5, dreadnoughts 4). Each turn a fleet moves beyond supply burns one; out of fuel it crawls a hex a turn. In supply it refuels. The Vael's living hulls need none.",

@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
+import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, inSupplyAt, cargoOf, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
-import { TECHS } from "../src/data.js";
+import { TECHS, SHIPS } from "../src/data.js";
 
 test("hexes: distance, neighbours, the map, and pixels both ways", () => {
   assert.equal(distance("0,0", "3,-1"), 3);
@@ -490,4 +490,46 @@ test("an outpost founded with its fuel depot, for credits", () => {
   const f2 = Object.values(s.fleets).find((x) => x.at === op.at && x.ships.some((y) => y.type === "outpost"));
   assert.ok(settle(s, f2.id, { depot: true }).ok);
   assert.ok(op.colony.buildings.depot); assert.equal(F.credits, 60);
+});
+
+/** A free hex at least `min` hexes from every supply point of `fid` (its colonies). */
+const farHex = (s, fid, min) => Object.keys(s.hexes).filter((h) => coloniesOf(s, fid).every((c) => distance(c.at, h) >= min) && !s.sysAt[h]).sort()[0];
+
+test("fuel tankers: one along tops up a dry fleet; a parked one supplies the line, a unit per fleet a turn, and fills up at home", () => {
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1 });
+  const cap = coloniesOf(s, "concord")[0], deep = farHex(s, "concord", 8);
+  assert.ok(deep);
+  // Along with a fleet: a dry tank is topped up from the tanker's cargo, so it doesn't crawl.
+  const f = spawnFleet(s, "concord", deep, ["frigate", "tanker"]); f.fuel = 0;
+  assert.ok(setDestination(s, f.id, cap.at).ok);
+  const c0 = cargoOf(f), steps = f.path.length; endTurn(s);
+  assert.ok(steps - f.path.length > 1 || !f.path.length, "topped up from the tanker, it moves at full speed instead of crawling");
+  assert.ok(cargoOf(f) === c0 - 1 || inSupply(s, f), "a unit of cargo burned (unless it reached home and the tanker filled up again)");
+  // A dry fleet without a tanker, the same way: it crawls.
+  const g = spawnFleet(s, "concord", deep, ["frigate"]); g.fuel = 0; setDestination(s, g.id, cap.at);
+  const gs = g.path.length; endTurn(s); assert.ok(gs - g.path.length <= 1, "without one it crawls");
+  // Parked: supply within 2 hexes, while it has fuel aboard.
+  const s2 = newGame({ seed: 4, size: "small", player: "concord", rivals: 1 }), d2 = farHex(s2, "concord", 8);
+  const tk = spawnFleet(s2, "concord", d2, ["tanker"]);
+  assert.ok(inSupplyAt(s2, "concord", d2), "a parked tanker is a supply point");
+  const near = Object.keys(s2.hexes).find((h) => h !== d2 && distance(h, d2) === 2);
+  const war = spawnFleet(s2, "concord", near, ["frigate"]); war.fuel = 1;
+  endTurn(s2);
+  assert.equal(fuelOf(s2, war), fuelMax(s2, war), "the fleet 2 hexes away refuelled");
+  assert.equal(cargoOf(tk), SHIPS.tanker.cargo - 1, "and the tanker paid a unit for it");
+  // An enemy's warships in its system cut it.
+  const foe = s2.factions[1].id; declareWar(s2, foe, "concord");
+  spawnFleet(s2, foe, d2, ["frigate"]);
+  assert.ok(!inSupplyAt(s2, "concord", near), "cut: no supply while the enemy holds its system");
+});
+
+test("a tanker home in supply fills up; a besieged colony gives no supply", () => {
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1 });
+  const cap = coloniesOf(s, "concord")[0];
+  const tk = spawnFleet(s, "concord", cap.at, ["tanker"]); tk.ships[0].cargo = 2;
+  endTurn(s); assert.equal(cargoOf(tk), SHIPS.tanker.cargo);
+  const foe = s.factions[1].id; declareWar(s, foe, "concord");
+  delete s.fleets[tk.id];
+  spawnFleet(s, foe, cap.at, ["cruiser", "cruiser"]);
+  assert.ok(!inSupplyAt(s, "concord", cap.at) || coloniesOf(s, "concord").length > 1, "the besieged capital gives none");
 });

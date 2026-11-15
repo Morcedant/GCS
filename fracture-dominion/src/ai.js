@@ -104,6 +104,7 @@ function production(s, F, diff) {
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
       ships && power < wantPower ? ["ship", has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
+      ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "tanker") < 1 ? ["ship", "tanker"] : null,
       c.pop >= 3 && !c.buildings.factory ? ["building", "factory"] : null,
       t.net < 3 && !c.buildings.market ? ["building", "market"] : null,
       c.pop >= 4 && !c.buildings.lab ? ["building", "lab"] : null,
@@ -153,6 +154,12 @@ function fleets(s, F) {
     }
     if (types.size === 1 && types.has("scout")) {
       if (!f.path.length) { const k = nearestUnexplored(s, F, f.at); if (k) setDestination(s, f.id, k); }
+      continue;
+    }
+    // Tankers keep with the strongest war fleet, and park where it does: a supply point behind the front.
+    if (types.size === 1 && types.has("tanker")) {
+      const lead = fleetsOf(s, F.id).filter(armed).sort((a, b) => b.ships.length - a.ships.length)[0];
+      if (lead && !f.path.length && lead.at !== f.at) setDestination(s, f.id, lead.dest || lead.at);
       continue;
     }
     if (types.has("transport") && !armed(f)) {

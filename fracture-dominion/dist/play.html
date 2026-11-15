@@ -202,7 +202,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-15 18:36 UTC";
+const BUILD = "2026-11-15 19:04 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -320,6 +320,7 @@ const SHIPS = {
   outpost: { name: "Outpost ship", cost: 30, fuel: 6, upkeep: 0.5, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, outpost: true, text: "Claims any system as an outpost: its exotics and its territory. Used up." },
   frigate: { name: "Frigate", cost: 40, fuel: 6, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, text: "The line of battle." },
   transport: { name: "Troop transport", cost: 45, fuel: 5, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
+  tanker: { name: "Fuel tanker", cost: 50, fuel: 12, upkeep: 1, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, cargo: 12, text: "Carries fuel: with a fleet, it tops up the tank when it runs dry; parked, it gives supply within 2 hexes (a unit of fuel per fleet a turn). Unarmed: escort it." },
   cruiser: { name: "Cruiser", cost: 90, fuel: 5, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
   dreadnought: { name: "Dreadnought", cost: 180, fuel: 4, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
@@ -408,7 +409,8 @@ const SUPPLY = { range: 3, graceTurns: 1 };
 // Fuel: a fleet carries enough for so many turns of travel beyond supply (its thirstiest ship's). Each turn it moves out
 // of supply burns one; with none left it crawls a hex a turn. In supply it refuels. Colonies give supply; an outpost
 // gives supply only once it has a Fuel depot (bought with credits, or founded with the outpost).
-const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1 };
+const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2 };
+// A supply point (a colony, a fuel depot, a parked tanker) with an enemy's warships in its system is cut: it gives no supply.
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
 // partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
 const TRADE = { range: 4, perLink: 0.5, maxLinks: 4, exchange: 2 };
@@ -671,8 +673,20 @@ function setFocus(s, fid, kind, n) {
 /** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
 /** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
-const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => x.colony.kind === "colony" || x.colony.buildings.depot);
-const inSupplyAt = (s, fid, hex) => fid === "vael" || fid === "wardens" || supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
+const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || x.colony.buildings.depot) && !besieged(s, x));
+/** A supply point is cut while an enemy at war has warships there. */
+const cutAt = (s, fid, hex) => fleetsAt(s, hex).some((o) => armed(o) && atWar(s, fid, o.owner));
+const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) => t + (x.cargo ?? SHIPS.tanker.cargo), 0);
+/** Tankers parked (not moving) with fuel aboard, their system not cut: forward supply points. */
+const tankerPoints = (s, fid) => fleetsOf(s, fid).filter((f) => !f.path.length && cargoOf(f) > 0 && !cutAt(s, fid, f.at));
+const baseSupplyAt = (s, fid, hex) => supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
+const inSupplyAt = (s, fid, hex) => fid === "vael" || fid === "wardens" || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
+/** Draw a unit of fuel from a fleet's own tankers (the fullest first); false if they're dry. */
+function drawCargo(f) {
+  const t = f.ships.filter((x) => x.type === "tanker" && (x.cargo ?? SHIPS.tanker.cargo) > 0).sort((a, b) => (b.cargo ?? 12) - (a.cargo ?? 12))[0];
+  if (!t) return false; t.cargo = (t.cargo ?? SHIPS.tanker.cargo) - 1; return true;
+}
+
 function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hulls (the Vael) feed themselves
 // ---- fuel ----
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
@@ -902,8 +916,8 @@ function findPath(s, fid, from, to) {
   return path;
 }
 // ---- muster points: standing orders for where newly built ships go ----
-const MUSTER_KINDS = { warship: "Warships", transport: "Troop transports", settler: "Colony and outpost ships", scout: "Scouts" };
-const musterKind = (type) => (SHIPS[type].skill > 0 ? "warship" : type === "transport" ? "transport" : type === "colony" || type === "outpost" ? "settler" : "scout");
+const MUSTER_KINDS = { warship: "Warships", transport: "Troop transports", tanker: "Fuel tankers", settler: "Colony and outpost ships", scout: "Scouts" };
+const musterKind = (type) => (SHIPS[type].skill > 0 ? "warship" : type === "transport" ? "transport" : type === "tanker" ? "tanker" : type === "colony" || type === "outpost" ? "settler" : "scout");
 const musterOk = (s, fid, id) => !!(id && s.systems[id] && s.systems[id].colony && s.systems[id].colony.owner === fid);
 /** Send every new ship (kind "all"), or every new ship of one kind, to one of your worlds or outposts; null clears it. */
 function setMuster(s, fid, kind, sysId) {
@@ -963,7 +977,7 @@ function moveFleets(s) {
     let mp = fleetSpeed(s, f);
     // Fuel: a turn's travel beyond supply burns one; with none left the fleet crawls.
     const out = f.path.length && !inSupply(s, f) && fuelMax(s, f) !== Infinity;
-    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else mp = Math.min(mp, FUEL.fumesSpeed); }
+    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else if (!drawCargo(f)) mp = Math.min(mp, FUEL.fumesSpeed); }   // a tanker along tops it up
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) {
       const step = f.path[0];
       // A fleet stops where an enemy at war guards the hex.
@@ -1441,6 +1455,14 @@ function economy(s, F) {
   if (F.ai && s.turn % 25 === 12) {
     const p = Object.keys(PROTOTYPES).find((x) => !(F.protos || {})[x]);
     if (p) { F.protos = F.protos || {}; F.protos[p] = true; if (player(s).met[F.id]) log(s, player(s).id, `${F.name} field-tested a prototype: ${PROTOTYPES[p].name} (${PROTOTYPES[p].text})`, "research"); }
+  }
+  // Tankers: those in supply from a colony or depot fill up; a parked one pays a unit of fuel for each fleet of ours it
+  // alone keeps in supply.
+  for (const f of fleetsOf(s, F.id)) if (baseSupplyAt(s, F.id, f.at)) for (const x of f.ships) if (x.type === "tanker") x.cargo = SHIPS.tanker.cargo;
+  for (const f of fleetsOf(s, F.id)) {
+    if (F.id === "vael" || baseSupplyAt(s, F.id, f.at)) continue;
+    const tp = tankerPoints(s, F.id).filter((t) => distance(t.at, f.at) <= FUEL.tankerRange).sort((a, b) => cargoOf(b) - cargoOf(a))[0];
+    if (tp && tp !== f) drawCargo(tp);
   }
   // Supply: warships too far from every colony and fuel depot of theirs wear down, a hull point a turn after the first
   // (never below 1). Scouts, colony ships, outposts and transports carry what they need.
@@ -2397,6 +2419,7 @@ function production(s, F, diff) {
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
       ships && power < wantPower ? ["ship", has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
+      ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "tanker") < 1 ? ["ship", "tanker"] : null,
       c.pop >= 3 && !c.buildings.factory ? ["building", "factory"] : null,
       t.net < 3 && !c.buildings.market ? ["building", "market"] : null,
       c.pop >= 4 && !c.buildings.lab ? ["building", "lab"] : null,
@@ -2446,6 +2469,12 @@ function fleets(s, F) {
     }
     if (types.size === 1 && types.has("scout")) {
       if (!f.path.length) { const k = nearestUnexplored(s, F, f.at); if (k) setDestination(s, f.id, k); }
+      continue;
+    }
+    // Tankers keep with the strongest war fleet, and park where it does: a supply point behind the front.
+    if (types.size === 1 && types.has("tanker")) {
+      const lead = fleetsOf(s, F.id).filter(armed).sort((a, b) => b.ships.length - a.ships.length)[0];
+      if (lead && !f.path.length && lead.at !== f.at) setDestination(s, f.id, lead.dest || lead.at);
       continue;
     }
     if (types.has("transport") && !armed(f)) {
@@ -2844,6 +2873,11 @@ function fleetHTML() {
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.<\/p>`;
   if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
     h += `<div class="kv"><span>Fuel<\/span><b class="${fu ? "" : "bad"}">${fu} / ${mx}<\/b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}<\/div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? "In supply: the tank stays full." : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.<\/p>`; }
+  // Fuel tankers: what they carry, and what they're doing with it.
+  const tk = f.ships.filter((x) => x.type === "tanker").length;
+  if (mine && tk) { const cg = cargoOf(f), max = tk * SHIPS.tanker.cargo, point = tankerPoints(S, me.id).includes(f), cut = !f.path.length && cg > 0 && !point;
+    const fed = point ? fleetsOf(S, me.id).filter((o) => o !== f && distance(o.at, f.at) <= FUEL.tankerRange).length : 0;
+    h += `<div class="kv"><span>Fuel aboard<\/span><b>${cg} / ${max}<\/b>${bar(cg, max, "#6fb3d9")}<\/div><p class="small ${cut ? "bad" : "muted"}" style="margin-top:-4px">${f.path.length ? "On the move: it tops up this fleet's tank when it runs dry." : cut ? "<b>Cut:<\/b> enemy warships here, so it gives no supply. Clear them, or move it." : cg ? `<b>Supply point:<\/b> parked, it keeps your fleets within ${FUEL.tankerRange} hexes in supply${fed ? ` (${fed} fleet${fed === 1 ? "" : "s"} near it now)` : ""}, a unit of fuel each a turn.` : "Empty: bring it back within reach of a colony or a fuel depot to fill up."} Unarmed: keep it escorted.<\/p>`; }
   if (f.admiral) h += admiralCard(f.admiral, mine);
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.<\/p>` : "");
   const reserve = me.reserve || [];
@@ -3481,7 +3515,7 @@ const GUIDE = [
   { id: "objectives", target: '[data-tab="objectives"]', tab: "objectives", title: "Three ways to win", text: "The Objectives tab: conquest (the last power standing), the Corridor Engine (research it, then build it at your capital), or the best score at turn 200. It shows how close everyone is.", done: () => S.tutorial.seen && S.tutorial.seen.objectives },
   { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "Directives and campaigns", text: "Your people send directives (the Mission tab): each pays credits, and each is a race against a rival. From turn 8, campaigns: three in a row, each against your nearest rival. Your research arm sends field tests that leave a prototype upgrade.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
   { id: "empire", target: '[data-tab="empire"]', tab: "empire", title: "Focus", text: "The Empire tab: share three Focus points between industry, science, credits and defense (2 at most to one). Change it whenever you like. Your prototypes are listed here too.", done: () => S.tutorial.seen && S.tutorial.seen.empire },
-  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels." },
+  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels. A fuel tanker extends your lines: travelling with a fleet it tops up the tank; parked, it keeps your fleets within 2 hexes in supply. Enemy warships in a supply point's system cut it, so defend your tankers and depots." },
   { id: "trade", read: true, title: "Trade and sieges", text: "Your colonies trade with each other and with treaty partners' worlds within 4 hexes, for credits (an Exchange doubles it; the Empire tab's market buys and sells exotics). Warships in an enemy's orbit besiege it: half its industry and credits, no trade, no growth, it starves, its garrison weakens, and an ordinary colony starved low enough surrenders. Your own worlds can be besieged too: break the siege with a fleet." },
   { id: "done", read: true, title: "The galaxy is yours", text: "That's the turn: research, build, move, end the turn. Next: a Factory and a Research lab at your capital, two or three frigates at home, and meet your neighbours (Diplomacy). Menu → Restart the guide brings this back any time." },
 ];

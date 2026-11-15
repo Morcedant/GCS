@@ -86,8 +86,20 @@ export function setFocus(s, fid, kind, n) {
 /** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 export const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
 /** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
-export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => x.colony.kind === "colony" || x.colony.buildings.depot);
-export const inSupplyAt = (s, fid, hex) => fid === "vael" || fid === "wardens" || supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
+export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || x.colony.buildings.depot) && !besieged(s, x));
+/** A supply point is cut while an enemy at war has warships there. */
+const cutAt = (s, fid, hex) => fleetsAt(s, hex).some((o) => armed(o) && atWar(s, fid, o.owner));
+const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) => t + (x.cargo ?? SHIPS.tanker.cargo), 0);
+/** Tankers parked (not moving) with fuel aboard, their system not cut: forward supply points. */
+export const tankerPoints = (s, fid) => fleetsOf(s, fid).filter((f) => !f.path.length && cargoOf(f) > 0 && !cutAt(s, fid, f.at));
+const baseSupplyAt = (s, fid, hex) => supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
+export const inSupplyAt = (s, fid, hex) => fid === "vael" || fid === "wardens" || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
+/** Draw a unit of fuel from a fleet's own tankers (the fullest first); false if they're dry. */
+function drawCargo(f) {
+  const t = f.ships.filter((x) => x.type === "tanker" && (x.cargo ?? SHIPS.tanker.cargo) > 0).sort((a, b) => (b.cargo ?? 12) - (a.cargo ?? 12))[0];
+  if (!t) return false; t.cargo = (t.cargo ?? SHIPS.tanker.cargo) - 1; return true;
+}
+export { cargoOf };
 export function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hulls (the Vael) feed themselves
 // ---- fuel ----
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
@@ -317,8 +329,8 @@ export function findPath(s, fid, from, to) {
   return path;
 }
 // ---- muster points: standing orders for where newly built ships go ----
-export const MUSTER_KINDS = { warship: "Warships", transport: "Troop transports", settler: "Colony and outpost ships", scout: "Scouts" };
-export const musterKind = (type) => (SHIPS[type].skill > 0 ? "warship" : type === "transport" ? "transport" : type === "colony" || type === "outpost" ? "settler" : "scout");
+export const MUSTER_KINDS = { warship: "Warships", transport: "Troop transports", tanker: "Fuel tankers", settler: "Colony and outpost ships", scout: "Scouts" };
+export const musterKind = (type) => (SHIPS[type].skill > 0 ? "warship" : type === "transport" ? "transport" : type === "tanker" ? "tanker" : type === "colony" || type === "outpost" ? "settler" : "scout");
 const musterOk = (s, fid, id) => !!(id && s.systems[id] && s.systems[id].colony && s.systems[id].colony.owner === fid);
 /** Send every new ship (kind "all"), or every new ship of one kind, to one of your worlds or outposts; null clears it. */
 export function setMuster(s, fid, kind, sysId) {
@@ -378,7 +390,7 @@ function moveFleets(s) {
     let mp = fleetSpeed(s, f);
     // Fuel: a turn's travel beyond supply burns one; with none left the fleet crawls.
     const out = f.path.length && !inSupply(s, f) && fuelMax(s, f) !== Infinity;
-    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else mp = Math.min(mp, FUEL.fumesSpeed); }
+    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else if (!drawCargo(f)) mp = Math.min(mp, FUEL.fumesSpeed); }   // a tanker along tops it up
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) {
       const step = f.path[0];
       // A fleet stops where an enemy at war guards the hex.
@@ -856,6 +868,14 @@ function economy(s, F) {
   if (F.ai && s.turn % 25 === 12) {
     const p = Object.keys(PROTOTYPES).find((x) => !(F.protos || {})[x]);
     if (p) { F.protos = F.protos || {}; F.protos[p] = true; if (player(s).met[F.id]) log(s, player(s).id, `${F.name} field-tested a prototype: ${PROTOTYPES[p].name} (${PROTOTYPES[p].text})`, "research"); }
+  }
+  // Tankers: those in supply from a colony or depot fill up; a parked one pays a unit of fuel for each fleet of ours it
+  // alone keeps in supply.
+  for (const f of fleetsOf(s, F.id)) if (baseSupplyAt(s, F.id, f.at)) for (const x of f.ships) if (x.type === "tanker") x.cargo = SHIPS.tanker.cargo;
+  for (const f of fleetsOf(s, F.id)) {
+    if (F.id === "vael" || baseSupplyAt(s, F.id, f.at)) continue;
+    const tp = tankerPoints(s, F.id).filter((t) => distance(t.at, f.at) <= FUEL.tankerRange).sort((a, b) => cargoOf(b) - cargoOf(a))[0];
+    if (tp && tp !== f) drawCargo(tp);
   }
   // Supply: warships too far from every colony and fuel depot of theirs wear down, a hull point a turn after the first
   // (never below 1). Scouts, colony ships, outposts and transports carry what they need.

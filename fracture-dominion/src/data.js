@@ -48,6 +48,7 @@ export const SHIPS = {
   outpost: { name: "Outpost ship", cost: 30, fuel: 6, upkeep: 0.5, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, outpost: true, text: "Claims any system as an outpost: its exotics and its territory. Used up." },
   frigate: { name: "Frigate", cost: 40, fuel: 6, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, text: "The line of battle." },
   transport: { name: "Troop transport", cost: 45, fuel: 5, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
+  tanker: { name: "Fuel tanker", cost: 50, fuel: 12, upkeep: 1, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, cargo: 12, text: "Carries fuel: with a fleet, it tops up the tank when it runs dry; parked, it gives supply within 2 hexes (a unit of fuel per fleet a turn). Unarmed: escort it." },
   cruiser: { name: "Cruiser", cost: 90, fuel: 5, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
   dreadnought: { name: "Dreadnought", cost: 180, fuel: 4, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
@@ -136,7 +137,8 @@ export const SUPPLY = { range: 3, graceTurns: 1 };
 // Fuel: a fleet carries enough for so many turns of travel beyond supply (its thirstiest ship's). Each turn it moves out
 // of supply burns one; with none left it crawls a hex a turn. In supply it refuels. Colonies give supply; an outpost
 // gives supply only once it has a Fuel depot (bought with credits, or founded with the outpost).
-export const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1 };
+export const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2 };
+// A supply point (a colony, a fuel depot, a parked tanker) with an enemy's warships in its system is cut: it gives no supply.
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
 // partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
 export const TRADE = { range: 4, perLink: 0.5, maxLinks: 4, exchange: 2 };

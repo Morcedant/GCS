@@ -33,7 +33,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   (claim it with one for 40 credits, or build one there later for 60). Beyond supply a fleet burns a turn of fuel for
   each turn it moves (its thirstiest ship's tank: scouts 10, frigates and colony ships 6, cruisers and transports 5,
   dreadnoughts 4); out of fuel it crawls a hex a turn, and warships out of supply wear down a hull point a turn. In
-  supply it refuels. The Vael's living hulls need neither. Each fleet also has a battle stance.
+  supply it refuels. The Vael's living hulls need neither. Each fleet also has a battle stance. **Fuel tankers** (any shipyard, 50)
+  carry 12 units of fuel: travelling with a fleet one tops up its tank when it runs dry; parked, it keeps your fleets
+  within 2 hexes in supply (a unit of fuel per fleet a turn) and fills up again in supply at home. Enemy warships in a
+  supply point's system (a tanker, a depot or a besieged colony) cut it: defend your lines.
 - **Battle pop-ups:** a battle you're in opens a report after the turn: both sides' ships and hulls, then every
   shot with its three dice, which you can step through one at a time, a round at a time, or skip to the result.
 - **Galactic events:** every nine turns or so, from turn 6, something happens that you decide about: a derelict of
