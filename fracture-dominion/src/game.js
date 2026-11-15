@@ -314,12 +314,23 @@ export function mergeFleets(s, intoId, fromId) {
   if (!a || !b || a.owner !== b.owner || a.at !== b.at) return { error: "They need to be in the same place." };
   a.ships.push(...b.ships); joinAdmirals(s, a, b); delete s.fleets[fromId]; return { ok: true };
 }
-export function splitFleet(s, fleetId, type) {
-  const f = s.fleets[fleetId]; const i = f.ships.findIndex((x) => x.type === type);
-  if (i < 0 || f.ships.length < 2) return { error: "Nothing to split off." };
-  const [ship] = f.ships.splice(i, 1);
-  const nf = spawnFleet(s, f.owner, f.at, []); nf.ships.push(ship);
-  return { ok: true, fleet: nf.id };
+/**
+ * Split ships of one type off into a new fleet at the same place: n of them (1 by default), "half", or "all". The most
+ * damaged go first, so a fleet can send its wounded home. The admiral stays; at least one ship stays with them.
+ */
+export function splitFleet(s, fleetId, type, n = 1) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  const of = f.ships.filter((x) => x.type === type);
+  if (!of.length || f.ships.length < 2) return { error: "Nothing to split off." };
+  let k = n === "all" ? of.length : n === "half" ? Math.max(1, Math.floor(of.length / 2)) : Math.max(1, Math.min(of.length, Math.floor(+n) || 1));
+  if (k >= f.ships.length) k = f.ships.length - 1;   // never the whole fleet: that's just moving it
+  if (k < 1) return { error: "Nothing to split off." };
+  const max = shipStats(s, f.owner, type).hull;
+  const go = of.slice().sort((a, b) => a.hull / max - b.hull / max).slice(0, k);
+  f.ships = f.ships.filter((x) => !go.includes(x));
+  const nf = spawnFleet(s, f.owner, f.at, []); nf.ships.push(...go);
+  if (f.stance) nf.stance = f.stance;
+  return { ok: true, fleet: nf.id, moved: k };
 }
 function moveFleets(s) {
   for (const f of Object.values(s.fleets)) {

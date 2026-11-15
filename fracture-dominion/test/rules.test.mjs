@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
+import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS } from "../src/data.js";
@@ -414,4 +414,20 @@ test("the exotics market: an Exchange to deal, buying raises the price, selling 
   assert.ok(sellPrice(s) < marketPrice(s), "selling pays less than buying: no free money");
   endTurn(s); assert.equal(marketPrice(s), p0 + 1, "drifts back a step a turn");
   F.credits = 0; assert.match(tradeExotics(s, "tessan", 1).error, /credits/);
+});
+
+test("splitting by type: one, half or all of a type, the most damaged first; never the whole fleet", () => {
+  const s = newGame({ seed: 4, size: "small", player: "hegemony", rivals: 1 });
+  const at = coloniesOf(s, "hegemony")[0].at;
+  const f = spawnFleet(s, "hegemony", at, ["cruiser", "cruiser", "cruiser", "cruiser", "frigate", "frigate", "transport"]);
+  f.ships[2].hull = 1;   // a damaged cruiser
+  let r = splitFleet(s, f.id, "cruiser", 1);
+  assert.equal(r.moved, 1); assert.equal(s.fleets[r.fleet].ships[0].hull, 1, "the damaged one goes first");
+  r = splitFleet(s, f.id, "cruiser", "half"); assert.equal(r.moved, 1, "half of three, rounded down");
+  r = splitFleet(s, f.id, "frigate", "all"); assert.equal(r.moved, 2);
+  assert.deepEqual(f.ships.map((x) => x.type).sort(), ["cruiser", "cruiser", "transport"]);
+  const g = spawnFleet(s, "hegemony", at, ["frigate", "frigate", "frigate"]);
+  r = splitFleet(s, g.id, "frigate", "all"); assert.equal(r.moved, 2, "all but one: a split never takes the whole fleet");
+  assert.equal(g.ships.length, 1);
+  assert.ok(splitFleet(s, g.id, "frigate", 1).error);
 });

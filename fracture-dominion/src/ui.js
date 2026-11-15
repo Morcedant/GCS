@@ -312,6 +312,16 @@ function systemHTML() {
   if (fl.length) h += `<h3>In orbit</h3>` + fl.map((f) => `<button class="row" data-selfleet="${f.id}"><span class="dot" style="background:${faction(S, f.owner).color}"></span>${esc(fleetName(f))}</button>`).join("");
   return h;
 }
+/** The Empire tab's fleets: war fleets and the rest, each a row with where it is; a long list folds away. */
+function fleetListHTML(me) {
+  const all = fleetsOf(S, me.id), row = (f) => { const sid = S.sysAt[f.at];
+    return `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}</span>` : ""}<span class="small muted"> · ${sid ? esc(S.systems[sid].name) : "deep space"}${f.path.length ? ", moving" : ", idle"}</span></button>`; };
+  const war = all.filter(armed), other = all.filter((f) => !armed(f));
+  const group = (title, list, open) => !list.length ? "" : list.length > 6
+    ? `<details class="fleet-group"${open ? " open" : ""}><summary><b>${title} (${list.length})</b> <span class="small muted">${list.reduce((t, f) => t + f.ships.length, 0)} ships</span></summary>${list.map(row).join("")}</details>`
+    : `<p class="small"><b>${title} (${list.length})</b></p>${list.map(row).join("")}`;
+  return `<h3>Fleets (${all.length})</h3>${group("War fleets", war, war.length <= 12)}${group("Scouts, transports and colony ships", other, false)}`;
+}
 function fleetName(f) {
   const counts = {}; for (const x of f.ships) counts[x.type] = (counts[x.type] || 0) + 1;
   return Object.entries(counts).map(([t, n]) => `${n > 1 ? n + " " : ""}${SHIPS[t].name}${n > 1 ? "s" : ""}`).join(", ");
@@ -322,7 +332,11 @@ function fleetHTML() {
   const mine = f.owner === me.id, F = faction(S, f.owner);
   const sid = S.sysAt[f.at], sys = sid && S.systems[sid];
   let h = `<h2><span class="dot" style="background:${F.color}"></span>${mine ? "Your fleet" : esc(F.name)}</h2><p class="muted">${sys ? `At ${esc(sys.name)}` : "In deep space"}${S.hexes[f.at].terrain === "nebula" ? ", inside a nebula" : ""}. Speed ${fleetSpeed(S, f)}.</p>`;
-  h += `<ul class="ships">${f.ships.map((x) => { const st = shipStats(S, f.owner, x.type); return `<li><b>${shipSVG(x.type, F.color, 22)} ${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg</span>` : ""}${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")}<span class="small">${x.hull}/${st.hull}</span></li>`; }).join("")}</ul>`;
+  // Ships by type: a row each with how many and their hull, and each ship's hull a click away.
+  const byType = [...new Set(f.ships.map((x) => x.type))].map((t) => ({ t, st: shipStats(S, f.owner, t), list: f.ships.filter((x) => x.type === t) }));
+  h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = st.hull * list.length, hurt = list.filter((x) => x.hull < st.hull).length;
+    return `<li><b>${shipSVG(t, F.color, 22)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each</span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}</span>${list.length > 1 ? `<details class="small"><summary>Each ship</summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}</div>`).join("")}</details>` : ""}</li>`; }).join("")}</ul>`;
+  if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.</p>`;
   if (f.admiral) h += admiralCard(f.admiral, mine);
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.</p>` : "");
   const reserve = me.reserve || [];
@@ -354,9 +368,13 @@ function fleetHTML() {
   if (bt.length) h += `<h3>Targeted barrage</h3><p class="small muted" style="margin-top:-4px">You hold the orbit: destroy one building, once a turn. The Shipyard takes the ships in its yards with it. No population is lost.</p>`
     + (f.barraged === S.turn ? `<p class="small">This fleet has fired its barrage this turn.</p>` : `<div class="opts">${bt.map((b) => `<button class="opt" data-barrage="${b}"><b>${esc(BUILDINGS[b].name)}</b></button>`).join("")}</div>`);
   const others = fleetsAt(S, f.at).filter((o) => o.owner === me.id && o.id !== f.id);
-  if (others.length) h += `<h3>Join with</h3>` + others.map((o) => `<button class="row" data-merge="${o.id}">${esc(fleetName(o))}</button>`).join("");
+  if (others.length) h += `<h3>Join with</h3>` + (others.length > 1 ? `<button class="btn wide" data-mergeall>Join all ${others.length} fleets here into this one (${others.reduce((t, o) => t + o.ships.length, 0)} ships)</button>` : "")
+    + others.map((o) => `<button class="row" data-merge="${o.id}">${esc(fleetName(o))}</button>`).join("");
   const types = [...new Set(f.ships.map((x) => x.type))];
-  if (f.ships.length > 1) h += `<h3>Split off</h3><div class="opts">${types.map((t) => `<button class="opt" data-split="${t}"><b>${esc(SHIPS[t].name)}</b></button>`).join("")}</div>`;
+  // Split off by type: one, half or all of them (the most damaged first), into a fleet of their own here.
+  if (f.ships.length > 1) h += `<h3>Split off by type</h3><p class="small muted" style="margin-top:-4px">Into a new fleet here. The most damaged go first; the admiral stays.</p>`
+    + types.map((t) => { const n = f.ships.filter((x) => x.type === t).length, all = n === f.ships.length;
+      return `<div class="split-row"><span>${shipSVG(t, me.color, 18)} ${esc(SHIPS[t].name)}${n > 1 ? ` ×${n}` : ""}</span><span class="opts">${[["1", "1"], ...(n >= 4 ? [["half", `Half (${Math.floor(n / 2)})`]] : []), ...(n > 1 ? [["all", all ? `All but 1 (${n - 1})` : `All ${n}`]] : [])].map(([k, label]) => `<button class="opt" data-split="${t}:${k}"><b>${label}</b></button>`).join("")}</span></div>`; }).join("");
   return h;
 }
 // ---------- Objectives: the race to win, at a glance ----------
@@ -516,7 +534,7 @@ function empireHTML() {
     ${focusHTML()}${marketHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})</h3><table class="tbl"><tr><th>World</th><th>Pop</th><th>Ind</th><th>Sci</th><th>Building</th></tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)</i>" : ""}</td><td>${sys.colony.pop || "–"}</td><td>${fmt(y.ind)}</td><td>${fmt(y.sci)}</td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}</td></tr>`; }).join("")}</table>
-    <h3>Fleets (${fleetsOf(S, me.id).length})</h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}</span>` : ""}<span class="small muted">${f.path.length ? " · moving" : " · idle"}</span></button>`).join("")}
+    ${fleetListHTML(me)}
     ${admiralsHTML()}
     <h3>Rivals</h3><table class="tbl"><tr><th>Faction</th><th>Worlds</th><th>Score</th></tr>${S.factions.slice(1).map((F) => `<tr><td><span class="dot" style="background:${F.color}"></span>${me.met[F.id] ? esc(F.name) : "Unknown"}${F.alive ? "" : " †"}</td><td>${me.met[F.id] ? coloniesOf(S, F.id).length : "?"}</td><td>${me.met[F.id] ? score(S, F.id) : "?"}</td></tr>`).join("")}</table>`;
   return h;
@@ -636,7 +654,8 @@ function bindChrome() {
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
-    else if (d.split) { const r = splitFleet(S, sel.id, d.split); if (r.error) toast(r.error, true); else sel = { kind: "fleet", id: r.fleet }; }
+    else if (d.mergeall !== undefined) { const f = S.fleets[sel.id]; let n = 0; for (const o of fleetsAt(S, f.at).filter((o) => o.owner === me.id && o.id !== f.id)) if (!mergeFleets(S, f.id, o.id).error) n++; toast(`${n} fleet${n === 1 ? "" : "s"} joined this one.`); }
+    else if (d.split) { const [t, n] = d.split.split(":"); const r = splitFleet(S, sel.id, t, n || 1); if (r.error) toast(r.error, true); else { toast(`${r.moved} ${SHIPS[t].name.toLowerCase()}${r.moved === 1 ? "" : "s"} split off into a new fleet.`); sel = { kind: "fleet", id: r.fleet }; } }
     else if (d.tech) setResearch(S, me.id, d.tech);
     else if (d.dip) {
       const [fid, what] = d.dip.split(":");

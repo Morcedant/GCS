@@ -6,6 +6,17 @@
     {
       "date": "2026-11-15",
       "kind": "site",
+      "title": "Dominion: managing big fleets",
+      "items": [
+        "A fleet's ships are listed by type, with how many and their hull together; each ship's hull is a click away.",
+        "Split off by type: one, half or all of a type into a new fleet, the most damaged first (to send the wounded home); the admiral stays.",
+        "Join all here: every fleet of yours in a system joins the selected one in a click.",
+        "The Empire tab lists war fleets apart from scouts, transports and colony ships, with where each is, and folds a long list away."
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "kind": "site",
       "title": "Dominion: trade, an exotics market, and real sieges",
       "items": [
         "Trade: each colony earns credits from trade links, other colonies within 4 hexes that are yours or a treaty partner's; an Exchange doubles it.",

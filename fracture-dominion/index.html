@@ -68,6 +68,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .row:hover { border-color: var(--accent); }
 .ships { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 6px; }
 .ships li { display: grid; grid-template-columns: 1fr auto auto; gap: 0 8px; align-items: center; } .ships li .meter { grid-column: 1 / -1; }
+.ships.grouped li details { grid-column: 1 / -1; } .ships.grouped li details div { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+.split-row { display: grid; grid-template-columns: minmax(8rem, 1fr) 2fr; gap: 8px; align-items: center; margin: 4px 0; }
+.split-row .opts { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+.fleet-group summary { cursor: pointer; margin: 6px 0; }
 .tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 13px; }
 .tbl th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 4px; border-bottom: 1px solid var(--line); }
 .tbl td { padding: 5px 4px; border-bottom: 1px solid rgba(130,160,220,.08); } .tbl tr[data-selsys] { cursor: pointer; } .tbl tr[data-selsys]:hover td { background: var(--panel-2); }

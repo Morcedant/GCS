@@ -15,6 +15,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Victory:** conquest, the Corridor Engine (a great work), or the highest score at turn 200. Or an **open game**
   with no end: retire when you choose. After a win, **Keep ruling** carries the game on in open rule.
 - **Focus:** three points a turn to share between industry, science, credits and defense (2 at most to one).
+- **Fleet management:** a fleet's ships are listed by type (how many, their hull, and each ship a click away). Split
+  off one, half or all of a type into a new fleet (the most damaged first; the admiral stays), or join every fleet in
+  a system into one. The Empire tab groups war fleets apart from scouts, transports and colony ships, and folds a long
+  list away.
 - **Trade and the market:** each colony earns credits from trade links (other colonies within 4 hexes, your own or a
   treaty partner's; an Exchange doubles it). With an Exchange you can buy exotics, or sell them for less, on a market
   whose price moves with every unit and drifts back.
