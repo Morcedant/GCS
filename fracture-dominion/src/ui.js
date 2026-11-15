@@ -2,7 +2,7 @@
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
 import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, MARKET } from "./data.js";
 import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
-  buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
+  buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
@@ -308,6 +308,7 @@ function systemHTML() {
     h += `<h3>Add to the queue</h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18) + " " : ""}${esc(o.name)}</b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></button>`).join("")}</div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.</p>`;
   }
+  if (mine) h += musterHereHTML(sys);
   const fl = fleetsAt(S, sys.at).filter((f) => f.owner === me.id || seen);
   if (fl.length) h += `<h3>In orbit</h3>` + fl.map((f) => `<button class="row" data-selfleet="${f.id}"><span class="dot" style="background:${faction(S, f.owner).color}"></span>${esc(fleetName(f))}</button>`).join("");
   return h;
@@ -531,7 +532,7 @@ function empireHTML() {
   const cols = coloniesOf(S, me.id).sort((a, b) => (b.colony.pop || 0) - (a.colony.pop || 0));
   let h = `<h2>${esc(me.name)}</h2><p class="small muted">${esc(FACTIONS.find((f) => f.id === me.id).trait)}: ${esc(FACTIONS.find((f) => f.id === me.id).traitText)}</p>
     <div class="yields"><span>Income <b>${fmt(t.cr)}</b></span><span>Upkeep <b>${fmt(t.upkeep)}</b></span><span>Score <b>${score(S, me.id)}</b></span><span>Fleet power <b>${militaryPower(S, me.id)}</b></span></div>
-    ${focusHTML()}${marketHTML()}${protosHTML()}
+    ${focusHTML()}${musterHTML()}${marketHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})</h3><table class="tbl"><tr><th>World</th><th>Pop</th><th>Ind</th><th>Sci</th><th>Building</th></tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)</i>" : ""}</td><td>${sys.colony.pop || "–"}</td><td>${fmt(y.ind)}</td><td>${fmt(y.sci)}</td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}</td></tr>`; }).join("")}</table>
     ${fleetListHTML(me)}
@@ -555,6 +556,21 @@ function admiralsHTML() {
     ${fallen.length ? `<details class="small"><summary>The fallen (${fallen.length})</summary><ul>${fallen.map((x) => `<li>${esc(x.name)}, at ${esc(x.at)} on turn ${x.turn} (${x.wins} win${x.wins === 1 ? "" : "s"})</li>`).join("")}</ul></details>` : ""}`;
 }
 /** The empire's Focus: three points to share between industry, science, credits and defense. */
+/** Muster points on a world or outpost of yours: which standing orders send new ships here, and buttons to set them. */
+function musterHereHTML(sys) {
+  const me = player(S), M = me.muster || {}, here = ["all", ...Object.keys(MUSTER_KINDS)].filter((k) => M[k] === sys.id);
+  const label = (k) => (k === "all" ? "all new ships" : MUSTER_KINDS[k].toLowerCase());
+  return `<h3>Muster point</h3><p class="small muted" style="margin-top:-4px">A standing order: new ships, wherever they're built, head here as soon as they're finished and join their kind waiting in orbit.</p>
+    ${here.length ? `<p class="small"><b>Here:</b> ${here.map(label).join(", ")}.</p>` : ""}
+    <div class="opts">${["all", ...Object.keys(MUSTER_KINDS)].map((k) => M[k] === sys.id ? `<button class="opt on" data-muster="${k}:" aria-pressed="true"><b>Stop sending ${esc(label(k))}</b></button>` : `<button class="opt" data-muster="${k}:${sys.id}"><b>Send ${esc(label(k))} here</b></button>`).join("")}</div>`;
+}
+/** The Empire tab's standing orders: where each kind of new ship goes. */
+function musterHTML() {
+  const me = player(S), M = me.muster || {}, places = coloniesOf(S, me.id).sort((a, b) => a.name.localeCompare(b.name));
+  const sel = (k) => `<select data-musterset="${k}" aria-label="Muster point for ${k === "all" ? "all new ships" : MUSTER_KINDS[k]}"><option value="">${k === "all" ? "Stay where they're built" : "As for all ships"}</option>${places.map((x) => `<option value="${x.id}"${M[k] === x.id ? " selected" : ""}>${esc(x.name)}${x.colony.kind === "outpost" ? " (outpost)" : ""}</option>`).join("")}</select>`;
+  return `<h3>Strategic orders: muster points</h3><p class="small muted">Where new ships go once they're built: a world or outpost of yours. They join their kind there. A kind's own order overrides the one for all ships.</p>
+    <div class="muster-grid"><span><b>All new ships</b></span>${sel("all")}${Object.entries(MUSTER_KINDS).map(([k, n]) => `<span>${esc(n)}</span>${sel(k)}`).join("")}</div>`;
+}
 /** The exotics market: buy at the price, sell for less; each unit moves the price. */
 function marketHTML() {
   const me = player(S), ex = coloniesOf(S, me.id).some((x) => x.colony.buildings.market), p = marketPrice(S), sp = sellPrice(S);
@@ -626,6 +642,12 @@ function logHTML() {
 
 // ---------- the panel's buttons ----------
 function bindChrome() {
+  // The Empire tab's muster-point menus.
+  $("panel").addEventListener("change", (e) => {
+    const el = e.target.closest("[data-musterset]"); if (!el || !S) return;
+    const r = setMuster(S, player(S).id, el.dataset.musterset, el.value || null);
+    if (r.error) toast(r.error, true); else { toast(el.value ? `New ${el.dataset.musterset === "all" ? "ships" : MUSTER_KINDS[el.dataset.musterset].toLowerCase()} will head for ${S.systems[el.value].name}.` : "Muster point cleared."); save(); renderAll(); }
+  });
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button, tr[data-selsys]"); if (!b || !S) return;
     const d = b.dataset, me = player(S);
@@ -651,6 +673,7 @@ function bindChrome() {
       else { reportSince(`Invasion of ${nm}`, since); if (report) report.lines.unshift(`Your troops ${o.troops} against their defense ${o.defense}: ${r.taken ? "the landing takes the world." : "the landing fails, and the transports are lost."}`); }
       if (!S.fleets[sel.id]) sel = null;
     }
+    else if (d.muster !== undefined) { const [k, id] = d.muster.split(":"); const r = setMuster(S, me.id, k, id || null); if (r.error) toast(r.error, true); else toast(id ? `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will head for ${S.systems[id].name}.` : `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will stay where they're built.`); }
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }

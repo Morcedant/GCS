@@ -302,6 +302,23 @@ export function findPath(s, fid, from, to) {
   while (k !== from) { const p = prev[k]; path.unshift({ hex: k, cost: round1(dist[k] - dist[p]) }); k = p; }
   return path;
 }
+// ---- muster points: standing orders for where newly built ships go ----
+export const MUSTER_KINDS = { warship: "Warships", transport: "Troop transports", settler: "Colony and outpost ships", scout: "Scouts" };
+export const musterKind = (type) => (SHIPS[type].skill > 0 ? "warship" : type === "transport" ? "transport" : type === "colony" || type === "outpost" ? "settler" : "scout");
+const musterOk = (s, fid, id) => !!(id && s.systems[id] && s.systems[id].colony && s.systems[id].colony.owner === fid);
+/** Send every new ship (kind "all"), or every new ship of one kind, to one of your worlds or outposts; null clears it. */
+export function setMuster(s, fid, kind, sysId) {
+  if (kind !== "all" && !MUSTER_KINDS[kind]) return { error: "No such kind of ship." };
+  if (sysId && !musterOk(s, fid, sysId)) return { error: "A muster point has to be one of your worlds or outposts." };
+  const F = faction(s, fid); F.muster = F.muster || {};
+  if (sysId) F.muster[kind] = sysId; else delete F.muster[kind];
+  return { ok: true };
+}
+/** Where a new ship of this type goes: its kind's muster point, else the one for all ships, else nowhere (null). */
+export function musterFor(s, fid, type) {
+  const M = faction(s, fid).muster || {}, id = M[musterKind(type)] || M.all;
+  return musterOk(s, fid, id) ? s.systems[id] : null;
+}
 export function setDestination(s, fleetId, hex) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   if (hex === f.at) { f.path = []; f.dest = null; return { ok: true }; }
@@ -331,6 +348,15 @@ export function splitFleet(s, fleetId, type, n = 1) {
   const nf = spawnFleet(s, f.owner, f.at, []); nf.ships.push(...go);
   if (f.stance) nf.stance = f.stance;
   return { ok: true, fleet: nf.id, moved: k };
+}
+/** Ships that reached their muster point join a resting fleet of their own kind there (warships already do). */
+function joinMustered(s) {
+  for (const f of Object.values(s.fleets)) {
+    if (!f.muster || f.path.length || !s.fleets[f.id]) continue;
+    const kind = f.muster; delete f.muster;
+    const into = fleetsAt(s, f.at).find((o) => o !== f && o.owner === f.owner && !o.path.length && !o.muster && o.ships.length && o.ships.every((x) => musterKind(x.type) === kind));
+    if (into) { into.ships.push(...f.ships); joinAdmirals(s, into, f); delete s.fleets[f.id]; }
+  }
 }
 function moveFleets(s) {
   for (const f of Object.values(s.fleets)) {
@@ -689,6 +715,7 @@ export function endTurn(s, aiTurn) {
   if (s.winner) return;
   for (const F of s.factions) if (F.ai && F.alive && aiTurn) aiTurn(s, F);
   moveFleets(s);
+  joinMustered(s);
   battles(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
   // The exotics market drifts back toward its usual price.
@@ -712,6 +739,11 @@ export function worldDesc(sys) {
   return what.join(", ");
 }
 function economy(s, F) {
+  // A muster point lost (taken, razed) is struck off the standing orders.
+  for (const [kind, id] of Object.entries(F.muster || {})) if (!musterOk(s, F.id, id)) {
+    delete F.muster[kind];
+    if (!F.ai) log(s, F.id, `${s.systems[id] ? s.systems[id].name : "A world"} is no longer yours: new ${kind === "all" ? "ships" : MUSTER_KINDS[kind].toLowerCase()} stay where they're built until you set a new muster point.`, "build");
+  }
   const t = totals(s, F.id);
   if (!F.ai) {
     const cur = TECHS.find((x) => x.id === F.research.current);
@@ -748,9 +780,15 @@ function economy(s, F) {
         F.exotics -= q.exotics || 0;
         c.queue.shift();
         if (q.kind === "ship") {
-          const warship = SHIPS[q.id].skill > 0;
-          const here = (warship && fleetsAt(s, sys.at).find((f) => f.owner === F.id && !f.path.length && f.ships.every((x) => SHIPS[x.type].skill > 0))) || spawnFleet(s, F.id, sys.at, []);
-          here.ships.push({ type: q.id, hull: shipStats(s, F.id, q.id).hull });
+          const warship = SHIPS[q.id].skill > 0, dest = musterFor(s, F.id, q.id);
+          if (dest && dest !== sys) {   // a standing order: it leaves for the muster point as soon as it's built
+            const nf = spawnFleet(s, F.id, sys.at, [q.id]), r = setDestination(s, nf.id, dest.at);
+            if (r.error) log(s, F.id, `${q.name} built at ${sys.name} can't find a way to the muster point at ${dest.name}: it waits here.`, "build");
+            else { nf.muster = musterKind(q.id); q.mustered = dest.name; }
+          } else {
+            const here = (warship && fleetsAt(s, sys.at).find((f) => f.owner === F.id && !f.path.length && f.ships.every((x) => SHIPS[x.type].skill > 0))) || spawnFleet(s, F.id, sys.at, []);
+            here.ships.push({ type: q.id, hull: shipStats(s, F.id, q.id).hull });
+          }
           F.stats.built++;
         } else {
           c.buildings[q.id] = true;
@@ -759,7 +797,7 @@ function economy(s, F) {
         }
         if (!F.ai || q.kind === "building") {
           const what = (q.kind === "ship" ? SHIPS : BUILDINGS)[q.id];
-          log(s, F.id, `${sys.name} finished ${/^[AEIOU]/.test(q.name) ? "an" : "a"} ${q.name}${what && what.text ? `: ${what.text}` : "."}${q.kind === "ship" && !F.ai ? " It's in orbit, waiting for orders." : ""}`, "build");
+          log(s, F.id, `${sys.name} finished ${/^[AEIOU]/.test(q.name) ? "an" : "a"} ${q.name}${what && what.text ? `: ${what.text}` : "."}${q.kind === "ship" && !F.ai ? (q.mustered ? ` It's on its way to the muster point at ${q.mustered}.` : " It's in orbit, waiting for orders.") : ""}`, "build");
         }
       }
       c.stock = Math.min(c.stock, 40); // a world can only stockpile so much

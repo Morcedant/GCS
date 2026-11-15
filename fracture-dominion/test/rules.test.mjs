@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
+import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS } from "../src/data.js";
@@ -431,3 +431,27 @@ test("splitting by type: one, half or all of a type, the most damaged first; nev
   assert.equal(g.ships.length, 1);
   assert.ok(splitFleet(s, g.id, "frigate", 1).error);
 });
+
+test("muster points: new ships head for the world you name, by kind or all of them, and join their kind there", () => {
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1 });
+  const cap = coloniesOf(s, "concord")[0], far = colonyNear(s, "concord", cap.at, 4);
+  assert.ok(far);
+  assert.ok(setMuster(s, "concord", "all", Object.values(s.systems).find((x) => !x.colony).id).error, "only a world or outpost of yours");
+  assert.ok(setMuster(s, "concord", "warship", far.id).ok);
+  assert.equal(musterFor(s, "concord", "frigate"), far); assert.equal(musterFor(s, "concord", "transport"), null);
+  assert.ok(setMuster(s, "concord", "all", cap.id).ok);
+  assert.equal(musterFor(s, "concord", "transport"), cap, "the all-ships order covers the kinds without their own");
+  assert.equal(musterFor(s, "concord", "frigate"), far, "a kind's own order wins");
+  cap.colony.buildings.shipyard = true; F0(s).credits = 500;
+  cap.colony.queue = [{ kind: "ship", id: "frigate", name: "Frigate", cost: 1, progress: 1 }];
+  const guard = spawnFleet(s, "concord", far.at, ["frigate"]);
+  endTurn(s);
+  const going = Object.values(s.fleets).find((f) => f.owner === "concord" && f.dest === far.at);
+  assert.ok(going || guard.ships.length === 2, "the new frigate is on its way (or already joined)");
+  for (let i = 0; i < 6 && guard.ships.length < 2; i++) endTurn(s);
+  assert.equal(s.fleets[guard.id].ships.length, 2, "it joined the warships waiting at the muster point");
+  // A muster point lost is struck off.
+  far.colony.owner = s.factions[1].id; endTurn(s);
+  assert.equal(musterFor(s, "concord", "frigate"), cap, "back to the all-ships order");
+});
+const F0 = (s) => s.factions[0];

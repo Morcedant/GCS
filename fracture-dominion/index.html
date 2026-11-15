@@ -72,6 +72,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .split-row { display: grid; grid-template-columns: minmax(8rem, 1fr) 2fr; gap: 8px; align-items: center; margin: 4px 0; }
 .split-row .opts { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
 .fleet-group summary { cursor: pointer; margin: 6px 0; }
+.muster-grid { display: grid; grid-template-columns: minmax(9rem, 1fr) 1.4fr; gap: 6px 10px; align-items: center; margin: 6px 0 10px; }
+.muster-grid select { width: 100%; }
 .tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 13px; }
 .tbl th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 4px; border-bottom: 1px solid var(--line); }
 .tbl td { padding: 5px 4px; border-bottom: 1px solid rgba(130,160,220,.08); } .tbl tr[data-selsys] { cursor: pointer; } .tbl tr[data-selsys]:hover td { background: var(--panel-2); }

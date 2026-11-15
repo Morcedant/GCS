@@ -6,6 +6,16 @@
     {
       "date": "2026-11-15",
       "kind": "site",
+      "title": "Dominion: muster points for new ships",
+      "items": [
+        "Standing orders for where new ships go: all of them, or warships, troop transports, colony and outpost ships or scouts on their own, to a world or outpost of yours. A kind's own order overrides the one for all ships.",
+        "Set them in the Empire tab's Strategic orders, or from a world's own panel (Send warships here). New ships leave as soon as they're built and join their kind waiting there.",
+        "A muster point that's taken or razed is struck off, and you're told."
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "kind": "site",
       "title": "Dominion: managing big fleets",
       "items": [
         "A fleet's ships are listed by type, with how many and their hull together; each ship's hull is a click away.",

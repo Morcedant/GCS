@@ -73,6 +73,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .split-row { display: grid; grid-template-columns: minmax(8rem, 1fr) 2fr; gap: 8px; align-items: center; margin: 4px 0; }
 .split-row .opts { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
 .fleet-group summary { cursor: pointer; margin: 6px 0; }
+.muster-grid { display: grid; grid-template-columns: minmax(9rem, 1fr) 1.4fr; gap: 6px 10px; align-items: center; margin: 6px 0 10px; }
+.muster-grid select { width: 100%; }
 .tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 13px; }
 .tbl th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 4px; border-bottom: 1px solid var(--line); }
 .tbl td { padding: 5px 4px; border-bottom: 1px solid rgba(130,160,220,.08); } .tbl tr[data-selsys] { cursor: pointer; } .tbl tr[data-selsys]:hover td { background: var(--panel-2); }
@@ -200,7 +202,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-15 17:06 UTC";
+const BUILD = "2026-11-15 18:31 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -880,6 +882,23 @@ function findPath(s, fid, from, to) {
   while (k !== from) { const p = prev[k]; path.unshift({ hex: k, cost: round1(dist[k] - dist[p]) }); k = p; }
   return path;
 }
+// ---- muster points: standing orders for where newly built ships go ----
+const MUSTER_KINDS = { warship: "Warships", transport: "Troop transports", settler: "Colony and outpost ships", scout: "Scouts" };
+const musterKind = (type) => (SHIPS[type].skill > 0 ? "warship" : type === "transport" ? "transport" : type === "colony" || type === "outpost" ? "settler" : "scout");
+const musterOk = (s, fid, id) => !!(id && s.systems[id] && s.systems[id].colony && s.systems[id].colony.owner === fid);
+/** Send every new ship (kind "all"), or every new ship of one kind, to one of your worlds or outposts; null clears it. */
+function setMuster(s, fid, kind, sysId) {
+  if (kind !== "all" && !MUSTER_KINDS[kind]) return { error: "No such kind of ship." };
+  if (sysId && !musterOk(s, fid, sysId)) return { error: "A muster point has to be one of your worlds or outposts." };
+  const F = faction(s, fid); F.muster = F.muster || {};
+  if (sysId) F.muster[kind] = sysId; else delete F.muster[kind];
+  return { ok: true };
+}
+/** Where a new ship of this type goes: its kind's muster point, else the one for all ships, else nowhere (null). */
+function musterFor(s, fid, type) {
+  const M = faction(s, fid).muster || {}, id = M[musterKind(type)] || M.all;
+  return musterOk(s, fid, id) ? s.systems[id] : null;
+}
 function setDestination(s, fleetId, hex) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   if (hex === f.at) { f.path = []; f.dest = null; return { ok: true }; }
@@ -909,6 +928,15 @@ function splitFleet(s, fleetId, type, n = 1) {
   const nf = spawnFleet(s, f.owner, f.at, []); nf.ships.push(...go);
   if (f.stance) nf.stance = f.stance;
   return { ok: true, fleet: nf.id, moved: k };
+}
+/** Ships that reached their muster point join a resting fleet of their own kind there (warships already do). */
+function joinMustered(s) {
+  for (const f of Object.values(s.fleets)) {
+    if (!f.muster || f.path.length || !s.fleets[f.id]) continue;
+    const kind = f.muster; delete f.muster;
+    const into = fleetsAt(s, f.at).find((o) => o !== f && o.owner === f.owner && !o.path.length && !o.muster && o.ships.length && o.ships.every((x) => musterKind(x.type) === kind));
+    if (into) { into.ships.push(...f.ships); joinAdmirals(s, into, f); delete s.fleets[f.id]; }
+  }
 }
 function moveFleets(s) {
   for (const f of Object.values(s.fleets)) {
@@ -1267,6 +1295,7 @@ function endTurn(s, aiTurn) {
   if (s.winner) return;
   for (const F of s.factions) if (F.ai && F.alive && aiTurn) aiTurn(s, F);
   moveFleets(s);
+  joinMustered(s);
   battles(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
   // The exotics market drifts back toward its usual price.
@@ -1290,6 +1319,11 @@ function worldDesc(sys) {
   return what.join(", ");
 }
 function economy(s, F) {
+  // A muster point lost (taken, razed) is struck off the standing orders.
+  for (const [kind, id] of Object.entries(F.muster || {})) if (!musterOk(s, F.id, id)) {
+    delete F.muster[kind];
+    if (!F.ai) log(s, F.id, `${s.systems[id] ? s.systems[id].name : "A world"} is no longer yours: new ${kind === "all" ? "ships" : MUSTER_KINDS[kind].toLowerCase()} stay where they're built until you set a new muster point.`, "build");
+  }
   const t = totals(s, F.id);
   if (!F.ai) {
     const cur = TECHS.find((x) => x.id === F.research.current);
@@ -1326,9 +1360,15 @@ function economy(s, F) {
         F.exotics -= q.exotics || 0;
         c.queue.shift();
         if (q.kind === "ship") {
-          const warship = SHIPS[q.id].skill > 0;
-          const here = (warship && fleetsAt(s, sys.at).find((f) => f.owner === F.id && !f.path.length && f.ships.every((x) => SHIPS[x.type].skill > 0))) || spawnFleet(s, F.id, sys.at, []);
-          here.ships.push({ type: q.id, hull: shipStats(s, F.id, q.id).hull });
+          const warship = SHIPS[q.id].skill > 0, dest = musterFor(s, F.id, q.id);
+          if (dest && dest !== sys) {   // a standing order: it leaves for the muster point as soon as it's built
+            const nf = spawnFleet(s, F.id, sys.at, [q.id]), r = setDestination(s, nf.id, dest.at);
+            if (r.error) log(s, F.id, `${q.name} built at ${sys.name} can't find a way to the muster point at ${dest.name}: it waits here.`, "build");
+            else { nf.muster = musterKind(q.id); q.mustered = dest.name; }
+          } else {
+            const here = (warship && fleetsAt(s, sys.at).find((f) => f.owner === F.id && !f.path.length && f.ships.every((x) => SHIPS[x.type].skill > 0))) || spawnFleet(s, F.id, sys.at, []);
+            here.ships.push({ type: q.id, hull: shipStats(s, F.id, q.id).hull });
+          }
           F.stats.built++;
         } else {
           c.buildings[q.id] = true;
@@ -1337,7 +1377,7 @@ function economy(s, F) {
         }
         if (!F.ai || q.kind === "building") {
           const what = (q.kind === "ship" ? SHIPS : BUILDINGS)[q.id];
-          log(s, F.id, `${sys.name} finished ${/^[AEIOU]/.test(q.name) ? "an" : "a"} ${q.name}${what && what.text ? `: ${what.text}` : "."}${q.kind === "ship" && !F.ai ? " It's in orbit, waiting for orders." : ""}`, "build");
+          log(s, F.id, `${sys.name} finished ${/^[AEIOU]/.test(q.name) ? "an" : "a"} ${q.name}${what && what.text ? `: ${what.text}` : "."}${q.kind === "ship" && !F.ai ? (q.mustered ? ` It's on its way to the muster point at ${q.mustered}.` : " It's in orbit, waiting for orders.") : ""}`, "build");
         }
       }
       c.stock = Math.min(c.stock, 40); // a world can only stockpile so much
@@ -2738,6 +2778,7 @@ function systemHTML() {
     h += `<h3>Add to the queue<\/h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18) + " " : ""}${esc(o.name)}<\/b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}<\/span><\/button>`).join("")}<\/div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.<\/p>`;
   }
+  if (mine) h += musterHereHTML(sys);
   const fl = fleetsAt(S, sys.at).filter((f) => f.owner === me.id || seen);
   if (fl.length) h += `<h3>In orbit<\/h3>` + fl.map((f) => `<button class="row" data-selfleet="${f.id}"><span class="dot" style="background:${faction(S, f.owner).color}"><\/span>${esc(fleetName(f))}<\/button>`).join("");
   return h;
@@ -2961,7 +3002,7 @@ function empireHTML() {
   const cols = coloniesOf(S, me.id).sort((a, b) => (b.colony.pop || 0) - (a.colony.pop || 0));
   let h = `<h2>${esc(me.name)}<\/h2><p class="small muted">${esc(FACTIONS.find((f) => f.id === me.id).trait)}: ${esc(FACTIONS.find((f) => f.id === me.id).traitText)}<\/p>
     <div class="yields"><span>Income <b>${fmt(t.cr)}<\/b><\/span><span>Upkeep <b>${fmt(t.upkeep)}<\/b><\/span><span>Score <b>${score(S, me.id)}<\/b><\/span><span>Fleet power <b>${militaryPower(S, me.id)}<\/b><\/span><\/div>
-    ${focusHTML()}${marketHTML()}${protosHTML()}
+    ${focusHTML()}${musterHTML()}${marketHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})<\/h3><table class="tbl"><tr><th>World<\/th><th>Pop<\/th><th>Ind<\/th><th>Sci<\/th><th>Building<\/th><\/tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)<\/i>" : ""}<\/td><td>${sys.colony.pop || "–"}<\/td><td>${fmt(y.ind)}<\/td><td>${fmt(y.sci)}<\/td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}<\/td><\/tr>`; }).join("")}<\/table>
     ${fleetListHTML(me)}
@@ -2985,6 +3026,21 @@ function admiralsHTML() {
     ${fallen.length ? `<details class="small"><summary>The fallen (${fallen.length})<\/summary><ul>${fallen.map((x) => `<li>${esc(x.name)}, at ${esc(x.at)} on turn ${x.turn} (${x.wins} win${x.wins === 1 ? "" : "s"})<\/li>`).join("")}<\/ul><\/details>` : ""}`;
 }
 /** The empire's Focus: three points to share between industry, science, credits and defense. */
+/** Muster points on a world or outpost of yours: which standing orders send new ships here, and buttons to set them. */
+function musterHereHTML(sys) {
+  const me = player(S), M = me.muster || {}, here = ["all", ...Object.keys(MUSTER_KINDS)].filter((k) => M[k] === sys.id);
+  const label = (k) => (k === "all" ? "all new ships" : MUSTER_KINDS[k].toLowerCase());
+  return `<h3>Muster point<\/h3><p class="small muted" style="margin-top:-4px">A standing order: new ships, wherever they're built, head here as soon as they're finished and join their kind waiting in orbit.<\/p>
+    ${here.length ? `<p class="small"><b>Here:<\/b> ${here.map(label).join(", ")}.<\/p>` : ""}
+    <div class="opts">${["all", ...Object.keys(MUSTER_KINDS)].map((k) => M[k] === sys.id ? `<button class="opt on" data-muster="${k}:" aria-pressed="true"><b>Stop sending ${esc(label(k))}<\/b><\/button>` : `<button class="opt" data-muster="${k}:${sys.id}"><b>Send ${esc(label(k))} here<\/b><\/button>`).join("")}<\/div>`;
+}
+/** The Empire tab's standing orders: where each kind of new ship goes. */
+function musterHTML() {
+  const me = player(S), M = me.muster || {}, places = coloniesOf(S, me.id).sort((a, b) => a.name.localeCompare(b.name));
+  const sel = (k) => `<select data-musterset="${k}" aria-label="Muster point for ${k === "all" ? "all new ships" : MUSTER_KINDS[k]}"><option value="">${k === "all" ? "Stay where they're built" : "As for all ships"}<\/option>${places.map((x) => `<option value="${x.id}"${M[k] === x.id ? " selected" : ""}>${esc(x.name)}${x.colony.kind === "outpost" ? " (outpost)" : ""}<\/option>`).join("")}<\/select>`;
+  return `<h3>Strategic orders: muster points<\/h3><p class="small muted">Where new ships go once they're built: a world or outpost of yours. They join their kind there. A kind's own order overrides the one for all ships.<\/p>
+    <div class="muster-grid"><span><b>All new ships<\/b><\/span>${sel("all")}${Object.entries(MUSTER_KINDS).map(([k, n]) => `<span>${esc(n)}<\/span>${sel(k)}`).join("")}<\/div>`;
+}
 /** The exotics market: buy at the price, sell for less; each unit moves the price. */
 function marketHTML() {
   const me = player(S), ex = coloniesOf(S, me.id).some((x) => x.colony.buildings.market), p = marketPrice(S), sp = sellPrice(S);
@@ -3056,6 +3112,12 @@ function logHTML() {
 
 // ---------- the panel's buttons ----------
 function bindChrome() {
+  // The Empire tab's muster-point menus.
+  $("panel").addEventListener("change", (e) => {
+    const el = e.target.closest("[data-musterset]"); if (!el || !S) return;
+    const r = setMuster(S, player(S).id, el.dataset.musterset, el.value || null);
+    if (r.error) toast(r.error, true); else { toast(el.value ? `New ${el.dataset.musterset === "all" ? "ships" : MUSTER_KINDS[el.dataset.musterset].toLowerCase()} will head for ${S.systems[el.value].name}.` : "Muster point cleared."); save(); renderAll(); }
+  });
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button, tr[data-selsys]"); if (!b || !S) return;
     const d = b.dataset, me = player(S);
@@ -3081,6 +3143,7 @@ function bindChrome() {
       else { reportSince(`Invasion of ${nm}`, since); if (report) report.lines.unshift(`Your troops ${o.troops} against their defense ${o.defense}: ${r.taken ? "the landing takes the world." : "the landing fails, and the transports are lost."}`); }
       if (!S.fleets[sel.id]) sel = null;
     }
+    else if (d.muster !== undefined) { const [k, id] = d.muster.split(":"); const r = setMuster(S, me.id, k, id || null); if (r.error) toast(r.error, true); else toast(id ? `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will head for ${S.systems[id].name}.` : `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will stay where they're built.`); }
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }

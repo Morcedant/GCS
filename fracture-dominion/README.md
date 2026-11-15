@@ -19,6 +19,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   off one, half or all of a type into a new fleet (the most damaged first; the admiral stays), or join every fleet in
   a system into one. The Empire tab groups war fleets apart from scouts, transports and colony ships, and folds a long
   list away.
+- **Muster points:** standing orders for where new ships go: all of them, or warships, troop transports, colony and
+  outpost ships or scouts on their own, to a world or outpost of yours (the Empire tab, or the world's own panel). They
+  leave as soon as they're built and join their kind waiting there. A muster point that's lost is struck off.
 - **Trade and the market:** each colony earns credits from trade links (other colonies within 4 hexes, your own or a
   treaty partner's; an Exchange doubles it). With an Exchange you can buy exotics, or sell them for less, on a market
   whose price moves with every unit and drifts back.
