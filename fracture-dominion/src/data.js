@@ -35,6 +35,7 @@ export const BUILDINGS = {
   market: { name: "Exchange", cost: 50, upkeep: 0, text: "+3 credits here." },
   shipyard: { name: "Shipyard", cost: 80, upkeep: 1, text: "Builds ships here." },
   battery: { name: "Orbital battery", cost: 70, upkeep: 1, needs: "batteries", text: "Defends the world: it fires on enemies in orbit (skill 13, 3 hull)." },
+  depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
   refinery: { name: "Exotics refinery", cost: 90, upkeep: 1, needs: "refining", text: "+1 exotics if the system has a deposit." },
   engine: { name: "The Corridor Engine", cost: 1200, upkeep: 0, needs: "engine", exotics: 15, wonder: true,
     text: "Finish it and you open a corridor to everywhere at once: you win." },
@@ -42,13 +43,13 @@ export const BUILDINGS = {
 
 // Ships. skill: the 3d6 roll-under target to hit; dmg: hull a hit takes; hull: what it can take.
 export const SHIPS = {
-  scout: { name: "Scout", cost: 20, upkeep: 0.5, speed: 4, hull: 1, skill: 0, dmg: 0, sensors: 3, text: "Fast eyes. Unarmed." },
-  colony: { name: "Colony ship", cost: 60, upkeep: 1, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, colonize: true, text: "Founds a colony on a world you can live on. Used up." },
-  outpost: { name: "Outpost ship", cost: 30, upkeep: 0.5, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, outpost: true, text: "Claims any system as an outpost: its exotics and its territory. Used up." },
-  frigate: { name: "Frigate", cost: 40, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, text: "The line of battle." },
-  transport: { name: "Troop transport", cost: 45, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
-  cruiser: { name: "Cruiser", cost: 90, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
-  dreadnought: { name: "Dreadnought", cost: 180, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
+  scout: { name: "Scout", cost: 20, fuel: 10, upkeep: 0.5, speed: 4, hull: 1, skill: 0, dmg: 0, sensors: 3, text: "Fast eyes. Unarmed." },
+  colony: { name: "Colony ship", cost: 60, fuel: 6, upkeep: 1, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, colonize: true, text: "Founds a colony on a world you can live on. Used up." },
+  outpost: { name: "Outpost ship", cost: 30, fuel: 6, upkeep: 0.5, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, outpost: true, text: "Claims any system as an outpost: its exotics and its territory. Used up." },
+  frigate: { name: "Frigate", cost: 40, fuel: 6, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, text: "The line of battle." },
+  transport: { name: "Troop transport", cost: 45, fuel: 5, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
+  cruiser: { name: "Cruiser", cost: 90, fuel: 5, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
+  dreadnought: { name: "Dreadnought", cost: 180, fuel: 4, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
@@ -130,8 +131,12 @@ export const STANCES = {
   aggressive: { name: "Aggressive", atk: 1, def: 1, text: "+1 to its rolls, but +1 to the enemy's rolls against it." },
   defensive: { name: "Defensive", atk: -1, def: -1, text: "−1 to its rolls, and −1 to the enemy's rolls against it." },
 };
-/** Fleets out of supply (farther than this from every world and outpost of theirs) wear down. */
+/** Fleets out of supply (farther than this from every colony and fuel-depot outpost of theirs) wear down, and burn fuel. */
 export const SUPPLY = { range: 3, graceTurns: 1 };
+// Fuel: a fleet carries enough for so many turns of travel beyond supply (its thirstiest ship's). Each turn it moves out
+// of supply burns one; with none left it crawls a hex a turn. In supply it refuels. Colonies give supply; an outpost
+// gives supply only once it has a Fuel depot (bought with credits, or founded with the outpost).
+export const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1 };
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
 // partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
 export const TRADE = { range: 4, perLink: 0.5, maxLinks: 4, exchange: 2 };

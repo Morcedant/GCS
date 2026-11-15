@@ -201,7 +201,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-15 18:31 UTC";
+const BUILD = "2026-11-15 18:36 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -306,6 +306,7 @@ const BUILDINGS = {
   market: { name: "Exchange", cost: 50, upkeep: 0, text: "+3 credits here." },
   shipyard: { name: "Shipyard", cost: 80, upkeep: 1, text: "Builds ships here." },
   battery: { name: "Orbital battery", cost: 70, upkeep: 1, needs: "batteries", text: "Defends the world: it fires on enemies in orbit (skill 13, 3 hull)." },
+  depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
   refinery: { name: "Exotics refinery", cost: 90, upkeep: 1, needs: "refining", text: "+1 exotics if the system has a deposit." },
   engine: { name: "The Corridor Engine", cost: 1200, upkeep: 0, needs: "engine", exotics: 15, wonder: true,
     text: "Finish it and you open a corridor to everywhere at once: you win." },
@@ -313,13 +314,13 @@ const BUILDINGS = {
 
 // Ships. skill: the 3d6 roll-under target to hit; dmg: hull a hit takes; hull: what it can take.
 const SHIPS = {
-  scout: { name: "Scout", cost: 20, upkeep: 0.5, speed: 4, hull: 1, skill: 0, dmg: 0, sensors: 3, text: "Fast eyes. Unarmed." },
-  colony: { name: "Colony ship", cost: 60, upkeep: 1, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, colonize: true, text: "Founds a colony on a world you can live on. Used up." },
-  outpost: { name: "Outpost ship", cost: 30, upkeep: 0.5, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, outpost: true, text: "Claims any system as an outpost: its exotics and its territory. Used up." },
-  frigate: { name: "Frigate", cost: 40, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, text: "The line of battle." },
-  transport: { name: "Troop transport", cost: 45, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
-  cruiser: { name: "Cruiser", cost: 90, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
-  dreadnought: { name: "Dreadnought", cost: 180, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
+  scout: { name: "Scout", cost: 20, fuel: 10, upkeep: 0.5, speed: 4, hull: 1, skill: 0, dmg: 0, sensors: 3, text: "Fast eyes. Unarmed." },
+  colony: { name: "Colony ship", cost: 60, fuel: 6, upkeep: 1, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, colonize: true, text: "Founds a colony on a world you can live on. Used up." },
+  outpost: { name: "Outpost ship", cost: 30, fuel: 6, upkeep: 0.5, speed: 2, hull: 1, skill: 0, dmg: 0, sensors: 1, outpost: true, text: "Claims any system as an outpost: its exotics and its territory. Used up." },
+  frigate: { name: "Frigate", cost: 40, fuel: 6, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, text: "The line of battle." },
+  transport: { name: "Troop transport", cost: 45, fuel: 5, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
+  cruiser: { name: "Cruiser", cost: 90, fuel: 5, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
+  dreadnought: { name: "Dreadnought", cost: 180, fuel: 4, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
@@ -401,8 +402,12 @@ const STANCES = {
   aggressive: { name: "Aggressive", atk: 1, def: 1, text: "+1 to its rolls, but +1 to the enemy's rolls against it." },
   defensive: { name: "Defensive", atk: -1, def: -1, text: "−1 to its rolls, and −1 to the enemy's rolls against it." },
 };
-/** Fleets out of supply (farther than this from every world and outpost of theirs) wear down. */
+/** Fleets out of supply (farther than this from every colony and fuel-depot outpost of theirs) wear down, and burn fuel. */
 const SUPPLY = { range: 3, graceTurns: 1 };
+// Fuel: a fleet carries enough for so many turns of travel beyond supply (its thirstiest ship's). Each turn it moves out
+// of supply burns one; with none left it crawls a hex a turn. In supply it refuels. Colonies give supply; an outpost
+// gives supply only once it has a Fuel depot (bought with credits, or founded with the outpost).
+const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1 };
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
 // partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
 const TRADE = { range: 4, perLink: 0.5, maxLinks: 4, exchange: 2 };
@@ -662,12 +667,26 @@ function setFocus(s, fid, kind, n) {
   fo[kind] = n; return { ok: true };
 }
 // ---- supply ----
-/** How far from its own worlds and outposts a faction's fleets stay in supply. */
+/** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
-function inSupply(s, f) {
-  if (f.owner === "vael") return true;   // living hulls feed themselves
-  const r = supplyRange(s, f.owner);
-  return coloniesOf(s, f.owner).some((x) => distance(x.at, f.at) <= r);
+/** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
+const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => x.colony.kind === "colony" || x.colony.buildings.depot);
+const inSupplyAt = (s, fid, hex) => fid === "vael" || fid === "wardens" || supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
+function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hulls (the Vael) feed themselves
+// ---- fuel ----
+/** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
+const fuelMax = (s, f) => (f.owner === "vael" || f.owner === "wardens" ? Infinity : Math.min(...f.ships.map((x) => SHIPS[x.type].fuel || 99)));
+const fuelOf = (s, f) => Math.min(fuelMax(s, f), f.fuel ?? fuelMax(s, f));
+/** Buy a Fuel depot at an outpost of yours, with credits (an outpost has no industry). */
+function buildDepot(s, fid, sysId) {
+  const sys = s.systems[sysId], c = sys && sys.colony, F = faction(s, fid);
+  if (!c || c.owner !== fid) return { error: "That isn't yours." };
+  if (c.kind !== "outpost") return { error: "A colony gives supply already; a fuel depot is for outposts." };
+  if (c.buildings.depot) return { error: "It has a fuel depot." };
+  if (F.credits < FUEL.depotCost) return { error: `A fuel depot costs ${FUEL.depotCost} credits.` };
+  F.credits = round1(F.credits - FUEL.depotCost); c.buildings.depot = true;
+  log(s, fid, `A fuel depot opened at ${sys.name}: the outpost gives supply, and fleets refuel there.`, "build");
+  return { ok: true };
 }
 /** Set a fleet's battle stance. */
 function setStance(s, fleetId, stance) { const f = s.fleets[fleetId]; if (!f || !STANCES[stance]) return { error: "No such stance." }; f.stance = stance; return { ok: true }; }
@@ -824,7 +843,7 @@ function buildOptions(s, sys) {
   if (c.kind !== "colony") return out;
   if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
   for (const [b, d] of Object.entries(BUILDINGS)) {
-    if (c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;
+    if (d.outpost || c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;   // a depot is for outposts (buildDepot)
     if (d.wonder && !c.capital) continue;
     out.push({ kind: "building", id: b, name: d.name, cost: d.cost, exotics: d.exotics || 0 });
   }
@@ -908,7 +927,7 @@ function setDestination(s, fleetId, hex) {
 function mergeFleets(s, intoId, fromId) {
   const a = s.fleets[intoId], b = s.fleets[fromId];
   if (!a || !b || a.owner !== b.owner || a.at !== b.at) return { error: "They need to be in the same place." };
-  a.ships.push(...b.ships); joinAdmirals(s, a, b); delete s.fleets[fromId]; return { ok: true };
+  const fu = Math.min(fuelOf(s, a), fuelOf(s, b)); a.ships.push(...b.ships); a.fuel = Math.min(fu, fuelMax(s, a)); joinAdmirals(s, a, b); delete s.fleets[fromId]; return { ok: true };
 }
 /**
  * Split ships of one type off into a new fleet at the same place: n of them (1 by default), "half", or "all". The most
@@ -924,8 +943,9 @@ function splitFleet(s, fleetId, type, n = 1) {
   const max = shipStats(s, f.owner, type).hull;
   const go = of.slice().sort((a, b) => a.hull / max - b.hull / max).slice(0, k);
   f.ships = f.ships.filter((x) => !go.includes(x));
-  const nf = spawnFleet(s, f.owner, f.at, []); nf.ships.push(...go);
+  const fu = fuelOf(s, { ...f, ships: [...f.ships, ...go] }), nf = spawnFleet(s, f.owner, f.at, []); nf.ships.push(...go);
   if (f.stance) nf.stance = f.stance;
+  nf.fuel = Math.min(fu, fuelMax(s, nf)); f.fuel = Math.min(fu, fuelMax(s, f));
   return { ok: true, fleet: nf.id, moved: k };
 }
 /** Ships that reached their muster point join a resting fleet of their own kind there (warships already do). */
@@ -934,12 +954,15 @@ function joinMustered(s) {
     if (!f.muster || f.path.length || !s.fleets[f.id]) continue;
     const kind = f.muster; delete f.muster;
     const into = fleetsAt(s, f.at).find((o) => o !== f && o.owner === f.owner && !o.path.length && !o.muster && o.ships.length && o.ships.every((x) => musterKind(x.type) === kind));
-    if (into) { into.ships.push(...f.ships); joinAdmirals(s, into, f); delete s.fleets[f.id]; }
+    if (into) { const fu = Math.min(fuelOf(s, into), fuelOf(s, f)); into.ships.push(...f.ships); into.fuel = Math.min(fu, fuelMax(s, into)); joinAdmirals(s, into, f); delete s.fleets[f.id]; }
   }
 }
 function moveFleets(s) {
   for (const f of Object.values(s.fleets)) {
     let mp = fleetSpeed(s, f);
+    // Fuel: a turn's travel beyond supply burns one; with none left the fleet crawls.
+    const out = f.path.length && !inSupply(s, f) && fuelMax(s, f) !== Infinity;
+    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else mp = Math.min(mp, FUEL.fumesSpeed); }
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) {
       const step = f.path[0];
       // A fleet stops where an enemy at war guards the hex.
@@ -947,16 +970,17 @@ function moveFleets(s) {
       if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; }
     }
     if (!f.path.length) f.dest = null;
+    if (inSupply(s, f)) f.fuel = fuelMax(s, f);   // refuelled
   }
   // Fleets of one faction resting in the same hex join up.
   const byHex = {};
   // Warships only: colony ships, outposts, scouts and transports keep their own fleets until the player joins them.
   const warOnly = (f) => f.ships.every((x) => SHIPS[x.type].skill > 0);
-  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f)) continue; const k = f.owner + "|" + f.at; if (byHex[k]) { byHex[k].ships.push(...f.ships); joinAdmirals(s, byHex[k], f); delete s.fleets[f.id]; } else byHex[k] = f; }
+  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f)) continue; const k = f.owner + "|" + f.at; if (byHex[k]) { const g = byHex[k], fu = Math.min(fuelOf(s, g), fuelOf(s, f)); g.ships.push(...f.ships); g.fuel = Math.min(fu, fuelMax(s, g)); joinAdmirals(s, g, f); delete s.fleets[f.id]; } else byHex[k] = f; }
 }
 
 // ---- settling and invading ----
-function settle(s, fleetId) {
+function settle(s, fleetId, opts = {}) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
   if (!sys) return { error: "There's no system here." };
   const ci = f.ships.findIndex((x) => x.type === "colony"), oi = f.ships.findIndex((x) => x.type === "outpost");
@@ -967,9 +991,12 @@ function settle(s, fleetId) {
     log(s, f.owner, `${faction(s, f.owner).name} founded a colony on ${sys.name}, ${worldDesc(sys)}.`, "settle");
   } else if (oi >= 0 || ci >= 0) {
     if (oi < 0 && !canSettle(s, f.owner, sys, "outpost")) return { error: "Nothing here to settle with." };
+    const F = faction(s, f.owner), depot = !!opts.depot && F.credits >= FUEL.foundWithDepot;
+    if (opts.depot && !depot) return { error: `Founding it with a fuel depot costs ${FUEL.foundWithDepot} credits.` };
     f.ships.splice(oi >= 0 ? oi : ci, 1);
-    sys.colony = { owner: f.owner, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
-    log(s, f.owner, `${faction(s, f.owner).name} claimed ${sys.name} as an outpost: ${worldDesc(sys)}. It extends your borders${sys.exotics ? " and mines its exotics" : ""}.`, "settle");
+    if (depot) F.credits = round1(F.credits - FUEL.foundWithDepot);
+    sys.colony = { owner: f.owner, kind: "outpost", pop: 0, growth: 0, buildings: depot ? { depot: true } : {}, queue: [], stock: 0, defense: 0, capital: false };
+    log(s, f.owner, `${F.name} claimed ${sys.name} as an outpost: ${worldDesc(sys)}. It extends your borders${sys.exotics ? " and mines its exotics" : ""}${depot ? ", and its fuel depot gives supply" : ""}.`, "settle");
   } else return { error: "This fleet has no colony or outpost ship." };
   if (!f.ships.length) dropFleet(s, f);
   noticeSettling(s, f.owner, sys);
@@ -1414,7 +1441,7 @@ function economy(s, F) {
     const p = Object.keys(PROTOTYPES).find((x) => !(F.protos || {})[x]);
     if (p) { F.protos = F.protos || {}; F.protos[p] = true; if (player(s).met[F.id]) log(s, player(s).id, `${F.name} field-tested a prototype: ${PROTOTYPES[p].name} (${PROTOTYPES[p].text})`, "research"); }
   }
-  // Supply: warships too far from every world and outpost of theirs wear down, a hull point a turn after the first
+  // Supply: warships too far from every colony and fuel depot of theirs wear down, a hull point a turn after the first
   // (never below 1). Scouts, colony ships, outposts and transports carry what they need.
   for (const f of fleetsOf(s, F.id)) {
     if (!armed(f) || inSupply(s, f) || admTrait(f, "quartermaster")) { f.out = 0; continue; }
@@ -2349,6 +2376,8 @@ function production(s, F, diff) {
   if (F.exotics > 8 && F.credits < 30) tradeExotics(s, F.id, -3);
   const waitingFor = Math.max(0, ...coloniesOf(s, F.id).flatMap((c) => c.colony.queue.filter((q) => q.waiting).map((q) => (q.exotics || 0) - F.exotics)));
   if (waitingFor > 0 && F.credits > marketPrice(s) * waitingFor + 40) tradeExotics(s, F.id, waitingFor);
+  // Fuel depots: an outpost gives supply only with one. Buy them while the treasury allows, the nearest the frontier first.
+  for (const o of coloniesOf(s, F.id).filter((x) => x.colony.kind === "outpost" && !x.colony.buildings.depot)) if (F.credits > FUEL.depotCost + 50) buildDepot(s, F.id, o.id);
   const cols = coloniesOf(s, F.id).filter((c) => c.colony.kind === "colony");
   const t = totals(s, F.id);
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
@@ -2444,7 +2473,10 @@ function fleets(s, F) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
           .map((sys) => ({ sys, d: distance(f.at, sys.at), guard: fleetsAt(s, sys.at).filter((g) => g.owner === sys.colony.owner).reduce((t, g) => t + g.ships.length * 2, 0) + (sys.colony.defense || 0) }))
-          .filter((x) => x.guard <= mine * 1.3).sort((a, b) => a.d - b.d);
+          .filter((x) => x.guard <= mine * 1.3)
+          // Within reach on its fuel: a target beyond supply no farther than its tank carries it.
+          .filter((x) => inSupplyAt(s, F.id, x.sys.at) || fuelOf(s, f) === Infinity || Math.min(...supplySources(s, F.id).map((c) => distance(c.at, x.sys.at))) - supplyRange(s, F.id) <= fuelOf(s, f) * fleetSpeed(s, f))
+          .sort((a, b) => a.d - b.d);
         if (targets[0] && f.ships.length >= 2) { setDestination(s, f.id, targets[0].sys.at); continue; }
       }
       if (huntWardens(s, F, f, 7)) continue;
@@ -2761,7 +2793,9 @@ function systemHTML() {
   let h = `<h2>${esc(sys.name)}<\/h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit<\/b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins<\/b>" : ""}.<\/p>`;
   if (!c) h += `<p>${w.outpostOnly ? "No one can live here, but an outpost can claim it." : w.needs && !has(S, me.id, w.needs) ? `Needs <b>${esc(TECHS.find((t) => t.id === w.needs).name)}<\/b> to settle; an outpost can claim it now.` : "Unclaimed. A colony ship can settle it."}<\/p>`;
   else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}<\/b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && (c.buildings.battery || c.capital) ? ` Orbital guns: ${c.defense} hull.` : ""}${seen ? siegeHTML(sys, false) : ""}<\/p>`;
-  else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.<\/p>`;
+  else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.<\/p>`
+    + (c.buildings.depot ? `<p class="small good"><b>Fuel depot.<\/b> It gives supply within ${supplyRange(S, me.id)} hexes, and fleets refuel here.<\/p>`
+      : `<p class="small"><b>No fuel depot:<\/b> an outpost gives supply only with one.<\/p><button class="btn" data-depot ${me.credits < FUEL.depotCost ? "disabled" : ""}>Build a fuel depot (${FUEL.depotCost} credits)<\/button>`);
   else {
     const y = yields(S, sys), max = maxPop(S, sys);
     h += `<div class="kv"><span>Population<\/span><b>${c.pop} / ${max}<\/b>${bar(c.pop + c.growth, max, "#7bc47f")}<\/div>
@@ -2807,6 +2841,8 @@ function fleetHTML() {
   h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = st.hull * list.length, hurt = list.filter((x) => x.hull < st.hull).length;
     return `<li><b>${shipSVG(t, F.color, 22)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(st.name)}<\/b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each<\/span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}<\/span>${list.length > 1 ? `<details class="small"><summary>Each ship<\/summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}<\/div>`).join("")}<\/details>` : ""}<\/li>`; }).join("")}<\/ul>`;
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.<\/p>`;
+  if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
+    h += `<div class="kv"><span>Fuel<\/span><b class="${fu ? "" : "bad"}">${fu} / ${mx}<\/b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}<\/div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? "In supply: the tank stays full." : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.<\/p>`; }
   if (f.admiral) h += admiralCard(f.admiral, mine);
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.<\/p>` : "");
   const reserve = me.reserve || [];
@@ -2818,12 +2854,13 @@ function fleetHTML() {
     h += `<p class="small ${ok ? "" : "bad"}"><b>Supply:<\/b> ${ok ? `in supply (within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours)` : `out of supply${f.out ? ` for ${f.out} turn${f.out === 1 ? "" : "s"}` : ""}: from the second turn its warships wear down a hull point a turn. Bring it within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours.`}<\/p>`;
     h += `<h3>Battle stance<\/h3><div class="opts">${Object.entries(STANCES).map(([k, x]) => `<button class="opt ${(f.stance || "balanced") === k ? "on" : ""}" data-stance="${k}" aria-pressed="${(f.stance || "balanced") === k}"><b>${esc(x.name)}<\/b><small>${esc(x.text)}<\/small><\/button>`).join("")}<\/div>`;
   }
-  if (f.path.length) h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f))} turn(s).<\/p>`;
+  if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
+    h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).<\/p>${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.<\/p>` : ""}`; }
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}<\/button>${f.path.length ? `<button class="btn" data-stop>Stop<\/button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}<\/button>`}<\/div>`;
   if (sys && !sys.colony) {
     const col = f.ships.some((x) => x.type === "colony") && canSettle(S, me.id, sys, "colony"), out = f.ships.some((x) => x.type === "outpost" || x.type === "colony");
     if (col) h += `<button class="btn primary wide" data-settle>Found a colony on ${esc(sys.name)}<\/button>`;
-    else if (out) h += `<button class="btn wide" data-settle>Claim ${esc(sys.name)} as an outpost<\/button>`;
+    else if (out) h += `<button class="btn wide" data-settle>Claim ${esc(sys.name)} as an outpost<\/button><button class="btn wide" data-settle="depot" ${me.credits < FUEL.foundWithDepot ? "disabled" : ""}>Claim it with a fuel depot (${FUEL.foundWithDepot} credits): supply from the start<\/button>`;
   }
   const o = invasionOdds(S, f.id);
   if (o && o.troops) {
@@ -3135,7 +3172,7 @@ function bindChrome() {
     else if (d.move !== undefined) { moveMode = !moveMode; if (moveMode) toast("Click where to send this fleet. Esc cancels."); }
     else if (d.stop !== undefined) setDestination(S, sel.id, S.fleets[sel.id].at);
     else if (d.sentry !== undefined) { const f = S.fleets[sel.id]; f.sentry = !f.sentry; if (f.sentry) nextIdle(); }
-    else if (d.settle !== undefined) { const since = mark(), at = S.fleets[sel.id].at, nm = S.systems[S.sysAt[at]].name, r = settle(S, sel.id); if (!r.error) reportSince(`${nm}`, since); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
+    else if (d.settle !== undefined) { const since = mark(), at = S.fleets[sel.id].at, nm = S.systems[S.sysAt[at]].name, r = settle(S, sel.id, { depot: d.settle === "depot" }); if (!r.error) reportSince(`${nm}`, since); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
     else if (d.invade !== undefined) {
       const since = mark(), o = invasionOdds(S, sel.id), nm = S.systems[S.sysAt[S.fleets[sel.id].at]].name, r = invade(S, sel.id);
       if (r.error) toast(r.error, true);
@@ -3143,6 +3180,7 @@ function bindChrome() {
       if (!S.fleets[sel.id]) sel = null;
     }
     else if (d.muster !== undefined) { const [k, id] = d.muster.split(":"); const r = setMuster(S, me.id, k, id || null); if (r.error) toast(r.error, true); else toast(id ? `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will head for ${S.systems[id].name}.` : `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will stay where they're built.`); }
+    else if (d.depot !== undefined) { const r = buildDepot(S, me.id, sel.id); if (r.error) toast(r.error, true); else toast("Fuel depot built: the outpost gives supply."); }
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
@@ -3442,7 +3480,7 @@ const GUIDE = [
   { id: "objectives", target: '[data-tab="objectives"]', tab: "objectives", title: "Three ways to win", text: "The Objectives tab: conquest (the last power standing), the Corridor Engine (research it, then build it at your capital), or the best score at turn 200. It shows how close everyone is.", done: () => S.tutorial.seen && S.tutorial.seen.objectives },
   { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "Directives and campaigns", text: "Your people send directives (the Mission tab): each pays credits, and each is a race against a rival. From turn 8, campaigns: three in a row, each against your nearest rival. Your research arm sends field tests that leave a prototype upgrade.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
   { id: "empire", target: '[data-tab="empire"]', tab: "empire", title: "Focus", text: "The Empire tab: share three Focus points between industry, science, credits and defense (2 at most to one). Change it whenever you like. Your prototypes are listed here too.", done: () => S.tutorial.seen && S.tutorial.seen.empire },
-  { id: "fleets", read: true, title: "Fleets: stance and supply", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Warships more than 3 hexes from your worlds and outposts are out of supply and wear down: outposts push your supply line out." },
+  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels." },
   { id: "trade", read: true, title: "Trade and sieges", text: "Your colonies trade with each other and with treaty partners' worlds within 4 hexes, for credits (an Exchange doubles it; the Empire tab's market buys and sells exotics). Warships in an enemy's orbit besiege it: half its industry and credits, no trade, no growth, it starves, its garrison weakens, and an ordinary colony starved low enough surrenders. Your own worlds can be besieged too: break the siege with a fleet." },
   { id: "done", read: true, title: "The galaxy is yours", text: "That's the turn: research, build, move, end the turn. Next: a Factory and a Research lab at your capital, two or three frigates at home, and meet your neighbours (Diplomacy). Menu → Restart the guide brings this back any time." },
 ];

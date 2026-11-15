@@ -1,9 +1,9 @@
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors } from "./hex.js";
-import { SHIPS, WORLDS, TECHS } from "./data.js";
+import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
 import { faction, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
   concord: ["xenology", "automation", "sensors", "domes", "commerce", "heavyHulls", "foldDrives", "terraforming", "refining", "orbitalYards"],
@@ -84,6 +84,8 @@ function production(s, F, diff) {
   if (F.exotics > 8 && F.credits < 30) tradeExotics(s, F.id, -3);
   const waitingFor = Math.max(0, ...coloniesOf(s, F.id).flatMap((c) => c.colony.queue.filter((q) => q.waiting).map((q) => (q.exotics || 0) - F.exotics)));
   if (waitingFor > 0 && F.credits > marketPrice(s) * waitingFor + 40) tradeExotics(s, F.id, waitingFor);
+  // Fuel depots: an outpost gives supply only with one. Buy them while the treasury allows, the nearest the frontier first.
+  for (const o of coloniesOf(s, F.id).filter((x) => x.colony.kind === "outpost" && !x.colony.buildings.depot)) if (F.credits > FUEL.depotCost + 50) buildDepot(s, F.id, o.id);
   const cols = coloniesOf(s, F.id).filter((c) => c.colony.kind === "colony");
   const t = totals(s, F.id);
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
@@ -179,7 +181,10 @@ function fleets(s, F) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
           .map((sys) => ({ sys, d: distance(f.at, sys.at), guard: fleetsAt(s, sys.at).filter((g) => g.owner === sys.colony.owner).reduce((t, g) => t + g.ships.length * 2, 0) + (sys.colony.defense || 0) }))
-          .filter((x) => x.guard <= mine * 1.3).sort((a, b) => a.d - b.d);
+          .filter((x) => x.guard <= mine * 1.3)
+          // Within reach on its fuel: a target beyond supply no farther than its tank carries it.
+          .filter((x) => inSupplyAt(s, F.id, x.sys.at) || fuelOf(s, f) === Infinity || Math.min(...supplySources(s, F.id).map((c) => distance(c.at, x.sys.at))) - supplyRange(s, F.id) <= fuelOf(s, f) * fleetSpeed(s, f))
+          .sort((a, b) => a.d - b.d);
         if (targets[0] && f.ships.length >= 2) { setDestination(s, f.id, targets[0].sys.at); continue; }
       }
       if (huntWardens(s, F, f, 7)) continue;

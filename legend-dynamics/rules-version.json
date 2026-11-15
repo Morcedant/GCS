@@ -6,6 +6,17 @@
     {
       "date": "2026-11-15",
       "kind": "site",
+      "title": "Dominion: fuel and fuel depots",
+      "items": [
+        "Fleets carry fuel: their thirstiest ship's tank, in turns of travel beyond supply (scouts 10, frigates and colony ships 6, cruisers and transports 5, dreadnoughts 4). Each turn a fleet moves beyond supply burns one; out of fuel it crawls a hex a turn. In supply it refuels. The Vael's living hulls need none.",
+        "Fuel depots: an outpost now gives supply only with one. Claim an outpost with its depot (40 credits), or build one there later (60 credits). A colony always gives supply.",
+        "A fleet's panel shows its fuel, and warns when a course ends beyond supply with too little in the tank.",
+        "The computer powers build depots and keep their attacks within reach of their fuel."
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "kind": "site",
       "title": "Dominion: muster points for new ships",
       "items": [
         "Standing orders for where new ships go: all of them, or warships, troop transports, colony and outpost ships or scouts on their own, to a world or outpost of yours. A kind's own order overrides the one for all ships.",

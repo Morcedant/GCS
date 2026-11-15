@@ -1,8 +1,8 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, MARKET } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, MARKET, FUEL } from "./data.js";
 import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
-  buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
+  buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
@@ -292,7 +292,9 @@ function systemHTML() {
   let h = `<h2>${esc(sys.name)}</h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit</b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins</b>" : ""}.</p>`;
   if (!c) h += `<p>${w.outpostOnly ? "No one can live here, but an outpost can claim it." : w.needs && !has(S, me.id, w.needs) ? `Needs <b>${esc(TECHS.find((t) => t.id === w.needs).name)}</b> to settle; an outpost can claim it now.` : "Unclaimed. A colony ship can settle it."}</p>`;
   else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}</b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && (c.buildings.battery || c.capital) ? ` Orbital guns: ${c.defense} hull.` : ""}${seen ? siegeHTML(sys, false) : ""}</p>`;
-  else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.</p>`;
+  else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.</p>`
+    + (c.buildings.depot ? `<p class="small good"><b>Fuel depot.</b> It gives supply within ${supplyRange(S, me.id)} hexes, and fleets refuel here.</p>`
+      : `<p class="small"><b>No fuel depot:</b> an outpost gives supply only with one.</p><button class="btn" data-depot ${me.credits < FUEL.depotCost ? "disabled" : ""}>Build a fuel depot (${FUEL.depotCost} credits)</button>`);
   else {
     const y = yields(S, sys), max = maxPop(S, sys);
     h += `<div class="kv"><span>Population</span><b>${c.pop} / ${max}</b>${bar(c.pop + c.growth, max, "#7bc47f")}</div>
@@ -338,6 +340,8 @@ function fleetHTML() {
   h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = st.hull * list.length, hurt = list.filter((x) => x.hull < st.hull).length;
     return `<li><b>${shipSVG(t, F.color, 22)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each</span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}</span>${list.length > 1 ? `<details class="small"><summary>Each ship</summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}</div>`).join("")}</details>` : ""}</li>`; }).join("")}</ul>`;
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.</p>`;
+  if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
+    h += `<div class="kv"><span>Fuel</span><b class="${fu ? "" : "bad"}">${fu} / ${mx}</b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}</div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? "In supply: the tank stays full." : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.</p>`; }
   if (f.admiral) h += admiralCard(f.admiral, mine);
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.</p>` : "");
   const reserve = me.reserve || [];
@@ -349,12 +353,13 @@ function fleetHTML() {
     h += `<p class="small ${ok ? "" : "bad"}"><b>Supply:</b> ${ok ? `in supply (within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours)` : `out of supply${f.out ? ` for ${f.out} turn${f.out === 1 ? "" : "s"}` : ""}: from the second turn its warships wear down a hull point a turn. Bring it within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours.`}</p>`;
     h += `<h3>Battle stance</h3><div class="opts">${Object.entries(STANCES).map(([k, x]) => `<button class="opt ${(f.stance || "balanced") === k ? "on" : ""}" data-stance="${k}" aria-pressed="${(f.stance || "balanced") === k}"><b>${esc(x.name)}</b><small>${esc(x.text)}</small></button>`).join("")}</div>`;
   }
-  if (f.path.length) h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f))} turn(s).</p>`;
+  if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
+    h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).</p>${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.</p>` : ""}`; }
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}</button>${f.path.length ? `<button class="btn" data-stop>Stop</button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}</button>`}</div>`;
   if (sys && !sys.colony) {
     const col = f.ships.some((x) => x.type === "colony") && canSettle(S, me.id, sys, "colony"), out = f.ships.some((x) => x.type === "outpost" || x.type === "colony");
     if (col) h += `<button class="btn primary wide" data-settle>Found a colony on ${esc(sys.name)}</button>`;
-    else if (out) h += `<button class="btn wide" data-settle>Claim ${esc(sys.name)} as an outpost</button>`;
+    else if (out) h += `<button class="btn wide" data-settle>Claim ${esc(sys.name)} as an outpost</button><button class="btn wide" data-settle="depot" ${me.credits < FUEL.foundWithDepot ? "disabled" : ""}>Claim it with a fuel depot (${FUEL.foundWithDepot} credits): supply from the start</button>`;
   }
   const o = invasionOdds(S, f.id);
   if (o && o.troops) {
@@ -666,7 +671,7 @@ function bindChrome() {
     else if (d.move !== undefined) { moveMode = !moveMode; if (moveMode) toast("Click where to send this fleet. Esc cancels."); }
     else if (d.stop !== undefined) setDestination(S, sel.id, S.fleets[sel.id].at);
     else if (d.sentry !== undefined) { const f = S.fleets[sel.id]; f.sentry = !f.sentry; if (f.sentry) nextIdle(); }
-    else if (d.settle !== undefined) { const since = mark(), at = S.fleets[sel.id].at, nm = S.systems[S.sysAt[at]].name, r = settle(S, sel.id); if (!r.error) reportSince(`${nm}`, since); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
+    else if (d.settle !== undefined) { const since = mark(), at = S.fleets[sel.id].at, nm = S.systems[S.sysAt[at]].name, r = settle(S, sel.id, { depot: d.settle === "depot" }); if (!r.error) reportSince(`${nm}`, since); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
     else if (d.invade !== undefined) {
       const since = mark(), o = invasionOdds(S, sel.id), nm = S.systems[S.sysAt[S.fleets[sel.id].at]].name, r = invade(S, sel.id);
       if (r.error) toast(r.error, true);
@@ -674,6 +679,7 @@ function bindChrome() {
       if (!S.fleets[sel.id]) sel = null;
     }
     else if (d.muster !== undefined) { const [k, id] = d.muster.split(":"); const r = setMuster(S, me.id, k, id || null); if (r.error) toast(r.error, true); else toast(id ? `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will head for ${S.systems[id].name}.` : `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will stay where they're built.`); }
+    else if (d.depot !== undefined) { const r = buildDepot(S, me.id, sel.id); if (r.error) toast(r.error, true); else toast("Fuel depot built: the outpost gives supply."); }
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
@@ -973,7 +979,7 @@ const GUIDE = [
   { id: "objectives", target: '[data-tab="objectives"]', tab: "objectives", title: "Three ways to win", text: "The Objectives tab: conquest (the last power standing), the Corridor Engine (research it, then build it at your capital), or the best score at turn 200. It shows how close everyone is.", done: () => S.tutorial.seen && S.tutorial.seen.objectives },
   { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "Directives and campaigns", text: "Your people send directives (the Mission tab): each pays credits, and each is a race against a rival. From turn 8, campaigns: three in a row, each against your nearest rival. Your research arm sends field tests that leave a prototype upgrade.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
   { id: "empire", target: '[data-tab="empire"]', tab: "empire", title: "Focus", text: "The Empire tab: share three Focus points between industry, science, credits and defense (2 at most to one). Change it whenever you like. Your prototypes are listed here too.", done: () => S.tutorial.seen && S.tutorial.seen.empire },
-  { id: "fleets", read: true, title: "Fleets: stance and supply", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Warships more than 3 hexes from your worlds and outposts are out of supply and wear down: outposts push your supply line out." },
+  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels." },
   { id: "trade", read: true, title: "Trade and sieges", text: "Your colonies trade with each other and with treaty partners' worlds within 4 hexes, for credits (an Exchange doubles it; the Empire tab's market buys and sells exotics). Warships in an enemy's orbit besiege it: half its industry and credits, no trade, no growth, it starves, its garrison weakens, and an ordinary colony starved low enough surrenders. Your own worlds can be besieged too: break the siege with a fleet." },
   { id: "done", read: true, title: "The galaxy is yours", text: "That's the turn: research, build, move, end the turn. Next: a Factory and a Research lab at your capital, two or three frigates at home, and meet your neighbours (Diplomacy). Menu → Restart the guide brings this back any time." },
 ];

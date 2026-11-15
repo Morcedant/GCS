@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
+import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS } from "../src/data.js";
@@ -455,3 +455,39 @@ test("muster points: new ships head for the world you name, by kind or all of th
   assert.equal(musterFor(s, "concord", "frigate"), cap, "back to the all-ships order");
 });
 const F0 = (s) => s.factions[0];
+
+test("fuel: a turn of travel beyond supply burns one; with none a fleet crawls; colonies and fuel depots refuel it", () => {
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1 });
+  const cap = coloniesOf(s, "concord")[0];
+  const far = Object.values(s.systems).filter((x) => !x.colony).sort((a, b) => distance(b.at, cap.at) - distance(a.at, cap.at))[0];
+  const f = spawnFleet(s, "concord", cap.at, ["frigate", "cruiser"]);
+  assert.equal(fuelMax(s, f), 5, "the thirstiest ship's tank (a cruiser's 5)");
+  // Out of supply with an empty tank: a hex a turn.
+  f.at = far.at; f.fuel = 0;
+  assert.ok(!inSupply(s, f));
+  const home = setDestination(s, f.id, cap.at); assert.ok(home.ok);
+  const steps = f.path.length; endTurn(s);
+  assert.ok(steps - f.path.length <= 1 && steps > 1, "on fumes it crawls: one step a turn");
+  // A fuel depot at an outpost: supply, and a full tank.
+  const op = Object.values(s.systems).filter((x) => !x.colony && canSettle(s, "concord", x, "outpost")).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  const o = spawnFleet(s, "concord", op.at, ["outpost"]);
+  faction(s, "concord").credits = 100;
+  assert.ok(settle(s, o.id).ok);
+  const g = spawnFleet(s, "concord", op.at, ["frigate"]); g.fuel = 1;
+  assert.equal(inSupply(s, g) && !coloniesOf(s, "concord").filter((x) => x.colony.kind === "colony").some((x) => distance(x.at, op.at) <= 3), false, "a bare outpost far from colonies gives no supply");
+  assert.ok(buildDepot(s, "concord", op.id).ok);
+  assert.ok(inSupply(s, g), "with a fuel depot it does");
+  endTurn(s); assert.equal(fuelOf(s, g), fuelMax(s, g), "refuelled");
+  assert.ok(buildDepot(s, "concord", cap.id).error, "a colony doesn't need one");
+});
+
+test("an outpost founded with its fuel depot, for credits", () => {
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1 });
+  const cap = coloniesOf(s, "concord")[0], op = Object.values(s.systems).find((x) => !x.colony && canSettle(s, "concord", x, "outpost"));
+  const F = faction(s, "concord"); F.credits = 10;
+  assert.match(settle(s, spawnFleet(s, "concord", op.at, ["outpost"]).id, { depot: true }).error, /credits/);
+  F.credits = 100;
+  const f2 = Object.values(s.fleets).find((x) => x.at === op.at && x.ships.some((y) => y.type === "outpost"));
+  assert.ok(settle(s, f2.id, { depot: true }).ok);
+  assert.ok(op.colony.buildings.depot); assert.equal(F.credits, 60);
+});

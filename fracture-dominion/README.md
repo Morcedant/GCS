@@ -29,9 +29,11 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   industry and credits are halved, it trades and grows nothing, it loses a population every 3 turns, and its garrison
   weakens (down to half). After 10 turns an ordinary colony starved to 3 population surrenders; a capital never does.
   A fleet holding the orbit can fire a **targeted barrage**: one building a turn (the Shipyard takes its queued ships).
-- **Supply and stances:** warships more than 3 hexes from every world and outpost of theirs wear down a hull point a
-  turn after the first (Vael fleets feed themselves). Each fleet fights balanced, aggressive (+1 to its rolls and to
-  theirs against it) or defensive (−1 to both).
+- **Supply, fuel and stances:** your colonies give supply within 3 hexes, and so does an outpost with a **fuel depot**
+  (claim it with one for 40 credits, or build one there later for 60). Beyond supply a fleet burns a turn of fuel for
+  each turn it moves (its thirstiest ship's tank: scouts 10, frigates and colony ships 6, cruisers and transports 5,
+  dreadnoughts 4); out of fuel it crawls a hex a turn, and warships out of supply wear down a hull point a turn. In
+  supply it refuels. The Vael's living hulls need neither. Each fleet also has a battle stance.
 - **Battle pop-ups:** a battle you're in opens a report after the turn: both sides' ships and hulls, then every
   shot with its three dice, which you can step through one at a time, a round at a time, or skip to the result.
 - **Galactic events:** every nine turns or so, from turn 6, something happens that you decide about: a derelict of
