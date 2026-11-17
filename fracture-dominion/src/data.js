@@ -272,6 +272,24 @@ export const RELICS = {
 export const RELIC_SCORE = 10;
 /** The Outer Reach (the Star Chart): how many rings it adds, and how often its systems have ruins and anomalies. */
 export const REACH = { rings: 4, ruins: 0.25, anomalies: 0.25, exotics: 0.3, reserved: 4 };
+/**
+ * Computer players: what each difficulty preset switches on, and how strong they are (fleet size and readiness for war).
+ * The new-game form starts from a preset and lets each option be changed (then it's "Custom"). Fixed for the game.
+ */
+export const AI_OPTIONS = {
+  stations: { name: "Build deep-space stations", text: "They put stations in open space on the approaches toward a rival: longer reach, more sight, pickets with guns." },
+  fortify: { name: "Fortify frontier outposts", text: "At war, they buy guns for outposts near the enemy." },
+  coalitions: { name: "Form coalitions against the Engine holder", text: "In an open game, they band together against whoever holds the Corridor Engine." },
+  raidDepots: { name: "Raid your fuel depots", text: "At war, their fleets loot unguarded fuel depots." },
+  payPirates: { name: "Pay pirates instead of fighting", text: "When they're rich, they pay ransom and tribute (off: they always fight)." },
+};
+export const AI_PRESETS = {
+  easy: { strength: 0.7, stations: false, fortify: false, coalitions: true, raidDepots: false, payPirates: true },
+  normal: { strength: 1, stations: false, fortify: true, coalitions: true, raidDepots: true, payPirates: true },
+  hard: { strength: 1.35, stations: true, fortify: true, coalitions: true, raidDepots: true, payPirates: false },
+};
+/** Deep-space stations for computer players: at most one per `perColonies` colonies, and `max` in all. */
+export const AI_STATIONS = { perColonies: 4, max: 4 };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
 
 /**

@@ -4,7 +4,7 @@
 // (never with each other); destroying one pays a bounty in credits and research (game.js, bounty).
 import { makeRng, distance } from "./hex.js";
 import { SHIPS, WILDS, WILD_LEVELS, PROTECTION, TRADERS } from "./data.js";
-import { player, faction, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, log, rng, placeAnomalies, placeRelics } from "./game.js";
+import { player, faction, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, log, rng, placeAnomalies, placeRelics, aiOpt } from "./game.js";
 
 export const PIRATES = "pirates", BEASTS = "beasts";
 const power = (id) => ({ id, name: WILDS[id].name, color: WILDS[id].color, ai: true, alive: true, wild: true, capital: null, credits: 0, exotics: 0,
@@ -194,12 +194,12 @@ const tributeOf = (s) => Math.round(PROTECTION.tributeBase + PROTECTION.tributeP
 /** The player is asked (a message); a computer power pays if it's rich, and otherwise fights. */
 function demandRansom(s, f, sys, R) {
   const fid = sys.colony.owner, F = faction(s, fid), n = ransomOf(sys);
-  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.6) payPirates(s, fid, f.home, n); return; }
+  if (F.ai) { if (aiOpt(s, "payPirates") && F.credits >= n * 3 && R.next() < 0.6) payPirates(s, fid, f.home, n); return; }
   (s.inbox = s.inbox || []).push({ kind: "ransom", from: PIRATES, ctx: { n, world: sys.id, home: f.home }, turn: s.turn });
 }
 function demandTribute(s, fid, haven, where, R) {
   const F = faction(s, fid), n = tributeOf(s);
   if (!F || !F.alive) return;
-  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.4) payPirates(s, fid, haven.at, n); return; }
+  if (F.ai) { if (aiOpt(s, "payPirates") && F.credits >= n * 3 && R.next() < 0.4) payPirates(s, fid, haven.at, n); return; }
   (s.inbox = s.inbox || []).push({ kind: "tribute", from: PIRATES, ctx: { n, where, home: haven.at }, turn: s.turn });
 }

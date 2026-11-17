@@ -62,3 +62,15 @@ export function within(k, n) {
     for (let dr = Math.max(-n, -dq - n); dr <= Math.min(n, -dq + n); dr++) out.push(key(q + dq, r + dr));
   return out;
 }
+/** The hexes on a straight line from a to b, both ends included. */
+export function hexLine(a, b) {
+  const A = parse(a), B = parse(b), n = distance(a, b), out = [];
+  for (let i = 0; i <= n; i++) {
+    const t = n ? i / n : 0, q = A.q + (B.q - A.q) * t + 1e-6, r = A.r + (B.r - A.r) * t + 1e-6, sv = -q - r;
+    let rq = Math.round(q), rr = Math.round(r); const rs = Math.round(sv);
+    const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - sv);
+    if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
+    out.push(key(rq, rr));
+  }
+  return out;
+}

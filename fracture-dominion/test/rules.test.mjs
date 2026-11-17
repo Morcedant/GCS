@@ -1007,3 +1007,34 @@ test("deep-space stations: an outpost ship and credits build one in open space; 
   delete st.colony.buildings.station; endTurn(s);
   assert.ok(!s.systems[r.id] && !s.sysAt[hex], "nothing left out there");
 });
+
+test("difficulty presets set the computer players' options; any can be changed (Custom); old saves use their preset", async () => {
+  const { aiOpt, difficultyLabel } = await import("../src/game.js");
+  const { AI_PRESETS } = await import("../src/data.js");
+  for (const d of ["easy", "normal", "hard"]) { const s = newGame({ seed: 34, size: "small", player: "concord", rivals: 1, difficulty: d }); assert.deepEqual(s.aiOpts, AI_PRESETS[d]); assert.equal(difficultyLabel(s), d[0].toUpperCase() + d.slice(1)); }
+  assert.ok(aiOpt(newGame({ seed: 34, size: "small", player: "concord", rivals: 1, difficulty: "hard" }), "stations"));
+  assert.ok(!aiOpt(newGame({ seed: 34, size: "small", player: "concord", rivals: 1, difficulty: "normal" }), "stations"));
+  const c = newGame({ seed: 34, size: "small", player: "concord", rivals: 1, difficulty: "normal", ai: { stations: true } });
+  assert.ok(aiOpt(c, "stations")); assert.equal(difficultyLabel(c), "Custom");
+  const old = newGame({ seed: 34, size: "small", player: "concord", rivals: 1, difficulty: "easy" }); delete old.aiOpts;
+  assert.equal(aiOpt(old, "fortify"), false); assert.equal(aiOpt(old, "strength"), 0.7);
+});
+
+test("computer players with the stations option send an outpost ship to build a deep-space station toward a rival", async () => {
+  const { aiTurn, stationTarget } = await import("../src/ai.js");
+  const { foundStation } = await import("../src/game.js");
+  const s = newGame({ seed: 35, size: "medium", player: "concord", rivals: 1, difficulty: "hard" });
+  const F = s.factions[1], me = s.factions[0]; F.met[me.id] = me.met[F.id] = true;
+  F.research.done.push("orbitalYards"); F.credits = 500;
+  // Give it enough colonies for a station.
+  const home = s.systems[F.capital];
+  for (const x of Object.values(s.systems).filter((y) => !y.colony && distance(y.at, home.at) <= 6).slice(0, 4)) x.colony = { owner: F.id, kind: "colony", pop: 2, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+  const k = stationTarget(s, F);
+  assert.ok(k, "a place for a picket toward the rival");
+  assert.ok(!s.sysAt[k] && s.hexes[k].terrain === "space");
+  const f = spawnFleet(s, F.id, home.at, ["outpost"]);
+  for (let i = 0; i < 12 && !Object.values(s.systems).some((x) => x.deep); i++) { aiTurn(s, F); endTurn(s); F.credits = Math.max(F.credits, 500); }
+  assert.ok(Object.values(s.systems).some((x) => x.deep && x.colony.owner === F.id), "it built one");
+  const n = newGame({ seed: 35, size: "medium", player: "concord", rivals: 1, difficulty: "normal" });
+  n.factions[1].research.done.push("orbitalYards"); assert.equal(stationTarget(n, n.factions[1]), null, "Normal: off");
+});

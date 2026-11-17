@@ -6,6 +6,19 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: difficulty choices for the computer players",
+      "items": [
+        "Easy, Normal and Hard are now presets for what the computer players do. Each option can be changed on the new-game form, under Computer players, and the difficulty then shows as Custom.",
+        "Strength, meaning fleet size and how readily they go to war: Gentle 0.7×, Standard 1× or Fierce 1.35×.",
+        "Build deep-space stations (Hard): computer players put stations in open space on the approaches toward a rival, about one per four colonies and four at most.",
+        "Fortify frontier outposts (Normal and Hard), Raid your fuel depots (Normal and Hard), and Form coalitions against the Engine holder (all three).",
+        "Pay pirates instead of fighting (Easy and Normal). On Hard they always fight.",
+        "The choices are fixed for the game. Games saved earlier use their difficulty's preset."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: deep-space stations",
       "items": [
         "With Orbital shipyards, an outpost ship in an empty hex of open space can build a deep-space station there. It uses up the ship and costs 135 credits. It can't be built in a rift or with hostile ships present.",

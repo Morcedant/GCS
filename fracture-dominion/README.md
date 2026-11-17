@@ -145,6 +145,12 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Prototypes:** your research arm sends field tests as directives; carried out, each leaves a unique upgrade (fold
   lances, ablative plating, long-range scanners, supply tenders, yard drones, an orbital shield grid, hab
   arcologies). Winning a campaign brings one; the computer powers field-test their own every 25 turns.
+- **Difficulty and the computer players:** Easy, Normal and Hard are presets for what the computer players do, and
+  each option can be changed on the new-game form (then it's "Custom"; fixed for the game). Strength (fleet size and
+  readiness for war): 0.7× / 1× / 1.35×. Build deep-space stations (Hard only: pickets in open space on the approaches
+  toward a rival, about one per four colonies, four at most). Fortify frontier outposts (Normal, Hard). Form coalitions
+  against the Engine holder (all). Raid your fuel depots (Normal, Hard). Pay pirates instead of fighting (Easy, Normal).
+  Games saved before there was a choice use their difficulty's preset.
 - **Galaxies:** small, medium, large or vast (radius 19, 136 systems).
 - **The guide:** a first game, step by step: a coach card walks a new player through the first turns (research,
   building, the scout, a second colony, ending a turn, the ways to win, directives and campaigns, Focus, stances and

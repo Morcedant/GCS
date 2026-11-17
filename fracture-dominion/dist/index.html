@@ -176,6 +176,9 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
   .tag-refit { font-size: 11px; color: #e0a050; border: 1px solid currentColor; border-radius: 8px; padding: 0 5px; margin-left: 4px; white-space: nowrap; }
+  .ng-ai { margin: 8px 0; } .ng-ai summary { cursor: pointer; margin-bottom: 6px; }
+  .ai-opt { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; font-size: 13px; } .ai-opt input { margin-top: 3px; flex: none; }
+  .ai-opt span { display: flex; flex-direction: column; } .ai-opt small { font-size: 12px; }
 </style>
 
 <div id="app" hidden>
@@ -202,7 +205,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 22:30 UTC";
+const BUILD = "2026-11-17 22:52 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -266,6 +269,18 @@ function within(k, n) {
   const { q, r } = parse(k), out = [];
   for (let dq = -n; dq <= n; dq++)
     for (let dr = Math.max(-n, -dq - n); dr <= Math.min(n, -dq + n); dr++) out.push(key(q + dq, r + dr));
+  return out;
+}
+/** The hexes on a straight line from a to b, both ends included. */
+function hexLine(a, b) {
+  const A = parse(a), B = parse(b), n = distance(a, b), out = [];
+  for (let i = 0; i <= n; i++) {
+    const t = n ? i / n : 0, q = A.q + (B.q - A.q) * t + 1e-6, r = A.r + (B.r - A.r) * t + 1e-6, sv = -q - r;
+    let rq = Math.round(q), rr = Math.round(r); const rs = Math.round(sv);
+    const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - sv);
+    if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
+    out.push(key(rq, rr));
+  }
   return out;
 }
 
@@ -544,6 +559,24 @@ const RELICS = {
 const RELIC_SCORE = 10;
 /** The Outer Reach (the Star Chart): how many rings it adds, and how often its systems have ruins and anomalies. */
 const REACH = { rings: 4, ruins: 0.25, anomalies: 0.25, exotics: 0.3, reserved: 4 };
+/**
+ * Computer players: what each difficulty preset switches on, and how strong they are (fleet size and readiness for war).
+ * The new-game form starts from a preset and lets each option be changed (then it's "Custom"). Fixed for the game.
+ */
+const AI_OPTIONS = {
+  stations: { name: "Build deep-space stations", text: "They put stations in open space on the approaches toward a rival: longer reach, more sight, pickets with guns." },
+  fortify: { name: "Fortify frontier outposts", text: "At war, they buy guns for outposts near the enemy." },
+  coalitions: { name: "Form coalitions against the Engine holder", text: "In an open game, they band together against whoever holds the Corridor Engine." },
+  raidDepots: { name: "Raid your fuel depots", text: "At war, their fleets loot unguarded fuel depots." },
+  payPirates: { name: "Pay pirates instead of fighting", text: "When they're rich, they pay ransom and tribute (off: they always fight)." },
+};
+const AI_PRESETS = {
+  easy: { strength: 0.7, stations: false, fortify: false, coalitions: true, raidDepots: false, payPirates: true },
+  normal: { strength: 1, stations: false, fortify: true, coalitions: true, raidDepots: true, payPirates: true },
+  hard: { strength: 1.35, stations: true, fortify: true, coalitions: true, raidDepots: true, payPirates: false },
+};
+/** Deep-space stations for computer players: at most one per `perColonies` colonies, and `max` in all. */
+const AI_STATIONS = { perColonies: 4, max: 4 };
 const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
 
 /**
@@ -725,7 +758,7 @@ function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -755,6 +788,14 @@ function newGame(opts) {
 // The wild things (wilds.js: pirates, and the creatures of the deep) are kept out of s.factions the same way.
 const faction = (s, id) => s.factions.find((f) => f.id === id) || (s.crisis && s.crisis.F && s.crisis.F.id === id ? s.crisis.F : undefined) || (s.wilds && s.wilds[id]) || (id === "traders" ? s.traders : undefined) || undefined;
 /** The Wardens, the pirates and the creatures of the deep: at war with every power, never with each other. */
+/** The computer players' options for this game (a game saved before there was a choice: its difficulty's preset). */
+const aiOpt = (s, k) => { const o = s.aiOpts || AI_PRESETS[s.difficulty] || AI_PRESETS.normal; return o[k] ?? (AI_PRESETS.normal)[k]; };
+/** "Easy", "Normal", "Hard", or "Custom" when the options differ from the difficulty's preset. */
+function difficultyLabel(s) {
+  const P = AI_PRESETS[s.difficulty] || AI_PRESETS.normal, o = s.aiOpts || P;
+  const same = Object.keys(P).every((k) => P[k] === o[k]);
+  return same ? ({ easy: "Easy", normal: "Normal", hard: "Hard" }[s.difficulty] || "Normal") : "Custom";
+}
 const isWild = (id) => id === "wardens" || id === "pirates" || id === "beasts";
 /** The level of an advance (repeatable research) a power has. */
 const advLevel = (s, fid, id) => { const F = faction(s, fid); return (F && F.research.adv && F.research.adv[id]) || 0; };
@@ -2489,7 +2530,7 @@ function wake(s) {
     focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} };
   // How hard they come: with the strength of the strongest power they wake among.
   const P = Math.max(0, ...crAlive(s).map((f) => militaryPower(s, f.id)));
-  C.m = Math.max(1, Math.min(10, Math.round((P / 250) * ({ easy: 0.7, hard: 1.25 }[s.difficulty] || 1))));
+  C.m = Math.max(1, Math.min(10, Math.round((P / 250) * (s.aiOpts ? Math.max(0.7, Math.min(1.25, s.aiOpts.strength)) : { easy: 0.7, hard: 1.25 }[s.difficulty] || 1))));
   C.heartMax = SHIPS.heart.hull * C.m - (C.studied ? CRISIS.studied * C.m : 0);
   const hf = spawnFleet(s, WARDENS, C.heart, []);
   hf.ships.push({ type: "heart", hull: C.heartMax });
@@ -2798,13 +2839,13 @@ const tributeOf = (s) => Math.round(PROTECTION.tributeBase + PROTECTION.tributeP
 /** The player is asked (a message); a computer power pays if it's rich, and otherwise fights. */
 function demandRansom(s, f, sys, R) {
   const fid = sys.colony.owner, F = faction(s, fid), n = ransomOf(sys);
-  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.6) payPirates(s, fid, f.home, n); return; }
+  if (F.ai) { if (aiOpt(s, "payPirates") && F.credits >= n * 3 && R.next() < 0.6) payPirates(s, fid, f.home, n); return; }
   (s.inbox = s.inbox || []).push({ kind: "ransom", from: PIRATES, ctx: { n, world: sys.id, home: f.home }, turn: s.turn });
 }
 function demandTribute(s, fid, haven, where, R) {
   const F = faction(s, fid), n = tributeOf(s);
   if (!F || !F.alive) return;
-  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.4) payPirates(s, fid, haven.at, n); return; }
+  if (F.ai) { if (aiOpt(s, "payPirates") && F.credits >= n * 3 && R.next() < 0.4) payPirates(s, fid, haven.at, n); return; }
   (s.inbox = s.inbox || []).push({ kind: "tribute", from: PIRATES, ctx: { n, where, home: haven.at }, turn: s.turn });
 }
 
@@ -3279,7 +3320,7 @@ const AGGRESSION = { concord: 0.9, tessan: 0.7, kel: 0.9, hegemony: 1.4, vael: 1
 const DIFF = { easy: 0.7, normal: 1, hard: 1.35 };
 
 function aiTurn(s, F) {
-  const diff = DIFF[s.difficulty] || 1;
+  const diff = aiOpt(s, "strength") || DIFF[s.difficulty] || 1;
   research(s, F);
   relics(s, F);
   outposts(s, F);
@@ -3301,8 +3342,45 @@ function research(s, F) {
 
 /** Relics: the Star Chart is read as soon as it's found (game.js); the Gate Shard links the capital to the farthest
  * world of ours it can reach that isn't linked already. */
+/**
+ * Deep-space stations (the "stations" option): where this power's supply runs short on the way to its nearest rival,
+ * a station in open space a hex or two past the edge. At most AI_STATIONS.perColonies colonies to a station.
+ */
+function stationTarget(s, F) {
+  if (!aiOpt(s, "stations") || !has(s, F.id, "orbitalYards")) return null;
+  const mine = coloniesOf(s, F.id), cols = mine.filter((x) => x.colony.kind === "colony");
+  const have = mine.filter((x) => x.deep).length;
+  if (have >= Math.min(AI_STATIONS.max, Math.floor(cols.length / AI_STATIONS.perColonies))) return null;
+  const rivals = s.factions.filter((o) => o.alive && o.id !== F.id && F.met[o.id] && !allied(s, F.id, o.id));
+  const range = supplyRange(s, F.id), sources = supplySources(s, F.id);
+  // Approach lines: from our nearest world toward each rival's capital and its few worlds nearest us, shortest first.
+  const lines = [];
+  for (const o of rivals) {
+    const theirs = coloniesOf(s, o.id); if (!theirs.length) continue;
+    const near = (x) => Math.min(...cols.map((c) => distance(c.at, x.at)));
+    const targets = [...new Set([s.systems[o.capital], ...theirs.sort((a, b) => near(a) - near(b)).slice(0, 3)])].filter((e) => e && e.colony && e.colony.owner === o.id);
+    for (const e of targets) { const c = cols.slice().sort((a, b) => distance(a.at, e.at) - distance(b.at, e.at))[0]; if (c && distance(c.at, e.at) <= 18) lines.push({ c, e, theirs, d: distance(c.at, e.at) }); }
+  }
+  lines.sort((a, b) => a.d - b.d);
+  // On each: open space 2–4 hexes out from our worlds (or just past the edge of our supply), 2 or more from theirs, not
+  // near a station of ours; the most forward such hex on the shortest line that has one.
+  for (const L of lines) {
+    let pick = null;
+    for (const k of hexLine(L.c.at, L.e.at)) {
+      if (s.sysAt[k] || !s.hexes[k] || s.hexes[k].terrain !== "space") continue;
+      const ours = Math.min(...mine.map((x) => distance(x.at, k))), gap = Math.min(99, ...sources.map((x) => distance(x.at, k)));
+      if (ours < 2 || (ours > 4 && gap > range + 1)) continue;
+      if (L.theirs.some((x) => distance(x.at, k) < 2)) continue;
+      if (mine.some((x) => x.deep && distance(x.at, k) < 5) || fleetsOf(s, F.id).some((f) => f.stationAt === k)) continue;
+      pick = k;
+    }
+    if (pick) return pick;
+  }
+  return null;
+}
 /** Outposts: at war, a frontier outpost near the enemy gets an Orbital battery (or station) when the treasury is full. */
 function outposts(s, F) {
+  if (!aiOpt(s, "fortify")) return;
   const foes = Object.entries(F.relations).filter(([, r]) => r.status === "war").map(([o]) => o); if (!foes.length) return;
   const enemyWorlds = foes.flatMap((o) => coloniesOf(s, o));
   for (const sys of coloniesOf(s, F.id).filter((x) => x.colony.kind === "outpost")) {
@@ -3339,7 +3417,7 @@ function diplomacy(s, F, diff) {
       const E = engineHeld(s);
       // A coalition: everyone not allied with the holder, together, against it.
       const coalition = E && E.owner === oid ? s.factions.filter((X) => X.alive && X.id !== oid && !allied(s, X.id, oid)).reduce((t, X) => t + militaryPower(s, X.id), 0) : 0;
-      if (E && E.owner === oid && s.turn - E.built >= 8 && mine > 6 && mine >= theirs * 0.2 && coalition >= theirs * 0.9 / diff && s.turn % 4 === 0) {
+      if (aiOpt(s, "coalitions") && E && E.owner === oid && s.turn - E.built >= 8 && mine > 6 && mine >= theirs * 0.2 && coalition >= theirs * 0.9 / diff && s.turn % 4 === 0) {
         declareWar(s, F.id, oid); log(s, null, `${F.name} joins the war on ${O.name}, holder of the Corridor Engine.`, "war"); continue;
       }
       // A pirate patrol pact, while pirates are about.
@@ -3401,6 +3479,7 @@ function production(s, F, diff) {
       ships && settleTargets(s, F, "colony").length && count(s, F, "colony") < (s.turn < 60 ? 2 : 1) && cols.length < 14 ? ["ship", "colony"] : null,
       ships && s.turn < 50 && count(s, F, "scout") < 2 ? ["ship", "scout"] : null,
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
+      ships && c.capital && count(s, F, "outpost") < 1 && F.credits >= 150 && stationTarget(s, F) ? ["ship", "outpost"] : null,   // for a deep-space station
       c.capital && has(s, F.id, "orbitalYards") && !c.buildings.drydock ? ["building", "drydock"] : null,   // one, at the capital: the refits
       ships && power < wantPower ? ["ship", has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
@@ -3445,6 +3524,15 @@ function fleets(s, F) {
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
     const types = new Set(f.ships.map((x) => x.type));
+    // An outpost ship on a station mission: build it when it gets there.
+    if (f.stationAt && types.has("outpost")) {
+      if (f.at === f.stationAt) { const r = foundStation(s, f.id); if (r.ok || !/credits/.test(r.error || "")) f.stationAt = null; continue; }
+      if (!f.path.length && setDestination(s, f.id, f.stationAt).error) f.stationAt = null;
+      continue;
+    }
+    if (types.has("outpost") && !types.has("colony") && !fleetsOf(s, F.id).some((g) => g.stationAt)) {
+      const k = stationTarget(s, F); if (k && F.credits >= (canFoundStation(s, f.id).credits || 135)) { f.stationAt = k; setDestination(s, f.id, k); continue; }
+    }
     if (types.has("colony") || types.has("outpost")) {
       const kind = types.has("colony") ? "colony" : "outpost";
       const here = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
@@ -3477,7 +3565,7 @@ function fleets(s, F) {
       // A rival's Corridor Engine (an open game): with no troops coming to take it, bring it down.
       const noTroops = !fleetsOf(s, F.id).some((x) => x.ships.some((y) => y.type === "transport"));
       const bt = barrageTargets(s, f.id), aim = [noTroops ? "engine" : null, "shipyard", "battery"].find((b) => b && bt.includes(b));
-      if (canRaidDepot(s, f.id)) raidDepot(s, f.id);   // an enemy's fuel depot, unguarded: take its fuel
+      if (aiOpt(s, "raidDepots") && canRaidDepot(s, f.id)) raidDepot(s, f.id);   // an enemy's fuel depot, unguarded: take its fuel
       if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
@@ -4500,23 +4588,35 @@ function showNewGame(canContinue, preset) {
       <label>Galaxy <select id="ng-size"><option value="small">Small<\/option><option value="medium" selected>Medium<\/option><option value="large">Large<\/option><option value="vast">Vast<\/option><\/select><\/label>
       <label>Game <select id="ng-mode"><option value="standard" selected>Standard: 200 turns<\/option><option value="open">Open: no end<\/option><\/select><\/label>
       <label>Rivals <select id="ng-rivals"><option>1<\/option><option>2<\/option><option selected>3<\/option><option>4<\/option><\/select><\/label>
-      <label>Difficulty <select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>
+      <label>Difficulty <select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select> <span class="small muted" id="ng-custom" hidden>(Custom)<\/span><\/label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"><\/label>
     <\/div>
+    <details class="ng-ai"><summary class="small"><b>Computer players<\/b> <span class="muted">· what the difficulty switches on (change any)<\/span><\/summary>
+      <label class="small">Strength <select id="ng-ai-strength"><option value="0.7">Gentle (0.7×)<\/option><option value="1">Standard (1×)<\/option><option value="1.35">Fierce (1.35×)<\/option><\/select> <span class="muted">fleet size, and how readily they go to war<\/span><\/label>
+      ${Object.entries(AI_OPTIONS).map(([k, o]) => `<label class="ai-opt"><input type="checkbox" data-aiopt="${k}"><span><b>${esc(o.name)}<\/b><small class="muted">${esc(o.text)}<\/small><\/span><\/label>`).join("")}
+    <\/details>
     <label>Pirates and creatures <select id="ng-wilds">${Object.entries(WILD_LEVELS).map(([k, v]) => `<option value="${k}" ${k === "light" ? "selected" : ""}>${v.name}<\/option>`).join("")}<\/select><\/label>
     <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world<\/label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step<\/label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-guide">New here? The starter guide<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>
     <p class="small muted">Version: ${esc(VERSION)}<\/p>`);
+  // The difficulty sets the computer players' options; change any and it's Custom.
+  const setAi = (o) => { $("ng-ai-strength").value = String(o.strength); document.querySelectorAll("[data-aiopt]").forEach((b) => { b.checked = !!o[b.dataset.aiopt]; }); };
+  const readAi = () => ({ strength: +$("ng-ai-strength").value, ...Object.fromEntries([...document.querySelectorAll("[data-aiopt]")].map((b) => [b.dataset.aiopt, b.checked])) });
+  const markCustom = () => { const P = AI_PRESETS[$("ng-diff").value], o = readAi(); $("ng-custom").hidden = Object.keys(P).every((k) => P[k] === o[k]); };
+  setAi(AI_PRESETS.normal);
+  $("ng-diff").onchange = () => { setAi(AI_PRESETS[$("ng-diff").value]); markCustom(); };
+  $("ng-ai-strength").onchange = markCustom; document.querySelectorAll("[data-aiopt]").forEach((b) => { b.onchange = markCustom; });
   if (preset) {
     $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
+    setAi({ ...(AI_PRESETS[preset.difficulty] || AI_PRESETS.normal), ...(preset.ai || {}) }); markCustom();
   }
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, wilds: $("ng-wilds").value });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, wilds: $("ng-wilds").value, ai: readAi() });
     if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
@@ -4686,9 +4786,9 @@ function showHelp(back) {
 /** This game's galaxy: its seed and the settings that, with it, rebuild the same map. */
 function galaxyInfo() {
   const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
-  const diff = { easy: "Easy", normal: "Normal", hard: "Hard" }[S.difficulty] || S.difficulty;
+  const diff = difficultyLabel(S);
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, wilds: wildsLevel(S) } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, wilds: wildsLevel(S), ai: S.aiOpts || null } };
 }
 function galaxyBox() {
   const g = galaxyInfo();

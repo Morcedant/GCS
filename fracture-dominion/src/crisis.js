@@ -70,7 +70,7 @@ function wake(s) {
     focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} };
   // How hard they come: with the strength of the strongest power they wake among.
   const P = Math.max(0, ...crAlive(s).map((f) => militaryPower(s, f.id)));
-  C.m = Math.max(1, Math.min(10, Math.round((P / 250) * ({ easy: 0.7, hard: 1.25 }[s.difficulty] || 1))));
+  C.m = Math.max(1, Math.min(10, Math.round((P / 250) * (s.aiOpts ? Math.max(0.7, Math.min(1.25, s.aiOpts.strength)) : { easy: 0.7, hard: 1.25 }[s.difficulty] || 1))));
   C.heartMax = SHIPS.heart.hull * C.m - (C.studied ? CRISIS.studied * C.m : 0);
   const hf = spawnFleet(s, WARDENS, C.heart, []);
   hf.ships.push({ type: "heart", hull: C.heartMax });

@@ -1,8 +1,8 @@
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
-import { distance, neighbors } from "./hex.js";
-import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
-import { missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { distance, neighbors, hexLine } from "./hex.js";
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS } from "./data.js";
+import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
@@ -17,7 +17,7 @@ const AGGRESSION = { concord: 0.9, tessan: 0.7, kel: 0.9, hegemony: 1.4, vael: 1
 const DIFF = { easy: 0.7, normal: 1, hard: 1.35 };
 
 export function aiTurn(s, F) {
-  const diff = DIFF[s.difficulty] || 1;
+  const diff = aiOpt(s, "strength") || DIFF[s.difficulty] || 1;
   research(s, F);
   relics(s, F);
   outposts(s, F);
@@ -39,8 +39,45 @@ function research(s, F) {
 
 /** Relics: the Star Chart is read as soon as it's found (game.js); the Gate Shard links the capital to the farthest
  * world of ours it can reach that isn't linked already. */
+/**
+ * Deep-space stations (the "stations" option): where this power's supply runs short on the way to its nearest rival,
+ * a station in open space a hex or two past the edge. At most AI_STATIONS.perColonies colonies to a station.
+ */
+export function stationTarget(s, F) {
+  if (!aiOpt(s, "stations") || !has(s, F.id, "orbitalYards")) return null;
+  const mine = coloniesOf(s, F.id), cols = mine.filter((x) => x.colony.kind === "colony");
+  const have = mine.filter((x) => x.deep).length;
+  if (have >= Math.min(AI_STATIONS.max, Math.floor(cols.length / AI_STATIONS.perColonies))) return null;
+  const rivals = s.factions.filter((o) => o.alive && o.id !== F.id && F.met[o.id] && !allied(s, F.id, o.id));
+  const range = supplyRange(s, F.id), sources = supplySources(s, F.id);
+  // Approach lines: from our nearest world toward each rival's capital and its few worlds nearest us, shortest first.
+  const lines = [];
+  for (const o of rivals) {
+    const theirs = coloniesOf(s, o.id); if (!theirs.length) continue;
+    const near = (x) => Math.min(...cols.map((c) => distance(c.at, x.at)));
+    const targets = [...new Set([s.systems[o.capital], ...theirs.sort((a, b) => near(a) - near(b)).slice(0, 3)])].filter((e) => e && e.colony && e.colony.owner === o.id);
+    for (const e of targets) { const c = cols.slice().sort((a, b) => distance(a.at, e.at) - distance(b.at, e.at))[0]; if (c && distance(c.at, e.at) <= 18) lines.push({ c, e, theirs, d: distance(c.at, e.at) }); }
+  }
+  lines.sort((a, b) => a.d - b.d);
+  // On each: open space 2–4 hexes out from our worlds (or just past the edge of our supply), 2 or more from theirs, not
+  // near a station of ours; the most forward such hex on the shortest line that has one.
+  for (const L of lines) {
+    let pick = null;
+    for (const k of hexLine(L.c.at, L.e.at)) {
+      if (s.sysAt[k] || !s.hexes[k] || s.hexes[k].terrain !== "space") continue;
+      const ours = Math.min(...mine.map((x) => distance(x.at, k))), gap = Math.min(99, ...sources.map((x) => distance(x.at, k)));
+      if (ours < 2 || (ours > 4 && gap > range + 1)) continue;
+      if (L.theirs.some((x) => distance(x.at, k) < 2)) continue;
+      if (mine.some((x) => x.deep && distance(x.at, k) < 5) || fleetsOf(s, F.id).some((f) => f.stationAt === k)) continue;
+      pick = k;
+    }
+    if (pick) return pick;
+  }
+  return null;
+}
 /** Outposts: at war, a frontier outpost near the enemy gets an Orbital battery (or station) when the treasury is full. */
 function outposts(s, F) {
+  if (!aiOpt(s, "fortify")) return;
   const foes = Object.entries(F.relations).filter(([, r]) => r.status === "war").map(([o]) => o); if (!foes.length) return;
   const enemyWorlds = foes.flatMap((o) => coloniesOf(s, o));
   for (const sys of coloniesOf(s, F.id).filter((x) => x.colony.kind === "outpost")) {
@@ -77,7 +114,7 @@ function diplomacy(s, F, diff) {
       const E = engineHeld(s);
       // A coalition: everyone not allied with the holder, together, against it.
       const coalition = E && E.owner === oid ? s.factions.filter((X) => X.alive && X.id !== oid && !allied(s, X.id, oid)).reduce((t, X) => t + militaryPower(s, X.id), 0) : 0;
-      if (E && E.owner === oid && s.turn - E.built >= 8 && mine > 6 && mine >= theirs * 0.2 && coalition >= theirs * 0.9 / diff && s.turn % 4 === 0) {
+      if (aiOpt(s, "coalitions") && E && E.owner === oid && s.turn - E.built >= 8 && mine > 6 && mine >= theirs * 0.2 && coalition >= theirs * 0.9 / diff && s.turn % 4 === 0) {
         declareWar(s, F.id, oid); log(s, null, `${F.name} joins the war on ${O.name}, holder of the Corridor Engine.`, "war"); continue;
       }
       // A pirate patrol pact, while pirates are about.
@@ -139,6 +176,7 @@ function production(s, F, diff) {
       ships && settleTargets(s, F, "colony").length && count(s, F, "colony") < (s.turn < 60 ? 2 : 1) && cols.length < 14 ? ["ship", "colony"] : null,
       ships && s.turn < 50 && count(s, F, "scout") < 2 ? ["ship", "scout"] : null,
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
+      ships && c.capital && count(s, F, "outpost") < 1 && F.credits >= 150 && stationTarget(s, F) ? ["ship", "outpost"] : null,   // for a deep-space station
       c.capital && has(s, F.id, "orbitalYards") && !c.buildings.drydock ? ["building", "drydock"] : null,   // one, at the capital: the refits
       ships && power < wantPower ? ["ship", has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
@@ -183,6 +221,15 @@ function fleets(s, F) {
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
     const types = new Set(f.ships.map((x) => x.type));
+    // An outpost ship on a station mission: build it when it gets there.
+    if (f.stationAt && types.has("outpost")) {
+      if (f.at === f.stationAt) { const r = foundStation(s, f.id); if (r.ok || !/credits/.test(r.error || "")) f.stationAt = null; continue; }
+      if (!f.path.length && setDestination(s, f.id, f.stationAt).error) f.stationAt = null;
+      continue;
+    }
+    if (types.has("outpost") && !types.has("colony") && !fleetsOf(s, F.id).some((g) => g.stationAt)) {
+      const k = stationTarget(s, F); if (k && F.credits >= (canFoundStation(s, f.id).credits || 135)) { f.stationAt = k; setDestination(s, f.id, k); continue; }
+    }
     if (types.has("colony") || types.has("outpost")) {
       const kind = types.has("colony") ? "colony" : "outpost";
       const here = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
@@ -215,7 +262,7 @@ function fleets(s, F) {
       // A rival's Corridor Engine (an open game): with no troops coming to take it, bring it down.
       const noTroops = !fleetsOf(s, F.id).some((x) => x.ships.some((y) => y.type === "transport"));
       const bt = barrageTargets(s, f.id), aim = [noTroops ? "engine" : null, "shipyard", "battery"].find((b) => b && bt.includes(b));
-      if (canRaidDepot(s, f.id)) raidDepot(s, f.id);   // an enemy's fuel depot, unguarded: take its fuel
+      if (aiOpt(s, "raidDepots") && canRaidDepot(s, f.id)) raidDepot(s, f.id);   // an enemy's fuel depot, unguarded: take its fuel
       if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
