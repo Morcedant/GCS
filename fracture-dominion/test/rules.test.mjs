@@ -853,3 +853,27 @@ test("traders: convoys run between Exchanges and pay both ends; pirates plunder 
   tradersTurn(s); assert.ok(s.fleets[h.id], "an escort keeps it safe");
   assert.ok(!buildOptions(s, a).some((o) => o.id === "merchant"), "nobody builds merchants");
 });
+
+test("orbital stations and batteries anywhere: an outpost buys them with credits; a station guards, repairs, sees and supplies", async () => {
+  const { outpostOptions, buildAtOutpost, gunsMax, gunsUp, guarded, supplySources } = await import("../src/game.js");
+  const { BUILDINGS, OUTPOST_BUY, BATTERY } = await import("../src/data.js");
+  const s = newGame({ seed: 27, size: "small", player: "concord", rivals: 1 }), me = s.factions[0];
+  const o = Object.values(s.systems).find((x) => !x.colony && distance(x.at, s.systems[me.capital].at) > 3);
+  o.colony = { owner: "concord", kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+  assert.equal(outpostOptions(s, o.id).length, 0, "nothing before the technology");
+  me.research.done.push("batteries", "orbitalYards");
+  assert.deepEqual(outpostOptions(s, o.id).map((x) => x.id).sort(), ["battery", "station"]);
+  me.credits = 10; assert.ok(buildAtOutpost(s, "concord", o.id, "station").error, "credits");
+  me.credits = 1000;
+  assert.ok(buildAtOutpost(s, "concord", o.id, "station").ok);
+  assert.equal(me.credits, 1000 - Math.round(BUILDINGS.station.cost * OUTPOST_BUY.rate));
+  assert.equal(gunsMax(s, o.colony), 4); assert.ok(gunsUp(o)); assert.ok(guarded(s, o, s.factions[1].id));
+  assert.ok(supplySources(s, "concord").includes(o), "a station gives supply");
+  assert.ok(buildAtOutpost(s, "concord", o.id, "battery").ok);
+  assert.equal(gunsMax(s, o.colony), BATTERY.hull + 4, "a battery with a station's extra hull");
+  // Ships at a station are repaired to full.
+  const f = spawnFleet(s, "concord", o.at, ["frigate"]); f.ships[0].hull = 1; endTurn(s);
+  assert.equal(f.ships[0].hull, shipStats(s, "concord", "frigate").hull);
+  // A colony can queue one too.
+  assert.ok(buildOptions(s, s.systems[me.capital]).some((x) => x.id === "station"));
+});

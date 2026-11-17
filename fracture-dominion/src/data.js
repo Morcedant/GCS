@@ -34,7 +34,8 @@ export const BUILDINGS = {
   lab: { name: "Research lab", cost: 60, upkeep: 1, text: "+2 science, and +50% science here." },
   market: { name: "Exchange", cost: 50, upkeep: 0, text: "+3 credits here." },
   shipyard: { name: "Shipyard", cost: 80, upkeep: 1, text: "Builds ships here." },
-  battery: { name: "Orbital battery", cost: 100, upkeep: 1, needs: "batteries", text: "A fortress in orbit: 6 hull, two shots a round at skill 13 for 2 damage each, and it repairs 2 a turn. While its guns stand, a siege can't blockade the world, and its garrison fights 2 points harder." },
+  battery: { name: "Orbital battery", cost: 100, upkeep: 1, needs: "batteries", anywhere: true, text: "A fortress in orbit: 6 hull, two shots a round at skill 13 for 2 damage each, and it repairs 2 a turn. While its guns stand, a siege can't blockade the world, and its garrison fights 2 points harder." },
+  station: { name: "Orbital station", cost: 90, upkeep: 1, needs: "orbitalYards", anywhere: true, text: "A station in orbit, at a colony or an outpost: light guns (4 hull, one shot of 2, or +4 hull to a battery's), your ships here are repaired to full each turn, it sees 2 hexes farther, and it gives supply like a fuel depot." },
   depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
   barracks: { name: "Garrison barracks", cost: 60, upkeep: 0.5, text: "+3 to the garrison against invasion, and a siege wears it down to no less than 80%." },
   observatory: { name: "Deep-space observatory", cost: 80, upkeep: 1, needs: "sensors", text: "+3 science, and it studies one anomaly within 4 hexes every few turns, without a ship." },
@@ -151,6 +152,9 @@ export const SUPPLY = { range: 3, graceTurns: 1 };
 // Fuel: a fleet carries enough for so many turns of travel beyond supply (its thirstiest ship's). Each turn it moves out
 // of supply burns one; with none left it crawls a hex a turn. In supply it refuels. Colonies give supply; an outpost
 // gives supply only once it has a Fuel depot (bought with credits, or founded with the outpost).
+/** Outposts have no industry: what they get (an Orbital battery or station, `anywhere` buildings) is bought with credits,
+ * at `rate` credits per point of the building's cost. */
+export const OUTPOST_BUY = { rate: 1.5 };
 export const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2 };
 // A supply point (a colony, a fuel depot, a parked tanker) with an enemy's warships in its system is cut: it gives no supply.
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty

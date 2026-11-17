@@ -6,6 +6,17 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: orbital stations, and guns over outposts",
+      "items": [
+        "Orbital station (needs Orbital shipyards, 90): build one over a colony or an outpost. It has light guns (4 hull, one shot of 2, or +4 hull added to a battery's).",
+        "Ships at a station are repaired to full each turn. The station sees 2 hexes farther, and gives supply like a fuel depot.",
+        "Outposts can now have an Orbital battery or an Orbital station. Outposts have no industry, so you buy these with credits from the outpost's panel: 150 for a battery, 135 for a station.",
+        "The computer powers fortify outposts near their enemies when they're at war."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: pirate ransom and tribute, patrol pacts, depot raids, and the Free Traders",
       "items": [
         "Pirates demand payment: a ransom when their raiders hold one of your worlds, and tribute when a haven sets up near you. Pay and that haven's raiders leave all your worlds alone for 20 turns; refuse and they come anyway.",

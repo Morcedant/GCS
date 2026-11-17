@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within, hexagon } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -94,7 +94,7 @@ export function setFocus(s, fid, kind, n) {
 /** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 export const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
 /** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
-export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || (x.colony.buildings.depot && !(x.colony.depotCut > s.turn))) && !blockaded(s, x));
+export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || ((x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn))) && !blockaded(s, x));
 /** A supply point is cut while an enemy at war has warships there. */
 const cutAt = (s, fid, hex) => fleetsAt(s, hex).some((o) => armed(o) && atWar(s, fid, o.owner));
 const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) => t + (x.cargo ?? SHIPS.tanker.cargo), 0);
@@ -122,6 +122,22 @@ export function buildDepot(s, fid, sysId) {
   if (F.credits < FUEL.depotCost) return { error: `A fuel depot costs ${FUEL.depotCost} credits.` };
   F.credits = round1(F.credits - FUEL.depotCost); c.buildings.depot = true;
   log(s, fid, `A fuel depot opened at ${sys.name}: the outpost gives supply, and fleets refuel there.`, "build");
+  return { ok: true };
+}
+/** What an outpost of yours can buy with credits: the `anywhere` buildings it hasn't got, whose technology you have. */
+export function outpostOptions(s, sysId) {
+  const sys = s.systems[sysId], c = sys && sys.colony; if (!c || c.kind !== "outpost") return [];
+  return Object.entries(BUILDINGS).filter(([b, d]) => d.anywhere && !c.buildings[b] && (!d.needs || has(s, c.owner, d.needs))).map(([b, d]) => ({ id: b, name: d.name, credits: Math.round(d.cost * OUTPOST_BUY.rate) }));
+}
+/** Buy an Orbital battery or station for an outpost of yours, with credits. Not while enemy warships hold its orbit. */
+export function buildAtOutpost(s, fid, sysId, b) {
+  const sys = s.systems[sysId], c = sys && sys.colony, F = faction(s, fid);
+  if (!c || c.owner !== fid) return { error: "That isn't yours." };
+  const o = outpostOptions(s, sysId).find((x) => x.id === b); if (!o) return { error: "That can't be built here." };
+  if (besieged(s, sys)) return { error: "Not while enemy warships hold its orbit." };
+  if (F.credits < o.credits) return { error: `It costs ${o.credits} credits.` };
+  F.credits = round1(F.credits - o.credits); c.buildings[b] = true; c.defense = gunsMax(s, c);
+  log(s, fid, `${sys.name} has ${/^[AEIOU]/.test(o.name) ? "an" : "a"} ${o.name.toLowerCase()} now: ${BUILDINGS[b].text}`, "build");
   return { ok: true };
 }
 /** Set a fleet's battle stance. */
@@ -527,15 +543,15 @@ export const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && 
 /** A world's orbital guns at full strength: an Orbital battery's, or a capital's smaller ones; the shield grid adds hull. */
 export function gunsMax(s, c) {
   const grid = proto(s, c.owner, "grid");
-  return (c.buildings.battery ? BATTERY.hull + (grid ? BATTERY.gridHull : 0) : c.capital ? BATTERY.capitalHull + (grid ? 1 : 0) : 0) + (c.aegis ? 6 : 0);
+  return (c.buildings.battery ? BATTERY.hull + (grid ? BATTERY.gridHull : 0) : c.capital ? BATTERY.capitalHull + (grid ? 1 : 0) : 0) + (c.aegis ? 6 : 0) + (c.buildings.station ? 4 : 0);
 }
 /** The world's guns still fire. */
-export const gunsUp = (sys) => !!(sys.colony && (sys.colony.buildings.battery || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0);
+export const gunsUp = (sys) => !!(sys.colony && (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0);
 /** Blockaded: besieged, and its guns are silent. While they stand, the world still trades, grows and makes its full
  * yields, and the siege clock doesn't run. */
 export const blockaded = (s, sys) => besieged(s, sys) && !gunsUp(sys);
 export function guarded(s, sys, attacker) {
-  return (sys.colony.buildings.battery || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0
+  return (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0
     || fleetsAt(s, sys.at).some((o) => armed(o) && (o.owner === sys.colony.owner || (attacker === "pirates" && patrolling(s, o.owner, sys.colony.owner))));
 }
 export function invade(s, fleetId) {
@@ -655,8 +671,8 @@ function battles(s) {
     // Units: ships, and the world's guns.
     const units = [];
     for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type) });
-    const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
-    if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : "Orbital guns" } }); }
+    const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
+    if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat || sys.colony.buildings.station ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : sys.colony.buildings.station ? "Orbital station" : "Orbital guns" } }); }
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
@@ -828,7 +844,7 @@ export function updateVision(s, F) {
   const charted = [];
   const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; if (!F.explored[k] && !F.ai && s.sysAt[k]) charted.push(s.systems[s.sysAt[k]]); F.explored[k] = 1; } };
   const bonus = has(s, F.id, "sensors") ? 1 : 0;
-  for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus);
+  for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus + (sys.colony.buildings.station ? 2 : 0));
   for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type).sensors)));
   // Allies share what their worlds see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && allied(s, F.id, o.id)) for (const sys of coloniesOf(s, o.id)) see(sys.at, 1);
@@ -951,7 +967,7 @@ function economy(s, F) {
         if (q.progress + 1e-9 < q.cost) break;
         if (q.exotics && F.exotics < q.exotics) { if (!q.waiting) log(s, F.id, `${q.name} at ${sys.name} waits for ${q.exotics} exotics.`, "build"); q.waiting = true; break; }
         // Under siege, nothing finished leaves the yards and no battery goes up: it waits until the orbit is free.
-        if ((q.kind === "ship" || q.id === "battery") && besieged(s, sys)) { if (!q.blockaded) log(s, F.id, `${q.name} at ${sys.name} is ready, but the siege holds it in the yards.`, "build"); q.blockaded = true; break; }
+        if ((q.kind === "ship" || q.id === "battery" || q.id === "station") && besieged(s, sys)) { if (!q.blockaded) log(s, F.id, `${q.name} at ${sys.name} is ready, but the siege holds it in the yards.`, "build"); q.blockaded = true; break; }
         q.blockaded = false;
         F.exotics -= q.exotics || 0;
         c.queue.shift();
@@ -968,7 +984,7 @@ function economy(s, F) {
           F.stats.built++;
         } else {
           c.buildings[q.id] = true;
-          if (q.id === "battery") c.defense = gunsMax(s, c);
+          if (q.id === "battery" || q.id === "station") c.defense = gunsMax(s, c);
           if (q.id === "engine" && s.mode === "open") claimEngine(s, sys, F);
           else if (q.id === "engine") { s.winner = F.id; s.winReason = "engine"; log(s, F.id, `${F.name} finished the Corridor Engine.`, "victory"); }
         }
@@ -1005,7 +1021,7 @@ function economy(s, F) {
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {
     const home = s.sysAt[f.at] && s.systems[s.sysAt[f.at]].colony && s.systems[s.sysAt[f.at]].colony.owner === F.id;
-    const dock = home && s.systems[s.sysAt[f.at]].colony.buildings.drydock && !besieged(s, s.systems[s.sysAt[f.at]]);
+    const dock = home && (s.systems[s.sysAt[f.at]].colony.buildings.drydock || s.systems[s.sysAt[f.at]].colony.buildings.station) && !besieged(s, s.systems[s.sysAt[f.at]]);
     if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = dock ? shipStats(s, F.id, x.type).hull : Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).

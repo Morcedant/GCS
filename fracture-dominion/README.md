@@ -81,6 +81,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Orbital batteries** (Planetary defense, 100 credits) are fortresses: 6 hull (8 with the shield grid), two shots a
   round at skill 13 for 2 damage each, and 2 hull repaired a turn when no enemy holds the orbit. A pair of frigates or a
   lone cruiser dies against one; it takes a real fleet to silence it. Its troops add 2 to the world's garrison.
+- **Orbital stations, and guns anywhere:** an Orbital station (Orbital shipyards, 90) can go up over a colony or an
+  outpost: light guns (4 hull, one shot of 2; +4 hull to a battery's), ships there repaired to full each turn, 2 hexes
+  more sight, and supply like a fuel depot. Outposts have no industry, so they buy an Orbital battery or station with
+  credits (1.5 per point of cost: 150 and 135). Computer powers fortify frontier outposts near their enemies.
 - **Sieges:** warships in an enemy world's orbit besiege it. Its guns don't repair and what its yards finish waits. Once
   its guns are silent it's **blockaded**: its industry and credits are halved, it trades and grows nothing, it loses a population every 3 turns, and its garrison
   weakens (down to half). After 10 turns an ordinary colony starved to 3 population surrenders; a capital never does.
