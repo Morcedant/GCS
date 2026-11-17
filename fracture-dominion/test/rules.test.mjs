@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, inSupplyAt, cargoOf, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor,
+import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, inSupplyAt, cargoOf, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, supplySources, gunsMax, gunsUp, blockaded, besieged, fleetsAt, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
-import { TECHS, SHIPS } from "../src/data.js";
+import { TECHS, SHIPS, BATTERY } from "../src/data.js";
 
 test("hexes: distance, neighbours, the map, and pixels both ways", () => {
   assert.equal(distance("0,0", "3,-1"), 3);
@@ -531,5 +531,43 @@ test("a tanker home in supply fills up; a besieged colony gives no supply", () =
   const foe = s.factions[1].id; declareWar(s, foe, "concord");
   delete s.fleets[tk.id];
   spawnFleet(s, foe, cap.at, ["cruiser", "cruiser"]);
-  assert.ok(!inSupplyAt(s, "concord", cap.at) || coloniesOf(s, "concord").length > 1, "the besieged capital gives none");
+  assert.ok(supplySources(s, "concord").includes(cap), "while its guns stand, it isn't blockaded");
+  cap.colony.defense = 0;
+  assert.ok(!supplySources(s, "concord").includes(cap), "blockaded (its guns down), the capital gives none");
+});
+
+test("an Orbital battery: a fortress that holds off small fleets, keeps the world unblockaded while it stands, and stiffens the garrison", () => {
+  const s = newGame({ seed: 11, size: "small", player: "concord", rivals: 1 });
+  const foe = s.factions[1].id, w = coloniesOf(s, foe)[0];
+  w.colony.capital = false; w.colony.pop = 4;
+  const bare = invasionOdds(s, spawnFleet(s, "concord", w.at, ["transport"]).id).defense;
+  w.colony.buildings.battery = true; w.colony.defense = gunsMax(s, w.colony);
+  assert.equal(w.colony.defense, BATTERY.hull);
+  for (const f of fleetsAt(s, w.at)) delete s.fleets[f.id];
+  assert.equal(invasionOdds(s, spawnFleet(s, "concord", w.at, ["transport"]).id).defense, bare + BATTERY.garrison, "its troops add to the garrison");
+  for (const f of fleetsAt(s, w.at)) delete s.fleets[f.id];
+  declareWar(s, "concord", foe);
+  // Two frigates against it: over many seeds, the battery wins nearly always.
+  let held = 0, lost = 0;
+  for (let seed = 0; seed < 30; seed++) {
+    const t = newGame({ seed: 100 + seed, size: "small", player: "concord", rivals: 1 }), x = coloniesOf(t, t.factions[1].id)[0], foe = t.factions[1].id;
+    x.colony.capital = false; x.colony.buildings.battery = true; x.colony.defense = gunsMax(t, x.colony);
+    declareWar(t, "concord", foe);
+    for (const f of fleetsAt(t, x.at)) delete t.fleets[f.id];
+    const f = spawnFleet(t, "concord", x.at, ["frigate", "frigate"]);
+    const yNow = yields(t, x);
+    assert.ok(besieged(t, x) && gunsUp(x) && !blockaded(t, x), "under siege, guns up: not blockaded");
+    assert.deepEqual(yields(t, x), yNow);
+    endTurn(t);
+    if (gunsUp(x)) held++;
+    if (!t.fleets[f.id] || t.fleets[f.id].ships.length < 2) lost++;
+    assert.equal(x.colony.siege || 0, 0, "the siege clock doesn't run while its guns stand");
+  }
+  assert.ok(held >= 27 && lost >= 27, `held ${held}, frigates lost ${lost} of 30`);
+  // Silenced: blockaded, and no repair while the enemy holds the orbit; free again, it repairs 2 a turn.
+  w.colony.defense = 0; spawnFleet(s, "concord", w.at, ["cruiser"]);
+  assert.ok(blockaded(s, w));
+  for (const f of fleetsAt(s, w.at)) delete s.fleets[f.id];
+  w.colony.defense = 1; endTurn(s);
+  assert.equal(w.colony.defense, 1 + BATTERY.repair);
 });

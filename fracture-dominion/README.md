@@ -25,8 +25,11 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Trade and the market:** each colony earns credits from trade links (other colonies within 4 hexes, your own or a
   treaty partner's; an Exchange doubles it). With an Exchange you can buy exotics, or sell them for less, on a market
   whose price moves with every unit and drifts back.
-- **Sieges:** warships in an enemy world's orbit besiege it. Its guns don't repair, what its yards finish waits, its
-  industry and credits are halved, it trades and grows nothing, it loses a population every 3 turns, and its garrison
+- **Orbital batteries** (Planetary defense, 100 credits) are fortresses: 6 hull (8 with the shield grid), two shots a
+  round at skill 13 for 2 damage each, and 2 hull repaired a turn when no enemy holds the orbit. A pair of frigates or a
+  lone cruiser dies against one; it takes a real fleet to silence it. Its troops add 2 to the world's garrison.
+- **Sieges:** warships in an enemy world's orbit besiege it. Its guns don't repair and what its yards finish waits. Once
+  its guns are silent it's **blockaded**: its industry and credits are halved, it trades and grows nothing, it loses a population every 3 turns, and its garrison
   weakens (down to half). After 10 turns an ordinary colony starved to 3 population surrenders; a capital never does.
   A fleet holding the orbit can fire a **targeted barrage**: one building a turn (the Shipyard takes its queued ships).
 - **Supply, fuel and stances:** your colonies give supply within 3 hexes, and so does an outpost with a **fuel depot**

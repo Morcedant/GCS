@@ -34,7 +34,7 @@ export const BUILDINGS = {
   lab: { name: "Research lab", cost: 60, upkeep: 1, text: "+2 science, and +50% science here." },
   market: { name: "Exchange", cost: 50, upkeep: 0, text: "+3 credits here." },
   shipyard: { name: "Shipyard", cost: 80, upkeep: 1, text: "Builds ships here." },
-  battery: { name: "Orbital battery", cost: 70, upkeep: 1, needs: "batteries", text: "Defends the world: it fires on enemies in orbit (skill 13, 3 hull)." },
+  battery: { name: "Orbital battery", cost: 100, upkeep: 1, needs: "batteries", text: "A fortress in orbit: 6 hull, two shots a round at skill 13 for 2 damage each, and it repairs 2 a turn. While its guns stand, a siege can't blockade the world, and its garrison fights 2 points harder." },
   depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
   refinery: { name: "Exotics refinery", cost: 90, upkeep: 1, needs: "refining", text: "+1 exotics if the system has a deposit." },
   engine: { name: "The Corridor Engine", cost: 1200, upkeep: 0, needs: "engine", exotics: 15, wonder: true,
@@ -113,7 +113,7 @@ export const PROTOTYPES = {
   scanners: { name: "Long-range scanners", text: "+1 sensor range for every ship.", test: ["explore", 3] },
   tenders: { name: "Supply tenders", text: "Fleets stay in supply 2 hexes farther from your worlds.", test: ["outpost", 1] },
   drones: { name: "Yard drones", text: "Every ship costs 10% less.", test: ["ships", 3] },
-  grid: { name: "Orbital shield grid", text: "+1 to every world's orbital guns, and +1 defense on every world with guns.", test: ["exotics", 3] },
+  grid: { name: "Orbital shield grid", text: "+1 to every world's orbital guns, and +1 hull on every world with guns (+2 with an Orbital battery).", test: ["exotics", 3] },
   arcologies: { name: "Hab arcologies", text: "+1 population on every colony.", test: ["growth", 3] },
 };
 /** The empire's Focus: points to share between its priorities each turn, 2 at most to one. */
@@ -145,6 +145,9 @@ export const TRADE = { range: 4, perLink: 0.5, maxLinks: 4, exchange: 2 };
 // Sieges: an enemy's warships in a world's orbit. Each turn of it the world's industry and credits are halved and it
 // grows nothing; every few turns it loses a population; its garrison weakens; an ordinary colony, starved down to a
 // few millions, surrenders at last.
+// The orbital battery: its guns' hull, shots a round and damage a shot, repair a turn, the shield grid's extra hull, and its
+// troops' share of the garrison. A capital without one has smaller guns (capitalHull, one shot of 1).
+export const BATTERY = { hull: 6, shots: 2, dmg: 2, repair: 2, gridHull: 2, garrison: 2, capitalHull: 2 };
 export const SIEGE = { industry: 0.5, credits: 0.5, starveEvery: 3, garrisonPerTurn: 0.1, garrisonMin: 0.5, surrenderAfter: 10, surrenderPop: 3 };
 // The exotics market: buy at the price, sell at three quarters of it; each unit moves the price, which drifts back.
 export const MARKET = { base: 12, step: 1, min: 4, max: 30, drift: 1, sellRate: 0.75 };

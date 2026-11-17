@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, MARKET, FUEL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -86,7 +86,7 @@ export function setFocus(s, fid, kind, n) {
 /** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 export const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
 /** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
-export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || x.colony.buildings.depot) && !besieged(s, x));
+export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || x.colony.buildings.depot) && !blockaded(s, x));
 /** A supply point is cut while an enemy at war has warships there. */
 const cutAt = (s, fid, hex) => fleetsAt(s, hex).some((o) => armed(o) && atWar(s, fid, o.owner));
 const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) => t + (x.cargo ?? SHIPS.tanker.cargo), 0);
@@ -247,7 +247,7 @@ export function yields(s, sys) {
     const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
     if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
     cr += tradeIncome(s, sys);
-    if (besieged(s, sys)) { ind *= SIEGE.industry; cr *= SIEGE.credits; }   // blockaded
+    if (blockaded(s, sys)) { ind *= SIEGE.industry; cr *= SIEGE.credits; }
   } else cr = 0.5;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
@@ -438,10 +438,10 @@ function noticeSettling(s, fid, sys) {
 // ---- trade ----
 /** A colony's trade partners: other colonies within range, its own power's or a treaty partner's, neither blockaded. */
 export function tradeLinks(s, sys) {
-  const c = sys.colony; if (!c || c.kind !== "colony" || besieged(s, sys)) return [];
+  const c = sys.colony; if (!c || c.kind !== "colony" || blockaded(s, sys)) return [];
   const F = faction(s, c.owner), ok = (o) => o === c.owner || !!(F.relations[o] && F.relations[o].treaty);
   return Object.values(s.systems).filter((x) => x !== sys && x.colony && x.colony.kind === "colony" && ok(x.colony.owner)
-    && distance(x.at, sys.at) <= TRADE.range && !besieged(s, x)).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at)).slice(0, TRADE.maxLinks);
+    && distance(x.at, sys.at) <= TRADE.range && !blockaded(s, x)).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at)).slice(0, TRADE.maxLinks);
 }
 export function tradeIncome(s, sys) {
   const n = tradeLinks(s, sys).length; if (!n) return 0;
@@ -478,11 +478,21 @@ export function invasionOdds(s, fleetId) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
   if (!sys || !sys.colony || sys.colony.owner === f.owner) return null;
   const troops = f.ships.filter((x) => x.type === "transport").reduce((t, x) => t + shipStats(s, f.owner, "transport").troops, 0);
-  const defense = (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0)) * garrisonFactor(sys);
+  const defense = (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0) + (sys.colony.buildings.battery ? BATTERY.garrison : 0)) * garrisonFactor(sys);
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
 export const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && atWar(s, f.owner, sys.colony.owner));
+/** A world's orbital guns at full strength: an Orbital battery's, or a capital's smaller ones; the shield grid adds hull. */
+export function gunsMax(s, c) {
+  const grid = proto(s, c.owner, "grid");
+  return c.buildings.battery ? BATTERY.hull + (grid ? BATTERY.gridHull : 0) : c.capital ? BATTERY.capitalHull + (grid ? 1 : 0) : 0;
+}
+/** The world's guns still fire. */
+export const gunsUp = (sys) => !!(sys.colony && (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0);
+/** Blockaded: besieged, and its guns are silent. While they stand, the world still trades, grows and makes its full
+ * yields, and the siege clock doesn't run. */
+export const blockaded = (s, sys) => besieged(s, sys) && !gunsUp(sys);
 export function guarded(s, sys, attacker) {
   return (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0
     || fleetsAt(s, sys.at).some((o) => o.owner === sys.colony.owner && armed(o));
@@ -585,14 +595,14 @@ function battles(s) {
     const units = [];
     for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type) });
     const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0;
-    if (worldGuns) { const o = sys.colony.owner; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0), dmg: 1, name: "Orbital guns" } }); }
+    if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0), dmg: bat ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : "Orbital guns" } }); }
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
     // A battle the player is in is recorded roll by roll, for the battle pop-up.
     const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
     const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
-      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? hp(u) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [],
+      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? gunsMax(s, u.world.colony) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [],
       admirals: [...new Set(units.filter((u) => u.fleet && u.fleet.admiral).map((u) => u.fleet))].map((f) => ({ fid: f.owner, name: admTitle(f.admiral), traits: f.admiral.traits.map((t) => ADMIRAL_TRAITS[t].name) })) } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
@@ -826,7 +836,7 @@ function economy(s, F) {
           F.stats.built++;
         } else {
           c.buildings[q.id] = true;
-          if (q.id === "battery") c.defense = 3;
+          if (q.id === "battery") c.defense = gunsMax(s, c);
           if (q.id === "engine") { s.winner = F.id; s.winReason = "engine"; log(s, F.id, `${F.name} finished the Corridor Engine.`, "victory"); }
         }
         if (!F.ai || q.kind === "building") {
@@ -837,16 +847,16 @@ function economy(s, F) {
       c.stock = Math.min(c.stock, 40); // a world can only stockpile so much
       // Growth (nothing grows under siege).
       const max = maxPop(s, sys);
-      if (besieged(s, sys)) { /* the blockade: no growth */ }
+      if (blockaded(s, sys)) { /* the blockade: no growth */ }
       else if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
       else c.growth = 0;
     }
-    const maxDef = (c.buildings.battery ? 3 : c.capital ? 2 : 0) + ((c.buildings.battery || c.capital) && proto(s, F.id, "grid") ? 1 : 0);
+    const maxDef = gunsMax(s, c);
     // A world under siege (an enemy's warships in its orbit) can't repair its guns: the battle at the end of a turn knocks
     // them out, and they stay out for the attacker's next turn, so the troops can land.
-    if (c.defense < maxDef && !besieged(s, sys)) c.defense = Math.min(maxDef, c.defense + 1);
-    // The siege, counted in turns: hunger every few turns, and at last an ordinary colony's surrender.
-    if (besieged(s, sys)) {
+    if (c.defense < maxDef && !besieged(s, sys)) c.defense = Math.min(maxDef, c.defense + (c.buildings.battery ? BATTERY.repair : 1));
+    // The siege, counted in turns once the guns are silent: hunger every few turns, and at last an ordinary colony's surrender.
+    if (blockaded(s, sys)) {
       c.siege = (c.siege || 0) + 1;
       const by = besiegerOf(s, sys);
       if (c.kind === "colony" && c.siege % SIEGE.starveEvery === 0 && c.pop > 1) {
@@ -857,7 +867,7 @@ function economy(s, F) {
         log(s, by, `${sys.name} surrendered after ${c.siege} turns of siege.`, "war");
         capture(s, sys, by); c.siege = 0;
       }
-    } else c.siege = 0;
+    } else if (!besieged(s, sys)) c.siege = 0;
   }
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {
