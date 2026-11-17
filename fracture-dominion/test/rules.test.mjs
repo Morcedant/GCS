@@ -642,3 +642,46 @@ test("the wild things: swarms nest on rich systems and block settling, havens se
   assert.equal(me.credits, c0 + WILDS.bounty.haven.credits); assert.equal(me.research.progress, p0 + WILDS.bounty.haven.research);
   const off = newGame({ seed: 15, size: "small", player: "concord", rivals: 1, wilds: false }); wildsTurn(off); assert.equal(off.wilds, undefined);
 });
+
+test("an open game's Corridor Engine: no victory but a prize; one at a time; it changes hands, can be destroyed, and the race starts again", async () => {
+  const { engineHeld, engineActive, engineGate, gateTargets, buildOptions } = await import("../src/game.js");
+  const { ENGINE } = await import("../src/data.js");
+  const s = newGame({ seed: 16, size: "small", player: "concord", rivals: 1, mode: "open" }), me = s.factions[0], foe = s.factions[1];
+  const cap = s.systems[me.capital], fcap = s.systems[foe.capital];
+  for (const F of [me, foe]) F.research.done.push("engine");
+  me.exotics = foe.exotics = 99;
+  enqueue(s, cap.id, "building", "engine"); enqueue(s, fcap.id, "building", "engine");
+  cap.colony.queue[0].progress = cap.colony.queue[0].cost; fcap.colony.queue[0].progress = fcap.colony.queue[0].cost - 300;
+  endTurn(s);
+  assert.equal(s.winner, null, "no victory in an open game");
+  assert.equal(engineHeld(s).owner, "concord");
+  assert.ok(fcap.colony.queue.find((q) => q.id === "engine").held, "the rival's waits");
+  const kept = fcap.colony.queue.find((q) => q.id === "engine").progress;
+  assert.ok(!buildOptions(s, fcap).some((o) => o.id === "engine"), "no new one can be queued");
+  assert.ok(engineActive(s, "concord"));
+  // The gate: from the Engine world to another world of ours.
+  const other = Object.values(s.systems).find((x) => !x.colony && distance(x.at, cap.at) > 3);
+  other.colony = { owner: "concord", kind: "colony", pop: 1, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+  const f = spawnFleet(s, "concord", cap.at, ["frigate"]);
+  assert.ok(gateTargets(s, f.id).includes(other));
+  assert.ok(engineGate(s, f.id, other.id).ok); assert.equal(f.at, other.at);
+  assert.ok(engineGate(s, f.id, other.id).error, "the gate rests");
+  // Enemy warships in its orbit: it gives nothing.
+  declareWar(s, "concord", foe.id);
+  const siege = spawnFleet(s, foe.id, cap.at, ["cruiser"]);
+  assert.ok(!engineActive(s, "concord"));
+  delete s.fleets[siege.id];
+  // Held, it scores.
+  const sc = me.stats.engineTurns || 0; endTurn(s); assert.ok((me.stats.engineTurns || 0) > sc);
+  // Destroyed (a barrage, or its world razed): the race is open again, and the rival's kept work counts.
+  delete cap.colony.buildings.engine; endTurn(s);
+  assert.equal(engineHeld(s), null);
+  const q = fcap.colony.queue.find((x) => x.id === "engine");
+  assert.ok(!q || q.progress >= kept, "work done is kept");
+  // Captured: it changes hands.
+  const t = newGame({ seed: 17, size: "small", player: "concord", rivals: 1, mode: "open" }), tc = t.systems[t.factions[0].capital];
+  tc.colony.buildings.engine = true; t.engine = { sys: tc.id, owner: "concord", built: 1, gate: 1 };
+  tc.colony.owner = t.factions[1].id; endTurn(t);
+  assert.equal(engineHeld(t).owner, t.factions[1].id);
+  assert.ok(ENGINE.gateEvery > 0);
+});

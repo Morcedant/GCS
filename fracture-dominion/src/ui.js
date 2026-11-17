@@ -1,7 +1,7 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS } from "./data.js";
-import { newGame, endTurn, gunsMax, gunsUp, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE } from "./data.js";
+import { newGame, endTurn, gunsMax, gunsUp, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
@@ -195,6 +195,7 @@ function draw() {
       if (sys.colony.capital) { ctx.fillStyle = colorOf(sys.colony.owner); ctx.beginPath(); ctx.moveTo(x, y - r - 13); ctx.lineTo(x + 5, y - r - 6); ctx.lineTo(x - 5, y - r - 6); ctx.closePath(); ctx.fill(); }
     }
     if (sys.exotics) { ctx.fillStyle = "#e9c7ff"; ctx.beginPath(); ctx.moveTo(x + r + 6, y - 4); ctx.lineTo(x + r + 9, y); ctx.lineTo(x + r + 6, y + 4); ctx.lineTo(x + r + 3, y); ctx.closePath(); ctx.fill(); }
+    if (engineHeld(S) && engineHeld(S).sys === sys.id) { ctx.strokeStyle = "#ffd36b"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 9, 0, Math.PI * 2); ctx.stroke(); if (view.zoom > 0.45) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ENGINE", x, y - r - 16); ctx.textAlign = "left"; } }
     if (sys.anomaly) { ctx.fillStyle = "#9fd8ff"; ctx.font = "bold 12px system-ui, sans-serif"; ctx.fillText("✦", x + r + 2, y + r + 9); }
     if (sys.ruins) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 11px system-ui, sans-serif"; ctx.fillText("?", x - r - 10, y + 4); }
     if (view.zoom > 0.55) {
@@ -293,6 +294,7 @@ function systemHTML() {
   const sys = S.systems[sel.id], me = player(S), w = WORLDS[sys.world], c = sys.colony;
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
   let h = `<h2>${esc(sys.name)}</h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit</b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins</b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}</b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.</p>`;
+  { const E = engineHeld(S); if (E && E.sys === sys.id) h += `<p class="small gold"><b>The Corridor Engine stands here</b>, held by ${esc(faction(S, E.owner).name)} since turn ${E.built}${engineActive(S, E.owner) ? "" : " (its orbit is held: it gives nothing)"}. Take the world to take it; hold its orbit with its guns down and a barrage destroys it.</p>`; }
   if (!c) h += `<p>${w.outpostOnly ? "No one can live here, but an outpost can claim it." : w.needs && !has(S, me.id, w.needs) ? `Needs <b>${esc(TECHS.find((t) => t.id === w.needs).name)}</b> to settle; an outpost can claim it now.` : "Unclaimed. A colony ship can settle it."}</p>`;
   else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}</b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && (c.buildings.battery || c.capital) ? ` Orbital guns: ${c.defense} / ${gunsMax(S, c)} hull${c.buildings.battery ? `, an Orbital battery (${BATTERY.shots} shots of ${BATTERY.dmg} a round)` : ""}.` : ""}${seen ? siegeHTML(sys, false) : ""}</p>`;
   else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.</p>`
@@ -380,6 +382,11 @@ function fleetHTML() {
     h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit. Keep warships here: the battle at the end of the turn knocks the guns out, and a world under siege can't repair them, so you can land next turn." : ""}${!war ? " You're not at war with them." : ""}</p>
       <p class="small muted" style="margin-top:-4px">Troops: ${tr} transport${tr === 1 ? "" : "s"} × ${per} = ${o.troops}. Defense: ${defParts} = ${o.defense}. ${o.troops >= o.defense ? "<b class=\"good\">Enough: the landing takes it.</b>" : `<b class="bad">Not enough: ${fmt(o.defense - o.troops)} more troops needed, or the transports are lost.</b>`}</p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops</button>`;
   }
+  // The Corridor Engine's gate (an open game): from the Engine world to any of your worlds.
+  const gt = gateTargets(S, f.id);
+  if (gt.length) { const E = engineHeld(S), shut = S.turn < E.gate;
+    h += `<h3>The Engine's gate</h3><p class="small muted" style="margin-top:-4px">${shut ? `It opens again on turn ${E.gate}.` : `Jump this fleet to any of your worlds, now. Then the gate rests ${ENGINE.gateEvery} turns.`}</p>`
+      + (shut ? "" : `<div class="opts">${gt.map((x) => `<button class="opt" data-gate="${x.id}"><b>${esc(x.name)}</b> <small>${distance(x.at, f.at)} hexes</small></button>`).join("")}</div>`); }
   // A targeted barrage: an enemy world's orbit held, one building destroyed (the Shipyard takes its queued ships with it).
   const bt = barrageTargets(S, f.id);
   if (bt.length) h += `<h3>Targeted barrage</h3><p class="small muted" style="margin-top:-4px">You hold the orbit: destroy one building, once a turn. The Shipyard takes the ships in its yards with it. No population is lost.</p>`
@@ -425,7 +432,8 @@ function objectivesHTML() {
   const done = me.research.done, chain = engineChain(), cap = S.systems[me.capital];
   const q = cap && cap.colony ? cap.colony.queue.find((x) => x.id === "engine") : null, built = cap && cap.colony && cap.colony.buildings.engine;
   const techDone = chain.filter((t) => done.includes(t.id)).length;
-  const eBadge = S.winner === me.id && S.winReason === "engine" ? ["Won", "good"] : q ? ["Building", "good"] : done.includes("engine") ? ["Ready to build", "good"] : techDone ? ["Researching", ""] : ["Not started", ""];
+  const EH = engineHeld(S);
+  const eBadge = EH ? (EH.owner === me.id ? ["You hold it", "good"] : ["A rival holds it", "bad"]) : S.winner === me.id && S.winReason === "engine" ? ["Won", "good"] : q ? ["Building", "good"] : done.includes("engine") ? ["Ready to build", "good"] : techDone ? ["Researching", ""] : ["Not started", ""];
   let firstOpen = true;
   const step = (isDone, text) => { const st = isDone ? "done" : firstOpen ? (firstOpen = false, "now") : ""; return stepLi(st, text); };
   h += `<div class="card obj"><h3 class="obj-h">The Corridor Engine <span class="badge-status ${eBadge[1]}">${eBadge[0]}</span></h3>
@@ -434,7 +442,7 @@ function objectivesHTML() {
     <ol class="steps-list">${chain.map((t) => step(done.includes(t.id), `Research ${esc(t.name)}${me.research.current === t.id ? ` (now: ${Math.round((me.research.progress / t.cost) * 100)}%)` : ""}`)).join("")}
     ${step(!!q || !!built, `Queue the Corridor Engine at your capital${cap ? `, ${esc(cap.name)}` : ""} (${BUILDINGS.engine.cost} industry, ${BUILDINGS.engine.exotics} exotics)`)}
     ${step(!!built, `Finish it${q ? `: ${Math.round((q.progress / q.cost) * 100)}% built` : ""}`)}</ol>
-    <p class="small" style="margin-top:6px"><b class="good">Win:</b> finish the Corridor Engine at your capital. <b class="bad">Watch:</b> lose your capital and the work is lost.</p></div>`;
+    ${S.mode === "open" ? engineOpenHTML(me) : `<p class="small" style="margin-top:6px"><b class="good">Win:</b> finish the Corridor Engine at your capital. <b class="bad">Watch:</b> lose your capital and the work is lost.</p>`}</div>`;
   // 3. Score.
   const gap = lead.f.id === me.id ? (ranked[1] ? mine - ranked[1].sc : mine) : lead.sc - mine;
   const sBadge = lead.f.id === me.id ? ["Leading", "good"] : ["Behind", "bad"];
@@ -449,10 +457,21 @@ function objectivesHTML() {
     const theirCap = S.systems[f.capital], tq = theirCap && theirCap.colony ? theirCap.colony.queue.find((x) => x.id === "engine") : null;
     if (tq) threats.push(`<li class="bad"><b>${esc(f.name)}</b> is building the Corridor Engine at ${esc(theirCap.name)}${me.met[f.id] ? `: ${Math.round((tq.progress / tq.cost) * 100)}% done` : ""}. Take or blockade it before it's finished.</li>`);
   }
+  { const E = engineHeld(S); if (E && E.owner !== me.id && me.met[E.owner]) threats.push(`<li class="bad"><b>${esc(faction(S, E.owner).name)}</b> holds the Corridor Engine at ${esc(S.systems[E.sys].name)}: ${ENGINE.scorePerTurn} score a turn, and its fleets move freely. Take it or destroy it.</li>`); }
   if (rivals.length === 1) threats.push(`<li class="war">Only ${esc(rivals[0].name)} is left: one of you will win by conquest.</li>`);
   h += `<h3>Threats</h3>` + (threats.length ? `<ul class="log">${threats.join("")}</ul>` : `<p class="small muted">No rival is close to winning yet.</p>`);
-  h += `<p class="small muted"><b>Defeat:</b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.</p>`;
+  h += S.mode === "open" ? `<p class="small muted"><b>Open rule:</b> no end but the one you choose. Your last world falling still ends it.</p>`
+    : `<p class="small muted"><b>Defeat:</b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.</p>`;
   return h;
+}
+/** An open game's Engine: who holds it and what it gives, or that the race is open. */
+function engineOpenHTML(me) {
+  const E = engineHeld(S), lost = (S.enginesLost || []).slice(-1)[0];
+  if (!E) return `<p class="small" style="margin-top:6px"><b class="good">The prize:</b> no Corridor Engine stands${lost ? ` (the last, at ${esc(lost.at)}, was destroyed on turn ${lost.turn})` : ""}. The first to finish one holds the corridors: free corridor travel, a gate from the Engine world to any of their worlds every ${ENGINE.gateEvery} turns, +${ENGINE.tradePerColony} credits on every colony and ${ENGINE.scorePerTurn} score a turn. Work you've already done on one is kept.</p>`;
+  const sys = S.systems[E.sys], mine = E.owner === me.id, on = engineActive(S, E.owner), H = faction(S, E.owner);
+  return `<p class="small ${mine ? "good" : "bad"}" style="margin-top:6px"><b>${mine ? "You hold the Corridor Engine" : `${esc(H.name)} holds the Corridor Engine`}</b> at ${esc(sys.name)}, since turn ${E.built}${on ? "" : `, <b class="bad">but enemy warships hold its orbit: it gives nothing until they're driven off</b>`}.
+    ${mine ? `Free corridor travel, +${ENGINE.tradePerColony} credits on every colony, ${ENGINE.scorePerTurn} score a turn, and the gate (a fleet at ${esc(sys.name)} jumps to any of your worlds; ${S.turn >= E.gate ? "open now" : `opens on turn ${E.gate}`}). <b class="bad">Watch:</b> the other powers resent whoever holds it. Lose ${esc(sys.name)} and you lose the Engine; a barrage from its orbit destroys it.`
+      : `Take ${esc(sys.name)} and it's yours; or hold its orbit with its guns down and destroy it with a barrage, and the race to build one starts again.`}</p>`;
 }
 /** The late-game crisis, on the Objectives tab: the warning, then the Heart, its waves and who is fighting them. */
 function crisisHTML() {
@@ -702,6 +721,7 @@ function bindChrome() {
     else if (d.muster !== undefined) { const [k, id] = d.muster.split(":"); const r = setMuster(S, me.id, k, id || null); if (r.error) toast(r.error, true); else toast(id ? `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will head for ${S.systems[id].name}.` : `New ${k === "all" ? "ships" : MUSTER_KINDS[k].toLowerCase()} will stay where they're built.`); }
     else if (d.depot !== undefined) { const r = buildDepot(S, me.id, sel.id); if (r.error) toast(r.error, true); else toast("Fuel depot built: the outpost gives supply."); }
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
+    else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
     else if (d.mergeall !== undefined) { const f = S.fleets[sel.id]; let n = 0; for (const o of fleetsAt(S, f.at).filter((o) => o.owner === me.id && o.id !== f.id)) if (!mergeFleets(S, f.id, o.id).error) n++; toast(`${n} fleet${n === 1 ? "" : "s"} joined this one.`); }

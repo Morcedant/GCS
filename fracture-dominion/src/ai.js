@@ -2,7 +2,7 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
-import { faction, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { faction, engineHeld, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
@@ -50,6 +50,13 @@ function diplomacy(s, F, diff) {
       if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
       if (allied(s, F.id, oid)) continue;
       if (s.turn > 25 && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
+      // The holder of the Corridor Engine (an open game): after it's held a while, anyone strong enough comes for it.
+      const E = engineHeld(s);
+      // A coalition: everyone not allied with the holder, together, against it.
+      const coalition = E && E.owner === oid ? s.factions.filter((X) => X.alive && X.id !== oid && !allied(s, X.id, oid)).reduce((t, X) => t + militaryPower(s, X.id), 0) : 0;
+      if (E && E.owner === oid && s.turn - E.built >= 8 && mine > 6 && mine >= theirs * 0.2 && coalition >= theirs * 0.9 / diff && s.turn % 4 === 0) {
+        declareWar(s, F.id, oid); log(s, null, `${F.name} joins the war on ${O.name}, holder of the Corridor Engine.`, "war"); continue;
+      }
       if (!r.treaty && r.score >= 0 && s.turn % 7 === 0) {
         if (O.ai) propose(s, F.id, oid, "trade");
         else if (!s.offers.some((o) => o.from === F.id)) { s.offers.push({ from: F.id, to: oid, what: "trade", turn: s.turn }); log(s, oid, `${F.name} proposes a trade treaty.`, "diplo"); }
@@ -176,7 +183,9 @@ function fleets(s, F) {
       const o = invasionOdds(s, f.id);
       if (o && !o.guarded && o.troops >= o.defense && atWar(s, F.id, s.systems[s.sysAt[f.at]].colony.owner)) { invade(s, f.id); continue; }
       // Holding an enemy's orbit without the troops to take it: a barrage on its shipyard (then its battery), and hold on.
-      const bt = barrageTargets(s, f.id), aim = ["shipyard", "battery"].find((b) => bt.includes(b));
+      // A rival's Corridor Engine (an open game): with no troops coming to take it, bring it down.
+      const noTroops = !fleetsOf(s, F.id).some((x) => x.ships.some((y) => y.type === "transport"));
+      const bt = barrageTargets(s, f.id), aim = [noTroops ? "engine" : null, "shipyard", "battery"].find((b) => b && bt.includes(b));
       if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
@@ -191,7 +200,9 @@ function fleets(s, F) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
           .map((sys) => ({ sys, d: distance(f.at, sys.at), guard: fleetsAt(s, sys.at).filter((g) => g.owner === sys.colony.owner).reduce((t, g) => t + g.ships.length * 2, 0) + (sys.colony.defense || 0) }))
-          .filter((x) => x.guard <= mine * 1.3)
+          .filter((x) => x.guard <= mine * (engineHeld(s) && engineHeld(s).sys === x.sys.id ? 2 : 1.3))
+          // A rival's Corridor Engine (an open game) draws every war fleet: it counts as five hexes nearer.
+          .map((x) => (engineHeld(s) && engineHeld(s).sys === x.sys.id ? { ...x, d: x.d - 5 } : x))
           // Within reach on its fuel: a target beyond supply no farther than its tank carries it.
           .filter((x) => inSupplyAt(s, F.id, x.sys.at) || fuelOf(s, f) === Infinity || Math.min(...supplySources(s, F.id).map((c) => distance(c.at, x.sys.at))) - supplyRange(s, F.id) <= fuelOf(s, f) * fleetSpeed(s, f))
           .sort((a, b) => a.d - b.d);

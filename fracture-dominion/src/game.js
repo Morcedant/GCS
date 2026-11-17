@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -128,7 +128,9 @@ export function setStance(s, fleetId, stance) { const f = s.fleets[fleetId]; if 
 export function keepRuling(s) {
   if (!s.winner || s.winner !== player(s).id) return { error: "Only after a victory of your own." };
   s.kept = (s.kept || []).concat([{ turn: s.turn, reason: s.winReason }]);
+  const engineWin = s.winReason === "engine";
   s.winner = null; s.winReason = null; s.mode = "open";
+  if (engineWin) { const at = coloniesOf(s, player(s).id).find((x) => x.colony.buildings.engine); if (at) s.engine = { sys: at.id, owner: player(s).id, built: s.turn, gate: s.turn }; }
   log(s, player(s).id, "The game goes on: open rule, with no end but the one you choose.", "victory");
   return { ok: true };
 }
@@ -256,6 +258,7 @@ export function yields(s, sys) {
     const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
     if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
     cr += tradeIncome(s, sys);
+    if (engineActive(s, fid)) cr += ENGINE.tradePerColony;   // the corridor network
     if (blockaded(s, sys)) { ind *= SIEGE.industry; cr *= SIEGE.credits; }
   } else cr = 0.5;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
@@ -283,6 +286,7 @@ export function buildOptions(s, sys) {
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (d.outpost || c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;   // a depot is for outposts (buildDepot)
     if (d.wonder && !c.capital) continue;
+    if (b === "engine" && engineHeld(s)) continue;   // an open game: only one can stand
     out.push({ kind: "building", id: b, name: d.name, cost: d.cost, exotics: d.exotics || 0 });
   }
   return out;
@@ -336,7 +340,7 @@ export function setResearch(s, fid, techId) {
 }
 
 // ---- movement ----
-const corridorCost = (s, fid) => (has(s, fid, "corridorTheory") ? 0.25 : 1);
+const corridorCost = (s, fid) => (engineActive(s, fid) ? 0 : has(s, fid, "corridorTheory") ? 0.25 : 1);
 /** The cheapest path from a hex to another: [{ hex, cost }] steps (the first step's hex is the next hex). */
 export function findPath(s, fid, from, to) {
   if (!s.hexes[to] || s.hexes[to].terrain === "rift") return null;
@@ -554,7 +558,7 @@ export function invade(s, fleetId) {
 export function barrageTargets(s, fleetId) {
   const f = s.fleets[fleetId], sys = f && s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
   if (!sys || !sys.colony || sys.colony.owner === f.owner || !armed(f) || !atWar(s, f.owner, sys.colony.owner) || guarded(s, sys, f.owner)) return [];
-  return Object.keys(sys.colony.buildings).filter((b) => sys.colony.buildings[b] && BUILDINGS[b] && !BUILDINGS[b].wonder);
+  return Object.keys(sys.colony.buildings).filter((b) => sys.colony.buildings[b] && BUILDINGS[b] && (!BUILDINGS[b].wonder || (b === "engine" && s.mode === "open")));
 }
 export function barrage(s, fleetId, building) {
   const f = s.fleets[fleetId];
@@ -584,7 +588,7 @@ function capture(s, sys, by) {
   remember(s, was, by, `took ${sys.name} from us`, -15);
   sys.colony.owner = by; sys.colony.capital = false; sys.colony.queue = []; sys.colony.stock = 0;
   if (sys.colony.kind === "colony") sys.colony.pop = Math.max(1, sys.colony.pop - 1);
-  delete sys.colony.buildings.engine;
+  if (s.mode !== "open") delete sys.colony.buildings.engine;   // in an open game the Engine changes hands (checkEngine)
   if (wasCapital) {
     const rest = coloniesOf(s, was).filter((x) => x.colony.kind === "colony").sort((a, b) => b.colony.pop - a.colony.pop);
     if (rest[0]) { rest[0].colony.capital = true; rest[0].colony.buildings.shipyard = true; faction(s, was).capital = rest[0].id; log(s, was, `${faction(s, was).name} moved its capital to ${rest[0].name}.`, "war"); }
@@ -827,6 +831,7 @@ export function endTurn(s, aiTurn) {
   joinMustered(s);
   battles(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
+  checkEngine(s);
   // The exotics market drifts back toward its usual price.
   if (s.market) s.market.price += Math.sign(MARKET.base - s.market.price) * Math.min(MARKET.drift, Math.abs(MARKET.base - s.market.price));
   for (const F of s.factions) if (F.alive) updateVision(s, F);
@@ -881,8 +886,12 @@ function economy(s, F) {
     const c = sys.colony, y = yields(s, sys);
     if (c.kind === "colony") {
       c.stock += y.ind * strike;
+      // While another Engine stands, one in the queue waits (its progress kept) at the back, and the rest goes ahead.
+      if (engineHeld(s) && c.queue[0] && c.queue[0].id === "engine" && c.queue.length > 1) c.queue.push(c.queue.shift());
       while (c.queue.length) {
         const q = c.queue[0];
+        if (q.id === "engine" && engineHeld(s)) { if (!q.held) log(s, F.id, `Work on the Corridor Engine at ${sys.name} stops: another stands. What's built is kept, ready for when it falls.`, "build"); q.held = true; break; }
+        q.held = false;
         const need = q.cost - q.progress, put = Math.min(need, c.stock);
         q.progress += put; c.stock -= put;
         if (q.progress + 1e-9 < q.cost) break;
@@ -906,7 +915,8 @@ function economy(s, F) {
         } else {
           c.buildings[q.id] = true;
           if (q.id === "battery") c.defense = gunsMax(s, c);
-          if (q.id === "engine") { s.winner = F.id; s.winReason = "engine"; log(s, F.id, `${F.name} finished the Corridor Engine.`, "victory"); }
+          if (q.id === "engine" && s.mode === "open") claimEngine(s, sys, F);
+          else if (q.id === "engine") { s.winner = F.id; s.winReason = "engine"; log(s, F.id, `${F.name} finished the Corridor Engine.`, "victory"); }
         }
         if (!F.ai || q.kind === "building") {
           const what = (q.kind === "ship" ? SHIPS : BUILDINGS)[q.id];
@@ -981,7 +991,58 @@ export function score(s, fid) {
   const cols = coloniesOf(s, fid);
   const F = faction(s, fid);
   return Math.round(cols.reduce((t, x) => t + (x.colony.kind === "colony" ? 5 + x.colony.pop * 2 : 2), 0) + F.research.done.length * 6 + militaryPower(s, fid) / 4
-    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0));
+    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0) + (F.stats.engineTurns || 0) * ENGINE.scorePerTurn);
+}
+// ---- the Corridor Engine in an open game ----
+/** The Engine that stands (open games only), or null: { sys, owner, built, gate }. */
+export const engineHeld = (s) => (s.mode === "open" && s.engine ? s.engine : null);
+/** This power holds the Engine and no enemy warships hold its orbit: its gifts work. */
+export function engineActive(s, fid) {
+  const E = engineHeld(s); if (!E || E.owner !== fid) return false;
+  const sys = s.systems[E.sys]; return !!(sys && sys.colony) && !besieged(s, sys);
+}
+function claimEngine(s, sys, F) {
+  s.engine = { sys: sys.id, owner: F.id, built: s.turn, gate: s.turn };
+  F.stats.enginesBuilt = (F.stats.enginesBuilt || 0) + 1;
+  log(s, null, `${F.name} finished the Corridor Engine at ${sys.name}. It holds the corridors now: whoever takes the world takes the Engine, and a barrage from its orbit can bring it down.`, "victory");
+}
+/** Once a turn: the Engine changes hands with its world, or is gone (destroyed, or its world burned); held, it scores, and
+ * the others' regard for its holder sours. */
+function checkEngine(s) {
+  const E = engineHeld(s); if (!E) return;
+  const sys = s.systems[E.sys];
+  if (!sys || !sys.colony || !sys.colony.buildings.engine) {
+    s.engine = null; (s.enginesLost = s.enginesLost || []).push({ turn: s.turn, owner: E.owner, at: sys ? sys.name : "?" });
+    log(s, null, `The Corridor Engine at ${sys ? sys.name : "its world"} is destroyed. The race to build it is open again: any power with the technology can build one at its capital, and work already done counts.`, "victory");
+    return;
+  }
+  if (sys.colony.owner !== E.owner) {
+    const was = faction(s, E.owner), now = faction(s, sys.colony.owner);
+    log(s, null, `${now.name} took the Corridor Engine at ${sys.name} from ${was.name}.`, "victory");
+    E.owner = sys.colony.owner; E.gate = s.turn;
+  }
+  const H = faction(s, E.owner); H.stats.engineTurns = (H.stats.engineTurns || 0) + 1;
+  if ((s.turn - E.built) % ENGINE.grudgeEvery === ENGINE.grudgeEvery - 1)
+    for (const O of s.factions) if (O.alive && O.id !== E.owner && O.ai) remember(s, O.id, E.owner, "holds the Corridor Engine", ENGINE.grudge);
+}
+/** The gate: a fleet at the Engine world jumps to any world of its holder's, now. Once every ENGINE.gateEvery turns. */
+export function gateTargets(s, fleetId) {
+  const f = s.fleets[fleetId], E = engineHeld(s);
+  if (!f || !E || f.owner !== E.owner || f.at !== s.systems[E.sys].at || !engineActive(s, f.owner)) return [];
+  return coloniesOf(s, f.owner).filter((x) => x.id !== E.sys);
+}
+export function engineGate(s, fleetId, sysId) {
+  const f = s.fleets[fleetId], E = engineHeld(s);
+  if (!f || !E) return { error: "There's no Corridor Engine." };
+  if (f.owner !== E.owner) return { error: "The Engine isn't yours." };
+  if (!engineActive(s, f.owner)) return { error: "Enemy warships hold the Engine's orbit: the gate is shut." };
+  if (s.turn < E.gate) return { error: `The gate opens again on turn ${E.gate}.` };
+  const to = gateTargets(s, fleetId).find((x) => x.id === sysId);
+  if (!to) return { error: "The gate opens from the Engine world to your other worlds." };
+  f.at = to.at; f.path = []; f.dest = null; f.fuel = fuelMax(s, f);
+  E.gate = s.turn + ENGINE.gateEvery;
+  log(s, f.owner, `A fleet went through the Corridor Engine's gate to ${to.name}. The gate opens again on turn ${E.gate}.`, "war");
+  return { ok: true };
 }
 function checkVictory(s) {
   if (s.winner) return;

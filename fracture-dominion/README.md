@@ -28,6 +28,13 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   100 credits and 50 research, a swarm 90 research and 2 exotics, a leviathan 40 credits, 160 research and 4 exotics).
   The computer powers hunt the ones near their worlds.
 - **Diplomacy:** contact, war and peace, trade treaties; settling next door makes neighbours angry.
+- **The Corridor Engine in an open game:** not a victory but the galaxy's great prize, and only one can stand. Its
+  holder's fleets travel corridors for nothing, and once every 5 turns a fleet at the Engine world can jump through its
+  gate to any of the holder's worlds; every colony of the holder earns +2 credits, and holding it scores 2 a turn. While
+  enemy warships hold its orbit it gives nothing. Take its world and the Engine is yours; hold its orbit with the guns
+  down and a barrage destroys it. Then the race starts again: any power with the technology can build one at its
+  capital, and work already done on one (it waits, kept, while another stands) counts. The other powers resent the
+  holder, and once it's held a while they band together against it.
 - **Victory:** conquest, the Corridor Engine (a great work), or the highest score at turn 200. Or an **open game**
   with no end: retire when you choose. After a win, **Keep ruling** carries the game on in open rule.
 - **Focus:** three points a turn to share between industry, science, credits and defense (2 at most to one).

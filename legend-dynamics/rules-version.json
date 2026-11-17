@@ -6,6 +6,19 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: the Corridor Engine in open games",
+      "items": [
+        "In an open game, finishing the Corridor Engine no longer ends the game. Its holder gets free corridor travel, a gate that jumps one fleet from the Engine world to any of its worlds every 5 turns, +2 credits on every colony, and 2 score a turn.",
+        "Only one Engine can stand. Others already under construction wait, with their work kept.",
+        "Capture the Engine world and the Engine is yours. Hold its orbit with its guns down and a barrage destroys it, and the race to build one starts again.",
+        "While enemy warships hold the Engine's orbit, it gives its holder nothing.",
+        "The computer powers resent the holder, and once it has held the Engine a while they form a coalition against it.",
+        "Standard 200-turn games are unchanged: finishing the Engine wins."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: advances, anomalies, new buildings, pirates and monsters",
       "items": [
         "Advances: once a technology is done, research builds on it a level at a time: +5% industry, science or credits a level (to 5), +1 warship hull or skill (to 2), +1 population room (to 3), +2 fuel (to 3). Each level costs more. Science never runs out of use.",

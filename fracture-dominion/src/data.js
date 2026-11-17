@@ -42,7 +42,7 @@ export const BUILDINGS = {
   habitat: { name: "Orbital habitat", cost: 110, upkeep: 1, needs: "domes", text: "+2 population room on this world." },
   refinery: { name: "Exotics refinery", cost: 90, upkeep: 1, needs: "refining", text: "+1 exotics if the system has a deposit." },
   engine: { name: "The Corridor Engine", cost: 1200, upkeep: 0, needs: "engine", exotics: 15, wonder: true,
-    text: "Finish it and you open a corridor to everywhere at once: you win." },
+    text: "Finish it and you open a corridor to everywhere at once: you win. In an open game, you hold the corridors instead: free corridor travel, a gate to any of your worlds, +2 credits on every colony, and score each turn, until someone takes or destroys it." },
 };
 
 // Ships. skill: the 3d6 roll-under target to hit; dmg: hull a hit takes; hull: what it can take.
@@ -92,7 +92,7 @@ export const TECHS = [
   { id: "shields", name: "Deflector shields", field: "Physics", cost: 375, needs: ["sensors"], text: "+1 hull for every warship." },
   { id: "targeting", name: "Targeting computers", field: "Physics", cost: 450, needs: ["shields"], text: "+1 to every ship's and battery's skill." },
   { id: "corridorTheory", name: "Corridor theory", field: "Physics", cost: 800, needs: ["foldDrives", "targeting"], text: "Moving along a corridor costs nothing." },
-  { id: "engine", name: "The Corridor Engine", field: "Physics", cost: 1500, needs: ["corridorTheory", "refining"], text: "Lets your capital build the Corridor Engine: the science victory." },
+  { id: "engine", name: "The Corridor Engine", field: "Physics", cost: 1500, needs: ["corridorTheory", "refining"], text: "Lets your capital build the Corridor Engine: the science victory. In an open game it's the galaxy's great prize instead, and only one can stand at a time." },
   { id: "automation", name: "Automated factories", field: "Industry", cost: 175, needs: [], text: "+1 industry on every world." },
   { id: "heavyHulls", name: "Heavy hulls", field: "Industry", cost: 325, needs: ["automation"], text: "Unlocks the Cruiser." },
   { id: "orbitalYards", name: "Orbital shipyards", field: "Industry", cost: 400, needs: ["heavyHulls"], text: "Ships cost 20% less." },
@@ -193,6 +193,14 @@ export const WILDS = {
   pirates: { name: "Pirates", color: "#d8d14a" }, beasts: { name: "The creatures of the deep", color: "#4ec9b0" },
 };
 export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
+/**
+ * The Corridor Engine in an open game: not a victory but the galaxy's great prize. Only one can stand. Its holder's
+ * fleets travel corridors for nothing and can jump through the gate from the Engine world to any of its worlds (every
+ * gateEvery turns); every colony of the holder earns tradePerColony credits; holding it scores scorePerTurn a turn; the
+ * other powers' regard for the holder falls by `grudge` every grudgeEvery turns. While enemy warships hold its orbit, it
+ * gives nothing. Capture the world and it's yours; a barrage destroys it, and the race to build it starts again.
+ */
+export const ENGINE = { gateEvery: 5, tradePerColony: 2, scorePerTurn: 2, grudgeEvery: 5, grudge: -3 };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
 
 /**
