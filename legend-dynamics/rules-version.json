@@ -6,6 +6,19 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: relics of the old empires, and the Outer Reach",
+      "items": [
+        "Eleven relics, one of each, hidden in ruins and anomalies. The first fleet to end its turn at one recovers it, and it's kept at the finder's capital. Each is worth 10 score.",
+        "A relic belongs to the world that keeps it: take the world and you take its relics. If the world is destroyed, they lie there, or nearby, for anyone to find.",
+        "The Founders' Star Chart expands the galaxy. Read it once and four rings of uncharted space, the Outer Reach, open beyond the rim, with new systems linked into the corridors and four more relics to find.",
+        "The Gate Shard opens a new corridor from one of your worlds every 15 turns.",
+        "The rest work by being held: faster ships, repairs anywhere, the whole map charted, more industry, science or credits, stronger guns, more population room, and protection against the Wardens.",
+        "The computer powers read the Star Chart as soon as they find it, and use the Gate Shard to link their capital to their farthest worlds."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: the Corridor Engine in open games",
       "items": [
         "In an open game, finishing the Corridor Engine no longer ends the game. Its holder gets free corridor travel, a gate that jumps one fleet from the Engine world to any of its worlds every 5 turns, +2 credits on every colony, and 2 score a turn.",

@@ -2,7 +2,7 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
-import { faction, engineHeld, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { faction, engineHeld, relicHeld, useRelic, shardTargets, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
@@ -18,6 +18,7 @@ const DIFF = { easy: 0.7, normal: 1, hard: 1.35 };
 export function aiTurn(s, F) {
   const diff = DIFF[s.difficulty] || 1;
   research(s, F);
+  relics(s, F);
   diplomacy(s, F, diff);
   production(s, F, diff);
   fleets(s, F);
@@ -34,6 +35,16 @@ function research(s, F) {
   setResearch(s, F.id, avail.some((t) => t.id === "engine") && s.turn > 90 ? "engine" : want);
 }
 
+/** Relics: the Star Chart is read as soon as it's found (game.js); the Gate Shard links the capital to the farthest
+ * world of ours it can reach that isn't linked already. */
+function relics(s, F) {
+  if (!relicHeld(s, F.id, "shard")) return;
+  const r = s.relics.shard; if (r.ready && s.turn < r.ready) return;
+  const cap = s.systems[F.capital]; if (!cap || !cap.colony || cap.colony.owner !== F.id) return;
+  const mineIds = new Set(coloniesOf(s, F.id).map((x) => x.id));
+  const t = shardTargets(s, F.id, cap.id).filter((x) => mineIds.has(x.id)).sort((a, b) => distance(b.at, cap.at) - distance(a.at, cap.at))[0];
+  if (t) useRelic(s, F.id, "shard", { from: cap.id, to: t.id });
+}
 function diplomacy(s, F, diff) {
   for (const [oid, r] of Object.entries(F.relations)) {
     const O = faction(s, oid); if (!O.alive || !F.met[oid]) continue;

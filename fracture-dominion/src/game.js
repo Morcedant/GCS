@@ -1,8 +1,8 @@
 // The rules of Fracture Lines: Dominion, as pure functions over one game state (plain JSON, so it saves as is).
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
-import { makeRng, distance, neighbors, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { makeRng, distance, neighbors, within, hexagon } from "./hex.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, REACH, STAR_NAMES, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -34,6 +34,7 @@ export function newGame(opts) {
   for (const F of state.factions) { const fr = fleetsOf(state, F.id).find(armed); if (fr) fr.admiral = makeAdmiral(state, F.id, rng); }
   for (const a of state.factions) for (const b of state.factions) if (a !== b) a.relations[b.id] = { status: "peace", treaty: false, score: 0, turnsAtWar: 0 };
   placeAnomalies(state);
+  placeRelics(state);
   for (const f of state.factions) updateVision(state, f);
   log(state, null, "The corridors are open. Turn 1.");
   return state;
@@ -71,10 +72,10 @@ export function shipStats(s, fid, type) {
   // The Heart of the Wardens grows with the galaxy it wakes in (crisis.js): more hull, more guns.
   if (type === "heart") { const m = (s.crisis && s.crisis.m) || 1; return { ...base, hull: s.crisis && s.crisis.heartMax || base.hull * m, shots: 1 + m }; }
   return { ...base,
-    speed: base.speed + (has(s, fid, "foldDrives") ? 1 : 0) + (fid === "vael" ? 1 : 0),
+    speed: base.speed + (has(s, fid, "foldDrives") ? 1 : 0) + (fid === "vael" ? 1 : 0) + (base.speed > 0 && relicHeld(s, fid, "anchor") ? 1 : 0),
     hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0) + (warship && proto(s, fid, "plating") ? 1 : 0) + (warship ? advLevel(s, fid, "armor") : 0),
     skill: warship ? base.skill + (has(s, fid, "targeting") ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (proto(s, fid, "lances") ? 1 : 0) + advLevel(s, fid, "fireControl") : 0,
-    sensors: base.sensors + (has(s, fid, "sensors") ? 1 : 0) + (proto(s, fid, "scanners") ? 1 : 0),
+    sensors: base.sensors + (has(s, fid, "sensors") ? 1 : 0) + (proto(s, fid, "scanners") ? 1 : 0) + (relicHeld(s, fid, "oracle") ? 2 : 0),
     troops: (base.troops || 0) * (fid === "hegemony" ? 2 : 1),
     cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * (proto(s, fid, "drones") ? 0.9 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1)) };
 }
@@ -238,7 +239,7 @@ export function canSettle(s, fid, sys, kind) {
 export function maxPop(s, sys) {
   const c = sys.colony; if (!c || c.kind !== "colony") return 0;
   return WORLDS[sys.world].pop + sys.size * 2 + (has(s, c.owner, "terraforming") ? 2 : 0) + (c.owner === "kel" ? 2 : 0) + (proto(s, c.owner, "arcologies") ? 1 : 0)
-    + (c.buildings.habitat ? 2 : 0) + advLevel(s, c.owner, "habitats");
+    + (c.buildings.habitat ? 2 : 0) + advLevel(s, c.owner, "habitats") + (relicHeld(s, c.owner, "seeds") ? 2 : 0);
 }
 /** What a world gives each turn: { ind, sci, cr, exo, upkeep }. */
 export function yields(s, sys) {
@@ -254,6 +255,9 @@ export function yields(s, sys) {
     if (fid === "tessan") cr *= 1.25;
     const fo = focusOf(s, fid);   // the empire's Focus
     ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
+    if (relicHeld(s, fid, "forge")) ind *= s.relics.forge.at === sys.id ? 1.5 : 1.1;
+    if (relicHeld(s, fid, "archive")) sci *= 1.2;
+    if (relicHeld(s, fid, "crown")) cr *= 1.2;
     ind *= 1 + 0.05 * advLevel(s, fid, "efficiency"); sci *= 1 + 0.05 * advLevel(s, fid, "theory"); cr *= 1 + 0.05 * advLevel(s, fid, "banking");
     const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
     if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
@@ -522,15 +526,15 @@ export const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && 
 /** A world's orbital guns at full strength: an Orbital battery's, or a capital's smaller ones; the shield grid adds hull. */
 export function gunsMax(s, c) {
   const grid = proto(s, c.owner, "grid");
-  return c.buildings.battery ? BATTERY.hull + (grid ? BATTERY.gridHull : 0) : c.capital ? BATTERY.capitalHull + (grid ? 1 : 0) : 0;
+  return (c.buildings.battery ? BATTERY.hull + (grid ? BATTERY.gridHull : 0) : c.capital ? BATTERY.capitalHull + (grid ? 1 : 0) : 0) + (c.aegis ? 6 : 0);
 }
 /** The world's guns still fire. */
-export const gunsUp = (sys) => !!(sys.colony && (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0);
+export const gunsUp = (sys) => !!(sys.colony && (sys.colony.buildings.battery || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0);
 /** Blockaded: besieged, and its guns are silent. While they stand, the world still trades, grows and makes its full
  * yields, and the siege clock doesn't run. */
 export const blockaded = (s, sys) => besieged(s, sys) && !gunsUp(sys);
 export function guarded(s, sys, attacker) {
-  return (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0
+  return (sys.colony.buildings.battery || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0
     || fleetsAt(s, sys.at).some((o) => o.owner === sys.colony.owner && armed(o));
 }
 export function invade(s, fleetId) {
@@ -630,8 +634,8 @@ function battles(s) {
     // Units: ships, and the world's guns.
     const units = [];
     for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type) });
-    const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0;
-    if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0), dmg: bat ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : "Orbital guns" } }); }
+    const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
+    if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : "Orbital guns" } }); }
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
@@ -651,7 +655,7 @@ function battles(s) {
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
-        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
+        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
         if (landed) {
           const was = hp(t); hit(t, u.st.dmg);
           // A Warden machine destroyed counts for whoever destroyed it; the Heart, for everyone who fought it.
@@ -808,6 +812,8 @@ export function updateVision(s, F) {
       log(s, F.id, `${F.name} made contact with ${o.name}: ${where} came into view. Diplomacy is open with them now.`, "contact");
     }
   }
+  // Relics: the first fleet to end its turn at one's site recovers it.
+  for (const sys of Object.values(s.systems)) if (sys.relic && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) recoverRelic(s, F, sys);
   // Anomalies: a scout that ends its turn at one surveys it.
   for (const sys of Object.values(s.systems)) if (sys.anomaly && fleetsAt(s, sys.at).some((f) => f.owner === F.id && f.ships.some((x) => x.type === "scout")))
     studyAnomaly(s, F, sys, "Your scouts surveyed");
@@ -832,6 +838,7 @@ export function endTurn(s, aiTurn) {
   battles(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
   checkEngine(s);
+  checkRelics(s);
   // The exotics market drifts back toward its usual price.
   if (s.market) s.market.price += Math.sign(MARKET.base - s.market.price) * Math.min(MARKET.drift, Math.abs(MARKET.base - s.market.price));
   for (const F of s.factions) if (F.alive) updateVision(s, F);
@@ -952,7 +959,7 @@ function economy(s, F) {
   for (const f of fleetsOf(s, F.id)) {
     const home = s.sysAt[f.at] && s.systems[s.sysAt[f.at]].colony && s.systems[s.sysAt[f.at]].colony.owner === F.id;
     const dock = home && s.systems[s.sysAt[f.at]].colony.buildings.drydock && !besieged(s, s.systems[s.sysAt[f.at]]);
-    if (home || F.id === "vael" || admTrait(f, "shipwright")) for (const x of f.ships) x.hull = dock ? shipStats(s, F.id, x.type).hull : Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
+    if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = dock ? shipStats(s, F.id, x.type).hull : Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
   if (s.turn % SCIENCE.observatoryEvery === 0) for (const sys of coloniesOf(s, F.id)) {
@@ -991,7 +998,140 @@ export function score(s, fid) {
   const cols = coloniesOf(s, fid);
   const F = faction(s, fid);
   return Math.round(cols.reduce((t, x) => t + (x.colony.kind === "colony" ? 5 + x.colony.pop * 2 : 2), 0) + F.research.done.length * 6 + militaryPower(s, fid) / 4
-    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0) + (F.stats.engineTurns || 0) * ENGINE.scorePerTurn);
+    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0) + (F.stats.engineTurns || 0) * ENGINE.scorePerTurn + relicsOf(s, fid).length * RELIC_SCORE);
+}
+// ---- relics of the old empires ----
+/** Who holds a relic: the owner of the world it's kept at, or null (lost, or not yet found). */
+export function relicOwner(s, id) {
+  const r = s.relics && s.relics[id]; if (!r || !r.at) return null;
+  const c = s.systems[r.at] && s.systems[r.at].colony; return c ? c.owner : null;
+}
+export const relicHeld = (s, fid, id) => !!s.relics && relicOwner(s, id) === fid;
+/** The relics a power holds: [{ id, name, text, at (system), used, ready }]. */
+export const relicsOf = (s, fid) => (s.relics ? Object.keys(s.relics).filter((id) => relicOwner(s, id) === fid).map((id) => ({ id, ...RELICS[id], ...s.relics[id] })) : []);
+/** Hide the relics: the Star Chart always on the map, a few kept back for the Outer Reach, the rest in ruins and anomalies. */
+export function placeRelics(s) {
+  if (s.relics) return;
+  s.relics = {}; s.relicsReach = [];
+  const R = makeRng("relics:" + s.seed);
+  const homes = new Set(s.factions.map((F) => F.capital));
+  const sites = Object.values(s.systems).filter((x) => (x.ruins || x.anomaly) && !homes.has(x.id) && !x.colony).sort((a, b) => (a.id < b.id ? -1 : 1));
+  const rest = Object.keys(RELICS).filter((id) => id !== "chart");
+  for (let i = 0; i < REACH.reserved && rest.length > 1; i++) s.relicsReach.push(rest.splice(R.int(rest.length), 1)[0]);
+  // The Star Chart lies at the site farthest from every homeworld: no one stumbles on it in the first turns.
+  const far = (x) => Math.min(...[...homes].map((h) => distance(s.systems[h].at, x.at)));
+  sites.sort((a, b) => far(b) - far(a) || (a.id < b.id ? -1 : 1));
+  const chartAt = sites.shift() || Object.values(s.systems).filter((x) => !x.colony).sort((a, b) => far(b) - far(a))[0];
+  if (chartAt) { chartAt.relic = "chart"; s.relics.chart = { at: null }; }
+  for (const id of rest) {
+    if (!sites.length) { s.relicsReach.push(id); continue; }
+    const sys = sites.splice(R.int(sites.length), 1)[0]; sys.relic = id; s.relics[id] = { at: null };
+  }
+}
+function recoverRelic(s, F, sys) {
+  const id = sys.relic, home = s.systems[F.capital] && s.systems[F.capital].colony && s.systems[F.capital].colony.owner === F.id ? s.systems[F.capital] : coloniesOf(s, F.id).find((x) => x.colony.kind === "colony");
+  if (!home) return;
+  sys.relic = null; sys.relicLost = false;
+  s.relics[id] = { ...(s.relics[id] || {}), at: home.id, found: s.turn, owner: F.id };
+  F.stats.relics = (F.stats.relics || 0) + 1;
+  log(s, F.id, `${F.name} recovered a relic of the old empires at ${sys.name}: ${RELICS[id].name}. It's kept at ${home.name}. ${RELICS[id].text}`, "explore");
+  for (const O of s.factions) if (O.id !== F.id && O.met[F.id]) log(s, O.id, `${F.name} has recovered ${RELICS[id].name} from the old empires. It's kept at ${home.name}.`, "explore");
+  relicGained(s, F.id, id);
+}
+function relicGained(s, fid, id) {
+  if (id === "oracle") revealAll(s, faction(s, fid));
+  if (id === "chart" && faction(s, fid).ai && !s.relics.chart.used) useRelic(s, fid, "chart");
+}
+const revealAll = (s, F) => { for (const k of Object.keys(s.hexes)) F.explored[k] = 1; };
+/** Once a turn: a relic whose world fell changes hands; one whose world is gone lies in the ruins; the Lens keeps the
+ * map charted; the Crown wins regard; the Aegis Lattice marks its world. */
+function checkRelics(s) {
+  if (!s.relics) return;
+  for (const sys of Object.values(s.systems)) if (sys.colony) sys.colony.aegis = false;
+  for (const [id, r] of Object.entries(s.relics)) {
+    if (!r.at) continue;
+    const sys = s.systems[r.at];
+    if (!sys.colony) {
+      // One relic to a site: the others the world held are scattered to the nearest empty systems.
+      const to = !sys.relic ? sys : Object.values(s.systems).filter((x) => !x.relic && !x.colony).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at))[0] || sys;
+      to.relic = id; to.relicLost = true; r.at = null; r.owner = null;
+      log(s, null, `${RELICS[id].name} lies ${to === sys ? `in the ruins of ${sys.name}` : `adrift at ${to.name}, thrown clear when ${sys.name} fell`}: the first fleet to reach it recovers it.`, "explore");
+      continue;
+    }
+    if (sys.colony.owner !== r.owner) {
+      const was = r.owner && faction(s, r.owner), now = faction(s, sys.colony.owner);
+      log(s, null, `${now.name} took ${RELICS[id].name} with ${sys.name}${was ? ` from ${was.name}` : ""}.`, "explore");
+      r.owner = sys.colony.owner; relicGained(s, r.owner, id);
+    }
+    if (id === "oracle") revealAll(s, faction(s, r.owner));
+    if (id === "aegis") sys.colony.aegis = true;
+    if (id === "crown") for (const O of s.factions) if (O.alive && O.id !== r.owner && O.relations[r.owner]) O.relations[r.owner].score = Math.min(40, O.relations[r.owner].score + 0.5);
+  }
+}
+/** Use a relic: the Star Chart (once), or the Gate Shard ({ from, to }: a world of yours, an explored system within 8). */
+export function useRelic(s, fid, id, opts = {}) {
+  const r = s.relics && s.relics[id], F = faction(s, fid);
+  if (!r || relicOwner(s, id) !== fid) return { error: "You don't hold it." };
+  if (id === "chart") {
+    if (r.used) return { error: "The Star Chart has been used: the Outer Reach is open." };
+    r.used = s.turn; const n = expandGalaxy(s, F);
+    log(s, null, `The galaxy is larger than anyone knew. ${F.name} read the Founders' Star Chart, and the Outer Reach opens beyond the rim: ${n} new systems, uncharted.`, "explore");
+    return { ok: true, systems: n };
+  }
+  if (id === "shard") {
+    if (r.ready && s.turn < r.ready) return { error: `The Gate Shard is spent until turn ${r.ready}.` };
+    const a = s.systems[opts.from], b = s.systems[opts.to];
+    if (!a || !a.colony || a.colony.owner !== fid) return { error: "Open it from a world of yours." };
+    if (!shardTargets(s, fid, a.id).includes(b)) return { error: "Choose an explored system within 8 hexes that isn't already linked." };
+    s.adj[a.id].push(b.id); s.adj[b.id].push(a.id); s.corridors.push([a.id, b.id]);
+    r.ready = s.turn + RELICS.shard.every;
+    log(s, null, `${F.name} opened a new corridor with the Gate Shard: ${a.name} to ${b.name}.`, "explore");
+    return { ok: true };
+  }
+  return { error: "That relic works by being held." };
+}
+export const shardTargets = (s, fid, fromId) => { const a = s.systems[fromId], F = faction(s, fid);
+  return a ? Object.values(s.systems).filter((x) => x !== a && F.explored[x.at] && distance(x.at, a.at) <= 8 && !s.adj[a.id].includes(x.id)) : []; };
+/** The Outer Reach: REACH.rings new rings of hexes beyond the rim, with nebulae, rifts and new systems (ruins, anomalies,
+ * and the relics kept back), linked into the corridor network. The chart's reader sees all of it. Returns the count. */
+export function expandGalaxy(s, reader) {
+  const R = makeRng("reach:" + s.seed + ":" + s.turn), R0 = s.radius, R1 = R0 + REACH.rings;
+  const fresh = hexagon(R1).filter((k) => !s.hexes[k]);
+  for (const k of fresh) s.hexes[k] = { terrain: "space" };
+  const blob = (terrain, count, len) => { for (let i = 0; i < count; i++) { let k = fresh[R.int(fresh.length)]; for (let j = 0; j < len; j++) { if (s.hexes[k] && distance(k, "0,0") > R0 && distance(k, "0,0") < R1) s.hexes[k].terrain = terrain; const n = neighbors(k).filter((x) => s.hexes[x] && distance(x, "0,0") > R0); if (!n.length) break; k = n[R.int(n.length)]; } } };
+  blob("nebula", Math.round(R1 * 0.5), 6); blob("rift", Math.round(R1 * 0.25), 3);
+  const density = Object.keys(s.systems).length / (3 * R0 * (R0 + 1) + 1), want = Math.round(density * fresh.length);
+  const used = new Set(Object.values(s.systems).map((x) => x.name)), names = STAR_NAMES.filter((n) => !used.has(n));
+  const syl = [["Ul", "Var", "Thes", "Ory", "Kae", "Mor", "Ix", "Sel", "Dra", "Ny", "Qor", "Ves"], ["dren", "os", "ith", "ara", "on", "ex", "uun", "ia", "el", "ok"]];
+  const nameOf = () => { if (names.length) return names.splice(R.int(names.length), 1)[0]; let n; do n = syl[0][R.int(12)] + syl[1][R.int(10)]; while (used.has(n)); used.add(n); return n; };
+  let made = [], tries = 0, next = Object.keys(s.systems).length;
+  while (made.length < want && tries++ < 5000) {
+    const k = fresh[R.int(fresh.length)];
+    if (s.hexes[k].terrain === "rift" || distance(k, "0,0") > R1 - 1 || Object.keys(s.sysAt).some((h) => distance(h, k) < 3)) continue;
+    let id = "s" + next++; while (s.systems[id]) id = "s" + next++;
+    const roll = R.next(), world = roll < 0.16 ? "terran" : roll < 0.3 ? "ocean" : roll < 0.46 ? "desert" : roll < 0.6 ? "arctic" : roll < 0.8 ? "barren" : "gas";
+    s.systems[id] = { id, name: nameOf(), at: k, world, size: 1 + R.int(4), rich: [0.6, 1, 1.4, 1.4][R.int(4)], exotics: R.next() < REACH.exotics, ruins: R.next() < REACH.ruins, colony: null, reach: true };
+    if (!s.systems[id].ruins && R.next() < REACH.anomalies) s.systems[id].anomaly = ANOMALY_KINDS[R.int(ANOMALY_KINDS.length)];
+    s.hexes[k].terrain = "space"; s.sysAt[k] = id; s.adj[id] = []; made.push(s.systems[id]);
+  }
+  // Corridors: each new system to its two nearest within 6, and the Reach joined to the old network at its nearest points.
+  const link = (a, b) => { if (a === b || s.adj[a].includes(b)) return; s.adj[a].push(b); s.adj[b].push(a); s.corridors.push([a, b]); };
+  const all = Object.values(s.systems);
+  for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
+  const ids = Object.keys(s.systems);
+  const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
+  for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
+    const main = c[ids.find((i) => !s.systems[i].reach)]; let best = null;
+    for (const a of ids) if (c[a] === main) for (const b of ids) if (c[b] !== main) { const d = distance(s.systems[a].at, s.systems[b].at); if (!best || d < best[2]) best = [a, b, d]; }
+    link(best[0], best[1]);
+  }
+  // The relics kept back go to the Reach's ruins and anomalies.
+  const sites = made.filter((x) => x.ruins || x.anomaly);
+  for (const id of s.relicsReach || []) { const pool = sites.length ? sites : made; if (!pool.length) break; const x = pool.splice(R.int(pool.length), 1)[0]; x.relic = id; s.relics[id] = { at: null }; }
+  s.relicsReach = [];
+  s.radius = R1;
+  if (reader) for (const k of fresh) reader.explored[k] = 1;
+  return made.length;
 }
 // ---- the Corridor Engine in an open game ----
 /** The Engine that stands (open games only), or null: { sys, owner, built, gate }. */

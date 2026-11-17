@@ -4,7 +4,7 @@
 // (never with each other); destroying one pays a bounty in credits and research (game.js, bounty).
 import { makeRng, distance } from "./hex.js";
 import { SHIPS, WILDS } from "./data.js";
-import { player, faction, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, log, rng, placeAnomalies } from "./game.js";
+import { player, faction, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, log, rng, placeAnomalies, placeRelics } from "./game.js";
 
 export const PIRATES = "pirates", BEASTS = "beasts";
 const power = (id) => ({ id, name: WILDS[id].name, color: WILDS[id].color, ai: true, alive: true, wild: true, capital: null, credits: 0, exotics: 0,
@@ -27,7 +27,7 @@ export function wildsState(s) {
 /** Once a turn, after the turn resolves: new havens and leviathans, the raids, the wandering. */
 export function wildsTurn(s) {
   if (s.wildsOff || s.winner) return;
-  placeAnomalies(s);
+  placeAnomalies(s); placeRelics(s);
   if (!s.wilds) {
     s.wilds = { pirates: power(PIRATES), beasts: power(BEASTS), nextHaven: Math.max(s.turn + 2, WILDS.havenFirst), nextLeviathan: Math.max(s.turn + 5, WILDS.leviathanFirst) };
     nestSwarms(s);

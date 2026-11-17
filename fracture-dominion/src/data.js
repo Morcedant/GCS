@@ -201,6 +201,29 @@ export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, hea
  * gives nothing. Capture the world and it's yours; a barrage destroys it, and the race to build it starts again.
  */
 export const ENGINE = { gateEvery: 5, tradePerColony: 2, scorePerTurn: 2, grudgeEvery: 5, grudge: -3 };
+/**
+ * Relics of the old empires: one of each, hidden in ruins and anomalies (a few out in the Outer Reach, which only the
+ * Star Chart opens). The first fleet to end its turn at a relic's site recovers it, and it goes to its finder's capital.
+ * A relic belongs to the world that holds it: take the world and you take the relic; burn the world and the relic lies
+ * in its ruins for anyone to find. `use` relics are used from the Empire tab; the rest work by being held. Each held
+ * relic is worth RELIC_SCORE.
+ */
+export const RELICS = {
+  chart: { name: "The Founders' Star Chart", use: "once", text: "Use it once: the galaxy grows. Four rings of uncharted space open beyond the rim (the Outer Reach), with new systems, ruins, anomalies and more relics, and you see the new region first." },
+  shard: { name: "The Gate Shard", use: "every", every: 15, text: "Every 15 turns: open a new corridor from a world of yours to any system you've explored within 8 hexes." },
+  keel: { name: "The Living Keel", text: "Your ships repair a point of hull every turn, anywhere." },
+  oracle: { name: "The Oracle Lens", text: "Every system in the galaxy is charted for you, and your ships see 2 hexes farther." },
+  key: { name: "The Warden Key", text: "Warden machines fight your ships and worlds at −2 skill." },
+  forge: { name: "The Forge of Ages", text: "+50% industry at the world that holds it, and +10% on all your worlds." },
+  archive: { name: "The Last Archive", text: "+20% science on every world." },
+  crown: { name: "The Crown of the First Empire", text: "+20% credits on every world, and every power thinks a little better of you each turn." },
+  anchor: { name: "The Fold Anchor", text: "+1 speed for all your ships." },
+  aegis: { name: "The Aegis Lattice", text: "The world that holds it gets orbital guns with 6 more hull (guns even without a battery), and all your worlds' guns fire at +1 skill." },
+  seeds: { name: "The Seed Vault", text: "+2 population room on every world of yours." },
+};
+export const RELIC_SCORE = 10;
+/** The Outer Reach (the Star Chart): how many rings it adds, and how often its systems have ruins and anomalies. */
+export const REACH = { rings: 4, ruins: 0.25, anomalies: 0.25, exotics: 0.3, reserved: 4 };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
 
 /**

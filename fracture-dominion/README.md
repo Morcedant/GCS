@@ -20,6 +20,18 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **More buildings:** Garrison barracks (+3 garrison; a siege wears it to no less than 80%), Deep-space observatory
   (Deep sensors: +3 science, and it studies an anomaly within 4 hexes every 4 turns), Drydock (Orbital shipyards: your
   ships there are repaired to full every turn) and Orbital habitat (Habitat domes: +2 population room).
+- **Relics of the old empires:** eleven, one of each, hidden in ruins and anomalies (♦ marks one held or lost). The first
+  fleet to end its turn at a relic's site recovers it, and it's kept at its finder's capital. A relic belongs to the
+  world that keeps it: take the world, take the relic; burn the world and the relic lies in its ruins for anyone to find.
+  Each is worth 10 score. **The Founders' Star Chart** (always on the map, at the site farthest from every homeworld)
+  is read once and **expands the galaxy**: four rings of uncharted space, the Outer Reach, open beyond the rim, with new
+  systems (more of them with ruins, anomalies and exotics), linked into the corridors, and four relics kept back for it.
+  **The Gate Shard** opens a new corridor from a world of yours to any explored system within 8 hexes, every 15 turns.
+  The rest work by being held: the Living Keel (ships repair anywhere), the Oracle Lens (the whole galaxy charted, +2
+  sensors), the Warden Key (Warden machines at −2 skill against you), the Forge of Ages (+50% industry at its world, +10%
+  everywhere), the Last Archive (+20% science), the Crown of the First Empire (+20% credits, and everyone's regard rises),
+  the Fold Anchor (+1 speed), the Aegis Lattice (its world gets guns with 6 more hull; +1 skill for all your guns) and
+  the Seed Vault (+2 population room everywhere).
 - **The wild things:** threats that belong to no power, at war with everyone. **Pirate havens** (8 hull, two shots of 2)
   appear in empty systems near the settled worlds from turn 14, another every 22 turns (up to 2–5 by galaxy size); each
   sends out raiders who hold weak worlds' orbits (a blockade) and take credits each turn. **Crystal swarms** nest on rich

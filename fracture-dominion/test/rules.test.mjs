@@ -685,3 +685,53 @@ test("an open game's Corridor Engine: no victory but a prize; one at a time; it 
   assert.equal(engineHeld(t).owner, t.factions[1].id);
   assert.ok(ENGINE.gateEvery > 0);
 });
+
+test("relics: hidden at ruins and anomalies, recovered by the first fleet there, held by the world that keeps them", async () => {
+  const { relicOwner, relicHeld, relicsOf, useRelic, shardTargets } = await import("../src/game.js");
+  const { RELICS, REACH, RELIC_SCORE } = await import("../src/data.js");
+  const s = newGame({ seed: 18, size: "medium", player: "concord", rivals: 2 }), me = s.factions[0], cap = s.systems[me.capital];
+  const sites = Object.values(s.systems).filter((x) => x.relic);
+  assert.ok(sites.length >= 3 && sites.every((x) => x.ruins || x.anomaly || x.relic === "chart"));
+  assert.ok(sites.some((x) => x.relic === "chart"), "the Star Chart is always on the map");
+  assert.equal(sites.length + s.relicsReach.length, Object.keys(RELICS).length, "one of each");
+  // Recover the Seed Vault (or whatever's nearest): it goes to the capital, and works.
+  const site = sites.find((x) => x.relic !== "chart"), id = site.relic, sc = score(s, "concord");
+  spawnFleet(s, "concord", site.at, ["scout"]); endTurn(s);
+  assert.equal(relicOwner(s, id), "concord"); assert.equal(s.relics[id].at, cap.id); assert.equal(site.relic, null);
+  assert.ok(score(s, "concord") >= sc + RELIC_SCORE - 15);
+  assert.equal(relicsOf(s, "concord").length, 1);
+  // Effects, held directly.
+  const room = maxPop(s, cap); s.relics.seeds = { at: cap.id, owner: "concord" }; assert.equal(maxPop(s, cap), room + (id === "seeds" ? 0 : 2));
+  const spd = shipStats(s, "concord", "frigate").speed; s.relics.anchor = { at: cap.id, owner: "concord" }; assert.equal(shipStats(s, "concord", "frigate").speed, spd + (id === "anchor" ? 0 : 1));
+  // The world falls: the relics go with it.
+  const foe = s.factions[1].id; cap.colony.owner = foe; endTurn(s);
+  assert.ok(relicHeld(s, foe, id)); assert.ok(!relicHeld(s, "concord", id));
+  // The world is gone: the relic lies in its ruins, for anyone to find.
+  cap.colony = null; endTurn(s);
+  for (const k of new Set([id, "seeds", "anchor"])) { assert.equal(relicOwner(s, k), null); assert.ok(Object.values(s.systems).some((x) => x.relic === k && x.relicLost), `${k} lies somewhere to be found`); }
+});
+
+test("the Star Chart opens the Outer Reach; the Gate Shard opens a corridor", async () => {
+  const { useRelic, shardTargets, findPath } = await import("../src/game.js");
+  const { REACH } = await import("../src/data.js");
+  const s = newGame({ seed: 19, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
+  const r0 = s.radius, n0 = Object.keys(s.systems).length, h0 = Object.keys(s.hexes).length, reserved = s.relicsReach.length;
+  s.relics.chart = { at: cap.id, owner: "concord" };
+  for (const x of Object.values(s.systems)) if (x.relic === "chart") x.relic = null;
+  const r = useRelic(s, "concord", "chart");
+  assert.ok(r.ok && r.systems > 5);
+  assert.equal(s.radius, r0 + REACH.rings);
+  assert.ok(Object.keys(s.hexes).length > h0 && Object.keys(s.systems).length === n0 + r.systems);
+  assert.ok(useRelic(s, "concord", "chart").error, "once only");
+  const reach = Object.values(s.systems).filter((x) => x.reach);
+  assert.ok(reach.every((x) => me.explored[x.at]), "the reader sees the Reach");
+  assert.ok(reach.every((x) => findPath(s, "concord", cap.at, x.at)), "every new system can be reached");
+  assert.equal(reach.filter((x) => x.relic).length, reserved, "the kept-back relics are out there");
+  // The Gate Shard.
+  s.relics.shard = { at: cap.id, owner: "concord" };
+  const tg = shardTargets(s, "concord", cap.id)[0];
+  assert.ok(tg);
+  assert.ok(useRelic(s, "concord", "shard", { from: cap.id, to: tg.id }).ok);
+  assert.ok(s.adj[cap.id].includes(tg.id));
+  assert.ok(useRelic(s, "concord", "shard", { from: cap.id, to: shardTargets(s, "concord", cap.id)[0]?.id }).error, "then it rests");
+});
