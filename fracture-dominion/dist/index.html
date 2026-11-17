@@ -201,7 +201,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 21:17 UTC";
+const BUILD = "2026-11-17 21:19 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -464,6 +464,21 @@ const WILDS = {
   bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 } },
   pirates: { name: "Pirates", color: "#d8d14a" }, beasts: { name: "The creatures of the deep", color: "#4ec9b0" },
 };
+/**
+ * How many wild things a game has (the new-game form, and Menu → Pirates and creatures, at any time). Light is the
+ * default: one haven at a time on most maps, one raider fleet each, and fewer swarms. Heavy is the full WILDS numbers.
+ */
+const WILD_LEVELS = {
+  none: { name: "None", text: "No pirates or creatures." },
+  light: { name: "Light", text: "A few: one pirate haven at a time (two on large maps) with one raider fleet, a couple of crystal swarms, and a single void leviathan late on.",
+    havens: { small: 1, medium: 1, large: 2, vast: 2 }, havenEvery: 35, raidersPerHaven: 1, raidEvery: 8, raidMax: 3,
+    swarms: { small: 1, medium: 2, large: 2, vast: 3 }, leviathans: 1, leviathanFirst: 70 },
+  heavy: { name: "Heavy", text: "Plenty: up to 2–5 havens, each with two raider fleets, swarms on many rich systems, and two leviathans from turn 40.",
+    havens: { small: 2, medium: 3, large: 4, vast: 5 }, havenEvery: 22, raidersPerHaven: 2, raidEvery: 5, raidMax: 5,
+    swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathans: 2, leviathanFirst: 40 },
+};
+/** Raiders who lose ships at a world stay away from it this many turns. */
+const RAID_AVOID = 15;
 const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 /**
  * The Corridor Engine in an open game: not a victory but the galaxy's great prize. Only one can stand. Its holder's
@@ -677,7 +692,7 @@ function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, wildsOff: opts.wilds === false, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -1329,6 +1344,8 @@ function battles(s) {
           }
           // A pirate or a creature destroyed: its bounty (credits), and what its wreck teaches (research), to whoever did it.
           if (was > 0 && hp(t) <= 0 && (t.fid === "pirates" || t.fid === "beasts") && !isWild(u.fid)) bounty(s, u.fid, t.ship.type, where);
+          // Raiders who lose ships at a world remember it, and stay away for a while.
+          if (was > 0 && hp(t) <= 0 && t.fid === "pirates" && sys && sys.colony && s.wilds) (s.wilds.avoid = s.wilds.avoid || {})[sys.id] = s.turn + RAID_AVOID;
         }
         if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? u.st.dmg : 0 });
         }
@@ -2391,22 +2408,47 @@ function wildsState(s) {
     seen: [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)].filter((f) => me.explored[f.at] && (isHaven(f) || f.ships.some((x) => x.type === "swarm") || me.visible[f.at])).length };
 }
 
+/** The game's setting: none, light (the default, and for games saved before there was a choice) or heavy. */
+const wildsLevel = (s) => (s.wildsOff ? "none" : WILD_LEVELS[s.wildsLevel] ? s.wildsLevel : "light");
+const L = (s) => WILD_LEVELS[wildsLevel(s)];
+/** Change the setting mid-game. Fewer: the havens and swarms beyond the new limit are gone (those nearest the settled
+ * worlds first), with their raiders; None: every pirate and creature is gone. */
+function setWildsLevel(s, level) {
+  if (!WILD_LEVELS[level]) return { error: "No such setting." };
+  s.wildsLevel = level; s.wildsOff = level === "none";
+  prune(s);
+  log(s, null, `Pirates and creatures: ${WILD_LEVELS[level].name.toLowerCase()}. ${WILD_LEVELS[level].text}`, "war");
+  return { ok: true };
+}
+function prune(s) {
+  if (wildsLevel(s) === "none") { for (const f of [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)]) delete s.fleets[f.id]; return; }
+  const P = L(s), near = (f) => colonyMin(s, f.at);
+  const cut = (list, max, also) => { list.sort((a, b) => near(a) - near(b)); while (list.length > max) { const f = list.shift(); if (also) also(f); delete s.fleets[f.id]; } };
+  cut(havens(s), P.havens[s.size] || 1, (h) => { for (const r of fleetsOf(s, PIRATES)) if (!isHaven(r) && r.home === h.at) delete s.fleets[r.id]; });
+  for (const h of havens(s)) cut(fleetsOf(s, PIRATES).filter((r) => !isHaven(r) && r.home === h.at), P.raidersPerHaven);
+  cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "swarm"), P.swarms[s.size] || 1);
+  cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "leviathan"), P.leviathans);
+}
+
 /** Once a turn, after the turn resolves: new havens and leviathans, the raids, the wandering. */
 function wildsTurn(s) {
   if (s.wildsOff || s.winner) return;
   placeAnomalies(s); placeRelics(s);
+  // A game saved before the setting existed starts on Light, trimmed to it.
+  if (!s.wildsLevel) { s.wildsLevel = "light"; if (s.wilds) prune(s); }
+  const P = L(s);
   if (!s.wilds) {
-    s.wilds = { pirates: power(PIRATES), beasts: power(BEASTS), nextHaven: Math.max(s.turn + 2, WILDS.havenFirst), nextLeviathan: Math.max(s.turn + 5, WILDS.leviathanFirst) };
+    s.wilds = { pirates: power(PIRATES), beasts: power(BEASTS), nextHaven: Math.max(s.turn + 2, WILDS.havenFirst), nextLeviathan: Math.max(s.turn + 5, P.leviathanFirst) };
     nestSwarms(s);
   }
   const W = s.wilds, R = rng(s);
   if (s.turn >= W.nextHaven) {
-    W.nextHaven = s.turn + WILDS.havenEvery;
-    if (havens(s).length < (WILDS.havens[s.size] || 3)) newHaven(s, R);
+    W.nextHaven = s.turn + P.havenEvery;
+    if (havens(s).length < (P.havens[s.size] || 1)) newHaven(s, R);
   }
   if (s.turn >= W.nextLeviathan) {
     W.nextLeviathan = s.turn + WILDS.leviathanEvery;
-    if (fleetsOf(s, BEASTS).filter((f) => f.ships.some((x) => x.type === "leviathan")).length < WILDS.leviathans) newLeviathan(s, R);
+    if (s.turn >= P.leviathanFirst && fleetsOf(s, BEASTS).filter((f) => f.ships.some((x) => x.type === "leviathan")).length < P.leviathans) newLeviathan(s, R);
   }
   for (const f of [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)]) {
     if (!s.fleets[f.id]) continue;
@@ -2424,7 +2466,7 @@ function nestSwarms(s) {
   const R = makeRng("swarms:" + s.seed);
   const pool = Object.values(s.systems).filter((x) => !x.colony && (x.exotics || x.rich > 1) && colonyMin(s, x.at) >= 3 && !fleetsAt(s, x.at).length)
     .sort((a, b) => (a.id < b.id ? -1 : 1));
-  for (let n = WILDS.swarms[s.size] || 3; n > 0 && pool.length; n--) {
+  for (let n = L(s).swarms[s.size] || 1; n > 0 && pool.length; n--) {
     const sys = pool.splice(R.int(pool.length), 1)[0];
     spawnFleet(s, BEASTS, sys.at, ["swarm"]).home = sys.at;
   }
@@ -2447,17 +2489,19 @@ function newHaven(s, R) {
 }
 
 function launchRaiders(s, haven) {
-  if ((s.turn - (haven.born || 0)) % WILDS.raidEvery !== 0) return;
+  const P = L(s);
+  if ((s.turn - (haven.born || 0)) % P.raidEvery !== 0) return;
   const out = fleetsOf(s, PIRATES).filter((f) => !isHaven(f) && f.home === haven.at).length;
-  if (out >= WILDS.raidersPerHaven) return;
-  const n = Math.min(5, 2 + Math.floor(s.turn / 50));
+  if (out >= P.raidersPerHaven) return;
+  const n = Math.min(P.raidMax, 2 + Math.floor(s.turn / 50));
   const f = spawnFleet(s, PIRATES, haven.at, []); f.home = haven.at; f.stay = 0;
   for (let i = 0; i < n; i++) f.ships.push({ type: "raider", hull: SHIPS.raider.hull });
 }
 
 /** Worth a raid: an established colony (population preyPop or more, and not newly founded). Outposts and young colonies
  * have nothing worth taking, so the frontier can still be settled. */
-const worthRaiding = (s, x) => !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns));
+const worthRaiding = (s, x) => !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns)
+  && !(s.wilds && s.wilds.avoid && s.wilds.avoid[x.id] > s.turn));   // a world that cost them ships: they stay away a while
 /** Raiders: hold an unguarded orbit for a few turns, taking credits each turn (the blockade halves the world's yields
  * too); hurt or done, go home; otherwise pick the next weak world within reach of the haven. */
 function raid(s, f, R) {
@@ -4005,19 +4049,20 @@ function showNewGame(canContinue, preset) {
       <label>Difficulty <select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"><\/label>
     <\/div>
+    <label>Pirates and creatures <select id="ng-wilds">${Object.entries(WILD_LEVELS).map(([k, v]) => `<option value="${k}" ${k === "light" ? "selected" : ""}>${v.name}<\/option>`).join("")}<\/select><\/label>
     <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world<\/label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step<\/label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-guide">New here? The starter guide<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>
     <p class="small muted">Version: ${esc(VERSION)}<\/p>`);
   if (preset) {
-    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff;
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
   }
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, wilds: $("ng-wilds").value });
     if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
@@ -4186,7 +4231,7 @@ function galaxyInfo() {
   const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
   const diff = { easy: "Easy", normal: "Normal", hard: "Hard" }[S.difficulty] || S.difficulty;
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, wilds: wildsLevel(S) } };
 }
 function galaxyBox() {
   const g = galaxyInfo();
@@ -4212,9 +4257,11 @@ function showMenu() {
     <a class="btn" href="tokens.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Printable ship tokens<\/a>
     <button class="btn" id="m-export">Save code (copy)<\/button>
     <button class="btn" id="m-load">Load a saved game<\/button>
+    ${S && !S.winner ? `<label class="small" style="display:block;margin:4px 0">Pirates and creatures <select id="m-wilds">${Object.entries(WILD_LEVELS).map(([k, v]) => `<option value="${k}" ${k === wildsLevel(S) ? "selected" : ""}>${v.name}<\/option>`).join("")}<\/select><\/label><p class="small muted" id="m-wilds-text" style="margin-top:-2px">${esc(WILD_LEVELS[wildsLevel(S)].text)}<\/p>` : ""}
     ${S && S.mode === "open" && !S.winner ? `<button class="btn" id="m-retire">Retire: end the game here<\/button>` : ""}
     <button class="btn danger" id="m-new">New game<\/button><\/div>
     <p class="small muted">Your game saves itself in this browser after every action. Version: ${esc(VERSION)}<\/p>${galaxyBox()}`);
+  if ($("m-wilds")) $("m-wilds").onchange = () => { const v = $("m-wilds").value; setWildsLevel(S, v); save(); $("m-wilds-text").textContent = WILD_LEVELS[v].text; renderAll(); toast(`Pirates and creatures: ${WILD_LEVELS[v].name}.`); };
   if ($("m-retire")) $("m-retire").onclick = () => { retire(S); save(); closeModal(); renderAll(); showEnd(); };
   bindGalaxyBox();
   $("m-resume").onclick = closeModal;

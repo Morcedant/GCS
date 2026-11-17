@@ -193,6 +193,21 @@ export const WILDS = {
   bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 } },
   pirates: { name: "Pirates", color: "#d8d14a" }, beasts: { name: "The creatures of the deep", color: "#4ec9b0" },
 };
+/**
+ * How many wild things a game has (the new-game form, and Menu → Pirates and creatures, at any time). Light is the
+ * default: one haven at a time on most maps, one raider fleet each, and fewer swarms. Heavy is the full WILDS numbers.
+ */
+export const WILD_LEVELS = {
+  none: { name: "None", text: "No pirates or creatures." },
+  light: { name: "Light", text: "A few: one pirate haven at a time (two on large maps) with one raider fleet, a couple of crystal swarms, and a single void leviathan late on.",
+    havens: { small: 1, medium: 1, large: 2, vast: 2 }, havenEvery: 35, raidersPerHaven: 1, raidEvery: 8, raidMax: 3,
+    swarms: { small: 1, medium: 2, large: 2, vast: 3 }, leviathans: 1, leviathanFirst: 70 },
+  heavy: { name: "Heavy", text: "Plenty: up to 2–5 havens, each with two raider fleets, swarms on many rich systems, and two leviathans from turn 40.",
+    havens: { small: 2, medium: 3, large: 4, vast: 5 }, havenEvery: 22, raidersPerHaven: 2, raidEvery: 5, raidMax: 5,
+    swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathans: 2, leviathanFirst: 40 },
+};
+/** Raiders who lose ships at a world stay away from it this many turns. */
+export const RAID_AVOID = 15;
 export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 /**
  * The Corridor Engine in an open game: not a victory but the galaxy's great prize. Only one can stand. Its holder's

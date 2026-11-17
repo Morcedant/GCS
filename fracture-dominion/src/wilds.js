@@ -3,7 +3,7 @@
 // wants. Void leviathans drift between the stars and feed on unguarded worlds. All of them are at war with every power
 // (never with each other); destroying one pays a bounty in credits and research (game.js, bounty).
 import { makeRng, distance } from "./hex.js";
-import { SHIPS, WILDS } from "./data.js";
+import { SHIPS, WILDS, WILD_LEVELS } from "./data.js";
 import { player, faction, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, log, rng, placeAnomalies, placeRelics } from "./game.js";
 
 export const PIRATES = "pirates", BEASTS = "beasts";
@@ -24,22 +24,47 @@ export function wildsState(s) {
     seen: [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)].filter((f) => me.explored[f.at] && (isHaven(f) || f.ships.some((x) => x.type === "swarm") || me.visible[f.at])).length };
 }
 
+/** The game's setting: none, light (the default, and for games saved before there was a choice) or heavy. */
+export const wildsLevel = (s) => (s.wildsOff ? "none" : WILD_LEVELS[s.wildsLevel] ? s.wildsLevel : "light");
+const L = (s) => WILD_LEVELS[wildsLevel(s)];
+/** Change the setting mid-game. Fewer: the havens and swarms beyond the new limit are gone (those nearest the settled
+ * worlds first), with their raiders; None: every pirate and creature is gone. */
+export function setWildsLevel(s, level) {
+  if (!WILD_LEVELS[level]) return { error: "No such setting." };
+  s.wildsLevel = level; s.wildsOff = level === "none";
+  prune(s);
+  log(s, null, `Pirates and creatures: ${WILD_LEVELS[level].name.toLowerCase()}. ${WILD_LEVELS[level].text}`, "war");
+  return { ok: true };
+}
+function prune(s) {
+  if (wildsLevel(s) === "none") { for (const f of [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)]) delete s.fleets[f.id]; return; }
+  const P = L(s), near = (f) => colonyMin(s, f.at);
+  const cut = (list, max, also) => { list.sort((a, b) => near(a) - near(b)); while (list.length > max) { const f = list.shift(); if (also) also(f); delete s.fleets[f.id]; } };
+  cut(havens(s), P.havens[s.size] || 1, (h) => { for (const r of fleetsOf(s, PIRATES)) if (!isHaven(r) && r.home === h.at) delete s.fleets[r.id]; });
+  for (const h of havens(s)) cut(fleetsOf(s, PIRATES).filter((r) => !isHaven(r) && r.home === h.at), P.raidersPerHaven);
+  cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "swarm"), P.swarms[s.size] || 1);
+  cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "leviathan"), P.leviathans);
+}
+
 /** Once a turn, after the turn resolves: new havens and leviathans, the raids, the wandering. */
 export function wildsTurn(s) {
   if (s.wildsOff || s.winner) return;
   placeAnomalies(s); placeRelics(s);
+  // A game saved before the setting existed starts on Light, trimmed to it.
+  if (!s.wildsLevel) { s.wildsLevel = "light"; if (s.wilds) prune(s); }
+  const P = L(s);
   if (!s.wilds) {
-    s.wilds = { pirates: power(PIRATES), beasts: power(BEASTS), nextHaven: Math.max(s.turn + 2, WILDS.havenFirst), nextLeviathan: Math.max(s.turn + 5, WILDS.leviathanFirst) };
+    s.wilds = { pirates: power(PIRATES), beasts: power(BEASTS), nextHaven: Math.max(s.turn + 2, WILDS.havenFirst), nextLeviathan: Math.max(s.turn + 5, P.leviathanFirst) };
     nestSwarms(s);
   }
   const W = s.wilds, R = rng(s);
   if (s.turn >= W.nextHaven) {
-    W.nextHaven = s.turn + WILDS.havenEvery;
-    if (havens(s).length < (WILDS.havens[s.size] || 3)) newHaven(s, R);
+    W.nextHaven = s.turn + P.havenEvery;
+    if (havens(s).length < (P.havens[s.size] || 1)) newHaven(s, R);
   }
   if (s.turn >= W.nextLeviathan) {
     W.nextLeviathan = s.turn + WILDS.leviathanEvery;
-    if (fleetsOf(s, BEASTS).filter((f) => f.ships.some((x) => x.type === "leviathan")).length < WILDS.leviathans) newLeviathan(s, R);
+    if (s.turn >= P.leviathanFirst && fleetsOf(s, BEASTS).filter((f) => f.ships.some((x) => x.type === "leviathan")).length < P.leviathans) newLeviathan(s, R);
   }
   for (const f of [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)]) {
     if (!s.fleets[f.id]) continue;
@@ -57,7 +82,7 @@ function nestSwarms(s) {
   const R = makeRng("swarms:" + s.seed);
   const pool = Object.values(s.systems).filter((x) => !x.colony && (x.exotics || x.rich > 1) && colonyMin(s, x.at) >= 3 && !fleetsAt(s, x.at).length)
     .sort((a, b) => (a.id < b.id ? -1 : 1));
-  for (let n = WILDS.swarms[s.size] || 3; n > 0 && pool.length; n--) {
+  for (let n = L(s).swarms[s.size] || 1; n > 0 && pool.length; n--) {
     const sys = pool.splice(R.int(pool.length), 1)[0];
     spawnFleet(s, BEASTS, sys.at, ["swarm"]).home = sys.at;
   }
@@ -80,17 +105,19 @@ function newHaven(s, R) {
 }
 
 function launchRaiders(s, haven) {
-  if ((s.turn - (haven.born || 0)) % WILDS.raidEvery !== 0) return;
+  const P = L(s);
+  if ((s.turn - (haven.born || 0)) % P.raidEvery !== 0) return;
   const out = fleetsOf(s, PIRATES).filter((f) => !isHaven(f) && f.home === haven.at).length;
-  if (out >= WILDS.raidersPerHaven) return;
-  const n = Math.min(5, 2 + Math.floor(s.turn / 50));
+  if (out >= P.raidersPerHaven) return;
+  const n = Math.min(P.raidMax, 2 + Math.floor(s.turn / 50));
   const f = spawnFleet(s, PIRATES, haven.at, []); f.home = haven.at; f.stay = 0;
   for (let i = 0; i < n; i++) f.ships.push({ type: "raider", hull: SHIPS.raider.hull });
 }
 
 /** Worth a raid: an established colony (population preyPop or more, and not newly founded). Outposts and young colonies
  * have nothing worth taking, so the frontier can still be settled. */
-const worthRaiding = (s, x) => !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns));
+const worthRaiding = (s, x) => !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns)
+  && !(s.wilds && s.wilds.avoid && s.wilds.avoid[x.id] > s.turn));   // a world that cost them ships: they stay away a while
 /** Raiders: hold an unguarded orbit for a few turns, taking credits each turn (the blockade halves the world's yields
  * too); hurt or done, go home; otherwise pick the next weak world within reach of the haven. */
 function raid(s, f, R) {

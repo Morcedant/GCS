@@ -40,7 +40,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   and exotic systems from the start: no one settles there until they're destroyed. **Void leviathans** (12 hull, 3
   damage) drift between the stars from turn 40 and feed on unguarded worlds. Each pays a bounty when destroyed (a haven
   100 credits and 50 research, a swarm 90 research and 2 exotics, a leviathan 40 credits, 160 research and 4 exotics).
-  The computer powers hunt the ones near their worlds.
+  The computer powers hunt the ones near their worlds. How many there are is a setting (the new-game form, or Menu at
+  any time): **None**, **Light** (the default: one haven at a time on most maps, one raider fleet each, a couple of
+  swarms, one leviathan from turn 70) or **Heavy** (the numbers above). Turning it down mid-game removes the extras,
+  those nearest the settled worlds first. Raiders who lose ships at a world stay away from it for 15 turns.
 - **Diplomacy:** contact, war and peace, trade treaties; settling next door makes neighbours angry.
 - **The Corridor Engine in an open game:** not a victory but the galaxy's great prize, and only one can stand. Its
   holder's fleets travel corridors for nothing, and once every 5 turns a fleet at the Engine world can jump through its

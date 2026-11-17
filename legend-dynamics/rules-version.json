@@ -6,6 +6,18 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: choose how many pirates and creatures",
+      "items": [
+        "A new setting, Pirates and creatures, with three levels: None, Light or Heavy. Choose it when you start a game, or change it at any time from the Menu.",
+        "Light is the default: one pirate haven at a time (two on large maps) with one raider fleet, a couple of crystal swarms, and one void leviathan from turn 70. Heavy keeps the full numbers.",
+        "Turning it down mid-game removes the extra havens, raiders and swarms at once, those nearest the settled worlds first. None removes them all.",
+        "Games saved earlier switch to Light.",
+        "Raiders who lose a ship at a world stay away from it for 15 turns, so defending a world drives them off."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: pirates no longer stop expansion",
       "items": [
         "Pirate havens first appear on turn 30 (was 14).",

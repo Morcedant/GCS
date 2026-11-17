@@ -619,7 +619,7 @@ test("the wild things: swarms nest on rich systems and block settling, havens se
   const { wildsTurn, PIRATES, BEASTS } = await import("../src/wilds.js");
   const { bounty } = await import("../src/game.js");
   const { WILDS } = await import("../src/data.js");
-  const s = newGame({ seed: 15, size: "medium", player: "concord", rivals: 2 }), me = s.factions[0];
+  const s = newGame({ seed: 15, size: "medium", player: "concord", rivals: 2, wilds: "heavy" }), me = s.factions[0];
   wildsTurn(s);
   const swarms = fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "swarm");
   assert.equal(swarms.length, WILDS.swarms.medium);
@@ -746,4 +746,30 @@ test("pirate, creature and Warden ships can't be built; any queued in an old sav
   endTurn(s);
   assert.ok(!cap.colony.queue.some((q) => q.id === "swarm" || q.id === "raider"));
   assert.ok(!s.fleets[f.id]);
+});
+
+test("pirates and creatures: Light by default, Heavy or None by choice, changeable mid-game; raiders shun a world that cost them ships", async () => {
+  const { wildsTurn, setWildsLevel, wildsLevel, PIRATES, BEASTS } = await import("../src/wilds.js");
+  const { WILD_LEVELS } = await import("../src/data.js");
+  const s = newGame({ seed: 21, size: "medium", player: "concord", rivals: 2 });
+  assert.equal(wildsLevel(s), "light");
+  wildsTurn(s);
+  assert.equal(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "swarm").length, WILD_LEVELS.light.swarms.medium);
+  const h = newGame({ seed: 21, size: "medium", player: "concord", rivals: 2, wilds: "heavy" }); wildsTurn(h);
+  assert.ok(fleetsOf(h, BEASTS).length > fleetsOf(s, BEASTS).length);
+  // Heavy to Light mid-game: the extras are gone.
+  while (h.turn < 80) { h.turn++; wildsTurn(h); }
+  assert.ok(setWildsLevel(h, "light").ok);
+  assert.ok(fleetsOf(h, PIRATES).filter((f) => f.ships[0].type === "haven").length <= WILD_LEVELS.light.havens.medium);
+  assert.equal(fleetsOf(h, BEASTS).filter((f) => f.ships[0].type === "swarm").length, WILD_LEVELS.light.swarms.medium);
+  assert.ok(setWildsLevel(h, "none").ok); assert.equal(fleetsOf(h, PIRATES).length + fleetsOf(h, BEASTS).length, 0);
+  h.turn++; wildsTurn(h); assert.equal(fleetsOf(h, PIRATES).length, 0, "and none come back");
+  // A raider lost at a world: they stay away from it.
+  const n = newGame({ seed: 22, size: "small", player: "concord", rivals: 1 }); wildsTurn(n);
+  const col = n.systems[n.factions[0].capital];
+  declareWar(n, "concord", n.factions[1].id);
+  spawnFleet(n, "concord", col.at, ["cruiser", "cruiser", "cruiser"]); const r = spawnFleet(n, PIRATES, col.at, ["raider"]);
+  endTurn(n);
+  assert.ok(!n.fleets[r.id] || !n.fleets[r.id].ships.length);
+  assert.ok(n.wilds.avoid && n.wilds.avoid[col.id] > n.turn, "remembered");
 });
