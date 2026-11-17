@@ -2,7 +2,7 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
-import { faction, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, setResearch, enqueue, rush, totals,
+import { faction, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
@@ -25,7 +25,9 @@ export function aiTurn(s, F) {
 
 function research(s, F) {
   if (F.research.current) return;
-  const avail = availableTechs(s, F.id); if (!avail.length) return;
+  const avail = availableTechs(s, F.id);
+  // Every technology done (or nothing left worth more): an advance, the cheapest level first.
+  if (!avail.length) { const adv = availableAdvances(s, F.id).sort((a, b) => a.cost - b.cost)[0]; if (adv) setResearch(s, F.id, adv.id); return; }
   const pri = PRIORITY[F.id] || [];
   const want = pri.find((id) => avail.some((t) => t.id === id)) || [...avail].sort((a, b) => a.cost - b.cost)[0].id;
   // Late in the game, the Corridor Engine.
@@ -178,6 +180,7 @@ function fleets(s, F) {
       if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
+      if (huntWilds(s, F, f, 4)) continue;
       // Relief: a world of ours under siege, and this fleet strong enough to break it.
       const mineHull = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
       const relief = coloniesOf(s, F.id).filter((sys) => besieged(s, sys)).map((sys) => ({ sys, d: distance(f.at, sys.at),
@@ -202,6 +205,16 @@ function fleets(s, F) {
   }
 }
 
+/** Pirates and creatures near this faction's worlds (havens and swarms a little farther): go after the nearest this
+ * fleet can beat, for the bounty and to keep its worlds safe. */
+function huntWilds(s, F, f, reach) {
+  const power = (fl, fid) => fl.ships.reduce((t, x) => { const st = shipStats(s, fid, x.type); return t + (st.skill ? (fl.owner === F.id ? st.hull : x.hull) * st.dmg * (st.shots || 1) : 0); }, 0);
+  const mine = power(f, F.id), cols = coloniesOf(s, F.id); if (!cols.length || f.ships.length < 2) return false;
+  const pick = [...fleetsOf(s, "pirates"), ...fleetsOf(s, "beasts")].filter((w) => F.explored[w.at] && armed(w))
+    .map((w) => ({ w, near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at), still: w.ships.some((x) => !SHIPS[x.type].speed) }))
+    .filter((x) => x.near <= reach + (x.still ? 2 : 0) && power(x.w, x.w.owner) * 1.4 <= mine).sort((a, b) => a.d - b.d)[0];
+  return !!(pick && pick.w.at !== f.at && setDestination(s, f.id, pick.w.at).ok);
+}
 /** While the Wardens are awake: go after a wave within `reach` hexes of one of this faction's worlds, if this fleet can
  * take it; a strong fleet goes for the Heart itself, once the powers have had time to see what they face. */
 function huntWardens(s, F, f, reach) {

@@ -2,7 +2,7 @@
 // short scene and two or three choices; each choice does something real (credits, research, exotics, population,
 // ships, relations, a few turns of a golden age) and says what came of it. Ruins of the old empires are events too:
 // surveying one asks what to do with what's found there.
-import { player, faction, coloniesOf, fleetsOf, spawnFleet, log, maxPop, atWar, militaryPower, rng } from "./game.js";
+import { player, faction, coloniesOf, fleetsOf, spawnFleet, log, maxPop, atWar, militaryPower, rng, researchItem } from "./game.js";
 import { TECHS, SHIPS, PROTOTYPES } from "./data.js";
 import { distance } from "./hex.js";
 import { CRISIS_EVENTS } from "./crisis.js";
@@ -11,7 +11,7 @@ const evMe = (s) => player(s);
 const evMetRivals = (s) => s.factions.filter((f) => f.id !== evMe(s).id && f.alive && evMe(s).met[f.id]);
 const evRelate = (s, fid, n) => { const r = faction(s, fid).relations[evMe(s).id]; if (r) r.score = Math.max(-60, Math.min(40, r.score + n)); };
 const evName = (s, fid) => faction(s, fid).name;
-const evResearch = (s, n) => { evMe(s).research.progress += n; const cur = TECHS.find((t) => t.id === evMe(s).research.current); return `+${n} research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}`; };
+const evResearch = (s, n) => { evMe(s).research.progress += n; const cur = researchItem(s, evMe(s).id); return `+${n} research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}`; };
 const evRoll3 = (R) => R.d6() + R.d6() + R.d6();
 
 /**

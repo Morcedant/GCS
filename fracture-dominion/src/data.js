@@ -36,6 +36,10 @@ export const BUILDINGS = {
   shipyard: { name: "Shipyard", cost: 80, upkeep: 1, text: "Builds ships here." },
   battery: { name: "Orbital battery", cost: 100, upkeep: 1, needs: "batteries", text: "A fortress in orbit: 6 hull, two shots a round at skill 13 for 2 damage each, and it repairs 2 a turn. While its guns stand, a siege can't blockade the world, and its garrison fights 2 points harder." },
   depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
+  barracks: { name: "Garrison barracks", cost: 60, upkeep: 0.5, text: "+3 to the garrison against invasion, and a siege wears it down to no less than 80%." },
+  observatory: { name: "Deep-space observatory", cost: 80, upkeep: 1, needs: "sensors", text: "+3 science, and it studies one anomaly within 4 hexes every few turns, without a ship." },
+  drydock: { name: "Drydock", cost: 90, upkeep: 1, needs: "orbitalYards", text: "Your ships here are repaired to full hull every turn, not a point at a time." },
+  habitat: { name: "Orbital habitat", cost: 110, upkeep: 1, needs: "domes", text: "+2 population room on this world." },
   refinery: { name: "Exotics refinery", cost: 90, upkeep: 1, needs: "refining", text: "+1 exotics if the system has a deposit." },
   engine: { name: "The Corridor Engine", cost: 1200, upkeep: 0, needs: "engine", exotics: 15, wonder: true,
     text: "Finish it and you open a corridor to everywhere at once: you win." },
@@ -51,6 +55,11 @@ export const SHIPS = {
   tanker: { name: "Fuel tanker", cost: 50, fuel: 12, upkeep: 1, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, cargo: 12, text: "Carries fuel: with a fleet, it tops up the tank when it runs dry; parked, it gives supply within 2 hexes (a unit of fuel per fleet a turn). Unarmed: escort it." },
   cruiser: { name: "Cruiser", cost: 90, fuel: 5, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
   dreadnought: { name: "Dreadnought", cost: 180, fuel: 4, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
+  // The wild things (wilds.js): pirates and the creatures of the deep. Nobody builds these either.
+  raider: { name: "Raider", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, wild: true, text: "A pirate gunship: fast, lightly armed, and after your credits." },
+  haven: { name: "Pirate haven", cost: 0, upkeep: 0, speed: 0, hull: 8, skill: 12, dmg: 2, shots: 2, sensors: 2, wild: true, text: "A fortified pirate base in an empty system. It sends out raiders until someone burns it." },
+  swarm: { name: "Crystal swarm", cost: 0, upkeep: 0, speed: 0, hull: 5, skill: 11, dmg: 1, shots: 3, sensors: 1, wild: true, text: "Living crystal that nests on rich worlds and shreds anything that comes near. It never leaves." },
+  leviathan: { name: "Void leviathan", cost: 0, upkeep: 0, speed: 1, hull: 12, skill: 12, dmg: 3, sensors: 2, wild: true, text: "A creature the size of a moon, drifting between the stars. It fights whatever it finds." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
@@ -69,6 +78,10 @@ export const SHIP_SHAPES = {
   dreadnought: "M12 -5 L12 5 L6 5 L4 8.5 L-10 8.5 L-12 4 L-12 -4 L-10 -8.5 L4 -8.5 L6 -5 Z M-12 -2 L-13.5 -2 M-12 2 L-13.5 2 M4 -8.5 L4 8.5 M-4 -8.5 L-4 8.5 M12 0 L6 0",
   sentinel: "M12 0 L2 -4 L-4 -10 L-2 -3 L-10 0 L-2 3 L-4 10 L2 4 Z M2 0 L-4 0",
   colossus: "M12 0 L7 -6 L0 -6 L-3 -11 L-8 -11 L-7 -6 L-12 -4 L-12 4 L-7 6 L-8 11 L-3 11 L0 6 L7 6 Z M7 0 L-7 0 M0 -6 L0 6",
+  raider: "M11 0 L-4 -6 L-9 -9 L-6 -2 L-10 0 L-6 2 L-9 9 L-4 6 Z M1 0 L-5 0",
+  haven: "M0 -11 L10 -4 L7 9 L-7 9 L-10 -4 Z M0 -5 L4 -2 L3 4 L-3 4 L-4 -2 Z M10 -4 L12.5 -6 M-10 -4 L-12.5 -6 M7 9 L9 11.5 M-7 9 L-9 11.5",
+  swarm: "M0 -11 L3 -3 L11 -4 L5 2 L8 10 L0 5 L-8 10 L-5 2 L-11 -4 L-3 -3 Z",
+  leviathan: "M12 0 Q8 -8 -2 -7 Q-8 -6 -12 -10 Q-10 -3 -10 0 Q-10 3 -12 10 Q-8 6 -2 7 Q8 8 12 0 Z M6 -2 L4 -2 M-2 -7 Q0 0 -2 7",
   heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
 };
 
@@ -152,6 +165,33 @@ export const SIEGE = { industry: 0.5, credits: 0.5, starveEvery: 3, garrisonPerT
 // The exotics market: buy at the price, sell at three quarters of it; each unit moves the price, which drifts back.
 export const MARKET = { base: 12, step: 1, min: 4, max: 30, drift: 1, sellRate: 0.75 };
 /** The late-game crisis: when the Wardens wake, and how hard they come. */
+/**
+ * Advances: research you can take again and again, a level at a time, once the technology it builds on is done.
+ * Each level costs more (cost × (1 + 0.5 × the level you have)); max is the last level.
+ */
+export const ADVANCES = [
+  { id: "efficiency", name: "Industrial efficiency", field: "Industry", cost: 350, max: 5, needs: "automation", text: "+5% industry on every world, per level." },
+  { id: "theory", name: "Unified theory", field: "Physics", cost: 350, max: 5, needs: "sensors", text: "+5% science on every world, per level." },
+  { id: "banking", name: "Interstellar banking", field: "Society", cost: 350, max: 5, needs: "commerce", text: "+5% credits on every world, per level." },
+  { id: "armor", name: "Composite armor", field: "Industry", cost: 500, max: 2, needs: "shields", text: "+1 hull on every warship, per level." },
+  { id: "fireControl", name: "Fire control", field: "Physics", cost: 700, max: 2, needs: "targeting", text: "+1 to every warship's skill, per level." },
+  { id: "habitats", name: "Habitat engineering", field: "Society", cost: 450, max: 3, needs: "domes", text: "+1 population room on every world, per level." },
+  { id: "tanks", name: "Drive tuning", field: "Physics", cost: 300, max: 3, needs: "foldDrives", text: "+2 fuel in every ship's tank, per level." },
+];
+/** Research from other sources: anomalies (a scout surveys one), research pacts (each trade treaty, up to 3). */
+export const SCIENCE = { anomalyBase: 40, anomalyPerTurn: 0.6, anomalyMax: 160, observatoryRange: 4, observatoryEvery: 4, observatoryShare: 0.5, pactBonus: 0.05, pactMax: 3 };
+/**
+ * The wild things (wilds.js). Pirate havens: the first at `havenFirst`, another every `havenEvery` turns, up to
+ * havens[size] at once; each sends out raiders every `raidEvery` turns. Crystal swarms nest on rich systems from the
+ * start; void leviathans wake from `leviathanFirst`. Destroying one pays a bounty: credits and research.
+ */
+export const WILDS = {
+  havenFirst: 14, havenEvery: 22, havens: { small: 2, medium: 3, large: 4, vast: 5 }, raidEvery: 5, raidersPerHaven: 2,
+  raidCredits: 12, raidPerPop: 3, raidStay: 3, raidRange: 6,
+  swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathanFirst: 40, leviathanEvery: 35, leviathans: 2,
+  bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 } },
+  pirates: { name: "Pirates", color: "#d8d14a" }, beasts: { name: "The creatures of the deep", color: "#4ec9b0" },
+};
 export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
 

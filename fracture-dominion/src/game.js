@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -16,7 +16,7 @@ export function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, wildsOff: opts.wilds === false, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -33,6 +33,7 @@ export function newGame(opts) {
   // Every power starts with one admiral, on its frigate.
   for (const F of state.factions) { const fr = fleetsOf(state, F.id).find(armed); if (fr) fr.admiral = makeAdmiral(state, F.id, rng); }
   for (const a of state.factions) for (const b of state.factions) if (a !== b) a.relations[b.id] = { status: "peace", treaty: false, score: 0, turnsAtWar: 0 };
+  placeAnomalies(state);
   for (const f of state.factions) updateVision(state, f);
   log(state, null, "The corridors are open. Turn 1.");
   return state;
@@ -41,7 +42,12 @@ export function newGame(opts) {
 // ---- helpers ----
 // The Wardens (the late-game crisis, crisis.js) are a power of their own, kept out of s.factions: they have no worlds,
 // no diplomacy and no score, and they're at war with everyone.
-export const faction = (s, id) => s.factions.find((f) => f.id === id) || (s.crisis && s.crisis.F && s.crisis.F.id === id ? s.crisis.F : undefined);
+// The wild things (wilds.js: pirates, and the creatures of the deep) are kept out of s.factions the same way.
+export const faction = (s, id) => s.factions.find((f) => f.id === id) || (s.crisis && s.crisis.F && s.crisis.F.id === id ? s.crisis.F : undefined) || (s.wilds && s.wilds[id]) || undefined;
+/** The Wardens, the pirates and the creatures of the deep: at war with every power, never with each other. */
+export const isWild = (id) => id === "wardens" || id === "pirates" || id === "beasts";
+/** The level of an advance (repeatable research) a power has. */
+export const advLevel = (s, fid, id) => { const F = faction(s, fid); return (F && F.research.adv && F.research.adv[id]) || 0; };
 export const has = (s, fid, tech) => faction(s, fid).research.done.includes(tech);
 export const player = (s) => s.factions[0];
 export function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
@@ -56,7 +62,7 @@ export function log(s, fid, text, kind = "info") {
 export function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 export function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
 export function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
-export const atWar = (s, a, b) => a !== b && (a === "wardens" || b === "wardens" || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
+export const atWar = (s, a, b) => a !== b && (isWild(a) !== isWild(b) || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
 
 /** Does this faction have this prototype fitted? */
 export const proto = (s, fid, id) => !!((faction(s, fid).protos || {})[id]);
@@ -66,8 +72,8 @@ export function shipStats(s, fid, type) {
   if (type === "heart") { const m = (s.crisis && s.crisis.m) || 1; return { ...base, hull: s.crisis && s.crisis.heartMax || base.hull * m, shots: 1 + m }; }
   return { ...base,
     speed: base.speed + (has(s, fid, "foldDrives") ? 1 : 0) + (fid === "vael" ? 1 : 0),
-    hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0) + (warship && proto(s, fid, "plating") ? 1 : 0),
-    skill: warship ? base.skill + (has(s, fid, "targeting") ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (proto(s, fid, "lances") ? 1 : 0) : 0,
+    hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0) + (warship && proto(s, fid, "plating") ? 1 : 0) + (warship ? advLevel(s, fid, "armor") : 0),
+    skill: warship ? base.skill + (has(s, fid, "targeting") ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (proto(s, fid, "lances") ? 1 : 0) + advLevel(s, fid, "fireControl") : 0,
     sensors: base.sensors + (has(s, fid, "sensors") ? 1 : 0) + (proto(s, fid, "scanners") ? 1 : 0),
     troops: (base.troops || 0) * (fid === "hegemony" ? 2 : 1),
     cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * (proto(s, fid, "drones") ? 0.9 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1)) };
@@ -93,7 +99,7 @@ const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) 
 /** Tankers parked (not moving) with fuel aboard, their system not cut: forward supply points. */
 export const tankerPoints = (s, fid) => fleetsOf(s, fid).filter((f) => !f.path.length && cargoOf(f) > 0 && !cutAt(s, fid, f.at));
 const baseSupplyAt = (s, fid, hex) => supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
-export const inSupplyAt = (s, fid, hex) => fid === "vael" || fid === "wardens" || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
+export const inSupplyAt = (s, fid, hex) => fid === "vael" || isWild(fid) || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
 /** Draw a unit of fuel from a fleet's own tankers (the fullest first); false if they're dry. */
 function drawCargo(f) {
   const t = f.ships.filter((x) => x.type === "tanker" && (x.cargo ?? SHIPS.tanker.cargo) > 0).sort((a, b) => (b.cargo ?? 12) - (a.cargo ?? 12))[0];
@@ -103,7 +109,7 @@ export { cargoOf };
 export function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hulls (the Vael) feed themselves
 // ---- fuel ----
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
-export const fuelMax = (s, f) => (f.owner === "vael" || f.owner === "wardens" ? Infinity : Math.min(...f.ships.map((x) => SHIPS[x.type].fuel || 99)));
+export const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) ? Infinity : Math.min(...f.ships.map((x) => SHIPS[x.type].fuel || 99)) + 2 * advLevel(s, f.owner, "tanks"));
 export const fuelOf = (s, f) => Math.min(fuelMax(s, f), f.fuel ?? fuelMax(s, f));
 /** Buy a Fuel depot at an outpost of yours, with credits (an outpost has no industry). */
 export function buildDepot(s, fid, sysId) {
@@ -181,7 +187,7 @@ function admiralsAfterBattle(s, fleets, outcome, at, R) {
   const news = [], me = player(s).id;
   const say = (fid, text) => { news.push({ fid, text }); log(s, fid, text, "war"); };
   for (const f of fleets) {
-    const F = faction(s, f.owner); if (!F || F.crisis) continue;
+    const F = faction(s, f.owner); if (!F || F.crisis || F.wild) continue;
     const gone = !s.fleets[f.id];
     if (f.admiral && gone) {
       const a = f.admiral; f.admiral = null;
@@ -222,13 +228,15 @@ export const armed = (f) => f.ships.some((x) => SHIPS[x.type].skill > 0);
 // ---- worlds ----
 export function canSettle(s, fid, sys, kind) {
   if (sys.colony) return false;
+  if (fleetsAt(s, sys.at).some((o) => armed(o) && atWar(s, fid, o.owner))) return false;   // a swarm (or an enemy) holds it: clear it first
   const w = WORLDS[sys.world];
   if (kind === "outpost") return true;
   return !w.outpostOnly && (!w.needs || has(s, fid, w.needs));
 }
 export function maxPop(s, sys) {
   const c = sys.colony; if (!c || c.kind !== "colony") return 0;
-  return WORLDS[sys.world].pop + sys.size * 2 + (has(s, c.owner, "terraforming") ? 2 : 0) + (c.owner === "kel" ? 2 : 0) + (proto(s, c.owner, "arcologies") ? 1 : 0);
+  return WORLDS[sys.world].pop + sys.size * 2 + (has(s, c.owner, "terraforming") ? 2 : 0) + (c.owner === "kel" ? 2 : 0) + (proto(s, c.owner, "arcologies") ? 1 : 0)
+    + (c.buildings.habitat ? 2 : 0) + advLevel(s, c.owner, "habitats");
 }
 /** What a world gives each turn: { ind, sci, cr, exo, upkeep }. */
 export function yields(s, sys) {
@@ -237,13 +245,14 @@ export function yields(s, sys) {
   let ind = 0, sci = 0, cr = 0;
   if (c.kind === "colony") {
     ind = c.pop * w.ind * sys.rich + (has(s, fid, "automation") ? 1 : 0) + (c.capital ? 2 : 0);
-    sci = c.pop * 0.5 * w.sci + (B.lab ? 2 : 0) + (c.capital ? 1 : 0);
+    sci = c.pop * 0.5 * w.sci + (B.lab ? 2 : 0) + (B.observatory ? 3 : 0) + (c.capital ? 1 : 0);
     cr = c.pop * 0.6 + (B.market ? 3 + (has(s, fid, "commerce") ? 2 : 0) : 0) + (has(s, fid, "commerce") ? 1 : 0) + (c.capital ? 2 : 0);
     if (B.factory) ind *= 1.5;
     if (B.lab) sci *= 1.5;
     if (fid === "tessan") cr *= 1.25;
     const fo = focusOf(s, fid);   // the empire's Focus
     ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
+    ind *= 1 + 0.05 * advLevel(s, fid, "efficiency"); sci *= 1 + 0.05 * advLevel(s, fid, "theory"); cr *= 1 + 0.05 * advLevel(s, fid, "banking");
     const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
     if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
     cr += tradeIncome(s, sys);
@@ -262,6 +271,7 @@ export function totals(s, fid) {
   for (const f of fleetsOf(s, fid)) for (const x of f.ships) upkeep += SHIPS[x.type].upkeep;
   const F = faction(s, fid);
   for (const [oid, r] of Object.entries(F.relations)) if (r.treaty && faction(s, oid).alive) cr += fid === "tessan" ? 6 : 3;
+  sci *= 1 + SCIENCE.pactBonus * pacts(s, fid);
   return { cr: round1(cr), sci: round1(sci), ind: round1(ind), exo, upkeep: round1(upkeep), net: round1(cr - upkeep) };
 }
 
@@ -299,7 +309,28 @@ export function rush(s, sysId) {
 
 // ---- research ----
 export function availableTechs(s, fid) { const done = faction(s, fid).research.done; return TECHS.filter((t) => !done.includes(t.id) && t.needs.every((n) => done.includes(n))); }
+/** An advance as something to research: { id: "adv:<id>", name, cost, text, level (the one it gives), max, field }. */
+export function advanceItem(s, fid, id) {
+  const a = ADVANCES.find((x) => x.id === id); if (!a) return null;
+  const lv = advLevel(s, fid, id);
+  return { ...a, id: "adv:" + id, adv: id, level: lv + 1, have: lv, name: `${a.name} ${["I", "II", "III", "IV", "V", "VI"][lv] || lv + 1}`, cost: Math.round(a.cost * (1 + 0.5 * lv)) };
+}
+/** The advances a power can research now: their technology done, and levels left. */
+export function availableAdvances(s, fid) {
+  return ADVANCES.filter((a) => has(s, fid, a.needs) && advLevel(s, fid, a.id) < a.max).map((a) => advanceItem(s, fid, a.id));
+}
+/** What a power is researching now (a technology or an advance), or null. */
+export function researchItem(s, fid) {
+  const cur = faction(s, fid).research.current; if (!cur) return null;
+  return cur.startsWith("adv:") ? advanceItem(s, fid, cur.slice(4)) : TECHS.find((x) => x.id === cur) || null;
+}
+/** Research pacts: each trade treaty with a living power, up to SCIENCE.pactMax, adds SCIENCE.pactBonus to science. */
+export const pacts = (s, fid) => Math.min(SCIENCE.pactMax, Object.entries(faction(s, fid).relations || {}).filter(([o, r]) => r.treaty && faction(s, o) && faction(s, o).alive).length);
 export function setResearch(s, fid, techId) {
+  if (String(techId).startsWith("adv:")) {
+    if (!availableAdvances(s, fid).some((a) => a.id === techId)) return { error: "Not available yet." };
+    faction(s, fid).research.current = techId; return { ok: true };
+  }
   if (!availableTechs(s, fid).some((t) => t.id === techId)) return { error: "Not available yet." };
   const R = faction(s, fid).research; if (R.current !== techId) { R.current = techId; } return { ok: true };
 }
@@ -404,7 +435,7 @@ function moveFleets(s) {
   const byHex = {};
   // Warships only: colony ships, outposts, scouts and transports keep their own fleets until the player joins them.
   const warOnly = (f) => f.ships.every((x) => SHIPS[x.type].skill > 0);
-  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f)) continue; const k = f.owner + "|" + f.at; if (byHex[k]) { const g = byHex[k], fu = Math.min(fuelOf(s, g), fuelOf(s, f)); g.ships.push(...f.ships); g.fuel = Math.min(fu, fuelMax(s, g)); joinAdmirals(s, g, f); delete s.fleets[f.id]; } else byHex[k] = f; }
+  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f) || f.owner === "pirates" || f.owner === "beasts") continue; const k = f.owner + "|" + f.at; if (byHex[k]) { const g = byHex[k], fu = Math.min(fuelOf(s, g), fuelOf(s, f)); g.ships.push(...f.ships); g.fuel = Math.min(fu, fuelMax(s, g)); joinAdmirals(s, g, f); delete s.fleets[f.id]; } else byHex[k] = f; }
 }
 
 // ---- settling and invading ----
@@ -413,6 +444,7 @@ export function settle(s, fleetId, opts = {}) {
   if (!sys) return { error: "There's no system here." };
   const ci = f.ships.findIndex((x) => x.type === "colony"), oi = f.ships.findIndex((x) => x.type === "outpost");
   if (sys.colony) return { error: "Someone already holds this system." };
+  if (fleetsAt(s, sys.at).some((o) => armed(o) && atWar(s, f.owner, o.owner))) return { error: "Hostile ships hold this system: clear them first." };
   if (ci >= 0 && canSettle(s, f.owner, sys, "colony")) {
     f.ships.splice(ci, 1);
     sys.colony = { owner: f.owner, kind: "colony", pop: f.owner === "concord" ? 2 : 1, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
@@ -467,18 +499,18 @@ export function tradeExotics(s, fid, n) {
 }
 // ---- sieges ----
 /** How far a long siege has worn down a world's garrison: 1 at the start, down to SIEGE.garrisonMin. */
-export const garrisonFactor = (sys) => Math.max(SIEGE.garrisonMin, 1 - SIEGE.garrisonPerTurn * ((sys.colony && sys.colony.siege) || 0));
+export const garrisonFactor = (sys) => Math.max(sys.colony && sys.colony.buildings.barracks ? 0.8 : SIEGE.garrisonMin, 1 - SIEGE.garrisonPerTurn * ((sys.colony && sys.colony.siege) || 0));
 /** The besieger who would take a world's surrender: the power with the most warships in its orbit. */
 function besiegerOf(s, sys) {
   const n = {};
-  for (const f of fleetsAt(s, sys.at)) if (armed(f) && atWar(s, f.owner, sys.colony.owner) && f.owner !== "wardens") n[f.owner] = (n[f.owner] || 0) + f.ships.filter((x) => SHIPS[x.type].skill > 0).length;
+  for (const f of fleetsAt(s, sys.at)) if (armed(f) && atWar(s, f.owner, sys.colony.owner) && !isWild(f.owner)) n[f.owner] = (n[f.owner] || 0) + f.ships.filter((x) => SHIPS[x.type].skill > 0).length;
   return Object.entries(n).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
 }
 export function invasionOdds(s, fleetId) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
   if (!sys || !sys.colony || sys.colony.owner === f.owner) return null;
   const troops = f.ships.filter((x) => x.type === "transport").reduce((t, x) => t + shipStats(s, f.owner, "transport").troops, 0);
-  const defense = (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0) + (sys.colony.buildings.battery ? BATTERY.garrison : 0)) * garrisonFactor(sys);
+  const defense = (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0) + (sys.colony.buildings.battery ? BATTERY.garrison : 0) + (sys.colony.buildings.barracks ? 3 : 0)) * garrisonFactor(sys);
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
@@ -625,6 +657,8 @@ function battles(s) {
             K.stats.wardenPts = (K.stats.wardenPts || 0) + (SHIPS[t.ship.type].hull * SHIPS[t.ship.type].dmg / 3) / ((s.crisis && s.crisis.m) || 1) * (K.glory ? 2 : 1);
             if (t.ship.type === "heart" && s.crisis) { s.crisis.heartBy = u.fid; s.crisis.heartWith = list.filter((x) => x !== "wardens"); }
           }
+          // A pirate or a creature destroyed: its bounty (credits), and what its wreck teaches (research), to whoever did it.
+          if (was > 0 && hp(t) <= 0 && (t.fid === "pirates" || t.fid === "beasts") && !isWild(u.fid)) bounty(s, u.fid, t.ship.type, where);
         }
         if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? u.st.dmg : 0 });
         }
@@ -651,6 +685,14 @@ function battles(s) {
   R.save();
 }
 
+/** A wild thing destroyed: credits, research and exotics, as WILDS.bounty says. */
+export function bounty(s, fid, type, where) {
+  const b = WILDS.bounty[type], K = faction(s, fid); if (!b || !K) return;
+  K.credits = round1(K.credits + (b.credits || 0)); K.research.progress += b.research || 0; K.exotics += b.exotics || 0;
+  K.stats.wild = (K.stats.wild || 0) + 1;
+  const got = [b.credits && `${b.credits} credits`, b.research && `${b.research} research`, b.exotics && `${b.exotics} exotics`].filter(Boolean).join(", ");
+  if (got && (type !== "raider" || !K.ai)) log(s, fid, `${K.name} destroyed ${type === "haven" ? "a pirate haven" : `a ${SHIPS[type].name.toLowerCase()}`} at ${where}: ${got}.`, type === "raider" ? "war" : "explore");
+}
 // ---- diplomacy ----
 /** `holder` remembers something `about` did: their standing changes by `delta`, and the act is kept (the last 12). */
 export function remember(s, holder, about, text, delta) {
@@ -714,6 +756,26 @@ export function militaryPower(s, fid) {
 }
 
 // ---- seeing ----
+// ---- anomalies ----
+const ANOMALY_KINDS = ["a derelict from before the Fracture", "a pulsar that sings in prime numbers", "a pocket of folded space",
+  "a field of frozen exotic matter", "an ancient signal beacon, still sending", "a star that shouldn't be there", "the wreck of a colony ark", "a lens of bent light around nothing"];
+/** Anomalies: about one empty system in six, studied for research by a scout (or an observatory nearby). */
+export function placeAnomalies(s) {
+  if (s.anomaliesPlaced) return; s.anomaliesPlaced = true;
+  const R = makeRng("anomalies:" + s.seed);
+  for (const sys of Object.values(s.systems).sort((a, b) => (a.id < b.id ? -1 : 1))) {
+    if (sys.colony || sys.ruins || R.next() >= 0.17) continue;
+    sys.anomaly = ANOMALY_KINDS[R.int(ANOMALY_KINDS.length)];
+  }
+}
+/** What an anomaly is worth: more the later it's studied. */
+export const anomalyValue = (s) => Math.round(Math.min(SCIENCE.anomalyMax, SCIENCE.anomalyBase + s.turn * SCIENCE.anomalyPerTurn));
+function studyAnomaly(s, F, sys, how, share = 1) {
+  const n = Math.round(anomalyValue(s) * share), what = sys.anomaly;
+  sys.anomaly = null; F.research.progress += n; F.stats.anomalies = (F.stats.anomalies || 0) + 1;
+  const cur = researchItem(s, F.id);
+  log(s, F.id, `${how} ${what} at ${sys.name}: +${n} research${cur ? ` toward ${cur.name}` : ", banked for your next research"}.`, "explore");
+}
 export function updateVision(s, F) {
   const vis = {};
   const charted = [];
@@ -742,13 +804,16 @@ export function updateVision(s, F) {
       log(s, F.id, `${F.name} made contact with ${o.name}: ${where} came into view. Diplomacy is open with them now.`, "contact");
     }
   }
+  // Anomalies: a scout that ends its turn at one surveys it.
+  for (const sys of Object.values(s.systems)) if (sys.anomaly && fleetsAt(s, sys.at).some((f) => f.owner === F.id && f.ships.some((x) => x.type === "scout")))
+    studyAnomaly(s, F, sys, "Your scouts surveyed");
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
     sys.ruins = false; F.stats.ruins = (F.stats.ruins || 0) + 1;
     // The player decides what to do with a ruin (a galactic event, events.js); the computer powers study it.
     if (!F.ai) { (s.ruinsFound = s.ruinsFound || []).push({ sys: sys.id, fleet: fleetsAt(s, sys.at).find((f) => f.owner === F.id).id, turn: s.turn }); log(s, F.id, `${F.name} found ruins of the old empires at ${sys.name}: what to do with them is yours to decide.`, "explore"); continue; }
     F.research.progress += 60;
-    const cur = TECHS.find((x) => x.id === F.research.current);
+    const cur = researchItem(s, F.id);
     log(s, F.id, `${F.name} surveyed the ruins at ${sys.name}: what the old empires left there is worth +60 research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}.`, "explore");
   }
 }
@@ -790,7 +855,7 @@ function economy(s, F) {
   }
   const t = totals(s, F.id);
   if (!F.ai) {
-    const cur = TECHS.find((x) => x.id === F.research.current);
+    const cur = researchItem(s, F.id);
     log(s, F.id, `The books: ${t.net >= 0 ? "+" : "−"}${Math.abs(round1(t.net))} credits (treasury ${round1(F.credits + t.net)}), +${round1(t.sci)} science ${cur ? `toward ${cur.name} (${Math.round(F.research.progress + t.sci)}/${cur.cost})` : "with nothing to research: choose a technology"}${t.exo ? `, +${round1(t.exo)} exotics` : ""}.`, "turn");
   }
   const strike = F.credits < 0 ? 0.75 : 1; // in debt: the yards and the labs slow down
@@ -800,8 +865,12 @@ function economy(s, F) {
   const R = F.research;
   if (R.current) {
     R.progress += t.sci * strike;
-    const tech = TECHS.find((x) => x.id === R.current);
-    if (R.progress >= tech.cost) {
+    const tech = researchItem(s, F.id);
+    if (tech && tech.adv && R.progress >= tech.cost) {
+      R.progress -= tech.cost; R.adv = R.adv || {}; R.adv[tech.adv] = tech.level; R.current = null;
+      log(s, F.id, `${F.name} reached ${tech.name}: ${tech.text}`, "research");
+      if (tech.adv === "armor") for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) x.hull += 1;
+    } else if (tech && !tech.adv && R.progress >= tech.cost) {
       R.progress -= tech.cost; R.done.push(tech.id); R.current = null;
       log(s, F.id, `${F.name} discovered ${tech.name}: ${tech.text}`, "research");
       if (tech.id === "shields") for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) x.hull += 1;
@@ -872,7 +941,14 @@ function economy(s, F) {
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {
     const home = s.sysAt[f.at] && s.systems[s.sysAt[f.at]].colony && s.systems[s.sysAt[f.at]].colony.owner === F.id;
-    if (home || F.id === "vael" || admTrait(f, "shipwright")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
+    const dock = home && s.systems[s.sysAt[f.at]].colony.buildings.drydock && !besieged(s, s.systems[s.sysAt[f.at]]);
+    if (home || F.id === "vael" || admTrait(f, "shipwright")) for (const x of f.ships) x.hull = dock ? shipStats(s, F.id, x.type).hull : Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
+  }
+  // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
+  if (s.turn % SCIENCE.observatoryEvery === 0) for (const sys of coloniesOf(s, F.id)) {
+    if (!sys.colony.buildings.observatory || blockaded(s, sys)) continue;
+    const a = Object.values(s.systems).filter((x) => x.anomaly && distance(x.at, sys.at) <= SCIENCE.observatoryRange).sort((x, y) => distance(x.at, sys.at) - distance(y.at, sys.at))[0];
+    if (a) studyAnomaly(s, F, a, `The observatory at ${sys.name} studied`, SCIENCE.observatoryShare);
   }
   // The computer powers' research arms field-test prototypes too: one every 25 turns.
   if (F.ai && s.turn % 25 === 12) {

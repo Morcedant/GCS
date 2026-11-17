@@ -4,7 +4,7 @@
 // an answer, and every answer is remembered (game.js remember()): it moves their standing with you, and the Diplomacy
 // tab lists what they remember.
 import { PERSONALITIES, TECHS } from "./data.js";
-import { player, faction, coloniesOf, fleetsOf, armed, atWar, allied, militaryPower, declareWar, remember, log, rng, admiralsOf, admTitle, setDestination } from "./game.js";
+import { player, faction, coloniesOf, fleetsOf, armed, atWar, allied, militaryPower, declareWar, remember, log, rng, admiralsOf, admTitle, setDestination, researchItem } from "./game.js";
 import { distance } from "./hex.js";
 
 const enMe = (s) => player(s);
@@ -73,7 +73,7 @@ export function envoysTurn(s) {
   R.save();
 }
 
-const enResearch = (s, n) => { const me = enMe(s); me.research.progress += n; const cur = TECHS.find((t) => t.id === me.research.current); return `+${n} research${cur ? ` toward ${cur.name}` : ""}`; };
+const enResearch = (s, n) => { const me = enMe(s); me.research.progress += n; const cur = researchItem(s, me.id); return `+${n} research${cur ? ` toward ${cur.name}` : ""}`; };
 /** The answers to each kind of message: what each does, and what came of it. */
 const ANSWERS = {
   hello: [

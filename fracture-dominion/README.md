@@ -10,7 +10,23 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   buildings), and credits can rush the front of it. Exotics come from deposits and pay for heavy ships and great works.
 - **Ships:** scouts, colony and outpost ships, frigates, cruisers, dreadnoughts and troop transports. Battles roll 3d6
   roll-under, as the tabletop game does: each armed ship rolls under its skill to hit, three exchanges a turn.
-- **Research:** sixteen technologies in three fields.
+- **Research:** sixteen technologies in three fields, then **advances**: research you can take again and again, a level at
+  a time (each level costs half again the first): Industrial efficiency, Unified theory and Interstellar banking (+5%
+  industry, science or credits a level, to 5), Composite armor (+1 warship hull, to 2), Fire control (+1 skill, to 2),
+  Habitat engineering (+1 population room, to 3) and Drive tuning (+2 fuel, to 3). More research comes from
+  **anomalies** (✦, about one empty system in six: a scout that ends its turn there surveys it, for 40 research early and
+  up to 160 late), **research pacts** (each trade treaty, up to three, +5% science), ruins, and the wrecks of pirates and
+  creatures you destroy.
+- **More buildings:** Garrison barracks (+3 garrison; a siege wears it to no less than 80%), Deep-space observatory
+  (Deep sensors: +3 science, and it studies an anomaly within 4 hexes every 4 turns), Drydock (Orbital shipyards: your
+  ships there are repaired to full every turn) and Orbital habitat (Habitat domes: +2 population room).
+- **The wild things:** threats that belong to no power, at war with everyone. **Pirate havens** (8 hull, two shots of 2)
+  appear in empty systems near the settled worlds from turn 14, another every 22 turns (up to 2–5 by galaxy size); each
+  sends out raiders who hold weak worlds' orbits (a blockade) and take credits each turn. **Crystal swarms** nest on rich
+  and exotic systems from the start: no one settles there until they're destroyed. **Void leviathans** (12 hull, 3
+  damage) drift between the stars from turn 40 and feed on unguarded worlds. Each pays a bounty when destroyed (a haven
+  100 credits and 50 research, a swarm 90 research and 2 exotics, a leviathan 40 credits, 160 research and 4 exotics).
+  The computer powers hunt the ones near their worlds.
 - **Diplomacy:** contact, war and peace, trade treaties; settling next door makes neighbours angry.
 - **Victory:** conquest, the Corridor Engine (a great work), or the highest score at turn 200. Or an **open game**
   with no end: retire when you choose. After a win, **Keep ruling** carries the game on in open rule.

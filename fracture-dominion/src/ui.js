@@ -1,12 +1,13 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL } from "./data.js";
-import { newGame, endTurn, gunsMax, gunsUp, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS } from "./data.js";
+import { newGame, endTurn, gunsMax, gunsUp, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
 import { crisisTurn, crisisState } from "./crisis.js";
+import { wildsTurn, wildsState } from "./wilds.js";
 import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
@@ -194,6 +195,7 @@ function draw() {
       if (sys.colony.capital) { ctx.fillStyle = colorOf(sys.colony.owner); ctx.beginPath(); ctx.moveTo(x, y - r - 13); ctx.lineTo(x + 5, y - r - 6); ctx.lineTo(x - 5, y - r - 6); ctx.closePath(); ctx.fill(); }
     }
     if (sys.exotics) { ctx.fillStyle = "#e9c7ff"; ctx.beginPath(); ctx.moveTo(x + r + 6, y - 4); ctx.lineTo(x + r + 9, y); ctx.lineTo(x + r + 6, y + 4); ctx.lineTo(x + r + 3, y); ctx.closePath(); ctx.fill(); }
+    if (sys.anomaly) { ctx.fillStyle = "#9fd8ff"; ctx.font = "bold 12px system-ui, sans-serif"; ctx.fillText("✦", x + r + 2, y + r + 9); }
     if (sys.ruins) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 11px system-ui, sans-serif"; ctx.fillText("?", x - r - 10, y + 4); }
     if (view.zoom > 0.55) {
       ctx.font = `${sel && sel.id === sys.id ? "bold " : ""}11px system-ui, sans-serif`; ctx.textAlign = "center";
@@ -250,7 +252,7 @@ function draw() {
 // ---------- the bar and the panels ----------
 function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); renderCoach(); }
 function renderBar() {
-  const me = player(S), t = totals(S, me.id), R = me.research, tech = R.current && TECHS.find((x) => x.id === R.current);
+  const me = player(S), t = totals(S, me.id), R = me.research, tech = researchItem(S, me.id);
   $("bar-faction").innerHTML = `<span class="dot" style="background:${me.color}"></span>${esc(me.name)}`;
   $("bar-stats").innerHTML = [
     `<span title="Credits: income minus upkeep each turn"><b>Credits</b> ${fmt(me.credits)} <i class="${t.net < 0 ? "neg" : ""}">${signed(t.net)}</i></span>`,
@@ -290,7 +292,7 @@ function siegeHTML(sys, mine) {
 function systemHTML() {
   const sys = S.systems[sel.id], me = player(S), w = WORLDS[sys.world], c = sys.colony;
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
-  let h = `<h2>${esc(sys.name)}</h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit</b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins</b>" : ""}.</p>`;
+  let h = `<h2>${esc(sys.name)}</h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit</b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins</b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}</b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.</p>`;
   if (!c) h += `<p>${w.outpostOnly ? "No one can live here, but an outpost can claim it." : w.needs && !has(S, me.id, w.needs) ? `Needs <b>${esc(TECHS.find((t) => t.id === w.needs).name)}</b> to settle; an outpost can claim it now.` : "Unclaimed. A colony ship can settle it."}</p>`;
   else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}</b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && (c.buildings.battery || c.capital) ? ` Orbital guns: ${c.defense} / ${gunsMax(S, c)} hull${c.buildings.battery ? `, an Orbital battery (${BATTERY.shots} shots of ${BATTERY.dmg} a round)` : ""}.` : ""}${seen ? siegeHTML(sys, false) : ""}</p>`;
   else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.</p>`
@@ -362,7 +364,10 @@ function fleetHTML() {
   if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
     h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).</p>${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.</p>` : ""}`; }
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}</button>${f.path.length ? `<button class="btn" data-stop>Stop</button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}</button>`}</div>`;
-  if (sys && !sys.colony) {
+  const held = sys && !sys.colony && fleetsAt(S, sys.at).find((o) => armed(o) && atWar(S, me.id, o.owner));
+  if (held) { const wild = held.owner === "beasts" || held.owner === "pirates", nm = SHIPS[held.ships[0].type].name.toLowerCase(), n = held.ships.length;
+    h += `<p class="small bad">${wild ? (n > 1 ? `${n} ${nm}s hold` : `A ${nm} holds`) : `${esc(faction(S, held.owner).name)}'s warships hold`} this system: destroy ${wild && n === 1 ? "it" : "them"} before you can settle here.</p>`; }
+  else if (sys && !sys.colony) {
     const col = f.ships.some((x) => x.type === "colony") && canSettle(S, me.id, sys, "colony"), out = f.ships.some((x) => x.type === "outpost" || x.type === "colony");
     if (col) h += `<button class="btn primary wide" data-settle>Found a colony on ${esc(sys.name)}</button>`;
     else if (out) h += `<button class="btn wide" data-settle>Claim ${esc(sys.name)} as an outpost</button><button class="btn wide" data-settle="depot" ${me.credits < FUEL.foundWithDepot ? "disabled" : ""}>Claim it with a fuel depot (${FUEL.foundWithDepot} credits): supply from the start</button>`;
@@ -602,7 +607,7 @@ function protosHTML() {
     : `<p class="small muted">None yet. Your research arm sends field tests as directives (the Mission tab); carry one out and its prototype stays with you. Winning a campaign brings one too.</p>`);
 }
 function researchHTML() {
-  const me = player(S), R = me.research, cur = R.current && TECHS.find((t) => t.id === R.current), t = totals(S, me.id);
+  const me = player(S), R = me.research, cur = researchItem(S, me.id), t = totals(S, me.id);
   let h = `<h2>Research</h2>`;
   h += cur ? `<p><b>${esc(cur.name)}</b>: ${Math.floor(R.progress)} / ${cur.cost}${t.sci ? ` · ${Math.ceil((cur.cost - R.progress) / t.sci)} turns` : ""}</p>${bar(R.progress, cur.cost)}` : `<p class="bad">Choose what to research next.${R.progress ? ` ${Math.floor(R.progress)} points are waiting.` : ""}</p>`;
   for (const field of ["Physics", "Industry", "Society"]) {
@@ -611,6 +616,16 @@ function researchHTML() {
       return `<button class="tech ${done ? "done" : can ? "can" : "locked"} ${R.current === x.id ? "cur" : ""}" ${can ? `data-tech="${x.id}"` : "disabled"}><b>${esc(x.name)}</b><span>${done ? "Done" : x.cost}</span><small>${esc(x.text)}${!done && !can ? ` Needs ${x.needs.map((n) => TECHS.find((y) => y.id === n).name).join(", ")}.` : ""}</small></button>`;
     }).join("") + `</div>`;
   }
+  // Advances: repeatable research, a level at a time.
+  const advs = ADVANCES.map((a) => ({ a, it: advanceItem(S, me.id, a.id), lv: advLevel(S, me.id, a.id), open: has(S, me.id, a.needs) }));
+  h += `<h3>Advances</h3><p class="small muted">Research them again and again: each level adds to the last, and costs a little more.</p><div class="techs">` + advs.map(({ a, it, lv, open }) => {
+    const maxed = lv >= a.max, can = open && !maxed;
+    return `<button class="tech ${maxed ? "done" : can ? "can" : "locked"} ${R.current === it.id ? "cur" : ""}" ${can ? `data-tech="${it.id}"` : "disabled"}><b>${esc(maxed ? a.name : it.name)}</b><span>${maxed ? `Level ${lv} (max)` : `${it.cost}${lv ? ` · has ${lv}/${a.max}` : ""}`}</span><small>${esc(a.text)}${!open ? ` Needs ${esc(TECHS.find((y) => y.id === a.needs).name)}.` : ""}</small></button>`;
+  }).join("") + `</div>`;
+  const pc = pacts(S, me.id), an = Object.values(S.systems).filter((x) => x.anomaly && me.explored[x.at]).length;
+  h += `<h3>Other sources</h3><ul class="small"><li><b>Research pacts:</b> each trade treaty (up to ${SCIENCE.pactMax}) adds ${Math.round(SCIENCE.pactBonus * 100)}% to your science. You have ${pc}.</li>
+    <li><b>Anomalies</b> (✦ on the map): a scout that ends its turn at one surveys it for about ${anomalyValue(S)} research; a Deep-space observatory studies one within ${SCIENCE.observatoryRange} hexes every ${SCIENCE.observatoryEvery} turns. ${an} known.</li>
+    <li><b>Ruins</b>, and the wrecks of pirates and creatures you destroy (a crystal swarm ${WILDS.bounty.swarm.research}, a void leviathan ${WILDS.bounty.leviathan.research}, a pirate haven ${WILDS.bounty.haven.research}).</li></ul>`;
   return h;
 }
 function diplomacyHTML() {
@@ -747,7 +762,7 @@ function nextIdle() {
 function doEndTurn() {
   if (!S || S.winner) return;
   const me = player(S);
-  if (!me.research.current && availableTechs(S, me.id).length) { tab = "research"; renderTabs(); renderPanel(); toast("Choose what to research first.", true); return; }
+  if (!me.research.current && (availableTechs(S, me.id).length || availableAdvances(S, me.id).length)) { tab = "research"; renderTabs(); renderPanel(); toast("Choose what to research first.", true); return; }
   const before = { cols: coloniesOf(S, me.id).length, log: S.log.length };
   $("end-turn").disabled = true; $("end-turn").textContent = "Thinking…";
   setTimeout(() => {
@@ -755,6 +770,7 @@ function doEndTurn() {
     endTurn(S, aiTurn);
     if (!S.winner) directivesTurn(S);
     if (!S.winner) crisisTurn(S);
+    if (!S.winner) wildsTurn(S);
     if (!S.winner) eventsTurn(S);
     if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
@@ -1036,6 +1052,9 @@ function showHelp(back) {
       <li><b>Colony ships</b> settle worlds you can live on; <b>outpost ships</b> claim any system, for its exotics ◆ and territory. Xenology and Habitat domes open harsher worlds.</li>
       <li><b>Exotics</b> ◆ come from deposits. Cruisers, dreadnoughts and the Corridor Engine need them.</li>
       <li><b>Battles</b> happen when fleets of factions at war share a hex. Each armed ship rolls 3d6 under its skill to hit (3–4 always hits, 17–18 always misses), three exchanges a turn. Worlds with guns fire back.</li>
+      <li><b>Advances:</b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.</li>
+      <li><b>Anomalies</b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.</li>
+      <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>
       <li><b>Invading:</b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.</li>
       <li><b>Diplomacy:</b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.</li>
       <li><b>Win</b> by conquest (the last people standing), by building the <b>Corridor Engine</b> (research it, then build it at your capital), or with the highest score at turn ${RULES.maxTurns}.</li>

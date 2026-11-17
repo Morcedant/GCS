@@ -5,12 +5,12 @@
 // The player meets them in three scenes with choices (warning, waking, the Heart broken), shown like galactic events.
 import { makeRng, distance, neighbors, within } from "./hex.js";
 import { SHIPS, CRISIS, TECHS } from "./data.js";
-import { player, faction, coloniesOf, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, razeWorld, log, atWar, militaryPower, rng, has, remember, gunsMax } from "./game.js";
+import { player, faction, coloniesOf, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, razeWorld, log, atWar, militaryPower, rng, has, remember, gunsMax, researchItem } from "./game.js";
 
 export const WARDENS = "wardens";
 const crMe = (s) => player(s);
 const crAlive = (s) => s.factions.filter((f) => f.alive);
-const crResearch = (s, F, n) => { F.research.progress += n; const cur = TECHS.find((t) => t.id === F.research.current); return `+${n} research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}`; };
+const crResearch = (s, F, n) => { F.research.progress += n; const cur = researchItem(s, F.id); return `+${n} research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}`; };
 const crPlace = (s, hex) => (s.sysAt[hex] ? s.systems[s.sysAt[hex]].name : (() => { const n = Object.values(s.systems).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0]; return n ? `deep space near ${n.name}` : "deep space"; })());
 
 /** Where things stand, for the panels: null before the warning. */

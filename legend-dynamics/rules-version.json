@@ -6,6 +6,18 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: advances, anomalies, new buildings, pirates and monsters",
+      "items": [
+        "Advances: once a technology is done, research builds on it a level at a time: +5% industry, science or credits a level (to 5), +1 warship hull or skill (to 2), +1 population room (to 3), +2 fuel (to 3). Each level costs more. Science never runs out of use.",
+        "More ways to research: anomalies (✦ on the map) that a scout surveys for 40–160 research, research pacts (+5% science per trade treaty, up to three), and the wrecks of pirates and creatures.",
+        "Four new buildings: Garrison barracks, Deep-space observatory (studies nearby anomalies without a ship), Drydock (full repairs every turn) and Orbital habitat (+2 population room).",
+        "Pirate havens appear near the settled worlds from turn 14 and send out raiders that blockade weak worlds and steal credits. Burn a haven for 100 credits and 50 research.",
+        "Crystal swarms guard rich and exotic systems from the start: clear one to settle there. Void leviathans drift in from turn 40 and feed on unguarded worlds. Both pay research when destroyed."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: Orbital batteries that defend a world",
       "items": [
         "The Orbital battery is a fortress now: 6 hull (8 with the shield grid), two shots a round at skill 13 for 2 damage each, and it repairs 2 hull a turn when no enemy holds the orbit. It costs 100 (was 70). Before, two cruisers silenced it every time without losing a ship; now two frigates or a lone cruiser die against it, and it takes a real fleet to bring it down.",

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, inSupplyAt, cargoOf, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, supplySources, gunsMax, gunsUp, blockaded, besieged, fleetsAt, marketPrice, sellPrice, garrisonFactor,
+import { newGame, endTurn, shipStats, maxPop, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, inSupplyAt, cargoOf, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, supplySources, gunsMax, gunsUp, blockaded, besieged, fleetsAt, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS, SHIPS, BATTERY } from "../src/data.js";
@@ -570,4 +570,75 @@ test("an Orbital battery: a fortress that holds off small fleets, keeps the worl
   for (const f of fleetsAt(s, w.at)) delete s.fleets[f.id];
   w.colony.defense = 1; endTurn(s);
   assert.equal(w.colony.defense, 1 + BATTERY.repair);
+});
+
+test("advances: repeatable research, a level at a time, each costing more and adding to the last", async () => {
+  const { availableAdvances, advLevel, researchItem } = await import("../src/game.js");
+  const s = newGame({ seed: 12, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = coloniesOf(s, "concord")[0];
+  assert.equal(availableAdvances(s, "concord").length, 0, "none before their technologies");
+  me.research.done.push("automation", "shields");
+  assert.ok(setResearch(s, "concord", "adv:efficiency").ok);
+  const ind0 = yields(s, cap).ind, cost1 = researchItem(s, "concord").cost;
+  me.research.progress = cost1; endTurn(s);
+  assert.equal(advLevel(s, "concord", "efficiency"), 1);
+  assert.ok(yields(s, cap).ind > ind0, "+5% industry");
+  assert.ok(setResearch(s, "concord", "adv:efficiency").ok);
+  assert.ok(researchItem(s, "concord").cost > cost1, "the next level costs more");
+  const hull = shipStats(s, "concord", "frigate").hull; me.research.adv.armor = 2;
+  assert.equal(shipStats(s, "concord", "frigate").hull, hull + 2);
+  me.research.adv.armor = 2; assert.ok(!availableAdvances(s, "concord").some((a) => a.adv === "armor"), "maxed out");
+});
+
+test("anomalies: a scout surveys one for research; an observatory studies one nearby", async () => {
+  const { anomalyValue } = await import("../src/game.js");
+  const s = newGame({ seed: 13, size: "small", player: "concord", rivals: 1 }), me = s.factions[0];
+  assert.ok(Object.values(s.systems).some((x) => x.anomaly), "anomalies are placed");
+  const a = Object.values(s.systems).find((x) => x.anomaly);
+  const before = me.research.progress; spawnFleet(s, "concord", a.at, ["scout"]); endTurn(s);
+  assert.equal(a.anomaly, null); assert.ok(me.research.progress - before >= anomalyValue(s) - 2);
+  const cap = coloniesOf(s, "concord")[0], b = Object.values(s.systems).find((x) => !x.colony && x !== a);
+  b.anomaly = "a test"; cap.colony.buildings.observatory = true;
+  const near = distance(b.at, cap.at) <= 4;
+  for (let i = 0; i < 4; i++) endTurn(s);
+  if (near) assert.equal(b.anomaly, null, "the observatory studied it");
+});
+
+test("new buildings: an Orbital habitat adds room, barracks stiffen the garrison, a drydock repairs at once", () => {
+  const s = newGame({ seed: 14, size: "small", player: "concord", rivals: 1 }), cap = coloniesOf(s, "concord")[0];
+  const room = maxPop(s, cap); cap.colony.buildings.habitat = true; assert.equal(maxPop(s, cap), room + 2);
+  const foe = s.factions[1].id, w = coloniesOf(s, foe)[0];
+  const t = spawnFleet(s, "concord", w.at, ["transport"]), d0 = invasionOdds(s, t.id).defense;
+  w.colony.buildings.barracks = true; assert.equal(invasionOdds(s, t.id).defense, d0 + 3);
+  delete s.fleets[t.id];
+  cap.colony.buildings.drydock = true;
+  const f = spawnFleet(s, "concord", cap.at, ["cruiser"]); f.ships[0].hull = 1; s.factions[0].research.done.push("heavyHulls");
+  endTurn(s); assert.equal(f.ships[0].hull, shipStats(s, "concord", "cruiser").hull);
+});
+
+test("the wild things: swarms nest on rich systems and block settling, havens send raiders that take credits, kills pay a bounty", async () => {
+  const { wildsTurn, PIRATES, BEASTS } = await import("../src/wilds.js");
+  const { bounty } = await import("../src/game.js");
+  const { WILDS } = await import("../src/data.js");
+  const s = newGame({ seed: 15, size: "medium", player: "concord", rivals: 2 }), me = s.factions[0];
+  wildsTurn(s);
+  const swarms = fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "swarm");
+  assert.equal(swarms.length, WILDS.swarms.medium);
+  const nest = s.systems[s.sysAt[swarms[0].at]];
+  assert.ok(nest.exotics || nest.rich > 1);
+  assert.ok(atWar(s, "concord", BEASTS) && atWar(s, PIRATES, "concord") && !atWar(s, PIRATES, BEASTS));
+  assert.ok(!canSettle(s, "concord", nest, "outpost"), "a swarm holds it");
+  // A haven by turn havenFirst, and raiders from it.
+  while (s.turn < WILDS.havenFirst + WILDS.raidEvery + 1) { s.turn++; wildsTurn(s); }
+  assert.ok(fleetsOf(s, PIRATES).some((f) => f.ships[0].type === "haven"), "a haven");
+  assert.ok(fleetsOf(s, PIRATES).some((f) => f.ships[0].type === "raider"), "its raiders");
+  // Raiders over an unguarded colony take credits.
+  const col = coloniesOf(s, "concord")[0]; col.colony.capital = false; col.colony.defense = 0;
+  for (const f of fleetsAt(s, col.at)) if (f.owner === "concord") delete s.fleets[f.id];
+  const r = fleetsOf(s, PIRATES).find((f) => f.ships[0].type === "raider"); r.at = col.at; r.path = []; r.stay = 0;
+  me.credits = 100; wildsTurn(s);
+  assert.ok(me.credits < 100, "raided");
+  // A bounty for a haven.
+  const c0 = me.credits, p0 = me.research.progress; bounty(s, "concord", "haven", "here");
+  assert.equal(me.credits, c0 + WILDS.bounty.haven.credits); assert.equal(me.research.progress, p0 + WILDS.bounty.haven.research);
+  const off = newGame({ seed: 15, size: "small", player: "concord", rivals: 1, wilds: false }); wildsTurn(off); assert.equal(off.wilds, undefined);
 });
