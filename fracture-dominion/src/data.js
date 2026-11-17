@@ -181,12 +181,13 @@ export const ADVANCES = [
 /** Research from other sources: anomalies (a scout surveys one), research pacts (each trade treaty, up to 3). */
 export const SCIENCE = { anomalyBase: 40, anomalyPerTurn: 0.6, anomalyMax: 160, observatoryRange: 4, observatoryEvery: 4, observatoryShare: 0.5, pactBonus: 0.05, pactMax: 3 };
 /**
- * The wild things (wilds.js). Pirate havens: the first at `havenFirst`, another every `havenEvery` turns, up to
+ * The wild things (wilds.js). Raiders only go after colonies of preyPop or more that are at least youngTurns old, and
+ * neither pirates nor swarms fire on unarmed ships: they don't stop anyone settling. Pirate havens: the first at `havenFirst`, another every `havenEvery` turns, up to
  * havens[size] at once; each sends out raiders every `raidEvery` turns. Crystal swarms nest on rich systems from the
  * start; void leviathans wake from `leviathanFirst`. Destroying one pays a bounty: credits and research.
  */
 export const WILDS = {
-  havenFirst: 14, havenEvery: 22, havens: { small: 2, medium: 3, large: 4, vast: 5 }, raidEvery: 5, raidersPerHaven: 2,
+  havenFirst: 30, havenEvery: 22, preyPop: 3, youngTurns: 12, havens: { small: 2, medium: 3, large: 4, vast: 5 }, raidEvery: 5, raidersPerHaven: 2,
   raidCredits: 12, raidPerPop: 3, raidStay: 3, raidRange: 6,
   swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathanFirst: 40, leviathanEvery: 35, leviathans: 2,
   bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 } },

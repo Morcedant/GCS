@@ -455,7 +455,7 @@ export function settle(s, fleetId, opts = {}) {
   if (fleetsAt(s, sys.at).some((o) => armed(o) && atWar(s, f.owner, o.owner))) return { error: "Hostile ships hold this system: clear them first." };
   if (ci >= 0 && canSettle(s, f.owner, sys, "colony")) {
     f.ships.splice(ci, 1);
-    sys.colony = { owner: f.owner, kind: "colony", pop: f.owner === "concord" ? 2 : 1, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+    sys.colony = { owner: f.owner, kind: "colony", founded: s.turn, pop: f.owner === "concord" ? 2 : 1, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
     log(s, f.owner, `${faction(s, f.owner).name} founded a colony on ${sys.name}, ${worldDesc(sys)}.`, "settle");
   } else if (oi >= 0 || ci >= 0) {
     if (oi < 0 && !canSettle(s, f.owner, sys, "outpost")) return { error: "Nothing here to settle with." };
@@ -463,7 +463,7 @@ export function settle(s, fleetId, opts = {}) {
     if (opts.depot && !depot) return { error: `Founding it with a fuel depot costs ${FUEL.foundWithDepot} credits.` };
     f.ships.splice(oi >= 0 ? oi : ci, 1);
     if (depot) F.credits = round1(F.credits - FUEL.foundWithDepot);
-    sys.colony = { owner: f.owner, kind: "outpost", pop: 0, growth: 0, buildings: depot ? { depot: true } : {}, queue: [], stock: 0, defense: 0, capital: false };
+    sys.colony = { owner: f.owner, kind: "outpost", founded: s.turn, pop: 0, growth: 0, buildings: depot ? { depot: true } : {}, queue: [], stock: 0, defense: 0, capital: false };
     log(s, f.owner, `${F.name} claimed ${sys.name} as an outpost: ${worldDesc(sys)}. It extends your borders${sys.exotics ? " and mines its exotics" : ""}${depot ? ", and its fuel depot gives supply" : ""}.`, "settle");
   } else return { error: "This fleet has no colony or outpost ship." };
   if (!f.ships.length) dropFleet(s, f);
@@ -651,7 +651,8 @@ function battles(s) {
         for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
         // The Heart of the Wardens can't be fired on while its guard still stands.
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && v.ship.type === "heart" && live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0)));
+        // Pirates and crystal swarms don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && u.ship.type === "swarm"))) && !(v.ship && v.ship.type === "heart" && live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0)));
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
@@ -949,7 +950,7 @@ function economy(s, F) {
     // them out, and they stay out for the attacker's next turn, so the troops can land.
     if (c.defense < maxDef && !besieged(s, sys)) c.defense = Math.min(maxDef, c.defense + (c.buildings.battery ? BATTERY.repair : 1));
     // The siege, counted in turns once the guns are silent: hunger every few turns, and at last an ordinary colony's surrender.
-    if (blockaded(s, sys)) {
+    if (blockaded(s, sys) && besiegerOf(s, sys)) {   // pirates and creatures blockade, but don't besiege a world into hunger
       c.siege = (c.siege || 0) + 1;
       const by = besiegerOf(s, sys);
       if (c.kind === "colony" && c.siege % SIEGE.starveEvery === 0 && c.pop > 1) {

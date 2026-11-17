@@ -88,13 +88,16 @@ function launchRaiders(s, haven) {
   for (let i = 0; i < n; i++) f.ships.push({ type: "raider", hull: SHIPS.raider.hull });
 }
 
+/** Worth a raid: an established colony (population preyPop or more, and not newly founded). Outposts and young colonies
+ * have nothing worth taking, so the frontier can still be settled. */
+const worthRaiding = (s, x) => !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns));
 /** Raiders: hold an unguarded orbit for a few turns, taking credits each turn (the blockade halves the world's yields
  * too); hurt or done, go home; otherwise pick the next weak world within reach of the haven. */
 function raid(s, f, R) {
   if (f.path.length) return;
   const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
   const hurt = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
-  if (sys && sys.colony && !guarded(s, sys, PIRATES) && !hurt && (f.stay || 0) < WILDS.raidStay) {
+  if (sys && worthRaiding(s, sys) && !guarded(s, sys, PIRATES) && !hurt && (f.stay || 0) < WILDS.raidStay) {
     const c = sys.colony, F = faction(s, c.owner), take = Math.min(Math.max(0, Math.floor(F.credits)), WILDS.raidCredits + (c.kind === "colony" ? c.pop * WILDS.raidPerPop : 0));
     f.stay = (f.stay || 0) + 1;
     if (take > 0) { F.credits -= take; log(s, F.id, `Pirate raiders hold the orbit of ${sys.name} and took ${take} credits. Send warships, or give it guns.`, "war"); }
@@ -105,7 +108,7 @@ function raid(s, f, R) {
   const haven = s.fleets && havens(s).find((h) => h.at === f.home);
   if (hurt && haven && f.at !== haven.at) { setDestination(s, f.id, haven.at); return; }
   const from = haven ? haven.at : f.at;
-  const prey = Object.values(s.systems).filter((x) => x.colony && x !== sys && distance(x.at, from) <= WILDS.raidRange && !guarded(s, x, PIRATES))
+  const prey = Object.values(s.systems).filter((x) => worthRaiding(s, x) && x !== sys && distance(x.at, from) <= WILDS.raidRange && !guarded(s, x, PIRATES))
     .map((x) => ({ x, v: (x.colony.kind === "colony" ? x.colony.pop : 1) - distance(x.at, f.at) * 0.5 })).sort((a, b) => b.v - a.v).slice(0, 3);
   const pick = prey[R.int(Math.max(1, prey.length))];
   if (pick && setDestination(s, f.id, pick.x.at).ok) return;

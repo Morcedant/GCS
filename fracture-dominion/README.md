@@ -33,8 +33,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   the Fold Anchor (+1 speed), the Aegis Lattice (its world gets guns with 6 more hull; +1 skill for all your guns) and
   the Seed Vault (+2 population room everywhere).
 - **The wild things:** threats that belong to no power, at war with everyone. **Pirate havens** (8 hull, two shots of 2)
-  appear in empty systems near the settled worlds from turn 14, another every 22 turns (up to 2–5 by galaxy size); each
-  sends out raiders who hold weak worlds' orbits (a blockade) and take credits each turn. **Crystal swarms** nest on rich
+  appear in empty systems near the settled worlds from turn 30, another every 22 turns (up to 2–5 by galaxy size); each
+  sends out raiders who hold the orbits of established, unguarded colonies (population 3 or more, founded 12 or more
+  turns ago) for a blockade, and take credits each turn. They leave outposts and young colonies alone, never fire on
+  unarmed ships (nor do swarms), and never starve a world: the frontier can always be settled. **Crystal swarms** nest on rich
   and exotic systems from the start: no one settles there until they're destroyed. **Void leviathans** (12 hull, 3
   damage) drift between the stars from turn 40 and feed on unguarded worlds. Each pays a bounty when destroyed (a haven
   100 credits and 50 research, a swarm 90 research and 2 exotics, a leviathan 40 credits, 160 research and 4 exotics).

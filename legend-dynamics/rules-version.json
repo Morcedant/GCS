@@ -6,6 +6,18 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: pirates no longer stop expansion",
+      "items": [
+        "Pirate havens first appear on turn 30 (was 14).",
+        "Raiders only go after established colonies (population 3 or more, founded at least 12 turns ago). Outposts and new colonies are left alone.",
+        "Pirates and crystal swarms never fire on unarmed ships, so colony ships, outpost ships, scouts, transports and tankers pass safely. A swarm still keeps anyone from settling its own system.",
+        "A pirate or creature blockade no longer starves a world or starts the surrender clock: it halves yields and stops growth only while it lasts.",
+        "Pirates and creatures had cut how far the powers spread by about a third by turn 60. Now it's about 3%."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: relics of the old empires, and the Outer Reach",
       "items": [
         "Eleven relics, one of each, hidden in ruins and anomalies. The first fleet to end its turn at one recovers it, and it's kept at the finder's capital. Each is worth 10 score.",
