@@ -200,6 +200,48 @@ export function outpostSales(s, sys) {
   const fuel = pumps ? OUTPOST_TRADE.fuel + (sys.world === "gas" ? OUTPOST_TRADE.gas : 0) : 0, exotics = sys.exotics ? OUTPOST_TRADE.exotics : 0;
   return { fuel, exotics, total: OUTPOST_TRADE.base + fuel + exotics };
 }
+/** A deep-space station: an outpost ship, in an empty hex of open space (no system, no rift), with Orbital shipyards and
+ * the credits for the station, founds one. It's an outpost with a station: guns, repairs, sight, supply, fuel sales,
+ * territory. It can be invaded, blockaded and bombarded like any outpost; lose the station and the site is gone. */
+export function canFoundStation(s, fleetId) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  if (!f.ships.some((x) => x.type === "outpost")) return { error: "It takes an outpost ship." };
+  if (s.sysAt[f.at]) return { error: "That's a system: claim it as an outpost instead." };
+  if (s.hexes[f.at].terrain === "rift") return { error: "Nothing can be built in a rift." };
+  if (!has(s, f.owner, "orbitalYards")) return { error: "Deep-space stations need Orbital shipyards." };
+  if (fleetsAt(s, f.at).some((o) => armed(o) && atWar(s, f.owner, o.owner))) return { error: "Not with hostile ships here." };
+  const credits = Math.round(BUILDINGS.station.cost * OUTPOST_BUY.rate);
+  if (faction(s, f.owner).credits < credits) return { error: `The station costs ${credits} credits, as well as the outpost ship.`, credits };
+  return { ok: true, credits };
+}
+export function foundStation(s, fleetId) {
+  const c = canFoundStation(s, fleetId); if (c.error) return c;
+  const f = s.fleets[fleetId], F = faction(s, f.owner);
+  f.ships.splice(f.ships.findIndex((x) => x.type === "outpost"), 1);
+  F.credits = round1(F.credits - c.credits);
+  const near = Object.values(s.systems).filter((x) => !x.deep).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  const base = `${near ? near.name : "Deep"} Station`, taken = new Set(Object.values(s.systems).map((x) => x.name));
+  let name = base, n = 2; while (taken.has(name)) name = `${base} ${n++}`;
+  s.deepSeq = (s.deepSeq || 0) + 1;
+  const id = "d" + s.deepSeq;
+  s.systems[id] = { id, name, at: f.at, world: "void", size: 1, rich: 1, exotics: false, ruins: false, deep: true,
+    colony: { owner: f.owner, kind: "outpost", founded: s.turn, pop: 0, growth: 0, buildings: { station: true }, queue: [], stock: 0, defense: 0, capital: false } };
+  s.sysAt[f.at] = id; s.adj[id] = [];
+  s.systems[id].colony.defense = gunsMax(s, s.systems[id].colony);
+  if (!f.ships.length) dropFleet(s, f);
+  log(s, f.owner, `${F.name} built ${name} in deep space: ${BUILDINGS.station.text}`, "build");
+  return { ok: true, id, name };
+}
+/** A deep-space site with no station (bombarded) or no owner (burned) is gone: nothing's left out there. */
+function clearDeepSites(s) {
+  for (const sys of Object.values(s.systems)) {
+    if (!sys.deep || (sys.colony && sys.colony.buildings.station)) continue;
+    if (sys.colony) log(s, sys.colony.owner, `${sys.name} is gone: without its station there's nothing left in that patch of space.`, "war");
+    delete s.systems[sys.id]; delete s.sysAt[sys.at];
+    for (const k of Object.keys(s.adj)) s.adj[k] = s.adj[k].filter((x) => x !== sys.id);
+    delete s.adj[sys.id]; s.corridors = s.corridors.filter(([a, b]) => a !== sys.id && b !== sys.id);
+  }
+}
 /** What an outpost of yours can buy with credits: the `anywhere` buildings it hasn't got, whose technology you have. */
 export function outpostOptions(s, sysId) {
   const sys = s.systems[sysId], c = sys && sys.colony; if (!c || c.kind !== "outpost") return [];
@@ -972,6 +1014,7 @@ export function endTurn(s, aiTurn) {
   for (const F of s.factions) if (F.alive) economy(s, F);
   checkEngine(s);
   checkRelics(s);
+  clearDeepSites(s);
   // The exotics market drifts back toward its usual price.
   if (s.market) s.market.price += Math.sign(MARKET.base - s.market.price) * Math.min(MARKET.drift, Math.abs(MARKET.base - s.market.price));
   for (const F of s.factions) if (F.alive) updateVision(s, F);
@@ -1270,9 +1313,9 @@ export function expandGalaxy(s, reader) {
   }
   // Corridors: each new system to its two nearest within 6, and the Reach joined to the old network at its nearest points.
   const link = (a, b) => { if (a === b || s.adj[a].includes(b)) return; s.adj[a].push(b); s.adj[b].push(a); s.corridors.push([a, b]); };
-  const all = Object.values(s.systems);
+  const all = Object.values(s.systems).filter((y) => !y.deep);   // deep-space stations sit off the corridors
   for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
-  const ids = Object.keys(s.systems);
+  const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep);
   const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
   for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
     const main = c[ids.find((i) => !s.systems[i].reach)]; let best = null;

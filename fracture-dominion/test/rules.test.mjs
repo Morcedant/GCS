@@ -984,3 +984,26 @@ test("shipyards fit the early systems (sensors, drives, shields); the rest waits
   assert.ok(!needsDrydock(s, "concord", g.ships[0]));
   const r = sendToDrydock(s, g.id); assert.ok(r.ok && r.dock === cap.name);
 });
+
+test("deep-space stations: an outpost ship and credits build one in open space; it acts as an outpost with a station, and is gone without it", async () => {
+  const { canFoundStation, foundStation, supplySources, gunsUp, outpostSales, barrage, useRelic } = await import("../src/game.js");
+  const { BUILDINGS, OUTPOST_BUY } = await import("../src/data.js");
+  const s = newGame({ seed: 33, size: "small", player: "concord", rivals: 1 }), me = s.factions[0];
+  const hex = Object.keys(s.hexes).find((k) => !s.sysAt[k] && s.hexes[k].terrain === "space" && !fleetsAt(s, k).length && distance(k, s.systems[me.capital].at) === 3);
+  const f = spawnFleet(s, "concord", hex, ["outpost", "frigate"]);
+  assert.ok(canFoundStation(s, f.id).error, "needs Orbital shipyards");
+  me.research.done.push("orbitalYards"); me.credits = 500;
+  const r = foundStation(s, f.id);
+  assert.ok(r.ok);
+  assert.equal(me.credits, 500 - Math.round(BUILDINGS.station.cost * OUTPOST_BUY.rate));
+  const st = s.systems[r.id];
+  assert.ok(st.deep && s.sysAt[hex] === r.id && st.colony.owner === "concord" && st.colony.buildings.station);
+  assert.ok(!f.ships.some((x) => x.type === "outpost"), "the outpost ship is used up");
+  assert.ok(gunsUp(st) && supplySources(s, "concord").includes(st));
+  assert.ok(outpostSales(s, st).fuel > 0, "it sells fuel");
+  assert.ok(foundStation(s, f.id).error, "one per hex, and the ship's gone");
+  // Bombarded: the station is gone, and the site with it.
+  const foe = s.factions[1].id; declareWar(s, "concord", foe);
+  delete st.colony.buildings.station; endTurn(s);
+  assert.ok(!s.systems[r.id] && !s.sysAt[hex], "nothing left out there");
+});

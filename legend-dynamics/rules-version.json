@@ -6,6 +6,16 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: deep-space stations",
+      "items": [
+        "With Orbital shipyards, an outpost ship in an empty hex of open space can build a deep-space station there. It uses up the ship and costs 135 credits. It can't be built in a rift or with hostile ships present.",
+        "A deep-space station works like an outpost with an Orbital station: light guns, repairs, sight, supply for your fleets, fuel sales, and territory. It's shown on the map as a square, named after the nearest system.",
+        "It can be invaded, blockaded and bombarded like any outpost. If its station is destroyed, the site is gone."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: shipyards do early refits",
       "items": [
         "Any Shipyard now refits ships with the early systems (Deep sensors, Fold drives and Deflector shields) when they end a turn there.",

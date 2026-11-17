@@ -27,6 +27,8 @@ export const WORLDS = {
   arctic: { name: "Arctic", pop: 2, ind: 1, sci: 1.2, needs: "xenology", color: "#bcd6e0" },
   barren: { name: "Barren", pop: 1, ind: 1.5, sci: 0.6, needs: "domes", color: "#8c8278" },
   gas: { name: "Gas giant", pop: 0, ind: 0, sci: 0, needs: null, color: "#c98f6a", outpostOnly: true },
+  // A deep-space station's site (game.js foundStation): no world at all, just the station.
+  void: { name: "Deep space", pop: 0, ind: 0, sci: 0, needs: null, color: "#8e9bb3", outpostOnly: true },
 };
 
 export const BUILDINGS = {
@@ -35,7 +37,7 @@ export const BUILDINGS = {
   market: { name: "Exchange", cost: 50, upkeep: 0, text: "+3 credits here." },
   shipyard: { name: "Shipyard", cost: 80, upkeep: 1, text: "Builds ships here." },
   battery: { name: "Orbital battery", cost: 100, upkeep: 1, needs: "batteries", anywhere: true, text: "A fortress in orbit: 6 hull, two shots a round at skill 13 for 2 damage each, and it repairs 2 a turn. While its guns stand, a siege can't blockade the world, and its garrison fights 2 points harder." },
-  station: { name: "Orbital station", cost: 90, upkeep: 1, needs: "orbitalYards", anywhere: true, text: "A forward base in orbit, at a colony or an outpost: light guns (4 hull, one shot of 2, or +4 hull to a battery's), your ships here repair 2 hull a turn, it sees 2 hexes farther, and it gives supply like a fuel depot." },
+  station: { name: "Orbital station", cost: 90, upkeep: 1, needs: "orbitalYards", anywhere: true, text: "A forward base in orbit, at a colony or an outpost (or, built by an outpost ship, in deep space): light guns (4 hull, one shot of 2, or +4 hull to a battery's), your ships here repair 2 hull a turn, it sees 2 hexes farther, and it gives supply like a fuel depot." },
   depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
   barracks: { name: "Garrison barracks", cost: 60, upkeep: 0.5, text: "+3 to the garrison against invasion, and a siege wears it down to no less than 80%." },
   observatory: { name: "Deep-space observatory", cost: 80, upkeep: 1, needs: "sensors", text: "+3 science, and it studies one anomaly within 4 hexes every few turns, without a ship." },

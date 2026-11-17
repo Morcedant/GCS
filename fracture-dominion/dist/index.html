@@ -202,7 +202,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 22:00 UTC";
+const BUILD = "2026-11-17 22:30 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -299,6 +299,8 @@ const WORLDS = {
   arctic: { name: "Arctic", pop: 2, ind: 1, sci: 1.2, needs: "xenology", color: "#bcd6e0" },
   barren: { name: "Barren", pop: 1, ind: 1.5, sci: 0.6, needs: "domes", color: "#8c8278" },
   gas: { name: "Gas giant", pop: 0, ind: 0, sci: 0, needs: null, color: "#c98f6a", outpostOnly: true },
+  // A deep-space station's site (game.js foundStation): no world at all, just the station.
+  void: { name: "Deep space", pop: 0, ind: 0, sci: 0, needs: null, color: "#8e9bb3", outpostOnly: true },
 };
 
 const BUILDINGS = {
@@ -307,7 +309,7 @@ const BUILDINGS = {
   market: { name: "Exchange", cost: 50, upkeep: 0, text: "+3 credits here." },
   shipyard: { name: "Shipyard", cost: 80, upkeep: 1, text: "Builds ships here." },
   battery: { name: "Orbital battery", cost: 100, upkeep: 1, needs: "batteries", anywhere: true, text: "A fortress in orbit: 6 hull, two shots a round at skill 13 for 2 damage each, and it repairs 2 a turn. While its guns stand, a siege can't blockade the world, and its garrison fights 2 points harder." },
-  station: { name: "Orbital station", cost: 90, upkeep: 1, needs: "orbitalYards", anywhere: true, text: "A forward base in orbit, at a colony or an outpost: light guns (4 hull, one shot of 2, or +4 hull to a battery's), your ships here repair 2 hull a turn, it sees 2 hexes farther, and it gives supply like a fuel depot." },
+  station: { name: "Orbital station", cost: 90, upkeep: 1, needs: "orbitalYards", anywhere: true, text: "A forward base in orbit, at a colony or an outpost (or, built by an outpost ship, in deep space): light guns (4 hull, one shot of 2, or +4 hull to a battery's), your ships here repair 2 hull a turn, it sees 2 hexes farther, and it gives supply like a fuel depot." },
   depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
   barracks: { name: "Garrison barracks", cost: 60, upkeep: 0.5, text: "+3 to the garrison against invasion, and a siege wears it down to no less than 80%." },
   observatory: { name: "Deep-space observatory", cost: 80, upkeep: 1, needs: "sensors", text: "+3 science, and it studies one anomaly within 4 hexes every few turns, without a ship." },
@@ -906,6 +908,48 @@ function outpostSales(s, sys) {
   const pumps = (c.buildings.depot || c.buildings.station) && !(c.depotCut > s.turn);
   const fuel = pumps ? OUTPOST_TRADE.fuel + (sys.world === "gas" ? OUTPOST_TRADE.gas : 0) : 0, exotics = sys.exotics ? OUTPOST_TRADE.exotics : 0;
   return { fuel, exotics, total: OUTPOST_TRADE.base + fuel + exotics };
+}
+/** A deep-space station: an outpost ship, in an empty hex of open space (no system, no rift), with Orbital shipyards and
+ * the credits for the station, founds one. It's an outpost with a station: guns, repairs, sight, supply, fuel sales,
+ * territory. It can be invaded, blockaded and bombarded like any outpost; lose the station and the site is gone. */
+function canFoundStation(s, fleetId) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  if (!f.ships.some((x) => x.type === "outpost")) return { error: "It takes an outpost ship." };
+  if (s.sysAt[f.at]) return { error: "That's a system: claim it as an outpost instead." };
+  if (s.hexes[f.at].terrain === "rift") return { error: "Nothing can be built in a rift." };
+  if (!has(s, f.owner, "orbitalYards")) return { error: "Deep-space stations need Orbital shipyards." };
+  if (fleetsAt(s, f.at).some((o) => armed(o) && atWar(s, f.owner, o.owner))) return { error: "Not with hostile ships here." };
+  const credits = Math.round(BUILDINGS.station.cost * OUTPOST_BUY.rate);
+  if (faction(s, f.owner).credits < credits) return { error: `The station costs ${credits} credits, as well as the outpost ship.`, credits };
+  return { ok: true, credits };
+}
+function foundStation(s, fleetId) {
+  const c = canFoundStation(s, fleetId); if (c.error) return c;
+  const f = s.fleets[fleetId], F = faction(s, f.owner);
+  f.ships.splice(f.ships.findIndex((x) => x.type === "outpost"), 1);
+  F.credits = round1(F.credits - c.credits);
+  const near = Object.values(s.systems).filter((x) => !x.deep).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  const base = `${near ? near.name : "Deep"} Station`, taken = new Set(Object.values(s.systems).map((x) => x.name));
+  let name = base, n = 2; while (taken.has(name)) name = `${base} ${n++}`;
+  s.deepSeq = (s.deepSeq || 0) + 1;
+  const id = "d" + s.deepSeq;
+  s.systems[id] = { id, name, at: f.at, world: "void", size: 1, rich: 1, exotics: false, ruins: false, deep: true,
+    colony: { owner: f.owner, kind: "outpost", founded: s.turn, pop: 0, growth: 0, buildings: { station: true }, queue: [], stock: 0, defense: 0, capital: false } };
+  s.sysAt[f.at] = id; s.adj[id] = [];
+  s.systems[id].colony.defense = gunsMax(s, s.systems[id].colony);
+  if (!f.ships.length) dropFleet(s, f);
+  log(s, f.owner, `${F.name} built ${name} in deep space: ${BUILDINGS.station.text}`, "build");
+  return { ok: true, id, name };
+}
+/** A deep-space site with no station (bombarded) or no owner (burned) is gone: nothing's left out there. */
+function clearDeepSites(s) {
+  for (const sys of Object.values(s.systems)) {
+    if (!sys.deep || (sys.colony && sys.colony.buildings.station)) continue;
+    if (sys.colony) log(s, sys.colony.owner, `${sys.name} is gone: without its station there's nothing left in that patch of space.`, "war");
+    delete s.systems[sys.id]; delete s.sysAt[sys.at];
+    for (const k of Object.keys(s.adj)) s.adj[k] = s.adj[k].filter((x) => x !== sys.id);
+    delete s.adj[sys.id]; s.corridors = s.corridors.filter(([a, b]) => a !== sys.id && b !== sys.id);
+  }
 }
 /** What an outpost of yours can buy with credits: the `anywhere` buildings it hasn't got, whose technology you have. */
 function outpostOptions(s, sysId) {
@@ -1679,6 +1723,7 @@ function endTurn(s, aiTurn) {
   for (const F of s.factions) if (F.alive) economy(s, F);
   checkEngine(s);
   checkRelics(s);
+  clearDeepSites(s);
   // The exotics market drifts back toward its usual price.
   if (s.market) s.market.price += Math.sign(MARKET.base - s.market.price) * Math.min(MARKET.drift, Math.abs(MARKET.base - s.market.price));
   for (const F of s.factions) if (F.alive) updateVision(s, F);
@@ -1977,9 +2022,9 @@ function expandGalaxy(s, reader) {
   }
   // Corridors: each new system to its two nearest within 6, and the Reach joined to the old network at its nearest points.
   const link = (a, b) => { if (a === b || s.adj[a].includes(b)) return; s.adj[a].push(b); s.adj[b].push(a); s.corridors.push([a, b]); };
-  const all = Object.values(s.systems);
+  const all = Object.values(s.systems).filter((y) => !y.deep);   // deep-space stations sit off the corridors
   for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
-  const ids = Object.keys(s.systems);
+  const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep);
   const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
   for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
     const main = c[ids.find((i) => !s.systems[i].reach)]; let best = null;
@@ -3681,7 +3726,7 @@ function draw() {
   for (const sys of Object.values(S.systems)) {
     if (!me.explored[sys.at]) continue;
     const { x, y } = toPixel(sys.at, size), w = WORLDS[sys.world], r = 5 + sys.size * 1.6;
-    ctx.fillStyle = w.color; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = w.color; ctx.beginPath(); if (sys.deep) ctx.rect(x - r * 0.8, y - r * 0.8, r * 1.6, r * 1.6); else ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     if (sys.colony) {
       ctx.strokeStyle = colorOf(sys.colony.owner); ctx.lineWidth = sys.colony.kind === "colony" ? 3 : 2;
       ctx.setLineDash(sys.colony.kind === "outpost" ? [3, 3] : []);
@@ -3788,7 +3833,7 @@ function siegeHTML(sys, mine) {
 function systemHTML() {
   const sys = S.systems[sel.id], me = player(S), w = WORLDS[sys.world], c = sys.colony;
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
-  let h = `<h2>${esc(sys.name)}<\/h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit<\/b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins<\/b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}<\/b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.<\/p>`;
+  let h = `<h2>${esc(sys.name)}<\/h2><p class="muted">${sys.deep ? "A station in deep space: no world here, just the station" : `${esc(w.name)} world, size ${sys.size}`}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit<\/b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins<\/b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}<\/b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.<\/p>`;
   { const rid = Object.keys(S.relics || {}).find((id) => S.relics[id].at === sys.id); if (rid && (mine || seen)) h += `<p class="small gold"><b>${esc(RELICS[rid].name)}<\/b> is kept here. ${esc(RELICS[rid].text)}${mine ? "" : " Take the world to take it."}<\/p>`; }
   if (sys.relic && sys.relicLost && me.explored[sys.at]) h += `<p class="small gold"><b>${esc(RELICS[sys.relic].name)}<\/b> lies in the ruins here: the first fleet to end its turn here recovers it.<\/p>`;
   if (mine && relicHeld(S, me.id, "shard")) { const r = S.relics.shard, ready = !r.ready || S.turn >= r.ready, tg = shardTargets(S, me.id, sys.id).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at));
@@ -3876,6 +3921,11 @@ function fleetHTML() {
   if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
     h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).<\/p>${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.<\/p>` : ""}`; }
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}<\/button>${f.path.length ? `<button class="btn" data-stop>Stop<\/button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}<\/button>`}<\/div>`;
+  if (!sys && mine && f.ships.some((x) => x.type === "outpost") && S.hexes[f.at].terrain !== "rift") {
+    const c = canFoundStation(S, f.id);
+    h += has(S, me.id, "orbitalYards") ? `<button class="btn wide" data-deepstation ${c.error ? "disabled" : ""} title="${esc(BUILDINGS.station.text)}">Build a deep-space station here (the outpost ship and ${Math.round(BUILDINGS.station.cost * OUTPOST_BUY.rate)} credits)<\/button>${c.error && !/credits/.test(c.error) ? `<p class="small muted">${esc(c.error)}<\/p>` : ""}`
+      : `<p class="small muted">With Orbital shipyards, an outpost ship can build a station here in deep space.<\/p>`;
+  }
   const held = sys && !sys.colony && fleetsAt(S, sys.at).find((o) => armed(o) && atWar(S, me.id, o.owner));
   if (held) { const wild = held.owner === "beasts" || held.owner === "pirates", nm = SHIPS[held.ships[0].type].name.toLowerCase(), n = held.ships.length;
     h += `<p class="small bad">${wild ? (n > 1 ? `${n} ${nm}s hold` : `A ${nm} holds`) : `${esc(faction(S, held.owner).name)}'s warships hold`} this system: destroy ${wild && n === 1 ? "it" : "them"} before you can settle here.<\/p>`; }
@@ -4262,6 +4312,7 @@ function bindChrome() {
     else if (d.todock) { const r = sendToDrydock(S, sel.id, d.todock === "old"); if (r.error) toast(r.error, true); else { toast(`${r.ships} ship${r.ships === 1 ? "" : "s"} on the way to the drydock at ${r.dock}${r.turns ? `: ${r.turns} turn${r.turns === 1 ? "" : "s"}` : ""}.`); if (r.split) sel = { kind: "fleet", id: r.fleet }; } }
     else if (d.alldock !== undefined) { const r = sendAllToDrydock(S, me.id); toast(r.ships ? `${r.ships} out-of-date ship${r.ships === 1 ? "" : "s"} from ${r.fleets} fleet${r.fleets === 1 ? "" : "s"} on the way to drydock.` : "Nothing to send: no drydock can take them, or they're already on the way.", !r.ships); }
     else if (d.autorefit !== undefined) { me.autoRefit = !me.autoRefit; toast(me.autoRefit ? "Standing order: idle fleets with out-of-date ships go to the nearest drydock." : "Standing order cancelled: fleets go for refits only when you send them."); }
+    else if (d.deepstation !== undefined) { const r = foundStation(S, sel.id); if (r.error) toast(r.error, true); else { toast(`${r.name} is built.`); sel = { kind: "system", id: r.id }; } }
     else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }

@@ -1,7 +1,7 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, DEPOT_RAID, TRADERS, OUTPOST_TRADE } from "./data.js";
-import { newGame, endTurn, gunsMax, gunsUp, missingFit, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, DEPOT_RAID, TRADERS, OUTPOST_TRADE } from "./data.js";
+import { newGame, endTurn, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
@@ -188,7 +188,7 @@ function draw() {
   for (const sys of Object.values(S.systems)) {
     if (!me.explored[sys.at]) continue;
     const { x, y } = toPixel(sys.at, size), w = WORLDS[sys.world], r = 5 + sys.size * 1.6;
-    ctx.fillStyle = w.color; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = w.color; ctx.beginPath(); if (sys.deep) ctx.rect(x - r * 0.8, y - r * 0.8, r * 1.6, r * 1.6); else ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     if (sys.colony) {
       ctx.strokeStyle = colorOf(sys.colony.owner); ctx.lineWidth = sys.colony.kind === "colony" ? 3 : 2;
       ctx.setLineDash(sys.colony.kind === "outpost" ? [3, 3] : []);
@@ -295,7 +295,7 @@ function siegeHTML(sys, mine) {
 function systemHTML() {
   const sys = S.systems[sel.id], me = player(S), w = WORLDS[sys.world], c = sys.colony;
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
-  let h = `<h2>${esc(sys.name)}</h2><p class="muted">${esc(w.name)} world, size ${sys.size}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit</b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins</b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}</b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.</p>`;
+  let h = `<h2>${esc(sys.name)}</h2><p class="muted">${sys.deep ? "A station in deep space: no world here, just the station" : `${esc(w.name)} world, size ${sys.size}`}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit</b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins</b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}</b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.</p>`;
   { const rid = Object.keys(S.relics || {}).find((id) => S.relics[id].at === sys.id); if (rid && (mine || seen)) h += `<p class="small gold"><b>${esc(RELICS[rid].name)}</b> is kept here. ${esc(RELICS[rid].text)}${mine ? "" : " Take the world to take it."}</p>`; }
   if (sys.relic && sys.relicLost && me.explored[sys.at]) h += `<p class="small gold"><b>${esc(RELICS[sys.relic].name)}</b> lies in the ruins here: the first fleet to end its turn here recovers it.</p>`;
   if (mine && relicHeld(S, me.id, "shard")) { const r = S.relics.shard, ready = !r.ready || S.turn >= r.ready, tg = shardTargets(S, me.id, sys.id).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at));
@@ -383,6 +383,11 @@ function fleetHTML() {
   if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
     h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).</p>${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.</p>` : ""}`; }
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}</button>${f.path.length ? `<button class="btn" data-stop>Stop</button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}</button>`}</div>`;
+  if (!sys && mine && f.ships.some((x) => x.type === "outpost") && S.hexes[f.at].terrain !== "rift") {
+    const c = canFoundStation(S, f.id);
+    h += has(S, me.id, "orbitalYards") ? `<button class="btn wide" data-deepstation ${c.error ? "disabled" : ""} title="${esc(BUILDINGS.station.text)}">Build a deep-space station here (the outpost ship and ${Math.round(BUILDINGS.station.cost * OUTPOST_BUY.rate)} credits)</button>${c.error && !/credits/.test(c.error) ? `<p class="small muted">${esc(c.error)}</p>` : ""}`
+      : `<p class="small muted">With Orbital shipyards, an outpost ship can build a station here in deep space.</p>`;
+  }
   const held = sys && !sys.colony && fleetsAt(S, sys.at).find((o) => armed(o) && atWar(S, me.id, o.owner));
   if (held) { const wild = held.owner === "beasts" || held.owner === "pirates", nm = SHIPS[held.ships[0].type].name.toLowerCase(), n = held.ships.length;
     h += `<p class="small bad">${wild ? (n > 1 ? `${n} ${nm}s hold` : `A ${nm} holds`) : `${esc(faction(S, held.owner).name)}'s warships hold`} this system: destroy ${wild && n === 1 ? "it" : "them"} before you can settle here.</p>`; }
@@ -769,6 +774,7 @@ function bindChrome() {
     else if (d.todock) { const r = sendToDrydock(S, sel.id, d.todock === "old"); if (r.error) toast(r.error, true); else { toast(`${r.ships} ship${r.ships === 1 ? "" : "s"} on the way to the drydock at ${r.dock}${r.turns ? `: ${r.turns} turn${r.turns === 1 ? "" : "s"}` : ""}.`); if (r.split) sel = { kind: "fleet", id: r.fleet }; } }
     else if (d.alldock !== undefined) { const r = sendAllToDrydock(S, me.id); toast(r.ships ? `${r.ships} out-of-date ship${r.ships === 1 ? "" : "s"} from ${r.fleets} fleet${r.fleets === 1 ? "" : "s"} on the way to drydock.` : "Nothing to send: no drydock can take them, or they're already on the way.", !r.ships); }
     else if (d.autorefit !== undefined) { me.autoRefit = !me.autoRefit; toast(me.autoRefit ? "Standing order: idle fleets with out-of-date ships go to the nearest drydock." : "Standing order cancelled: fleets go for refits only when you send them."); }
+    else if (d.deepstation !== undefined) { const r = foundStation(S, sel.id); if (r.error) toast(r.error, true); else { toast(`${r.name} is built.`); sel = { kind: "system", id: r.id }; } }
     else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }

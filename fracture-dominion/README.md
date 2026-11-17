@@ -85,7 +85,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Orbital stations, and guns anywhere:** an Orbital station (Orbital shipyards, 90) can go up over a colony or an
   outpost: a forward base with light guns (4 hull, one shot of 2; +4 hull to a battery's), ships there repaired 2 hull a
   turn, 2 hexes more sight, and supply like a fuel depot. Outposts have no industry, so they buy an Orbital battery or station with
-  credits (1.5 per point of cost: 150 and 135). Computer powers fortify frontier outposts near their enemies.
+  credits (1.5 per point of cost: 150 and 135). With Orbital shipyards, an outpost ship in an empty hex of open space (no
+  system, no rift, no hostile ships) builds a **deep-space station** there for 135 credits: an outpost with a station
+  (shown as a square), with its guns, repairs, sight, supply, fuel sales and territory, but off the corridors. It can be
+  invaded, blockaded and bombarded like any outpost; if its station is destroyed, the site is gone. Computer powers fortify frontier outposts near their enemies.
 - **Repairs:** at any world of yours a ship repairs 1 hull a turn (anywhere for the Vael, a Shipwright admiral's fleet, or
   with the Living Keel); 2 a turn at an Orbital station; to full at a Drydock. Not while enemy warships hold the orbit
   (then it's 1 a turn).
