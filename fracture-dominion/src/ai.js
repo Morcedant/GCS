@@ -2,15 +2,16 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
-import { refitOptions, refit, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { missingFit, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
-  concord: ["xenology", "automation", "sensors", "domes", "commerce", "heavyHulls", "foldDrives", "terraforming", "refining", "orbitalYards"],
-  tessan: ["commerce", "automation", "xenology", "sensors", "refining", "heavyHulls", "terraforming", "orbitalYards", "domes"],
-  kel: ["automation", "xenology", "commerce", "domes", "terraforming", "sensors", "batteries", "heavyHulls"],
-  hegemony: ["automation", "heavyHulls", "shields", "targeting", "orbitalYards", "xenology", "batteries", "refining", "capitalShips"],
-  vael: ["sensors", "foldDrives", "automation", "xenology", "shields", "heavyHulls", "corridorTheory", "refining"],
+  // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
+  concord: ["xenology", "automation", "sensors", "orbitalYards", "domes", "commerce", "heavyHulls", "foldDrives", "terraforming", "refining"],
+  tessan: ["commerce", "automation", "xenology", "orbitalYards", "sensors", "refining", "heavyHulls", "terraforming", "domes"],
+  kel: ["automation", "xenology", "commerce", "orbitalYards", "domes", "terraforming", "sensors", "batteries", "heavyHulls"],
+  hegemony: ["automation", "heavyHulls", "orbitalYards", "shields", "targeting", "xenology", "batteries", "refining", "capitalShips"],
+  vael: ["sensors", "automation", "orbitalYards", "foldDrives", "xenology", "shields", "heavyHulls", "corridorTheory", "refining"],
 };
 const AGGRESSION = { concord: 0.9, tessan: 0.7, kel: 0.9, hegemony: 1.4, vael: 1.0 };
 const DIFF = { easy: 0.7, normal: 1, hard: 1.35 };
@@ -20,7 +21,6 @@ export function aiTurn(s, F) {
   research(s, F);
   relics(s, F);
   outposts(s, F);
-  refits(s, F);
   diplomacy(s, F, diff);
   production(s, F, diff);
   fleets(s, F);
@@ -48,10 +48,6 @@ function outposts(s, F) {
     const o = outpostOptions(s, sys.id).sort((a, b) => (a.id === "battery" ? -1 : 1))[0];
     if (o && F.credits >= o.credits * 2.5) { buildAtOutpost(s, F.id, sys.id, o.id); return; }
   }
-}
-/** Drydocks: a rich power refits a frigate a turn into a cruiser (or a cruiser into a dreadnought) at its yards. */
-function refits(s, F) {
-  for (const f of fleetsOf(s, F.id)) for (const o of refitOptions(s, f.id)) if (F.credits >= o.credits * 3 && F.exotics >= o.exotics + 2) { refit(s, f.id, o.from); return; }
 }
 function relics(s, F) {
   if (!relicHeld(s, F.id, "shard")) return;
@@ -143,6 +139,7 @@ function production(s, F, diff) {
       ships && settleTargets(s, F, "colony").length && count(s, F, "colony") < (s.turn < 60 ? 2 : 1) && cols.length < 14 ? ["ship", "colony"] : null,
       ships && s.turn < 50 && count(s, F, "scout") < 2 ? ["ship", "scout"] : null,
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
+      c.capital && has(s, F.id, "orbitalYards") && !c.buildings.drydock ? ["building", "drydock"] : null,   // one, at the capital: the refits
       ships && power < wantPower ? ["ship", has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "tanker") < 1 ? ["ship", "tanker"] : null,
@@ -229,6 +226,12 @@ function fleets(s, F) {
         foe: fleetsAt(s, sys.at).filter((g) => armed(g) && atWar(s, g.owner, F.id)).reduce((t, g) => t + g.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? x.hull : 0), 0), 0) }))
         .filter((x) => x.foe <= mineHull * 1.2).sort((a, b) => a.d - b.d)[0];
       if (relief) { if (relief.sys.at !== f.at) setDestination(s, f.id, relief.sys.at); continue; }
+      // Out of date: to the nearest drydock, for a refit with what's been researched since these ships were built
+      // (before going on the attack; a world of ours under siege comes first).
+      if (f.ships.some((x) => missingFit(s, F.id, x).length)) {
+        const dock = coloniesOf(s, F.id).filter((x) => x.colony.buildings.drydock && !besieged(s, x)).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+        if (dock && distance(dock.at, f.at) <= 12) { if (f.at !== dock.at) setDestination(s, f.id, dock.at); continue; }
+      }
       if (enemies.length) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])

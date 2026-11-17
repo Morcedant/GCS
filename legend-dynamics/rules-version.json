@@ -6,6 +6,19 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: research reaches ships at a drydock",
+      "items": [
+        "Ships now carry the systems their power had researched when they were built: sensors, drives, shields, targeting, armor, fire control, fuel tanks and the ship prototypes.",
+        "New ships are built with everything you've researched. Ships already in service get new research only by ending a turn at one of your Drydocks, where they're refitted at no cost and new armor is added to their hull. It can't happen while enemy warships hold the drydock's orbit.",
+        "A fleet's panel says which ships need a refit and how far the nearest drydock is.",
+        "The drydock's class upgrades (frigate to cruiser, cruiser to dreadnought) are gone.",
+        "Your existing ships keep everything you'd researched before this update.",
+        "The computer powers research Orbital shipyards early, build a drydock at their capital, and send out-of-date fleets there before going on the attack."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: stations and drydocks do different jobs",
       "items": [
         "Orbital stations are forward bases: ships there now repair 2 hull a turn, not to full. Their guns, sight and supply are unchanged.",

@@ -1,7 +1,7 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
 import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, DEPOT_RAID, TRADERS, OUTPOST_TRADE } from "./data.js";
-import { newGame, endTurn, gunsMax, gunsUp, refitOptions, refit, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { newGame, endTurn, gunsMax, gunsUp, missingFit, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
@@ -354,8 +354,8 @@ function fleetHTML() {
   const sid = S.sysAt[f.at], sys = sid && S.systems[sid];
   let h = `<h2><span class="dot" style="background:${F.color}"></span>${mine ? "Your fleet" : esc(F.name)}</h2><p class="muted">${sys ? `At ${esc(sys.name)}` : "In deep space"}${S.hexes[f.at].terrain === "nebula" ? ", inside a nebula" : ""}. Speed ${fleetSpeed(S, f)}.</p>`;
   // Ships by type: a row each with how many and their hull, and each ship's hull a click away.
-  const byType = [...new Set(f.ships.map((x) => x.type))].map((t) => ({ t, st: shipStats(S, f.owner, t), list: f.ships.filter((x) => x.type === t) }));
-  h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = st.hull * list.length, hurt = list.filter((x) => x.hull < st.hull).length;
+  const byType = [...new Set(f.ships.map((x) => x.type))].map((t) => { const list = f.ships.filter((x) => x.type === t); return { t, st: shipStats(S, f.owner, t, list[0]), list }; });
+  h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = list.reduce((a, x) => a + shipStats(S, f.owner, t, x).hull, 0), hurt = list.filter((x) => x.hull < shipStats(S, f.owner, t, x).hull).length;
     return `<li><b>${shipSVG(t, F.color, 22)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each</span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}</span>${list.length > 1 ? `<details class="small"><summary>Each ship</summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}</div>`).join("")}</details>` : ""}</li>`; }).join("")}</ul>`;
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.</p>`;
   if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
@@ -395,9 +395,10 @@ function fleetHTML() {
     h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit. Keep warships here: the battle at the end of the turn knocks the guns out, and a world under siege can't repair them, so you can land next turn." : ""}${!war ? " You're not at war with them." : ""}</p>
       <p class="small muted" style="margin-top:-4px">Troops: ${tr} transport${tr === 1 ? "" : "s"} × ${per} = ${o.troops}. Defense: ${defParts} = ${o.defense}. ${o.troops >= o.defense ? "<b class=\"good\">Enough: the landing takes it.</b>" : `<b class="bad">Not enough: ${fmt(o.defense - o.troops)} more troops needed, or the transports are lost.</b>`}</p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops</button>`;
   }
-  // Refits at a drydock.
-  const rf = refitOptions(S, f.id);
-  if (rf.length) h += `<h3>Drydock refits</h3><p class="small muted" style="margin-top:-4px">Refit a ship to the next class up, now: it comes out at full hull.</p><div class="opts">${rf.map((o) => `<button class="opt" data-refit="${o.from}" ${me.credits < o.credits || me.exotics < o.exotics ? "disabled" : ""}><b>${esc(SHIPS[o.from].name)} → ${esc(SHIPS[o.to].name)}</b> <small>${o.credits} credits${o.exotics ? `, ${o.exotics} exotic${o.exotics === 1 ? "" : "s"}` : ""}</small></button>`).join("")}</div>`;
+  // Systems: research reaches a ship only at a drydock.
+  if (mine) { const old = f.ships.filter((x) => missingFit(S, me.id, x).length);
+    if (old.length) { const miss = [...new Set(old.flatMap((x) => missingFit(S, me.id, x)))], dock = coloniesOf(S, me.id).filter((x) => x.colony.buildings.drydock).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+      h += `<p class="small bad"><b>Refit needed:</b> ${old.length} of these ships ${old.length === 1 ? "lacks" : "lack"} ${esc(miss.join(", "))}. ${dock ? `End a turn at the drydock at ${esc(dock.name)} (${distance(dock.at, f.at)} hexes) and they're refitted.` : "Build a Drydock (Orbital shipyards) at a colony: research reaches existing ships only there."}</p>`; } }
   // Raiding an enemy's fuel depot.
   if (canRaidDepot(S, f.id)) h += `<h3>Their fuel depot</h3><p class="small muted" style="margin-top:-4px">Take its fuel: this fleet and its tankers fill up, and the depot gives them no supply for ${DEPOT_RAID.cut} turns.</p><button class="btn wide" data-depotraid>Raid the depot</button>`;
   // The Corridor Engine's gate (an open game): from the Engine world to any of your worlds.
@@ -662,7 +663,7 @@ function protosHTML() {
 }
 function researchHTML() {
   const me = player(S), R = me.research, cur = researchItem(S, me.id), t = totals(S, me.id);
-  let h = `<h2>Research</h2>`;
+  let h = `<h2>Research</h2><p class="small muted">What improves ships (sensors, drives, shields, targeting, armor, fire control) is built into new ships at once; ships already in service get it when they end a turn at a Drydock.</p>`;
   h += cur ? `<p><b>${esc(cur.name)}</b>: ${Math.floor(R.progress)} / ${cur.cost}${t.sci ? ` · ${Math.ceil((cur.cost - R.progress) / t.sci)} turns` : ""}</p>${bar(R.progress, cur.cost)}` : `<p class="bad">Choose what to research next.${R.progress ? ` ${Math.floor(R.progress)} points are waiting.` : ""}</p>`;
   for (const field of ["Physics", "Industry", "Society"]) {
     h += `<h3>${field}</h3><div class="techs">` + TECHS.filter((x) => x.field === field).map((x) => {
@@ -759,7 +760,6 @@ function bindChrome() {
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.relic) { const r = useRelic(S, me.id, d.relic); if (r.error) toast(r.error, true); else { toast(`The Outer Reach is open: ${r.systems} new systems beyond the rim.`); draw(); } }
     else if (d.shard) { const r = useRelic(S, me.id, "shard", { from: sel.id, to: d.shard }); if (r.error) toast(r.error, true); else toast(`A new corridor: ${S.systems[sel.id].name} to ${S.systems[d.shard].name}.`); }
-    else if (d.refit) { const r = refit(S, sel.id, d.refit); if (r.error) toast(r.error, true); else toast(`Refitted: a ${SHIPS[r.to].name.toLowerCase()}.`); }
     else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
@@ -1119,6 +1119,7 @@ function showHelp(back) {
       <li><b>Advances:</b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.</li>
       <li><b>Anomalies</b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.</li>
       <li><b>Relics</b> (♦): eleven artifacts of the old empires, hidden in ruins and anomalies. End a fleet's turn at one to recover it; take a world to take its relics. The Founders' Star Chart opens the Outer Reach beyond the rim. See them on the Empire tab.</li>
+      <li><b>Refits:</b> research that improves ships goes into new ones; ships already in service get it at a Drydock. A fleet's panel says when its ships need a refit.</li>
       <li><b>Pirate ransom and tribute:</b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts</b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.</li>
       <li><b>Traders:</b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot</b> to fill its tanks and cut the depot's supply.</li>
       <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>

@@ -68,15 +68,42 @@ export const atWar = (s, a, b) => a !== b && (a === "traders" || b === "traders"
 
 /** Does this faction have this prototype fitted? */
 export const proto = (s, fid, id) => { const F = faction(s, fid); return !!(F && (F.protos || {})[id]); };
-export function shipStats(s, fid, type) {
+// ---- ships' systems: what research a ship is fitted with ----
+/** The research that goes into a ship's systems: technologies, prototypes and advances. A ship is fitted with what its
+ * power had when it was built; what's researched later reaches it only at a drydock (refitAt). */
+const FIT = { sensors: "Deep sensors", foldDrives: "Fold drives", shields: "Deflector shields", targeting: "Targeting computers",
+  plating: "Ablative plating", lances: "Fold lances", scanners: "Long-range scanners", armor: "Composite armor", fireControl: "Fire control", tanks: "Drive tuning" };
+export function currentFit(s, fid) {
+  return { sensors: has(s, fid, "sensors"), foldDrives: has(s, fid, "foldDrives"), shields: has(s, fid, "shields"), targeting: has(s, fid, "targeting"),
+    plating: proto(s, fid, "plating"), lances: proto(s, fid, "lances"), scanners: proto(s, fid, "scanners"),
+    armor: advLevel(s, fid, "armor"), fireControl: advLevel(s, fid, "fireControl"), tanks: advLevel(s, fid, "tanks") };
+}
+/** A ship's systems: its own fit, or (a ship being built now, or anyone without a fit) the power's current research. */
+export const fitOf = (s, fid, ship) => (ship && ship.fit) || currentFit(s, fid);
+/** What research a ship is missing: the names, for the panels; [] when it's up to date. */
+export function missingFit(s, fid, ship) {
+  if (!ship || !ship.fit) return [];
+  const now = currentFit(s, fid), base = SHIPS[ship.type];
+  return Object.keys(FIT).filter((k) => (now[k] || 0) > (ship.fit[k] || 0) && (base.skill > 0 || ["sensors", "foldDrives", "scanners", "tanks"].includes(k))).map((k) => FIT[k]);
+}
+/** Refit a ship with everything its power has researched: its hull grows with any new armor. */
+export function refitShip(s, fid, ship) {
+  const was = shipStats(s, fid, ship.type, ship).hull;
+  ship.fit = currentFit(s, fid);
+  ship.hull = Math.max(1, ship.hull + Math.max(0, shipStats(s, fid, ship.type, ship).hull - was));
+}
+const newShip = (s, owner, type) => { const x = { type, hull: shipStats(s, owner, type).hull }; if (s.factions.some((F) => F.id === owner)) x.fit = currentFit(s, owner); return x; };
+export function shipStats(s, fid, type, ship) {
   const base = SHIPS[type], warship = base.skill > 0;
   // The Heart of the Wardens grows with the galaxy it wakes in (crisis.js): more hull, more guns.
   if (type === "heart") { const m = (s.crisis && s.crisis.m) || 1; return { ...base, hull: s.crisis && s.crisis.heartMax || base.hull * m, shots: 1 + m }; }
+  // Research comes through the ship's own systems (fitOf); a people's traits and relics reach every ship at once.
+  const k = fitOf(s, fid, ship);
   return { ...base,
-    speed: base.speed + (has(s, fid, "foldDrives") ? 1 : 0) + (fid === "vael" ? 1 : 0) + (base.speed > 0 && relicHeld(s, fid, "anchor") ? 1 : 0),
-    hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0) + (warship && proto(s, fid, "plating") ? 1 : 0) + (warship ? advLevel(s, fid, "armor") : 0),
-    skill: warship ? base.skill + (has(s, fid, "targeting") ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (proto(s, fid, "lances") ? 1 : 0) + advLevel(s, fid, "fireControl") : 0,
-    sensors: base.sensors + (has(s, fid, "sensors") ? 1 : 0) + (proto(s, fid, "scanners") ? 1 : 0) + (relicHeld(s, fid, "oracle") ? 2 : 0),
+    speed: base.speed + (k.foldDrives ? 1 : 0) + (fid === "vael" ? 1 : 0) + (base.speed > 0 && relicHeld(s, fid, "anchor") ? 1 : 0),
+    hull: base.hull + (warship && k.shields ? 1 : 0) + (warship && k.plating ? 1 : 0) + (warship ? k.armor || 0 : 0),
+    skill: warship ? base.skill + (k.targeting ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (k.lances ? 1 : 0) + (k.fireControl || 0) : 0,
+    sensors: base.sensors + (k.sensors ? 1 : 0) + (k.scanners ? 1 : 0) + (relicHeld(s, fid, "oracle") ? 2 : 0),
     troops: (base.troops || 0) * (fid === "hegemony" ? 2 : 1),
     cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * (proto(s, fid, "drones") ? 0.9 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1)) };
 }
@@ -111,7 +138,7 @@ export { cargoOf };
 export function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hulls (the Vael) feed themselves
 // ---- fuel ----
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
-export const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) || f.owner === "traders" ? Infinity : Math.min(...f.ships.map((x) => SHIPS[x.type].fuel || 99)) + 2 * advLevel(s, f.owner, "tanks"));
+export const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) || f.owner === "traders" ? Infinity : Math.min(...f.ships.map((x) => (SHIPS[x.type].fuel || 99) + 2 * (fitOf(s, f.owner, x).tanks || 0))));
 export const fuelOf = (s, f) => Math.min(fuelMax(s, f), f.fuel ?? fuelMax(s, f));
 /** Buy a Fuel depot at an outpost of yours, with credits (an outpost has no industry). */
 export function buildDepot(s, fid, sysId) {
@@ -131,27 +158,6 @@ export function outpostSales(s, sys) {
   const pumps = (c.buildings.depot || c.buildings.station) && !(c.depotCut > s.turn);
   const fuel = pumps ? OUTPOST_TRADE.fuel + (sys.world === "gas" ? OUTPOST_TRADE.gas : 0) : 0, exotics = sys.exotics ? OUTPOST_TRADE.exotics : 0;
   return { fuel, exotics, total: OUTPOST_TRADE.base + fuel + exotics };
-}
-/** Refits at a drydock: for each ship type in the fleet that can go up a class, { from, to, credits, exotics }. */
-export function refitOptions(s, fleetId) {
-  const f = s.fleets[fleetId], sys = f && s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
-  if (!sys || !sys.colony || sys.colony.owner !== f.owner || !sys.colony.buildings.drydock || besieged(s, sys)) return [];
-  return [...new Set(f.ships.map((x) => x.type))].filter((t) => YARDS.refits[t] && (!SHIPS[YARDS.refits[t]].needs || has(s, f.owner, SHIPS[YARDS.refits[t]].needs))).map((t) => {
-    const to = YARDS.refits[t];
-    return { from: t, to, credits: Math.round(Math.max(0, shipStats(s, f.owner, to).cost - shipStats(s, f.owner, t).cost) * (1 - YARDS.discount) * YARDS.refitRate), exotics: Math.max(0, (SHIPS[to].exotics || 0) - (SHIPS[t].exotics || 0)) };
-  });
-}
-/** Refit one ship of type `from` in this fleet to the next class up, at once: it comes out of the yard at full hull. */
-export function refit(s, fleetId, from) {
-  const f = s.fleets[fleetId], o = refitOptions(s, fleetId).find((x) => x.from === from), F = f && faction(s, f.owner);
-  if (!o) return { error: "Refits need a drydock of yours, with no enemy warships in orbit, and the technology for the bigger class." };
-  if (F.credits < o.credits) return { error: `The refit costs ${o.credits} credits.` };
-  if (F.exotics < o.exotics) return { error: `The refit needs ${o.exotics} exotics.` };
-  const ship = f.ships.filter((x) => x.type === from).sort((a, b) => a.hull - b.hull)[0];
-  F.credits = round1(F.credits - o.credits); F.exotics -= o.exotics;
-  ship.type = o.to; ship.hull = shipStats(s, f.owner, o.to).hull;
-  log(s, f.owner, `A ${SHIPS[from].name.toLowerCase()} came out of the drydock at ${s.systems[s.sysAt[f.at]].name} a ${SHIPS[o.to].name.toLowerCase()}.`, "build");
-  return { ok: true, to: o.to };
 }
 /** What an outpost of yours can buy with credits: the `anywhere` buildings it hasn't got, whose technology you have. */
 export function outpostOptions(s, sysId) {
@@ -268,10 +274,10 @@ function admiralsAfterBattle(s, fleets, outcome, at, R) {
 
 export function spawnFleet(s, owner, at, types) {
   const id = "f" + s.nextId++;
-  s.fleets[id] = { id, owner, at, ships: types.map((t) => ({ type: t, hull: shipStats(s, owner, t).hull })), path: [], dest: null };
+  s.fleets[id] = { id, owner, at, ships: types.map((t) => newShip(s, owner, t)), path: [], dest: null };
   return s.fleets[id];
 }
-export const fleetSpeed = (s, f) => Math.min(...f.ships.map((x) => shipStats(s, f.owner, x.type).speed)) + (admTrait(f, "swift") && f.ships.every((x) => SHIPS[x.type].speed > 0) ? 1 : 0);
+export const fleetSpeed = (s, f) => Math.min(...f.ships.map((x) => shipStats(s, f.owner, x.type, x).speed)) + (admTrait(f, "swift") && f.ships.every((x) => SHIPS[x.type].speed > 0) ? 1 : 0);
 export const armed = (f) => f.ships.some((x) => SHIPS[x.type].skill > 0);
 
 // ---- worlds ----
@@ -699,7 +705,7 @@ function battles(s) {
     if (!list.some((a) => list.some((b) => atWar(s, a, b)))) continue;
     // Units: ships, and the world's guns.
     const units = [];
-    for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type) });
+    for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type, sh) });
     const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
     if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat || sys.colony.buildings.station ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : sys.colony.buildings.station ? "Orbital station" : "Orbital guns" } }); }
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
@@ -844,7 +850,7 @@ export function propose(s, from, to, what) {
   return { ok: true, accepted: !!yes };
 }
 export function militaryPower(s, fid) {
-  return fleetsOf(s, fid).reduce((t, f) => t + f.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? shipStats(s, fid, x.type).hull * SHIPS[x.type].dmg * 2 : 0), 0), 0);
+  return fleetsOf(s, fid).reduce((t, f) => t + f.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? shipStats(s, fid, x.type, x).hull * SHIPS[x.type].dmg * 2 : 0), 0), 0);
 }
 
 // ---- seeing ----
@@ -874,7 +880,7 @@ export function updateVision(s, F) {
   const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; if (!F.explored[k] && !F.ai && s.sysAt[k]) charted.push(s.systems[s.sysAt[k]]); F.explored[k] = 1; } };
   const bonus = has(s, F.id, "sensors") ? 1 : 0;
   for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus + (sys.colony.buildings.station ? 2 : 0));
-  for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type).sensors)));
+  for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type, x).sensors)));
   // Allies share what their worlds see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && allied(s, F.id, o.id)) for (const sys of coloniesOf(s, o.id)) see(sys.at, 1);
   F.visible = vis;
@@ -965,12 +971,10 @@ function economy(s, F) {
     const tech = researchItem(s, F.id);
     if (tech && tech.adv && R.progress >= tech.cost) {
       R.progress -= tech.cost; R.adv = R.adv || {}; R.adv[tech.adv] = tech.level; R.current = null;
-      log(s, F.id, `${F.name} reached ${tech.name}: ${tech.text}`, "research");
-      if (tech.adv === "armor") for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) x.hull += 1;
+      log(s, F.id, `${F.name} reached ${tech.name}: ${tech.text}${["sensors", "foldDrives", "shields", "targeting", "armor", "fireControl", "tanks"].includes(tech.adv || tech.id) ? " New ships are built with it; ships already in service get it at a drydock." : ""}`, "research");
     } else if (tech && !tech.adv && R.progress >= tech.cost) {
       R.progress -= tech.cost; R.done.push(tech.id); R.current = null;
-      log(s, F.id, `${F.name} discovered ${tech.name}: ${tech.text}`, "research");
-      if (tech.id === "shields") for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) x.hull += 1;
+      log(s, F.id, `${F.name} discovered ${tech.name}: ${tech.text}${["sensors", "foldDrives", "shields", "targeting", "armor", "fireControl", "tanks"].includes(tech.adv || tech.id) ? " New ships are built with it; ships already in service get it at a drydock." : ""}`, "research");
     }
   }
   // Pirate, creature and Warden ships were never anyone's to build (an old bug listed them): any queued are struck off,
@@ -980,6 +984,8 @@ function economy(s, F) {
     if (bad.length) { c.queue = c.queue.filter((q) => !bad.includes(q)); c.stock += bad.reduce((n, q) => n + q.progress, 0); }
   }
   for (const f of fleetsOf(s, F.id)) { f.ships = f.ships.filter((x) => !SHIPS[x.type].wild && !SHIPS[x.type].warden && !SHIPS[x.type].trader); if (!f.ships.length) delete s.fleets[f.id]; }
+  // Ships from before systems were fitted one by one keep what they had: today's research.
+  for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (!x.fit) x.fit = currentFit(s, F.id);
   // Each world: production, growth, defenses.
   for (const sys of coloniesOf(s, F.id)) {
     const c = sys.colony, y = yields(s, sys);
@@ -1008,7 +1014,7 @@ function economy(s, F) {
             else { nf.muster = musterKind(q.id); q.mustered = dest.name; }
           } else {
             const here = (warship && fleetsAt(s, sys.at).find((f) => f.owner === F.id && !f.path.length && f.ships.every((x) => SHIPS[x.type].skill > 0))) || spawnFleet(s, F.id, sys.at, []);
-            here.ships.push({ type: q.id, hull: shipStats(s, F.id, q.id).hull });
+            here.ships.push(newShip(s, F.id, q.id));
           }
           F.stats.built++;
         } else {
@@ -1053,7 +1059,9 @@ function economy(s, F) {
     // A drydock repairs to full; a station 2 a turn; any world of yours (and the Vael, a shipwright, the Living Keel) 1.
     const here = home && s.systems[s.sysAt[f.at]], free = here && !besieged(s, here);
     const step = free && here.colony.buildings.drydock ? Infinity : free && here.colony.buildings.station ? YARDS.station : 1;
-    if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type).hull, x.hull + (home ? step : 1));
+    // A drydock refits every ship there with what's been researched since it was built.
+    if (free && here.colony.buildings.drydock) { const n = f.ships.filter((x) => missingFit(s, F.id, x).length).length; if (n) { for (const x of f.ships) refitShip(s, F.id, x); if (!F.ai) log(s, F.id, `${n} ship${n === 1 ? "" : "s"} refitted at the drydock at ${here.name}: their systems are up to date.`, "build"); } }
+    if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
   if (s.turn % SCIENCE.observatoryEvery === 0) for (const sys of coloniesOf(s, F.id)) {

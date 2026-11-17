@@ -901,8 +901,7 @@ test("outposts sell fuel and exotics for credits, and fuel to passing convoys; n
   assert.equal(outpostSales(s, o).total, 0);
 });
 
-test("yards: a station repairs 2 a turn, a drydock to full; a drydock builds 15% cheaper and refits ships up a class", async () => {
-  const { refitOptions, refit } = await import("../src/game.js");
+test("yards: a station repairs 2 a turn, a drydock to full; a drydock builds 15% cheaper", async () => {
   const { YARDS } = await import("../src/data.js");
   const s = newGame({ seed: 29, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
   me.research.done.push("heavyHulls", "orbitalYards");
@@ -914,13 +913,29 @@ test("yards: a station repairs 2 a turn, a drydock to full; a drydock builds 15%
   cap.colony.buildings.drydock = true; f.ships[0].hull = 1; endTurn(s);
   assert.equal(f.ships[0].hull, full, "a drydock: to full");
   assert.equal(buildOptions(s, cap).find((o) => o.id === "frigate").cost, Math.round(plain * (1 - YARDS.discount)));
-  const g = spawnFleet(s, "concord", cap.at, ["frigate"]);
-  const o = refitOptions(s, g.id).find((x) => x.from === "frigate");
-  assert.ok(o && o.to === "cruiser");
-  me.credits = 1000; me.exotics = 5;
-  assert.ok(refit(s, g.id, "frigate").ok);
-  assert.equal(g.ships[0].type, "cruiser"); assert.equal(g.ships[0].hull, full);
-  assert.equal(me.credits, 1000 - o.credits); assert.equal(me.exotics, 5 - o.exotics);
-  assert.ok(!refitOptions(s, g.id).some((x) => x.from === "cruiser"), "a dreadnought needs Capital ships");
-  delete cap.colony.buildings.drydock; assert.equal(refitOptions(s, g.id).length, 0, "no drydock, no refits");
+});
+
+test("research reaches existing ships only at a drydock; new ships are built with it", async () => {
+  const { missingFit, fleetSpeed } = await import("../src/game.js");
+  const s = newGame({ seed: 30, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
+  const old = spawnFleet(s, "concord", cap.at, ["frigate"]), x = old.ships[0];
+  const h0 = shipStats(s, "concord", "frigate", x).hull, k0 = shipStats(s, "concord", "frigate", x).skill, v0 = fleetSpeed(s, old);
+  me.research.done.push("shields", "targeting", "foldDrives");
+  assert.equal(shipStats(s, "concord", "frigate", x).hull, h0, "the old ship hasn't got the shields");
+  assert.equal(shipStats(s, "concord", "frigate", x).skill, k0); assert.equal(fleetSpeed(s, old), v0);
+  assert.deepEqual(missingFit(s, "concord", x).sort(), ["Deflector shields", "Fold drives", "Targeting computers"]);
+  const neu = spawnFleet(s, "concord", cap.at, ["frigate"]);
+  assert.equal(shipStats(s, "concord", "frigate", neu.ships[0]).hull, h0 + 1, "a new ship has them");
+  assert.equal(missingFit(s, "concord", neu.ships[0]).length, 0);
+  // At a world without a drydock: nothing changes.
+  endTurn(s); assert.ok(missingFit(s, "concord", x).length);
+  // At a drydock: refitted, with the new armor added to its hull.
+  me.research.done.push("orbitalYards"); cap.colony.buildings.drydock = true;
+  const before = x.hull; endTurn(s);
+  assert.equal(missingFit(s, "concord", x).length, 0);
+  assert.equal(shipStats(s, "concord", "frigate", x).skill, k0 + 1);
+  assert.ok(x.hull >= before + 1 || x.hull === shipStats(s, "concord", "frigate", x).hull);
+  // New research again: the ship is out of date until its next visit.
+  const y = spawnFleet(s, "concord", cap.at, ["frigate"]).ships[0]; me.research.adv = { armor: 1 };
+  assert.ok(missingFit(s, "concord", y).includes("Composite armor"));
 });

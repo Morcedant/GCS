@@ -39,7 +39,7 @@ export const BUILDINGS = {
   depot: { name: "Fuel depot", cost: 60, upkeep: 1, outpost: true, text: "Processes the system's volatiles into fuel: the outpost gives supply, and fleets refuel here." },
   barracks: { name: "Garrison barracks", cost: 60, upkeep: 0.5, text: "+3 to the garrison against invasion, and a siege wears it down to no less than 80%." },
   observatory: { name: "Deep-space observatory", cost: 80, upkeep: 1, needs: "sensors", text: "+3 science, and it studies one anomaly within 4 hexes every few turns, without a ship." },
-  drydock: { name: "Drydock", cost: 90, upkeep: 1, needs: "orbitalYards", text: "The home yard: your ships here are repaired to full every turn, ships built here cost 15% less, and ships here can be refitted to a bigger class (a frigate into a cruiser, a cruiser into a dreadnought)." },
+  drydock: { name: "Drydock", cost: 90, upkeep: 1, needs: "orbitalYards", text: "The home yard: research reaches your existing ships only here (they're refitted with it the turn they spend here); ships here are repaired to full every turn, and ships built here cost 15% less." },
   habitat: { name: "Orbital habitat", cost: 110, upkeep: 1, needs: "domes", text: "+2 population room on this world." },
   refinery: { name: "Exotics refinery", cost: 90, upkeep: 1, needs: "refining", text: "+1 exotics if the system has a deposit." },
   engine: { name: "The Corridor Engine", cost: 1200, upkeep: 0, needs: "engine", exotics: 15, wonder: true,
@@ -156,8 +156,8 @@ export const SUPPLY = { range: 3, graceTurns: 1 };
  * at `rate` credits per point of the building's cost. */
 export const OUTPOST_BUY = { rate: 1.5 };
 /** Yards: a station repairs `station` hull a turn; a drydock repairs to full, takes `discount` off ships built there, and
- * refits a ship to the next class up for the difference in cost (in credits, at `refitRate` per point) and exotics. */
-export const YARDS = { station: 2, discount: 0.15, refitRate: 1.5, refits: { frigate: "cruiser", cruiser: "dreadnought" } };
+ * refits ships with what's been researched since they were built (game.js refitShip): nowhere else can. */
+export const YARDS = { station: 2, discount: 0.15 };
 /** What an outpost sells: fuel (with a fuel depot or a station; more from a gas giant's volatiles), exotics (from a
  * deposit), and fuel to each passing merchant convoy. Nothing while blockaded, or while a raided depot is dry. */
 export const OUTPOST_TRADE = { base: 0.5, fuel: 2, gas: 1, exotics: 2, convoy: 2 };
