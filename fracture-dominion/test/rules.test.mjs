@@ -939,3 +939,31 @@ test("research reaches existing ships only at a drydock; new ships are built wit
   const y = spawnFleet(s, "concord", cap.at, ["frigate"]).ships[0]; me.research.adv = { armor: 1 };
   assert.ok(missingFit(s, "concord", y).includes("Composite armor"));
 });
+
+test("sending out-of-date ships to drydock: a whole fleet, only its old ships, every one at once, or by standing order", async () => {
+  const { needsRefit, sendToDrydock, sendAllToDrydock, nearestDrydock } = await import("../src/game.js");
+  const s = newGame({ seed: 31, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
+  const away = Object.values(s.systems).find((x) => !x.colony && distance(x.at, cap.at) >= 3 && findPath(s, "concord", x.at, cap.at));
+  const f = spawnFleet(s, "concord", away.at, ["frigate", "frigate"]);
+  me.research.done.push("shields");
+  f.ships.push(spawnFleet(s, "concord", away.at, ["frigate"]).ships[0]); for (const g of fleetsAt(s, away.at)) if (g !== f) delete s.fleets[g.id];
+  assert.ok(needsRefit(s, f));
+  assert.ok(sendToDrydock(s, f.id).error, "no drydock yet");
+  me.research.done.push("orbitalYards"); cap.colony.buildings.drydock = true;
+  assert.equal(nearestDrydock(s, "concord", away.at), cap);
+  // Only the old ones: split off and sent; the new frigate stays.
+  const r = sendToDrydock(s, f.id, true);
+  assert.ok(r.ok && r.split && r.ships === 2);
+  assert.equal(f.ships.length, 1); assert.equal(s.fleets[r.fleet].dest, cap.at);
+  // Everything at once.
+  const g = spawnFleet(s, "concord", away.at, ["frigate"]); g.ships[0].fit = { ...g.ships[0].fit, shields: false };
+  const all = sendAllToDrydock(s, "concord"); assert.ok(all.ships >= 1 && s.fleets[g.id].dest === cap.at);
+  // The standing order: an idle fleet goes by itself; one holding position doesn't.
+  const h = spawnFleet(s, "concord", away.at, ["frigate"]); h.ships[0].fit = { ...h.ships[0].fit, shields: false };
+  const k = spawnFleet(s, "concord", away.at, ["frigate"]); k.ships[0].fit = { ...k.ships[0].fit, shields: false }; k.sentry = true;
+  me.autoRefit = true; endTurn(s);
+  const hs = h.ships[0], hf = Object.values(s.fleets).find((x) => x.ships.includes(hs));
+  assert.ok(hf && (hf.dest === cap.at || hf.at === cap.at), "sent (it may have joined the others on the way)");
+  const kf = Object.values(s.fleets).find((x) => x.ships.includes(k.ships[0]));
+  assert.ok(kf && kf.at === away.at, "holding position");
+});

@@ -93,8 +93,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   Deflector shields, Targeting computers, the Ablative plating, Fold lances and Long-range scanners prototypes, and the
   Composite armor, Fire control and Drive tuning advances. Ships built later have the new research; ships already in
   service get it only by ending a turn at a Drydock of yours (not while enemy warships hold its orbit), where they're
-  refitted at no cost, new armor added to their hull. A people's traits and relics reach every ship at once. A fleet's
-  panel says which of its ships need a refit, and where the nearest drydock is. The computer powers research Orbital
+  refitted at no cost, new armor added to their hull. A people's traits and relics reach every ship at once. Fleets with
+  out-of-date ships are tagged ⚙ in the Empire tab's fleet list, under a Refits card that counts them and sends them all
+  (split off their fleets) to the nearest drydock in one click; a standing order there sends idle fleets by
+  themselves. A fleet's panel says which ships need a refit and sends the fleet, or only its old ships, to the drydock. The computer powers research Orbital
   shipyards early, build a drydock at the capital, and send out-of-date fleets there before going on the attack.
 - **Outpost trade:** an outpost earns 0.5 credits a turn, +2 selling fuel with a fuel depot or station (+1 more on a
   gas giant, for its volatiles), +2 exporting exotics from a deposit, and +2 from each merchant convoy that refuels

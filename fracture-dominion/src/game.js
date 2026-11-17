@@ -92,6 +92,34 @@ export function refitShip(s, fid, ship) {
   ship.fit = currentFit(s, fid);
   ship.hull = Math.max(1, ship.hull + Math.max(0, shipStats(s, fid, ship.type, ship).hull - was));
 }
+/** A fleet with ships that need a refit. */
+export const needsRefit = (s, f) => f.ships.some((x) => missingFit(s, f.owner, x).length);
+/** The nearest drydock of a power's that can refit now (no enemy warships in its orbit), or null. */
+export const nearestDrydock = (s, fid, hex) => coloniesOf(s, fid).filter((x) => x.colony.buildings.drydock && !besieged(s, x)).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0] || null;
+/** Send a fleet to the nearest drydock for a refit; with onlyOld, split off just its out-of-date ships and send those. */
+export function sendToDrydock(s, fleetId, onlyOld = false) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  const dock = nearestDrydock(s, f.owner, f.at);
+  if (!dock) return { error: "You have no drydock that can refit now: build one (Orbital shipyards) at a colony." };
+  if (!needsRefit(s, f)) return { error: "These ships are up to date." };
+  if (f.at === dock.at) return { error: `They're at the drydock at ${dock.name}: they're refitted at the end of the turn.` };
+  let go = f;
+  const old = f.ships.filter((x) => missingFit(s, f.owner, x).length);
+  if (onlyOld && old.length < f.ships.length) {
+    const fu = fuelOf(s, f); f.ships = f.ships.filter((x) => !old.includes(x));
+    go = spawnFleet(s, f.owner, f.at, []); go.ships.push(...old); go.fuel = Math.min(fu, fuelMax(s, go)); if (f.stance) go.stance = f.stance;
+  }
+  const r = setDestination(s, go.id, dock.at);
+  if (r.error) { if (go !== f) { f.ships.push(...go.ships); delete s.fleets[go.id]; } return { error: `No way to ${dock.name} from here.` }; }
+  go.sentry = false; go.refitTrip = true;
+  return { ok: true, fleet: go.id, dock: dock.name, turns: r.turns, ships: go.ships.length, split: go !== f };
+}
+/** Every out-of-date ship of a power's, split off its fleet and sent to the nearest drydock. Returns how many ships. */
+export function sendAllToDrydock(s, fid) {
+  let n = 0, fleets = 0;
+  for (const f of fleetsOf(s, fid)) { if (!needsRefit(s, f) || f.refitTrip && f.path.length) continue; const r = sendToDrydock(s, f.id, true); if (r.ok) { n += r.ships; fleets++; } }
+  return { ok: true, ships: n, fleets };
+}
 const newShip = (s, owner, type) => { const x = { type, hull: shipStats(s, owner, type).hull }; if (s.factions.some((F) => F.id === owner)) x.fit = currentFit(s, owner); return x; };
 export function shipStats(s, fid, type, ship) {
   const base = SHIPS[type], warship = base.skill > 0;
@@ -923,6 +951,8 @@ export function updateVision(s, F) {
 export function endTurn(s, aiTurn) {
   if (s.winner) return;
   for (const F of s.factions) if (F.ai && F.alive && aiTurn) aiTurn(s, F);
+  // The standing order: idle fleets with out-of-date ships go to the nearest drydock (not ones told to hold).
+  for (const F of s.factions) if (!F.ai && F.alive && F.autoRefit) for (const f of fleetsOf(s, F.id)) if (!f.path.length && !f.sentry && needsRefit(s, f)) sendToDrydock(s, f.id);
   moveFleets(s);
   joinMustered(s);
   battles(s);
@@ -1060,7 +1090,7 @@ function economy(s, F) {
     const here = home && s.systems[s.sysAt[f.at]], free = here && !besieged(s, here);
     const step = free && here.colony.buildings.drydock ? Infinity : free && here.colony.buildings.station ? YARDS.station : 1;
     // A drydock refits every ship there with what's been researched since it was built.
-    if (free && here.colony.buildings.drydock) { const n = f.ships.filter((x) => missingFit(s, F.id, x).length).length; if (n) { for (const x of f.ships) refitShip(s, F.id, x); if (!F.ai) log(s, F.id, `${n} ship${n === 1 ? "" : "s"} refitted at the drydock at ${here.name}: their systems are up to date.`, "build"); } }
+    if (free && here.colony.buildings.drydock) { const n = f.ships.filter((x) => missingFit(s, F.id, x).length).length; if (n) { for (const x of f.ships) refitShip(s, F.id, x); f.refitTrip = false; if (!F.ai) log(s, F.id, `${n} ship${n === 1 ? "" : "s"} refitted at the drydock at ${here.name}: their systems are up to date.`, "build"); } }
     if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).

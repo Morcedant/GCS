@@ -175,6 +175,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
   #to-panel { display: inline-block; }   /* jumps down to the panel below the map */
 }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+  .tag-refit { font-size: 11px; color: #e0a050; border: 1px solid currentColor; border-radius: 8px; padding: 0 5px; margin-left: 4px; white-space: nowrap; }
 </style>
 
 <div id="app" hidden>
@@ -201,7 +202,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 21:54 UTC";
+const BUILD = "2026-11-17 21:56 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -797,6 +798,34 @@ function refitShip(s, fid, ship) {
   const was = shipStats(s, fid, ship.type, ship).hull;
   ship.fit = currentFit(s, fid);
   ship.hull = Math.max(1, ship.hull + Math.max(0, shipStats(s, fid, ship.type, ship).hull - was));
+}
+/** A fleet with ships that need a refit. */
+const needsRefit = (s, f) => f.ships.some((x) => missingFit(s, f.owner, x).length);
+/** The nearest drydock of a power's that can refit now (no enemy warships in its orbit), or null. */
+const nearestDrydock = (s, fid, hex) => coloniesOf(s, fid).filter((x) => x.colony.buildings.drydock && !besieged(s, x)).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0] || null;
+/** Send a fleet to the nearest drydock for a refit; with onlyOld, split off just its out-of-date ships and send those. */
+function sendToDrydock(s, fleetId, onlyOld = false) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  const dock = nearestDrydock(s, f.owner, f.at);
+  if (!dock) return { error: "You have no drydock that can refit now: build one (Orbital shipyards) at a colony." };
+  if (!needsRefit(s, f)) return { error: "These ships are up to date." };
+  if (f.at === dock.at) return { error: `They're at the drydock at ${dock.name}: they're refitted at the end of the turn.` };
+  let go = f;
+  const old = f.ships.filter((x) => missingFit(s, f.owner, x).length);
+  if (onlyOld && old.length < f.ships.length) {
+    const fu = fuelOf(s, f); f.ships = f.ships.filter((x) => !old.includes(x));
+    go = spawnFleet(s, f.owner, f.at, []); go.ships.push(...old); go.fuel = Math.min(fu, fuelMax(s, go)); if (f.stance) go.stance = f.stance;
+  }
+  const r = setDestination(s, go.id, dock.at);
+  if (r.error) { if (go !== f) { f.ships.push(...go.ships); delete s.fleets[go.id]; } return { error: `No way to ${dock.name} from here.` }; }
+  go.sentry = false; go.refitTrip = true;
+  return { ok: true, fleet: go.id, dock: dock.name, turns: r.turns, ships: go.ships.length, split: go !== f };
+}
+/** Every out-of-date ship of a power's, split off its fleet and sent to the nearest drydock. Returns how many ships. */
+function sendAllToDrydock(s, fid) {
+  let n = 0, fleets = 0;
+  for (const f of fleetsOf(s, fid)) { if (!needsRefit(s, f) || f.refitTrip && f.path.length) continue; const r = sendToDrydock(s, f.id, true); if (r.ok) { n += r.ships; fleets++; } }
+  return { ok: true, ships: n, fleets };
 }
 const newShip = (s, owner, type) => { const x = { type, hull: shipStats(s, owner, type).hull }; if (s.factions.some((F) => F.id === owner)) x.fit = currentFit(s, owner); return x; };
 function shipStats(s, fid, type, ship) {
@@ -1629,6 +1658,8 @@ function updateVision(s, F) {
 function endTurn(s, aiTurn) {
   if (s.winner) return;
   for (const F of s.factions) if (F.ai && F.alive && aiTurn) aiTurn(s, F);
+  // The standing order: idle fleets with out-of-date ships go to the nearest drydock (not ones told to hold).
+  for (const F of s.factions) if (!F.ai && F.alive && F.autoRefit) for (const f of fleetsOf(s, F.id)) if (!f.path.length && !f.sentry && needsRefit(s, f)) sendToDrydock(s, f.id);
   moveFleets(s);
   joinMustered(s);
   battles(s);
@@ -1766,7 +1797,7 @@ function economy(s, F) {
     const here = home && s.systems[s.sysAt[f.at]], free = here && !besieged(s, here);
     const step = free && here.colony.buildings.drydock ? Infinity : free && here.colony.buildings.station ? YARDS.station : 1;
     // A drydock refits every ship there with what's been researched since it was built.
-    if (free && here.colony.buildings.drydock) { const n = f.ships.filter((x) => missingFit(s, F.id, x).length).length; if (n) { for (const x of f.ships) refitShip(s, F.id, x); if (!F.ai) log(s, F.id, `${n} ship${n === 1 ? "" : "s"} refitted at the drydock at ${here.name}: their systems are up to date.`, "build"); } }
+    if (free && here.colony.buildings.drydock) { const n = f.ships.filter((x) => missingFit(s, F.id, x).length).length; if (n) { for (const x of f.ships) refitShip(s, F.id, x); f.refitTrip = false; if (!F.ai) log(s, F.id, `${n} ship${n === 1 ? "" : "s"} refitted at the drydock at ${here.name}: their systems are up to date.`, "build"); } }
     if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
@@ -3779,12 +3810,16 @@ function systemHTML() {
 /** The Empire tab's fleets: war fleets and the rest, each a row with where it is; a long list folds away. */
 function fleetListHTML(me) {
   const all = fleetsOf(S, me.id), row = (f) => { const sid = S.sysAt[f.at];
-    return `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}<\/span>` : ""}<span class="small muted"> · ${sid ? esc(S.systems[sid].name) : "deep space"}${f.path.length ? ", moving" : ", idle"}<\/span><\/button>`; };
+    return `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${needsRefit(S, f) ? ` <span class="tag-refit" title="Ships in this fleet need a refit at a drydock">⚙ refit${f.refitTrip && f.path.length ? " (on the way)" : ""}<\/span>` : ""}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}<\/span>` : ""}<span class="small muted"> · ${sid ? esc(S.systems[sid].name) : "deep space"}${f.path.length ? ", moving" : ", idle"}<\/span><\/button>`; };
   const war = all.filter(armed), other = all.filter((f) => !armed(f));
   const group = (title, list, open) => !list.length ? "" : list.length > 6
     ? `<details class="fleet-group"${open ? " open" : ""}><summary><b>${title} (${list.length})<\/b> <span class="small muted">${list.reduce((t, f) => t + f.ships.length, 0)} ships<\/span><\/summary>${list.map(row).join("")}<\/details>`
     : `<p class="small"><b>${title} (${list.length})<\/b><\/p>${list.map(row).join("")}`;
-  return `<h3>Fleets (${all.length})<\/h3>${group("War fleets", war, war.length <= 12)}${group("Scouts, transports and colony ships", other, false)}`;
+  const oldShips = all.reduce((t, f) => t + f.ships.filter((x) => missingFit(S, me.id, x).length).length, 0), oldFleets = all.filter((f) => needsRefit(S, f)), dock = coloniesOf(S, me.id).some((x) => x.colony.buildings.drydock);
+  const refits = `<div class="card refits"><p class="small"><b>Refits:<\/b> ${oldShips ? `${oldShips} ship${oldShips === 1 ? "" : "s"} in ${oldFleets.length} fleet${oldFleets.length === 1 ? "" : "s"} ${oldShips === 1 ? "is" : "are"} out of date (⚙ below).` : "every ship is up to date."}${dock ? "" : " You have no Drydock yet (Orbital shipyards): research reaches ships in service only there."}<\/p>
+    <div class="btn-row">${oldShips && dock ? `<button class="btn primary" data-alldock>Send all out-of-date ships to drydock<\/button>` : ""}<button class="btn" data-autorefit>${me.autoRefit ? "✓ " : ""}Standing order: idle fleets go for refits<\/button><\/div>
+    <p class="small muted">"Send all" splits the out-of-date ships off their fleets. The standing order sends whole fleets, but only idle ones (not those holding position).<\/p><\/div>`;
+  return `<h3>Fleets (${all.length})<\/h3>${refits}${group("War fleets", war, war.length <= 12)}${group("Scouts, transports and colony ships", other, false)}`;
 }
 function fleetName(f) {
   const counts = {}; for (const x of f.ships) counts[x.type] = (counts[x.type] || 0) + 1;
@@ -3841,7 +3876,9 @@ function fleetHTML() {
   // Systems: research reaches a ship only at a drydock.
   if (mine) { const old = f.ships.filter((x) => missingFit(S, me.id, x).length);
     if (old.length) { const miss = [...new Set(old.flatMap((x) => missingFit(S, me.id, x)))], dock = coloniesOf(S, me.id).filter((x) => x.colony.buildings.drydock).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
-      h += `<p class="small bad"><b>Refit needed:<\/b> ${old.length} of these ships ${old.length === 1 ? "lacks" : "lack"} ${esc(miss.join(", "))}. ${dock ? `End a turn at the drydock at ${esc(dock.name)} (${distance(dock.at, f.at)} hexes) and they're refitted.` : "Build a Drydock (Orbital shipyards) at a colony: research reaches existing ships only there."}<\/p>`; } }
+      const atDock = dock && dock.at === f.at;
+      h += `<p class="small bad"><b>Refit needed:<\/b> ${old.length} of these ships ${old.length === 1 ? "lacks" : "lack"} ${esc(miss.join(", "))}. ${atDock ? `They're at the drydock at ${esc(dock.name)}: refitted at the end of this turn.` : dock ? `The nearest drydock is at ${esc(dock.name)}, ${distance(dock.at, f.at)} hexes away.` : "Build a Drydock (Orbital shipyards) at a colony: research reaches existing ships only there."}<\/p>`
+        + (dock && !atDock ? `<div class="btn-row"><button class="btn primary" data-todock="all">Send the fleet to ${esc(dock.name)}<\/button>${old.length < f.ships.length ? `<button class="btn" data-todock="old">Send only the ${old.length} out of date<\/button>` : ""}<\/div>` : ""); } }
   // Raiding an enemy's fuel depot.
   if (canRaidDepot(S, f.id)) h += `<h3>Their fuel depot<\/h3><p class="small muted" style="margin-top:-4px">Take its fuel: this fleet and its tankers fill up, and the depot gives them no supply for ${DEPOT_RAID.cut} turns.<\/p><button class="btn wide" data-depotraid>Raid the depot<\/button>`;
   // The Corridor Engine's gate (an open game): from the Engine world to any of your worlds.
@@ -4203,6 +4240,9 @@ function bindChrome() {
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.relic) { const r = useRelic(S, me.id, d.relic); if (r.error) toast(r.error, true); else { toast(`The Outer Reach is open: ${r.systems} new systems beyond the rim.`); draw(); } }
     else if (d.shard) { const r = useRelic(S, me.id, "shard", { from: sel.id, to: d.shard }); if (r.error) toast(r.error, true); else toast(`A new corridor: ${S.systems[sel.id].name} to ${S.systems[d.shard].name}.`); }
+    else if (d.todock) { const r = sendToDrydock(S, sel.id, d.todock === "old"); if (r.error) toast(r.error, true); else { toast(`${r.ships} ship${r.ships === 1 ? "" : "s"} on the way to the drydock at ${r.dock}${r.turns ? `: ${r.turns} turn${r.turns === 1 ? "" : "s"}` : ""}.`); if (r.split) sel = { kind: "fleet", id: r.fleet }; } }
+    else if (d.alldock !== undefined) { const r = sendAllToDrydock(S, me.id); toast(r.ships ? `${r.ships} out-of-date ship${r.ships === 1 ? "" : "s"} from ${r.fleets} fleet${r.fleets === 1 ? "" : "s"} on the way to drydock.` : "Nothing to send: no drydock can take them, or they're already on the way.", !r.ships); }
+    else if (d.autorefit !== undefined) { me.autoRefit = !me.autoRefit; toast(me.autoRefit ? "Standing order: idle fleets with out-of-date ships go to the nearest drydock." : "Standing order cancelled: fleets go for refits only when you send them."); }
     else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }

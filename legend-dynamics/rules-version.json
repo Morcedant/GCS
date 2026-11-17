@@ -6,6 +6,17 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: sending ships for refits",
+      "items": [
+        "The Empire tab has a Refits card that counts your out-of-date ships, and a ⚙ refit tag on each fleet that has them.",
+        "\"Send all out-of-date ships to drydock\" splits them off their fleets and sends them to the nearest drydock that can refit, in one click.",
+        "A fleet's panel can send the whole fleet to the drydock, or just its out-of-date ships.",
+        "A standing order (on or off, in the Refits card): idle fleets with out-of-date ships go to the nearest drydock by themselves. Fleets told to hold position stay put."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: research reaches ships at a drydock",
       "items": [
         "Ships now carry the systems their power had researched when they were built: sensors, drives, shields, targeting, armor, fire control, fuel tanks and the ship prototypes.",
