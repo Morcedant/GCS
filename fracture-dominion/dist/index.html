@@ -205,7 +205,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 22:52 UTC";
+const BUILD = "2026-11-17 22:57 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -375,6 +375,81 @@ const SHIP_SHAPES = {
   leviathan: "M12 0 Q8 -8 -2 -7 Q-8 -6 -12 -10 Q-10 -3 -10 0 Q-10 3 -12 10 Q-8 6 -2 7 Q8 8 12 0 Z M6 -2 L4 -2 M-2 -7 Q0 0 -2 7",
   heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
 };
+
+// Outlines for ships that had none: the fuel tanker, and the free traders' merchant convoys.
+SHIP_SHAPES.tanker = "M11 0 Q11 -5 6 -5 L-8 -5 Q-11 -5 -11 0 Q-11 5 -8 5 L6 5 Q11 5 11 0 Z M-11 -2 L-13 -2 M-11 2 L-13 2 M0 -5 L0 5";
+SHIP_SHAPES.merchant = "M11 0 L7 -5 L-9 -5 L-11 -3 L-11 3 L-9 5 L7 5 Z M-3 -5 L-3 5 M2 -5 L2 5 M-11 0 L-13 0";
+
+/**
+ * Each people's own ships: its class names and outlines for every ship type (bow +x, −12 to 12, like SHIP_SHAPES).
+ * The Concord build angular and modular; the Tessan in sweeping curves; the Kel grow segmented hulls; the Hegemony
+ * heavy spiked prows; the Vael's living ships have fins and tails. What the ships do is the same for everyone.
+ */
+const FLEET_STYLES = {
+  concord: { style: "Angular, modular hulls: Earth's yards build what works, and bolt on more.",
+    classes: { scout: "Wayfarer", colony: "Mayflower", outpost: "Homestead", frigate: "Lancer", transport: "Marathon", tanker: "Wellspring", cruiser: "Aegis", dreadnought: "Sovereign" },
+    shapes: {
+      scout: "M12 0 L2 -3 L-8 -3 L-10 -5 L-11 -2 L-11 2 L-10 5 L-8 3 L2 3 Z M-2 -3 L-2 3",
+      colony: "M11 0 L7 -5 L-9 -5 L-11 -2 L-11 2 L-9 5 L7 5 Z M-1 -5 L-1 5 M-5 -5 L-5 5 M3 -5 L3 5",
+      outpost: "M8 -5 L8 5 L-8 5 L-8 -5 Z M8 0 L12 0 M0 -5 L0 -10 M-4 -10 L4 -10 M-8 -2 L-11 -2 M-8 2 L-11 2",
+      frigate: "M12 0 L4 -3 L-6 -3 L-6 -7 L-10 -7 L-10 7 L-6 7 L-6 3 L4 3 Z M-3 -3 L-3 3",
+      transport: "M11 0 L7 -6 L-10 -6 L-10 6 L7 6 Z M-10 -3 L-12 -3 L-12 3 L-10 3 M-4 -6 L-4 6 M2 -6 L2 6",
+      tanker: "M11 0 Q11 -5 6 -5 L-8 -5 Q-11 -5 -11 0 Q-11 5 -8 5 L6 5 Q11 5 11 0 Z M-11 -2 L-13 -2 M-11 2 L-13 2 M0 -5 L0 5",
+      cruiser: "M12 0 L6 -4 L-4 -4 L-4 -10 L-9 -10 L-9 -4 L-12 -4 L-12 4 L-9 4 L-9 10 L-4 10 L-4 4 L6 4 Z M0 -4 L0 4 M6 -4 L6 4",
+      dreadnought: "M12 -3 L12 3 L8 6 L-2 6 L-2 11 L-10 11 L-10 6 L-12 6 L-12 -6 L-10 -6 L-10 -11 L-2 -11 L-2 -6 L8 -6 Z M4 -6 L4 6 M-6 -6 L-6 6" } },
+  tessan: { style: "Sweeping curves and crescent wings: old money builds to be admired.",
+    classes: { scout: "Envoy", colony: "Dowry", outpost: "Tollhouse", frigate: "Courtier", transport: "Retinue", tanker: "Cistern", cruiser: "Magistrate", dreadnought: "Dynast" },
+    shapes: {
+      scout: "M12 0 Q4 -4 -8 -2 Q-4 0 -8 2 Q4 4 12 0 Z",
+      colony: "M11 0 Q9 -6 0 -6 Q-9 -6 -11 0 Q-9 6 0 6 Q9 6 11 0 Z M-11 0 L-13 0 M1 -6 L1 6",
+      outpost: "M0 -9 Q8 -9 8 0 Q8 9 0 9 Q-8 9 -8 0 Q-8 -9 0 -9 Z M0 -4 A4 4 0 1 0 0 4 A4 4 0 1 0 0 -4 M8 0 L12 0",
+      frigate: "M12 0 Q6 -3 -2 -3 Q-8 -9 -11 -8 Q-7 -4 -8 0 Q-7 4 -11 8 Q-8 9 -2 3 Q6 3 12 0 Z",
+      transport: "M11 0 Q9 -6 -2 -6 L-10 -5 Q-12 0 -10 5 L-2 6 Q9 6 11 0 Z M-3 -6 L-3 6 M4 -6 L4 6",
+      tanker: "M11 0 Q10 -7 0 -7 Q-10 -7 -11 0 Q-10 7 0 7 Q10 7 11 0 Z M-5 -6 L-5 6 M3 -7 L3 7",
+      cruiser: "M12 0 Q8 -5 0 -5 Q-6 -11 -12 -10 Q-8 -5 -9 0 Q-8 5 -12 10 Q-6 11 0 5 Q8 5 12 0 Z M4 0 A3 3 0 1 0 -2 0 A3 3 0 1 0 4 0",
+      dreadnought: "M12 0 Q10 -7 2 -8 Q-4 -12 -12 -11 Q-9 -6 -10 -3 L-12 0 L-10 3 Q-9 6 -12 11 Q-4 12 2 8 Q10 7 12 0 Z M6 0 A4 4 0 1 0 -2 0 A4 4 0 1 0 6 0 M-6 -6 L-6 6" } },
+  kel: { style: "Segmented hulls grown in the hive-yards, bristling with mandibles.",
+    classes: { scout: "Drone", colony: "Swarmseed", outpost: "Burrow", frigate: "Stinger", transport: "Broodcarrier", tanker: "Nectar", cruiser: "Mandible", dreadnought: "Hivemother" },
+    shapes: {
+      scout: "M11 0 Q8 -3 5 0 Q8 3 11 0 Z M5 0 Q0 -4 -5 0 Q0 4 5 0 Z M-5 0 Q-9 -3 -11 0 Q-9 3 -5 0 Z",
+      colony: "M10 0 Q8 -7 0 -7 Q-8 -7 -10 0 Q-8 7 0 7 Q8 7 10 0 Z M-2 -3 A2 2 0 1 0 -2 1 A2 2 0 1 0 -2 -3 M4 -1 A1.5 1.5 0 1 0 4 2 A1.5 1.5 0 1 0 4 -1",
+      outpost: "M0 -9 Q9 -6 9 0 Q9 6 0 9 Q-9 6 -9 0 Q-9 -6 0 -9 Z M0 -4 Q4 0 0 4 Q-4 0 0 -4 Z M9 0 L12 0",
+      frigate: "M12 0 Q9 -4 5 0 Q9 4 12 0 Z M5 0 Q0 -5 -6 0 Q0 5 5 0 Z M-6 0 Q-10 -4 -12 0 Q-10 4 -6 0 Z M2 -3 L5 -8 M2 3 L5 8",
+      transport: "M11 0 Q8 -6 2 -6 Q-2 -2 -6 -6 Q-11 -5 -11 0 Q-11 5 -6 6 Q-2 2 2 6 Q8 6 11 0 Z",
+      tanker: "M10 0 Q10 -8 0 -8 Q-10 -8 -10 0 Q-10 8 0 8 Q10 8 10 0 Z M10 0 L13 0 M-2 -8 L-2 8",
+      cruiser: "M12 0 Q8 -5 4 0 Q8 5 12 0 Z M4 0 Q-1 -7 -7 0 Q-1 7 4 0 Z M-7 0 Q-11 -5 -13 0 Q-11 5 -7 0 Z M0 -5 L4 -11 M0 5 L4 11 M-4 -5 L-6 -10 M-4 5 L-6 10",
+      dreadnought: "M12 0 Q9 -5 5 0 Q9 5 12 0 Z M5 0 Q0 -9 -6 0 Q0 9 5 0 Z M-6 0 Q-10 -7 -13 0 Q-10 7 -6 0 Z M1 -7 L6 -12 M1 7 L6 12 M-3 -8 L-5 -12 M-3 8 L-5 12 M-8 -5 L-12 -9 M-8 5 L-12 9" } },
+  hegemony: { style: "Heavy armoured prows and spiked fins: the legions' ships are built to frighten.",
+    classes: { scout: "Outrider", colony: "Colonia", outpost: "Castellum", frigate: "Gladius", transport: "Cohort", tanker: "Aqueduct", cruiser: "Praetor", dreadnought: "Imperator" },
+    shapes: {
+      scout: "M12 0 L0 -4 L-6 -4 L-10 -7 L-8 0 L-10 7 L-6 4 L0 4 Z",
+      colony: "M10 -6 L10 6 L-10 6 L-12 3 L-12 -3 L-10 -6 Z M10 0 L13 0 M-4 -6 L-4 6 M3 -6 L3 6",
+      outpost: "M-7 -7 L7 -7 L7 7 L-7 7 Z M-7 -7 L-10 -10 M7 -7 L10 -10 M7 7 L10 10 M-7 7 L-10 10 M7 0 L12 0",
+      frigate: "M12 0 L6 -2 L6 -5 L-4 -5 L-8 -9 L-10 -5 L-10 5 L-8 9 L-4 5 L6 5 L6 2 Z M-2 -5 L-2 5",
+      transport: "M12 0 L8 -6 L-10 -6 L-12 -3 L-12 3 L-10 6 L8 6 Z M-5 -6 L-5 6 M1 -6 L1 6 M8 -6 L8 6",
+      tanker: "M11 -4 L11 4 L8 7 L-9 7 L-12 4 L-12 -4 L-9 -7 L8 -7 Z M-3 -7 L-3 7 M11 0 L13 0",
+      cruiser: "M13 0 L7 -3 L7 -6 L-2 -6 L-6 -11 L-9 -6 L-12 -6 L-12 6 L-9 6 L-6 11 L-2 6 L7 6 L7 3 Z M2 -6 L2 6 M-5 -6 L-5 6",
+      dreadnought: "M13 0 L9 -4 L9 -8 L-1 -8 L-4 -12 L-7 -8 L-12 -8 L-12 8 L-7 8 L-4 12 L-1 8 L9 8 L9 4 Z M3 -8 L3 8 M-6 -8 L-6 8 M9 -4 L9 4" } },
+  vael: { style: "Living ships: rays and fish the size of towers, with fins and trailing tails.",
+    classes: { scout: "Mote", colony: "Spore", outpost: "Coral", frigate: "Darter", transport: "Shoal", tanker: "Wellfin", cruiser: "Manta", dreadnought: "Abyssal" },
+    shapes: {
+      scout: "M12 0 Q6 -3 -4 -1 Q-9 -5 -12 -4 Q-8 0 -12 4 Q-9 5 -4 1 Q6 3 12 0 Z",
+      colony: "M11 0 Q8 -7 -2 -6 Q-10 -6 -11 0 Q-10 6 -2 6 Q8 7 11 0 Z M-11 0 L-13 -5 M-11 0 L-13 5",
+      outpost: "M0 -10 Q6 -4 9 0 Q6 4 0 10 Q-6 4 -9 0 Q-6 -4 0 -10 Z M0 -4 Q2 0 0 4 Q-2 0 0 -4 Z",
+      frigate: "M12 0 Q7 -5 -2 -3 Q-6 -9 -10 -10 Q-8 -4 -12 0 Q-8 4 -10 10 Q-6 9 -2 3 Q7 5 12 0 Z",
+      transport: "M11 0 Q7 -7 -3 -6 Q-11 -5 -11 0 Q-11 5 -3 6 Q7 7 11 0 Z M0 -6 L0 6 M-5 -5 L-5 5",
+      tanker: "M11 0 Q9 -8 -1 -7 Q-11 -6 -11 0 Q-11 6 -1 7 Q9 8 11 0 Z M-11 0 L-13 -3 M-11 0 L-13 3",
+      cruiser: "M12 0 Q8 -4 2 -4 Q-2 -12 -10 -11 Q-6 -5 -8 0 Q-6 5 -10 11 Q-2 12 2 4 Q8 4 12 0 Z M-8 0 L-13 0",
+      dreadnought: "M12 0 Q10 -6 4 -7 Q-2 -13 -12 -12 Q-7 -6 -9 0 Q-7 6 -12 12 Q-2 13 4 7 Q10 6 12 0 Z M-9 0 L-13 -2 M-9 0 L-13 2 M1 -3 L1 3" } },
+};
+/** A ship's outline for its owner: the people's own, or the common one (the Wardens, pirates, creatures, traders). */
+const shipShape = (fid, type) => (FLEET_STYLES[fid] && FLEET_STYLES[fid].shapes[type]) || SHIP_SHAPES[type] || SHIP_SHAPES.frigate;
+/** "Aegis-class cruiser" (plural: "Aegis-class cruisers"); a ship with no class keeps its plain name. */
+function shipLabel(fid, type, plural = false) {
+  const c = FLEET_STYLES[fid] && FLEET_STYLES[fid].classes[type], n = SHIPS[type].name;
+  const base = c ? `${c}-class ${n.toLowerCase()}` : n;
+  return plural && !base.endsWith("s") ? base + "s" : base;
+}
 
 // Research: three fields. cost in science; needs: earlier techs.
 const TECHS = [
@@ -1171,7 +1246,7 @@ function totals(s, fid) {
 function buildOptions(s, sys) {
   const c = sys.colony, fid = c.owner, out = [];
   if (c.kind !== "colony") return out;
-  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && !d.wild && !d.trader && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: Math.round(shipStats(s, fid, t).cost * (c.buildings.drydock ? 1 - YARDS.discount : 1)), exotics: d.exotics || 0 });
+  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && !d.wild && !d.trader && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: shipLabel(fid, t), cost: Math.round(shipStats(s, fid, t).cost * (c.buildings.drydock ? 1 - YARDS.discount : 1)), exotics: d.exotics || 0 });
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (d.outpost || c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;   // a depot is for outposts (buildDepot)
     if (d.wonder && !c.capital) continue;
@@ -1547,7 +1622,7 @@ function battles(s) {
     // A battle the player is in is recorded roll by roll, for the battle pop-up.
     const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
     const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
-      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? gunsMax(s, u.world.colony) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [],
+      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : shipLabel(u.fid, u.ship.type), hull: hp(u), max: u.world ? gunsMax(s, u.world.colony) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [],
       admirals: [...new Set(units.filter((u) => u.fleet && u.fleet.admiral).map((u) => u.fleet))].map((f) => ({ fid: f.owner, name: admTitle(f.admiral), traits: f.admiral.traits.map((t) => ADMIRAL_TRAITS[t].name) })) } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
@@ -3758,8 +3833,8 @@ function territory() {
 const SHIP_PATHS = {};
 /** The biggest ship in a fleet: what the map draws for it. */
 const flagship = (f) => f.ships.reduce((a, x) => (!a || SHIPS[x.type].cost > SHIPS[a].cost ? x.type : a), null) || "frigate";
-function drawShip(ctx, kind, x, y, angle, scale, color, ring) {
-  const p = SHIP_PATHS[kind] || (SHIP_PATHS[kind] = new Path2D(SHIP_SHAPES[kind] || SHIP_SHAPES.frigate));
+function drawShip(ctx, kind, x, y, angle, scale, color, ring, fid) {
+  const pk = (fid || "") + ":" + kind, p = SHIP_PATHS[pk] || (SHIP_PATHS[pk] = new Path2D(shipShape(fid, kind)));
   ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.scale(scale, scale);
   ctx.lineJoin = "round"; ctx.lineWidth = (ring ? 3.6 : 2.8) / scale; ctx.strokeStyle = ring || "rgba(3,5,10,.85)"; ctx.stroke(p);
   ctx.globalAlpha = 0.35; ctx.fillStyle = color; ctx.fill(p); ctx.globalAlpha = 1;
@@ -3767,7 +3842,7 @@ function drawShip(ctx, kind, x, y, angle, scale, color, ring) {
   ctx.restore();
 }
 /** The same outline as a little SVG, for the panels. */
-const shipSVG = (kind, color, px = 26) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle;flex:none" aria-hidden="true"><path d="${SHIP_SHAPES[kind]}" fill="${color}" fill-opacity=".25" stroke="${color}" stroke-width=".9" stroke-linejoin="round"/><\/svg>`;
+const shipSVG = (kind, color, px = 26, fid) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle;flex:none" aria-hidden="true"><path d="${shipShape(fid, kind)}" fill="${color}" fill-opacity=".25" stroke="${color}" stroke-width=".9" stroke-linejoin="round"/><\/svg>`;
 function hexPath(ctx, cx, cy, r) {
   ctx.beginPath();
   for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
@@ -3864,7 +3939,7 @@ function draw() {
       // The fleet's outline: its biggest ship, pointing where it's going.
       const ring = sel && sel.id === f.id ? "#fff6b0" : war ? "#ff6b5b" : null;
       const to = f.path.length ? toPixel(f.path[0].hex, size) : null, angle = to ? Math.atan2(to.y - y, to.x - x) : 0;
-      drawShip(ctx, flagship(f), fx, fy, angle, 0.62, colorOf(f.owner), ring);
+      drawShip(ctx, flagship(f), fx, fy, angle, 0.62, colorOf(f.owner), ring, f.owner);
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
   }
@@ -3951,7 +4026,7 @@ function systemHTML() {
     h += `<ol class="queue">${c.queue.map((q, i) => `<li><span>${esc(q.name)}${q.exotics ? ` <i class="exo">${q.exotics}◆<\/i>` : ""}<\/span>${bar(q.progress, q.cost)}<span class="small">${Math.floor(q.progress)}/${q.cost}${i === 0 ? ` · ${y.ind ? Math.max(1, Math.ceil((q.cost - q.progress) / y.ind)) + "t" : "—"}` : ""}<\/span><button class="x" data-deq="${i}" title="Remove">×<\/button><\/li>`).join("")}<\/ol>`;
     if (c.queue.length) { const rc = rushCost(S, sys.id); h += `<button class="btn small" data-rush ${me.credits < rc ? "disabled" : ""}>Rush ${esc(c.queue[0].name)} for ${rc} credits<\/button>`; }
     const opts = buildOptions(S, sys);
-    h += `<h3>Add to the queue<\/h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18) + " " : ""}${esc(o.name)}<\/b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}<\/span><\/button>`).join("")}<\/div>`;
+    h += `<h3>Add to the queue<\/h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18, player(S).id) + " " : ""}${esc(o.name)}<\/b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}<\/span><\/button>`).join("")}<\/div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.<\/p>`;
   }
   if (mine) h += musterHereHTML(sys);
@@ -3962,7 +4037,7 @@ function systemHTML() {
 /** The Empire tab's fleets: war fleets and the rest, each a row with where it is; a long list folds away. */
 function fleetListHTML(me) {
   const all = fleetsOf(S, me.id), row = (f) => { const sid = S.sysAt[f.at];
-    return `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${needsRefit(S, f) ? ` <span class="tag-refit" title="Ships in this fleet need a refit at a drydock">⚙ refit${f.refitTrip && f.path.length ? " (on the way)" : ""}<\/span>` : ""}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}<\/span>` : ""}<span class="small muted"> · ${sid ? esc(S.systems[sid].name) : "deep space"}${f.path.length ? ", moving" : ", idle"}<\/span><\/button>`; };
+    return `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18, me.id)} ${esc(fleetName(f))}${needsRefit(S, f) ? ` <span class="tag-refit" title="Ships in this fleet need a refit at a drydock">⚙ refit${f.refitTrip && f.path.length ? " (on the way)" : ""}<\/span>` : ""}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}<\/span>` : ""}<span class="small muted"> · ${sid ? esc(S.systems[sid].name) : "deep space"}${f.path.length ? ", moving" : ", idle"}<\/span><\/button>`; };
   const war = all.filter(armed), other = all.filter((f) => !armed(f));
   const group = (title, list, open) => !list.length ? "" : list.length > 6
     ? `<details class="fleet-group"${open ? " open" : ""}><summary><b>${title} (${list.length})<\/b> <span class="small muted">${list.reduce((t, f) => t + f.ships.length, 0)} ships<\/span><\/summary>${list.map(row).join("")}<\/details>`
@@ -3975,7 +4050,7 @@ function fleetListHTML(me) {
 }
 function fleetName(f) {
   const counts = {}; for (const x of f.ships) counts[x.type] = (counts[x.type] || 0) + 1;
-  return Object.entries(counts).map(([t, n]) => `${n > 1 ? n + " " : ""}${SHIPS[t].name}${n > 1 ? "s" : ""}`).join(", ");
+  return Object.entries(counts).map(([t, n]) => `${n > 1 ? n + " " : ""}${shipLabel(f.owner, t, n > 1)}`).join(", ");
 }
 function fleetHTML() {
   const f = S.fleets[sel.id], me = player(S);
@@ -3986,7 +4061,7 @@ function fleetHTML() {
   // Ships by type: a row each with how many and their hull, and each ship's hull a click away.
   const byType = [...new Set(f.ships.map((x) => x.type))].map((t) => { const list = f.ships.filter((x) => x.type === t); return { t, st: shipStats(S, f.owner, t, list[0]), list }; });
   h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = list.reduce((a, x) => a + shipStats(S, f.owner, t, x).hull, 0), hurt = list.filter((x) => x.hull < shipStats(S, f.owner, t, x).hull).length;
-    return `<li><b>${shipSVG(t, F.color, 22)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(st.name)}<\/b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each<\/span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}<\/span>${list.length > 1 ? `<details class="small"><summary>Each ship<\/summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}<\/div>`).join("")}<\/details>` : ""}<\/li>`; }).join("")}<\/ul>`;
+    return `<li><b>${shipSVG(t, F.color, 22, f.owner)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(shipLabel(f.owner, t))}<\/b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each<\/span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}<\/span>${list.length > 1 ? `<details class="small"><summary>Each ship<\/summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}<\/div>`).join("")}<\/details>` : ""}<\/li>`; }).join("")}<\/ul>`;
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.<\/p>`;
   if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
     h += `<div class="kv"><span>Fuel<\/span><b class="${fu ? "" : "bad"}">${fu} / ${mx}<\/b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}<\/div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? "In supply: the tank stays full." : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.<\/p>`; }
@@ -4054,7 +4129,7 @@ function fleetHTML() {
   // Split off by type: one, half or all of them (the most damaged first), into a fleet of their own here.
   if (f.ships.length > 1) h += `<h3>Split off by type<\/h3><p class="small muted" style="margin-top:-4px">Into a new fleet here. The most damaged go first; the admiral stays.<\/p>`
     + types.map((t) => { const n = f.ships.filter((x) => x.type === t).length, all = n === f.ships.length;
-      return `<div class="split-row"><span>${shipSVG(t, me.color, 18)} ${esc(SHIPS[t].name)}${n > 1 ? ` ×${n}` : ""}<\/span><span class="opts">${[["1", "1"], ...(n >= 4 ? [["half", `Half (${Math.floor(n / 2)})`]] : []), ...(n > 1 ? [["all", all ? `All but 1 (${n - 1})` : `All ${n}`]] : [])].map(([k, label]) => `<button class="opt" data-split="${t}:${k}"><b>${label}<\/b><\/button>`).join("")}<\/span><\/div>`; }).join("");
+      return `<div class="split-row"><span>${shipSVG(t, me.color, 18, me.id)} ${esc(shipLabel(me.id, t))}${n > 1 ? ` ×${n}` : ""}<\/span><span class="opts">${[["1", "1"], ...(n >= 4 ? [["half", `Half (${Math.floor(n / 2)})`]] : []), ...(n > 1 ? [["all", all ? `All but 1 (${n - 1})` : `All ${n}`]] : [])].map(([k, label]) => `<button class="opt" data-split="${t}:${k}"><b>${label}<\/b><\/button>`).join("")}<\/span><\/div>`; }).join("");
   return h;
 }
 // ---------- Objectives: the race to win, at a glance ----------
@@ -4506,7 +4581,7 @@ function showBattle(then) {
   let shown = 0;
   const unitName = (u) => { if (u.fid === "wardens") return u.type === "heart" ? "The Heart" : `Warden ${u.name.toLowerCase()}`; const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
   const hullAt = (k) => B.units.map((u, i) => Math.max(0, u.hull - B.events.slice(0, k).filter((e) => e.t === i).reduce((t, e) => t + e.dmg, 0)));
-  const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/><\/svg>` : shipSVG(u.type, faction(S, u.fid).color, 22));
+  const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/><\/svg>` : shipSVG(u.type, faction(S, u.fid).color, 22, u.fid));
   const sideHTML = (fids, hull, title) => `<div class="bside"><h3>${title}<\/h3>${B.units.map((u, i) => fids.includes(u.fid) ? `<div class="bunit ${hull[i] <= 0 ? "dead" : ""}">${icon(u)}<span>${esc(unitName(u))}${u.stance && u.stance !== "balanced" ? ` <i class="small muted">(${esc(STANCES[u.stance].name.toLowerCase())})<\/i>` : ""}<\/span><span class="pips">${Array.from({ length: u.max }, (_, k) => `<i class="${k < hull[i] ? "on" : ""}"><\/i>`).join("")}<\/span><\/div>` : "").join("")}<\/div>`;
   const draw = () => {
     const hull = hullAt(shown), done = shown >= n;

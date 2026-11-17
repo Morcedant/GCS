@@ -1,6 +1,6 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE } from "./data.js";
 import { newGame, endTurn, difficultyLabel, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
@@ -132,8 +132,8 @@ function territory() {
 const SHIP_PATHS = {};
 /** The biggest ship in a fleet: what the map draws for it. */
 const flagship = (f) => f.ships.reduce((a, x) => (!a || SHIPS[x.type].cost > SHIPS[a].cost ? x.type : a), null) || "frigate";
-function drawShip(ctx, kind, x, y, angle, scale, color, ring) {
-  const p = SHIP_PATHS[kind] || (SHIP_PATHS[kind] = new Path2D(SHIP_SHAPES[kind] || SHIP_SHAPES.frigate));
+function drawShip(ctx, kind, x, y, angle, scale, color, ring, fid) {
+  const pk = (fid || "") + ":" + kind, p = SHIP_PATHS[pk] || (SHIP_PATHS[pk] = new Path2D(shipShape(fid, kind)));
   ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.scale(scale, scale);
   ctx.lineJoin = "round"; ctx.lineWidth = (ring ? 3.6 : 2.8) / scale; ctx.strokeStyle = ring || "rgba(3,5,10,.85)"; ctx.stroke(p);
   ctx.globalAlpha = 0.35; ctx.fillStyle = color; ctx.fill(p); ctx.globalAlpha = 1;
@@ -141,7 +141,7 @@ function drawShip(ctx, kind, x, y, angle, scale, color, ring) {
   ctx.restore();
 }
 /** The same outline as a little SVG, for the panels. */
-const shipSVG = (kind, color, px = 26) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle;flex:none" aria-hidden="true"><path d="${SHIP_SHAPES[kind]}" fill="${color}" fill-opacity=".25" stroke="${color}" stroke-width=".9" stroke-linejoin="round"/></svg>`;
+const shipSVG = (kind, color, px = 26, fid) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle;flex:none" aria-hidden="true"><path d="${shipShape(fid, kind)}" fill="${color}" fill-opacity=".25" stroke="${color}" stroke-width=".9" stroke-linejoin="round"/></svg>`;
 function hexPath(ctx, cx, cy, r) {
   ctx.beginPath();
   for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
@@ -238,7 +238,7 @@ function draw() {
       // The fleet's outline: its biggest ship, pointing where it's going.
       const ring = sel && sel.id === f.id ? "#fff6b0" : war ? "#ff6b5b" : null;
       const to = f.path.length ? toPixel(f.path[0].hex, size) : null, angle = to ? Math.atan2(to.y - y, to.x - x) : 0;
-      drawShip(ctx, flagship(f), fx, fy, angle, 0.62, colorOf(f.owner), ring);
+      drawShip(ctx, flagship(f), fx, fy, angle, 0.62, colorOf(f.owner), ring, f.owner);
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
   }
@@ -325,7 +325,7 @@ function systemHTML() {
     h += `<ol class="queue">${c.queue.map((q, i) => `<li><span>${esc(q.name)}${q.exotics ? ` <i class="exo">${q.exotics}◆</i>` : ""}</span>${bar(q.progress, q.cost)}<span class="small">${Math.floor(q.progress)}/${q.cost}${i === 0 ? ` · ${y.ind ? Math.max(1, Math.ceil((q.cost - q.progress) / y.ind)) + "t" : "—"}` : ""}</span><button class="x" data-deq="${i}" title="Remove">×</button></li>`).join("")}</ol>`;
     if (c.queue.length) { const rc = rushCost(S, sys.id); h += `<button class="btn small" data-rush ${me.credits < rc ? "disabled" : ""}>Rush ${esc(c.queue[0].name)} for ${rc} credits</button>`; }
     const opts = buildOptions(S, sys);
-    h += `<h3>Add to the queue</h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18) + " " : ""}${esc(o.name)}</b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></button>`).join("")}</div>`;
+    h += `<h3>Add to the queue</h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18, player(S).id) + " " : ""}${esc(o.name)}</b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></button>`).join("")}</div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.</p>`;
   }
   if (mine) h += musterHereHTML(sys);
@@ -336,7 +336,7 @@ function systemHTML() {
 /** The Empire tab's fleets: war fleets and the rest, each a row with where it is; a long list folds away. */
 function fleetListHTML(me) {
   const all = fleetsOf(S, me.id), row = (f) => { const sid = S.sysAt[f.at];
-    return `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${needsRefit(S, f) ? ` <span class="tag-refit" title="Ships in this fleet need a refit at a drydock">⚙ refit${f.refitTrip && f.path.length ? " (on the way)" : ""}</span>` : ""}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}</span>` : ""}<span class="small muted"> · ${sid ? esc(S.systems[sid].name) : "deep space"}${f.path.length ? ", moving" : ", idle"}</span></button>`; };
+    return `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18, me.id)} ${esc(fleetName(f))}${needsRefit(S, f) ? ` <span class="tag-refit" title="Ships in this fleet need a refit at a drydock">⚙ refit${f.refitTrip && f.path.length ? " (on the way)" : ""}</span>` : ""}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}</span>` : ""}<span class="small muted"> · ${sid ? esc(S.systems[sid].name) : "deep space"}${f.path.length ? ", moving" : ", idle"}</span></button>`; };
   const war = all.filter(armed), other = all.filter((f) => !armed(f));
   const group = (title, list, open) => !list.length ? "" : list.length > 6
     ? `<details class="fleet-group"${open ? " open" : ""}><summary><b>${title} (${list.length})</b> <span class="small muted">${list.reduce((t, f) => t + f.ships.length, 0)} ships</span></summary>${list.map(row).join("")}</details>`
@@ -349,7 +349,7 @@ function fleetListHTML(me) {
 }
 function fleetName(f) {
   const counts = {}; for (const x of f.ships) counts[x.type] = (counts[x.type] || 0) + 1;
-  return Object.entries(counts).map(([t, n]) => `${n > 1 ? n + " " : ""}${SHIPS[t].name}${n > 1 ? "s" : ""}`).join(", ");
+  return Object.entries(counts).map(([t, n]) => `${n > 1 ? n + " " : ""}${shipLabel(f.owner, t, n > 1)}`).join(", ");
 }
 function fleetHTML() {
   const f = S.fleets[sel.id], me = player(S);
@@ -360,7 +360,7 @@ function fleetHTML() {
   // Ships by type: a row each with how many and their hull, and each ship's hull a click away.
   const byType = [...new Set(f.ships.map((x) => x.type))].map((t) => { const list = f.ships.filter((x) => x.type === t); return { t, st: shipStats(S, f.owner, t, list[0]), list }; });
   h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = list.reduce((a, x) => a + shipStats(S, f.owner, t, x).hull, 0), hurt = list.filter((x) => x.hull < shipStats(S, f.owner, t, x).hull).length;
-    return `<li><b>${shipSVG(t, F.color, 22)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each</span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}</span>${list.length > 1 ? `<details class="small"><summary>Each ship</summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}</div>`).join("")}</details>` : ""}</li>`; }).join("")}</ul>`;
+    return `<li><b>${shipSVG(t, F.color, 22, f.owner)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(shipLabel(f.owner, t))}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each</span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}</span>${list.length > 1 ? `<details class="small"><summary>Each ship</summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}</div>`).join("")}</details>` : ""}</li>`; }).join("")}</ul>`;
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.</p>`;
   if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
     h += `<div class="kv"><span>Fuel</span><b class="${fu ? "" : "bad"}">${fu} / ${mx}</b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}</div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? "In supply: the tank stays full." : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.</p>`; }
@@ -428,7 +428,7 @@ function fleetHTML() {
   // Split off by type: one, half or all of them (the most damaged first), into a fleet of their own here.
   if (f.ships.length > 1) h += `<h3>Split off by type</h3><p class="small muted" style="margin-top:-4px">Into a new fleet here. The most damaged go first; the admiral stays.</p>`
     + types.map((t) => { const n = f.ships.filter((x) => x.type === t).length, all = n === f.ships.length;
-      return `<div class="split-row"><span>${shipSVG(t, me.color, 18)} ${esc(SHIPS[t].name)}${n > 1 ? ` ×${n}` : ""}</span><span class="opts">${[["1", "1"], ...(n >= 4 ? [["half", `Half (${Math.floor(n / 2)})`]] : []), ...(n > 1 ? [["all", all ? `All but 1 (${n - 1})` : `All ${n}`]] : [])].map(([k, label]) => `<button class="opt" data-split="${t}:${k}"><b>${label}</b></button>`).join("")}</span></div>`; }).join("");
+      return `<div class="split-row"><span>${shipSVG(t, me.color, 18, me.id)} ${esc(shipLabel(me.id, t))}${n > 1 ? ` ×${n}` : ""}</span><span class="opts">${[["1", "1"], ...(n >= 4 ? [["half", `Half (${Math.floor(n / 2)})`]] : []), ...(n > 1 ? [["all", all ? `All but 1 (${n - 1})` : `All ${n}`]] : [])].map(([k, label]) => `<button class="opt" data-split="${t}:${k}"><b>${label}</b></button>`).join("")}</span></div>`; }).join("");
   return h;
 }
 // ---------- Objectives: the race to win, at a glance ----------
@@ -880,7 +880,7 @@ function showBattle(then) {
   let shown = 0;
   const unitName = (u) => { if (u.fid === "wardens") return u.type === "heart" ? "The Heart" : `Warden ${u.name.toLowerCase()}`; const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
   const hullAt = (k) => B.units.map((u, i) => Math.max(0, u.hull - B.events.slice(0, k).filter((e) => e.t === i).reduce((t, e) => t + e.dmg, 0)));
-  const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/></svg>` : shipSVG(u.type, faction(S, u.fid).color, 22));
+  const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/></svg>` : shipSVG(u.type, faction(S, u.fid).color, 22, u.fid));
   const sideHTML = (fids, hull, title) => `<div class="bside"><h3>${title}</h3>${B.units.map((u, i) => fids.includes(u.fid) ? `<div class="bunit ${hull[i] <= 0 ? "dead" : ""}">${icon(u)}<span>${esc(unitName(u))}${u.stance && u.stance !== "balanced" ? ` <i class="small muted">(${esc(STANCES[u.stance].name.toLowerCase())})</i>` : ""}</span><span class="pips">${Array.from({ length: u.max }, (_, k) => `<i class="${k < hull[i] ? "on" : ""}"></i>`).join("")}</span></div>` : "").join("")}</div>`;
   const draw = () => {
     const hull = hullAt(shown), done = shown >= n;

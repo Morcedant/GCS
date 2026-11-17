@@ -155,9 +155,15 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **The guide:** a first game, step by step: a coach card walks a new player through the first turns (research,
   building, the scout, a second colony, ending a turn, the ways to win, directives and campaigns, Focus, stances and
   supply), rings what to use next and moves on by itself. On by default for a first game; the menu restarts it.
-- **Ship outlines:** each of the seven ships has its own outline, on the map (a fleet shows its biggest ship, pointing
-  where it's going), in the panels, and on a printable token sheet (`tokens.mjs` writes `dist/tokens.html`; the
-  menu links to it).
+- **Each people's own ships:** every power builds its eight ship types in its own style, with its own outlines and
+  class names (data.js FLEET_STYLES): the Concord's angular, modular hulls (Wayfarer, Lancer, Aegis, Sovereign,
+  Marathon, Wellspring, Mayflower, Homestead), the Tessan's sweeping curves (Envoy, Courtier, Magistrate, Dynast…), the
+  Kel's segmented hive-grown hulls (Drone, Stinger, Mandible, Hivemother…), the Hegemony's spiked armoured prows
+  (Outrider, Gladius, Praetor, Imperator…) and the Vael's living fins and tails (Mote, Darter, Manta, Abyssal…). What a
+  ship does is the same for everyone. The map, the panels, the build list and the battle reports use them ("Aegis-class
+  cruiser"). The printable token sheet (`tokens.mjs` writes `dist/tokens.html`; the menu links to it) has a page for
+  each people's ships, a table of every class name, the ships that belong to no one (traders, pirates, creatures, the
+  Wardens), and markers for orbital stations, batteries and fuel depots.
 
 ## Files
 

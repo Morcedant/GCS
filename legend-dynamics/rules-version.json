@@ -6,6 +6,18 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: each people's own ships, and a new token sheet",
+      "items": [
+        "Every people now builds its ships in its own style, with its own outlines and class names. The Concord fly Aegis-class cruisers and Sovereign-class dreadnoughts; the Tessan, Magistrates and Dynasts; the Kel, Mandibles and Hivemothers; the Hegemony, Praetors and Imperators; the Vael, Mantas and Abyssals. All eight ship types have names.",
+        "What each ship does is the same for everyone. Only the look and the name change.",
+        "The map, the fleet panels, the build list and the battle reports all use them.",
+        "The fuel tanker and the traders' merchant convoys have their own outlines now.",
+        "A new printable token sheet: a page for each people's ships, a table of every class name, tokens for the traders, pirates, creatures and Wardens, and markers for orbital stations, batteries and fuel depots."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: difficulty choices for the computer players",
       "items": [
         "Easy, Normal and Hard are now presets for what the computer players do. Each option can be changed on the new-game form, under Computer players, and the difficulty then shows as Custom.",

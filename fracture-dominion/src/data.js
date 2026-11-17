@@ -89,6 +89,81 @@ export const SHIP_SHAPES = {
   heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
 };
 
+// Outlines for ships that had none: the fuel tanker, and the free traders' merchant convoys.
+SHIP_SHAPES.tanker = "M11 0 Q11 -5 6 -5 L-8 -5 Q-11 -5 -11 0 Q-11 5 -8 5 L6 5 Q11 5 11 0 Z M-11 -2 L-13 -2 M-11 2 L-13 2 M0 -5 L0 5";
+SHIP_SHAPES.merchant = "M11 0 L7 -5 L-9 -5 L-11 -3 L-11 3 L-9 5 L7 5 Z M-3 -5 L-3 5 M2 -5 L2 5 M-11 0 L-13 0";
+
+/**
+ * Each people's own ships: its class names and outlines for every ship type (bow +x, −12 to 12, like SHIP_SHAPES).
+ * The Concord build angular and modular; the Tessan in sweeping curves; the Kel grow segmented hulls; the Hegemony
+ * heavy spiked prows; the Vael's living ships have fins and tails. What the ships do is the same for everyone.
+ */
+export const FLEET_STYLES = {
+  concord: { style: "Angular, modular hulls: Earth's yards build what works, and bolt on more.",
+    classes: { scout: "Wayfarer", colony: "Mayflower", outpost: "Homestead", frigate: "Lancer", transport: "Marathon", tanker: "Wellspring", cruiser: "Aegis", dreadnought: "Sovereign" },
+    shapes: {
+      scout: "M12 0 L2 -3 L-8 -3 L-10 -5 L-11 -2 L-11 2 L-10 5 L-8 3 L2 3 Z M-2 -3 L-2 3",
+      colony: "M11 0 L7 -5 L-9 -5 L-11 -2 L-11 2 L-9 5 L7 5 Z M-1 -5 L-1 5 M-5 -5 L-5 5 M3 -5 L3 5",
+      outpost: "M8 -5 L8 5 L-8 5 L-8 -5 Z M8 0 L12 0 M0 -5 L0 -10 M-4 -10 L4 -10 M-8 -2 L-11 -2 M-8 2 L-11 2",
+      frigate: "M12 0 L4 -3 L-6 -3 L-6 -7 L-10 -7 L-10 7 L-6 7 L-6 3 L4 3 Z M-3 -3 L-3 3",
+      transport: "M11 0 L7 -6 L-10 -6 L-10 6 L7 6 Z M-10 -3 L-12 -3 L-12 3 L-10 3 M-4 -6 L-4 6 M2 -6 L2 6",
+      tanker: "M11 0 Q11 -5 6 -5 L-8 -5 Q-11 -5 -11 0 Q-11 5 -8 5 L6 5 Q11 5 11 0 Z M-11 -2 L-13 -2 M-11 2 L-13 2 M0 -5 L0 5",
+      cruiser: "M12 0 L6 -4 L-4 -4 L-4 -10 L-9 -10 L-9 -4 L-12 -4 L-12 4 L-9 4 L-9 10 L-4 10 L-4 4 L6 4 Z M0 -4 L0 4 M6 -4 L6 4",
+      dreadnought: "M12 -3 L12 3 L8 6 L-2 6 L-2 11 L-10 11 L-10 6 L-12 6 L-12 -6 L-10 -6 L-10 -11 L-2 -11 L-2 -6 L8 -6 Z M4 -6 L4 6 M-6 -6 L-6 6" } },
+  tessan: { style: "Sweeping curves and crescent wings: old money builds to be admired.",
+    classes: { scout: "Envoy", colony: "Dowry", outpost: "Tollhouse", frigate: "Courtier", transport: "Retinue", tanker: "Cistern", cruiser: "Magistrate", dreadnought: "Dynast" },
+    shapes: {
+      scout: "M12 0 Q4 -4 -8 -2 Q-4 0 -8 2 Q4 4 12 0 Z",
+      colony: "M11 0 Q9 -6 0 -6 Q-9 -6 -11 0 Q-9 6 0 6 Q9 6 11 0 Z M-11 0 L-13 0 M1 -6 L1 6",
+      outpost: "M0 -9 Q8 -9 8 0 Q8 9 0 9 Q-8 9 -8 0 Q-8 -9 0 -9 Z M0 -4 A4 4 0 1 0 0 4 A4 4 0 1 0 0 -4 M8 0 L12 0",
+      frigate: "M12 0 Q6 -3 -2 -3 Q-8 -9 -11 -8 Q-7 -4 -8 0 Q-7 4 -11 8 Q-8 9 -2 3 Q6 3 12 0 Z",
+      transport: "M11 0 Q9 -6 -2 -6 L-10 -5 Q-12 0 -10 5 L-2 6 Q9 6 11 0 Z M-3 -6 L-3 6 M4 -6 L4 6",
+      tanker: "M11 0 Q10 -7 0 -7 Q-10 -7 -11 0 Q-10 7 0 7 Q10 7 11 0 Z M-5 -6 L-5 6 M3 -7 L3 7",
+      cruiser: "M12 0 Q8 -5 0 -5 Q-6 -11 -12 -10 Q-8 -5 -9 0 Q-8 5 -12 10 Q-6 11 0 5 Q8 5 12 0 Z M4 0 A3 3 0 1 0 -2 0 A3 3 0 1 0 4 0",
+      dreadnought: "M12 0 Q10 -7 2 -8 Q-4 -12 -12 -11 Q-9 -6 -10 -3 L-12 0 L-10 3 Q-9 6 -12 11 Q-4 12 2 8 Q10 7 12 0 Z M6 0 A4 4 0 1 0 -2 0 A4 4 0 1 0 6 0 M-6 -6 L-6 6" } },
+  kel: { style: "Segmented hulls grown in the hive-yards, bristling with mandibles.",
+    classes: { scout: "Drone", colony: "Swarmseed", outpost: "Burrow", frigate: "Stinger", transport: "Broodcarrier", tanker: "Nectar", cruiser: "Mandible", dreadnought: "Hivemother" },
+    shapes: {
+      scout: "M11 0 Q8 -3 5 0 Q8 3 11 0 Z M5 0 Q0 -4 -5 0 Q0 4 5 0 Z M-5 0 Q-9 -3 -11 0 Q-9 3 -5 0 Z",
+      colony: "M10 0 Q8 -7 0 -7 Q-8 -7 -10 0 Q-8 7 0 7 Q8 7 10 0 Z M-2 -3 A2 2 0 1 0 -2 1 A2 2 0 1 0 -2 -3 M4 -1 A1.5 1.5 0 1 0 4 2 A1.5 1.5 0 1 0 4 -1",
+      outpost: "M0 -9 Q9 -6 9 0 Q9 6 0 9 Q-9 6 -9 0 Q-9 -6 0 -9 Z M0 -4 Q4 0 0 4 Q-4 0 0 -4 Z M9 0 L12 0",
+      frigate: "M12 0 Q9 -4 5 0 Q9 4 12 0 Z M5 0 Q0 -5 -6 0 Q0 5 5 0 Z M-6 0 Q-10 -4 -12 0 Q-10 4 -6 0 Z M2 -3 L5 -8 M2 3 L5 8",
+      transport: "M11 0 Q8 -6 2 -6 Q-2 -2 -6 -6 Q-11 -5 -11 0 Q-11 5 -6 6 Q-2 2 2 6 Q8 6 11 0 Z",
+      tanker: "M10 0 Q10 -8 0 -8 Q-10 -8 -10 0 Q-10 8 0 8 Q10 8 10 0 Z M10 0 L13 0 M-2 -8 L-2 8",
+      cruiser: "M12 0 Q8 -5 4 0 Q8 5 12 0 Z M4 0 Q-1 -7 -7 0 Q-1 7 4 0 Z M-7 0 Q-11 -5 -13 0 Q-11 5 -7 0 Z M0 -5 L4 -11 M0 5 L4 11 M-4 -5 L-6 -10 M-4 5 L-6 10",
+      dreadnought: "M12 0 Q9 -5 5 0 Q9 5 12 0 Z M5 0 Q0 -9 -6 0 Q0 9 5 0 Z M-6 0 Q-10 -7 -13 0 Q-10 7 -6 0 Z M1 -7 L6 -12 M1 7 L6 12 M-3 -8 L-5 -12 M-3 8 L-5 12 M-8 -5 L-12 -9 M-8 5 L-12 9" } },
+  hegemony: { style: "Heavy armoured prows and spiked fins: the legions' ships are built to frighten.",
+    classes: { scout: "Outrider", colony: "Colonia", outpost: "Castellum", frigate: "Gladius", transport: "Cohort", tanker: "Aqueduct", cruiser: "Praetor", dreadnought: "Imperator" },
+    shapes: {
+      scout: "M12 0 L0 -4 L-6 -4 L-10 -7 L-8 0 L-10 7 L-6 4 L0 4 Z",
+      colony: "M10 -6 L10 6 L-10 6 L-12 3 L-12 -3 L-10 -6 Z M10 0 L13 0 M-4 -6 L-4 6 M3 -6 L3 6",
+      outpost: "M-7 -7 L7 -7 L7 7 L-7 7 Z M-7 -7 L-10 -10 M7 -7 L10 -10 M7 7 L10 10 M-7 7 L-10 10 M7 0 L12 0",
+      frigate: "M12 0 L6 -2 L6 -5 L-4 -5 L-8 -9 L-10 -5 L-10 5 L-8 9 L-4 5 L6 5 L6 2 Z M-2 -5 L-2 5",
+      transport: "M12 0 L8 -6 L-10 -6 L-12 -3 L-12 3 L-10 6 L8 6 Z M-5 -6 L-5 6 M1 -6 L1 6 M8 -6 L8 6",
+      tanker: "M11 -4 L11 4 L8 7 L-9 7 L-12 4 L-12 -4 L-9 -7 L8 -7 Z M-3 -7 L-3 7 M11 0 L13 0",
+      cruiser: "M13 0 L7 -3 L7 -6 L-2 -6 L-6 -11 L-9 -6 L-12 -6 L-12 6 L-9 6 L-6 11 L-2 6 L7 6 L7 3 Z M2 -6 L2 6 M-5 -6 L-5 6",
+      dreadnought: "M13 0 L9 -4 L9 -8 L-1 -8 L-4 -12 L-7 -8 L-12 -8 L-12 8 L-7 8 L-4 12 L-1 8 L9 8 L9 4 Z M3 -8 L3 8 M-6 -8 L-6 8 M9 -4 L9 4" } },
+  vael: { style: "Living ships: rays and fish the size of towers, with fins and trailing tails.",
+    classes: { scout: "Mote", colony: "Spore", outpost: "Coral", frigate: "Darter", transport: "Shoal", tanker: "Wellfin", cruiser: "Manta", dreadnought: "Abyssal" },
+    shapes: {
+      scout: "M12 0 Q6 -3 -4 -1 Q-9 -5 -12 -4 Q-8 0 -12 4 Q-9 5 -4 1 Q6 3 12 0 Z",
+      colony: "M11 0 Q8 -7 -2 -6 Q-10 -6 -11 0 Q-10 6 -2 6 Q8 7 11 0 Z M-11 0 L-13 -5 M-11 0 L-13 5",
+      outpost: "M0 -10 Q6 -4 9 0 Q6 4 0 10 Q-6 4 -9 0 Q-6 -4 0 -10 Z M0 -4 Q2 0 0 4 Q-2 0 0 -4 Z",
+      frigate: "M12 0 Q7 -5 -2 -3 Q-6 -9 -10 -10 Q-8 -4 -12 0 Q-8 4 -10 10 Q-6 9 -2 3 Q7 5 12 0 Z",
+      transport: "M11 0 Q7 -7 -3 -6 Q-11 -5 -11 0 Q-11 5 -3 6 Q7 7 11 0 Z M0 -6 L0 6 M-5 -5 L-5 5",
+      tanker: "M11 0 Q9 -8 -1 -7 Q-11 -6 -11 0 Q-11 6 -1 7 Q9 8 11 0 Z M-11 0 L-13 -3 M-11 0 L-13 3",
+      cruiser: "M12 0 Q8 -4 2 -4 Q-2 -12 -10 -11 Q-6 -5 -8 0 Q-6 5 -10 11 Q-2 12 2 4 Q8 4 12 0 Z M-8 0 L-13 0",
+      dreadnought: "M12 0 Q10 -6 4 -7 Q-2 -13 -12 -12 Q-7 -6 -9 0 Q-7 6 -12 12 Q-2 13 4 7 Q10 6 12 0 Z M-9 0 L-13 -2 M-9 0 L-13 2 M1 -3 L1 3" } },
+};
+/** A ship's outline for its owner: the people's own, or the common one (the Wardens, pirates, creatures, traders). */
+export const shipShape = (fid, type) => (FLEET_STYLES[fid] && FLEET_STYLES[fid].shapes[type]) || SHIP_SHAPES[type] || SHIP_SHAPES.frigate;
+/** "Aegis-class cruiser" (plural: "Aegis-class cruisers"); a ship with no class keeps its plain name. */
+export function shipLabel(fid, type, plural = false) {
+  const c = FLEET_STYLES[fid] && FLEET_STYLES[fid].classes[type], n = SHIPS[type].name;
+  const base = c ? `${c}-class ${n.toLowerCase()}` : n;
+  return plural && !base.endsWith("s") ? base + "s" : base;
+}
+
 // Research: three fields. cost in science; needs: earlier techs.
 export const TECHS = [
   { id: "sensors", name: "Deep sensors", field: "Physics", cost: 150, needs: [], text: "+1 sensor range for ships and worlds." },
