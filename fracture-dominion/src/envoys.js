@@ -3,8 +3,9 @@
 // an offer of alliance, a call to join a war, a gift, a declaration of war, or (for an ally) a call to arms. Most ask for
 // an answer, and every answer is remembered (game.js remember()): it moves their standing with you, and the Diplomacy
 // tab lists what they remember.
-import { PERSONALITIES, TECHS } from "./data.js";
-import { player, faction, coloniesOf, fleetsOf, armed, atWar, allied, militaryPower, declareWar, remember, log, rng, admiralsOf, admTitle, setDestination, researchItem } from "./game.js";
+import { PERSONALITIES, TECHS, PROTECTION } from "./data.js";
+import { player, faction, coloniesOf, fleetsOf, armed, atWar, allied, militaryPower, declareWar, remember, log, rng, admiralsOf, admTitle, setDestination, researchItem, spawnFleet } from "./game.js";
+import { payPirates } from "./wilds.js";
 import { distance } from "./hex.js";
 
 const enMe = (s) => player(s);
@@ -55,7 +56,7 @@ const CANDIDATES = {
 /** Once a turn: now and then (every four turns at most), one rival has something to say. */
 export function envoysTurn(s) {
   if (s.winner) return;
-  s.inbox = (s.inbox || []).filter((m) => ["hello", "war", "callToArms"].includes(m.kind) || s.turn - m.turn <= 3);
+  s.inbox = (s.inbox || []).filter((m) => ["hello", "war", "callToArms"].includes(m.kind) || s.turn - m.turn <= (OUTSIDERS[m.kind] ? 1 : 3));
   if (s.turn < 8 || s.turn - (s.lastEnvoy || 0) < 4 || s.inbox.some((m) => CANDIDATES[m.kind])) return;
   const R = rng(s);
   if (R.next() > 0.4) { R.save(); return; }
@@ -126,9 +127,53 @@ const ANSWERS = {
 };
 const CALL_TO_ARMS = "{them} have attacked us. By our alliance, we call on {you} to stand with us. Will you?";
 
+/**
+ * Messages from outside the powers: the pirates (a ransom when their raiders hold one of your worlds, tribute when a
+ * haven sets up near you) and the free traders (a deal, when a convoy reaches one of your worlds). Their answers are
+ * built for the message; `apply` returns what came of it.
+ */
+const OUTSIDERS = {
+  ransom: { leader: "The raider captain", title: "Pirates", attitude: "hostile",
+    text: (s, c) => `We hold the sky over ${s.systems[c.world].name}. ${c.n} credits and we're gone, and we'll leave every world of yours alone for ${PROTECTION.turns} turns. Or we stay, and take it a little at a time.`,
+    options: (s, c) => [
+      { id: "pay", label: `Pay the ransom (${c.n} credits)`, does: `Their raiders leave ${s.systems[c.world].name} now, and let your worlds be for ${PROTECTION.turns} turns.`,
+        apply: (s) => { const r = payPirates(s, enMe(s).id, c.home, c.n); return r.error ? `You can't: ${r.error}` : `You pay. The raiders break orbit, laughing. They'll leave your worlds alone until turn ${r.until}.`; } },
+      { id: "refuse", label: "Refuse", does: "They stay and take credits each turn until warships drive them off (lose a ship there and they stay away 15 turns).", apply: () => "The raiders settle in to take what they can. Send warships." },
+    ] },
+  tribute: { leader: "The haven's master", title: "Pirates", attitude: "hostile",
+    text: (s, c) => `We've made a home at ${c.where}, close to your worlds. A gift of ${c.n} credits and our ships won't trouble yours for ${PROTECTION.turns} turns. No gift, and we'll come calling.`,
+    options: (s, c) => [
+      { id: "pay", label: `Pay tribute (${c.n} credits)`, does: `Their raiders leave your worlds alone for ${PROTECTION.turns} turns.`, apply: (s) => { const r = payPirates(s, enMe(s).id, c.home, c.n); return r.error ? `You can't: ${r.error}` : `The tribute is paid. Their raiders will leave your worlds be until turn ${r.until}.`; } },
+      { id: "refuse", label: "Refuse", does: "Their raiders may come for your established worlds. Burn the haven for a bounty (100 credits, 50 research).", apply: () => "No tribute. You'll deal with them another way." },
+    ] },
+  trader: { leader: "A merchant captain", title: "The Free Traders", attitude: "friendly",
+    text: (s, c) => `Our convoy made ${s.systems[c.world].name} safe and sound. Before we go, a little business? ${TRADER_OFFERS[c.offer].pitch(s, c)}`,
+    options: (s, c) => [{ id: "deal", label: TRADER_OFFERS[c.offer].label(s, c), does: TRADER_OFFERS[c.offer].does(s, c), apply: (s) => TRADER_OFFERS[c.offer].apply(s, c) },
+      { id: "no", label: "No, thank you", does: "They go on their way.", apply: () => "The merchants shrug and go on their way. There'll be another convoy." }] },
+};
+/** What a trader convoy can offer the player. */
+export const TRADER_OFFERS = {
+  buyExotics: { pitch: () => "Exotic matter, two units, fresh from the far Exchanges.", label: (s, c) => `Buy 2 exotics for ${c.n} credits`, does: () => "+2 exotics.",
+    apply: (s, c) => { const me = enMe(s); if (me.credits < c.n) return "You haven't the credits."; me.credits -= c.n; me.exotics += 2; return `+2 exotics, for ${c.n} credits.`; } },
+  sellExotics: { pitch: () => "We'd buy exotics from you, two units, at a good price.", label: (s, c) => `Sell 2 exotics for ${c.n} credits`, does: () => "−2 exotics.",
+    apply: (s, c) => { const me = enMe(s); if (me.exotics < 2) return "You haven't two exotics to sell."; me.exotics -= 2; me.credits += c.n; return `Sold: +${c.n} credits.`; } },
+  frigate: { pitch: () => "A frigate, a little used, crew not included. She flies.", label: (s, c) => `Buy the frigate for ${c.n} credits`, does: (s, c) => `A frigate joins you at ${s.systems[c.world].name}.`,
+    apply: (s, c) => { const me = enMe(s); if (me.credits < c.n) return "You haven't the credits."; me.credits -= c.n; spawnFleet(s, me.id, s.systems[c.world].at, ["frigate"]); return `The frigate is yours, in orbit over ${s.systems[c.world].name}.`; } },
+  rumor: { pitch: () => "A rumor, for a price: where something of the old empires still lies.", label: (s, c) => `Buy the rumor for ${c.n} credits`, does: () => "You learn where a hidden relic lies.",
+    apply: (s, c) => { const me = enMe(s), x = s.systems[c.site]; if (me.credits < c.n) return "You haven't the credits."; if (!x || !x.relic) return "The rumor's gone stale: someone got there first."; me.credits -= c.n; for (const k of Object.keys(s.hexes)) if (distance(k, x.at) <= 1) me.explored[k] = 1; x.rumored = me.id; return `They swear by it: a relic of the old empires lies at ${x.name}. The first fleet to end its turn there recovers it.`; } },
+  charts: { pitch: () => "Star charts of the lanes around here, the ones we fly.", label: (s, c) => `Buy the charts for ${c.n} credits`, does: () => "Every hex within 6 of here is charted for you.",
+    apply: (s, c) => { const me = enMe(s); if (me.credits < c.n) return "You haven't the credits."; me.credits -= c.n; const at = s.systems[c.world].at; for (const k of Object.keys(s.hexes)) if (distance(k, at) <= 6) me.explored[k] = 1; return "The charts are yours: everything within 6 hexes is mapped."; } },
+};
+
 /** The message waiting for the player: who sends it, what they say, the answers. */
 export function currentEnvoy(s) {
   const m = (s.inbox || [])[0]; if (!m) return null;
+  if (OUTSIDERS[m.kind]) {
+    const O = OUTSIDERS[m.kind], F = faction(s, m.from);
+    if ((m.kind === "ransom" || m.kind === "tribute") && !fleetsOf(s, "pirates").some((r) => r.home === m.ctx.home || r.at === m.ctx.home)) { s.inbox.shift(); return currentEnvoy(s); }
+    return { from: m.from, name: F ? F.name : O.title, color: F ? F.color : "#999", leader: O.leader, title: O.title, kind: m.kind, text: O.text(s, m.ctx), attitude: O.attitude,
+      options: O.options(s, m.ctx).map((o) => ({ id: o.id, label: o.label, does: o.does })) };
+  }
   const F = faction(s, m.from); if (!F || !F.alive) { s.inbox.shift(); return currentEnvoy(s); }
   const ctx = { ...m.ctx, them: m.ctx.them || m.ctx.enemy };
   const text = m.kind === "callToArms" ? CALL_TO_ARMS.replace("{them}", faction(s, m.ctx.enemy).name).replace("{you}", enMe(s).name)
@@ -140,6 +185,12 @@ export function currentEnvoy(s) {
 /** The player's answer: what it does, and what came of it. */
 export function answerEnvoy(s, optId) {
   const m = (s.inbox || [])[0]; if (!m) return { error: "No message is waiting." };
+  if (OUTSIDERS[m.kind]) {
+    const O = OUTSIDERS[m.kind], o = O.options(s, m.ctx).find((x) => x.id === optId); if (!o) return { error: "No such answer." };
+    s.inbox.shift(); const text = o.apply(s);
+    log(s, enMe(s).id, `${O.leader} (${O.title}): you answered "${o.label}". ${text}`, "diplo");
+    return { ok: true, name: O.title, choice: o.label, text };
+  }
   const o = ANSWERS[m.kind].find((x) => x.id === optId); if (!o) return { error: "No such answer." };
   const F = faction(s, m.from), R = rng(s);
   s.inbox.shift();

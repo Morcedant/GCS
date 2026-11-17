@@ -5,6 +5,7 @@ import { ensureDirectives, directivesTurn } from "../src/orders.js";
 import { eventsTurn, currentEvent, chooseEvent } from "../src/events.js";
 import { crisisTurn, crisisState } from "../src/crisis.js";
 import { wildsTurn, wildsState } from "../src/wilds.js";
+import { tradersTurn } from "../src/traders.js";
 import { envoysTurn, currentEnvoy, answerEnvoy } from "../src/envoys.js";
 import { admiralsOf } from "../src/game.js";
 const seed = +(process.argv[2] || 7), turns = +(process.argv[3] || 200), size = process.argv[4] || "medium";
@@ -13,7 +14,7 @@ ensureDirectives(s);
 s.factions[0].ai = true;
 const t0 = Date.now(); let evs = 0; const msgs = {};
 for (let i = 0; i < turns && !s.winner; i++) {
-  endTurn(s, aiTurn); directivesTurn(s); crisisTurn(s); wildsTurn(s); s.directives.reports = []; s.battleReports = [];
+  endTurn(s, aiTurn); directivesTurn(s); crisisTurn(s); wildsTurn(s); tradersTurn(s); s.directives.reports = []; s.battleReports = [];
   eventsTurn(s); if (s.galEvent) { const e = currentEvent(s); chooseEvent(s, e.options[s.turn % e.options.length].id); evs++; }
   envoysTurn(s); for (let m; (m = currentEnvoy(s)); ) { msgs[m.kind] = (msgs[m.kind] || 0) + 1; answerEnvoy(s, m.options[(s.turn + 1) % m.options.length].id); }
   if (process.env.CRISIS && s.crisis && s.crisis.stage === "awake" && s.turn % 5 === 0) { const c = crisisState(s); console.log(`  T${s.turn} heart ${c.hull}/${c.max} wave ${c.wave} warden ships ${c.ships}`); }

@@ -3,7 +3,7 @@
 // wants. Void leviathans drift between the stars and feed on unguarded worlds. All of them are at war with every power
 // (never with each other); destroying one pays a bounty in credits and research (game.js, bounty).
 import { makeRng, distance } from "./hex.js";
-import { SHIPS, WILDS, WILD_LEVELS } from "./data.js";
+import { SHIPS, WILDS, WILD_LEVELS, PROTECTION, TRADERS } from "./data.js";
 import { player, faction, fleetsOf, fleetsAt, spawnFleet, setDestination, guarded, log, rng, placeAnomalies, placeRelics } from "./game.js";
 
 export const PIRATES = "pirates", BEASTS = "beasts";
@@ -101,6 +101,7 @@ function newHaven(s, R) {
   const f = spawnFleet(s, PIRATES, pick.k, ["haven"]); f.home = pick.k; f.born = s.turn;
   const near = Object.values(s.systems).filter((x) => x.colony && distance(x.at, pick.k) <= WILDS.raidRange).sort((a, b) => distance(a.at, pick.k) - distance(b.at, pick.k));
   const where = pick.name || `an asteroid field near ${near[0] ? near[0].name : "the frontier"}`;
+  for (const fid of new Set(near.map((x) => x.colony.owner))) demandTribute(s, fid, f, where, R);
   for (const fid of new Set(near.map((x) => x.colony.owner))) log(s, fid, `Pirates have set up a haven at ${where}, close to your worlds. Its raiders will come for weak worlds until someone burns it (a bounty of ${WILDS.bounty.haven.credits} credits and ${WILDS.bounty.haven.research} research).`, "war");
 }
 
@@ -116,17 +117,28 @@ function launchRaiders(s, haven) {
 
 /** Worth a raid: an established colony (population preyPop or more, and not newly founded). Outposts and young colonies
  * have nothing worth taking, so the frontier can still be settled. */
-const worthRaiding = (s, x) => !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns)
+const worthRaiding = (s, x, home) => !protectedFrom(s, x.colony && x.colony.owner, home) && !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns)
   && !(s.wilds && s.wilds.avoid && s.wilds.avoid[x.id] > s.turn));   // a world that cost them ships: they stay away a while
 /** Raiders: hold an unguarded orbit for a few turns, taking credits each turn (the blockade halves the world's yields
  * too); hurt or done, go home; otherwise pick the next weak world within reach of the haven. */
+/** The nearest merchant convoy within TRADERS.hunt hexes with no warships beside it, and where to meet it: a hex or two
+ * along its way. */
+function convoyPrey(s, f) {
+  const c = fleetsOf(s, "traders").filter((x) => distance(x.at, f.at) <= TRADERS.hunt && !fleetsAt(s, x.at).some((o) => o.owner !== "traders" && o.owner !== PIRATES && o.ships.some((y) => SHIPS[y.type].skill > 0)))
+    .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  return c ? (c.path.length ? c.path[Math.min(c.path.length - 1, 1)].hex : c.at) : null;
+}
 function raid(s, f, R) {
+  const hurt0 = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
+  // On the way somewhere, or between raids: a convoy in reach is worth turning for.
+  if (!hurt0 && !(f.stay > 0)) { const meet = convoyPrey(s, f); if (meet && meet !== f.at && setDestination(s, f.id, meet).ok) return; }
   if (f.path.length) return;
   const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
   const hurt = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
-  if (sys && worthRaiding(s, sys) && !guarded(s, sys, PIRATES) && !hurt && (f.stay || 0) < WILDS.raidStay) {
+  if (sys && worthRaiding(s, sys, f.home) && !guarded(s, sys, PIRATES) && !hurt && (f.stay || 0) < WILDS.raidStay) {
     const c = sys.colony, F = faction(s, c.owner), take = Math.min(Math.max(0, Math.floor(F.credits)), WILDS.raidCredits + (c.kind === "colony" ? c.pop * WILDS.raidPerPop : 0));
     f.stay = (f.stay || 0) + 1;
+    if (f.stay === 1 && !f.asked) { f.asked = true; demandRansom(s, f, sys, R); if (!s.fleets[f.id] || f.stay >= WILDS.raidStay) return; }
     if (take > 0) { F.credits -= take; log(s, F.id, `Pirate raiders hold the orbit of ${sys.name} and took ${take} credits. Send warships, or give it guns.`, "war"); }
     else if (f.stay === 1) log(s, F.id, `Pirate raiders hold the orbit of ${sys.name}: it's blockaded until they're driven off.`, "war");
     return;
@@ -135,7 +147,8 @@ function raid(s, f, R) {
   const haven = s.fleets && havens(s).find((h) => h.at === f.home);
   if (hurt && haven && f.at !== haven.at) { setDestination(s, f.id, haven.at); return; }
   const from = haven ? haven.at : f.at;
-  const prey = Object.values(s.systems).filter((x) => worthRaiding(s, x) && x !== sys && distance(x.at, from) <= WILDS.raidRange && !guarded(s, x, PIRATES))
+  f.asked = false;
+  const prey = Object.values(s.systems).filter((x) => worthRaiding(s, x, f.home) && x !== sys && distance(x.at, from) <= WILDS.raidRange && !guarded(s, x, PIRATES))
     .map((x) => ({ x, v: (x.colony.kind === "colony" ? x.colony.pop : 1) - distance(x.at, f.at) * 0.5 })).sort((a, b) => b.v - a.v).slice(0, 3);
   const pick = prey[R.int(Math.max(1, prey.length))];
   if (pick && setDestination(s, f.id, pick.x.at).ok) return;
@@ -162,4 +175,31 @@ function wander(s, f, R) {
   if (f.stay < 2) return;
   const near = Object.values(s.systems).filter((x) => x.at !== f.at && distance(x.at, f.at) <= 6);
   for (let i = 0; i < 4 && near.length; i++) { const x = near[R.int(near.length)]; if (setDestination(s, f.id, x.at).ok) { f.stay = 0; if (x.colony && seenBy(s, f.at)) log(s, x.colony.owner, `The void leviathan is drifting toward ${x.name}.`, "war"); return; } }
+}
+
+// ---- protection: ransom and tribute ----
+/** A power that paid a haven (ransom or tribute) is left alone by its raiders until the turn it paid for. */
+export const protectedFrom = (s, fid, home) => !!(fid && home && s.wilds && s.wilds.paid && s.wilds.paid[fid] && s.wilds.paid[fid][home] > s.turn);
+/** Pay a haven: its raiders leave the payer's worlds alone for PROTECTION.turns, and any holding one of them leave now. */
+export function payPirates(s, fid, home, n) {
+  const F = faction(s, fid); if (!F || F.credits < n) return { error: `That takes ${n} credits.` };
+  if (!havens(s).some((h) => h.at === home) && !fleetsOf(s, PIRATES).some((r) => r.home === home)) return { error: "Those pirates are gone." };
+  F.credits -= n; F.stats.tribute = (F.stats.tribute || 0) + n;
+  const W = s.wilds; W.paid = W.paid || {}; W.paid[fid] = W.paid[fid] || {}; W.paid[fid][home] = s.turn + PROTECTION.turns;
+  for (const r of fleetsOf(s, PIRATES)) if (r.home === home && s.sysAt[r.at] && s.systems[s.sysAt[r.at]].colony && s.systems[s.sysAt[r.at]].colony.owner === fid) r.stay = WILDS.raidStay;
+  return { ok: true, until: W.paid[fid][home] };
+}
+const ransomOf = (sys) => PROTECTION.ransomBase + PROTECTION.ransomPerPop * (sys.colony.pop || 0);
+const tributeOf = (s) => Math.round(PROTECTION.tributeBase + PROTECTION.tributePerTurn * s.turn);
+/** The player is asked (a message); a computer power pays if it's rich, and otherwise fights. */
+function demandRansom(s, f, sys, R) {
+  const fid = sys.colony.owner, F = faction(s, fid), n = ransomOf(sys);
+  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.6) payPirates(s, fid, f.home, n); return; }
+  (s.inbox = s.inbox || []).push({ kind: "ransom", from: PIRATES, ctx: { n, world: sys.id, home: f.home }, turn: s.turn });
+}
+function demandTribute(s, fid, haven, where, R) {
+  const F = faction(s, fid), n = tributeOf(s);
+  if (!F || !F.alive) return;
+  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.4) payPirates(s, fid, haven.at, n); return; }
+  (s.inbox = s.inbox || []).push({ kind: "tribute", from: PIRATES, ctx: { n, where, home: haven.at }, turn: s.turn });
 }

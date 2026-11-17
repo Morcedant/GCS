@@ -2,7 +2,7 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
-import { faction, engineHeld, relicHeld, useRelic, shardTargets, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
@@ -67,6 +67,11 @@ function diplomacy(s, F, diff) {
       const coalition = E && E.owner === oid ? s.factions.filter((X) => X.alive && X.id !== oid && !allied(s, X.id, oid)).reduce((t, X) => t + militaryPower(s, X.id), 0) : 0;
       if (E && E.owner === oid && s.turn - E.built >= 8 && mine > 6 && mine >= theirs * 0.2 && coalition >= theirs * 0.9 / diff && s.turn % 4 === 0) {
         declareWar(s, F.id, oid); log(s, null, `${F.name} joins the war on ${O.name}, holder of the Corridor Engine.`, "war"); continue;
+      }
+      // A pirate patrol pact, while pirates are about.
+      if (!r.patrol && r.score >= 0 && s.turn % 9 === 0 && s.wilds && fleetsOf(s, "pirates").length) {
+        if (O.ai) propose(s, F.id, oid, "patrol");
+        else if (!s.offers.some((o) => o.from === F.id && o.what === "patrol")) { s.offers.push({ from: F.id, to: oid, what: "patrol", turn: s.turn }); log(s, oid, `${F.name} propose a pirate patrol pact.`, "diplo"); }
       }
       if (!r.treaty && r.score >= 0 && s.turn % 7 === 0) {
         if (O.ai) propose(s, F.id, oid, "trade");
@@ -197,6 +202,7 @@ function fleets(s, F) {
       // A rival's Corridor Engine (an open game): with no troops coming to take it, bring it down.
       const noTroops = !fleetsOf(s, F.id).some((x) => x.ships.some((y) => y.type === "transport"));
       const bt = barrageTargets(s, f.id), aim = [noTroops ? "engine" : null, "shipyard", "battery"].find((b) => b && bt.includes(b));
+      if (canRaidDepot(s, f.id)) raidDepot(s, f.id);   // an enemy's fuel depot, unguarded: take its fuel
       if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
@@ -231,7 +237,7 @@ function fleets(s, F) {
  * fleet can beat, for the bounty and to keep its worlds safe. */
 function huntWilds(s, F, f, reach) {
   const power = (fl, fid) => fl.ships.reduce((t, x) => { const st = shipStats(s, fid, x.type); return t + (st.skill ? (fl.owner === F.id ? st.hull : x.hull) * st.dmg * (st.shots || 1) : 0); }, 0);
-  const mine = power(f, F.id), cols = coloniesOf(s, F.id); if (!cols.length || f.ships.length < 2) return false;
+  const mine = power(f, F.id), cols = s.factions.filter((P) => P.alive && patrolling(s, F.id, P.id)).flatMap((P) => coloniesOf(s, P.id)); if (!cols.length || f.ships.length < 2) return false;
   const pick = [...fleetsOf(s, "pirates"), ...fleetsOf(s, "beasts")].filter((w) => F.explored[w.at] && armed(w))
     .map((w) => ({ w, near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at), still: w.ships.some((x) => !SHIPS[x.type].speed) }))
     .filter((x) => x.near <= reach + (x.still ? 2 : 0) && power(x.w, x.w.owner) * 1.4 <= mine).sort((a, b) => a.d - b.d)[0];

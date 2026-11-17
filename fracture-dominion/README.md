@@ -32,6 +32,19 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   everywhere), the Last Archive (+20% science), the Crown of the First Empire (+20% credits, and everyone's regard rises),
   the Fold Anchor (+1 speed), the Aegis Lattice (its world gets guns with 6 more hull; +1 skill for all your guns) and
   the Seed Vault (+2 population room everywhere).
+- **Pirate protection:** raiders holding one of your worlds demand a ransom (15 + 6 per population); a new haven near
+  your worlds demands tribute (25 + 0.4 × the turn). Pay either and that haven's raiders leave all your worlds alone for
+  20 turns (any holding one leave at once); refuse and they come or stay. Computer powers pay when they're rich.
+- **Pirate patrol pacts** (Diplomacy): partners' warships guard each other's worlds from raiders, each gets half the
+  bounty when the other destroys a pirate ship, and regard grows. War ends a pact. The computer powers propose them
+  while pirates are about, and hunt pirates near their partners' worlds too.
+- **Depot raids:** at war, with warships in an enemy fuel depot's system and none of theirs, raid it: your fleet and its
+  tankers fill up, and the depot gives them no supply for 5 turns.
+- **The Free Traders:** merchant convoys run between colonies with an Exchange (any power's, if the two aren't at war,
+  within 10 hexes) and pay both worlds' owners when they arrive (4 + 1 per hex). They're at peace with everyone but the
+  pirates: raiders go after a convoy with no warships beside it, and plunder one that ends its turn next to them. A
+  convoy that reaches one of your worlds sometimes offers a deal: exotics to buy or sell, a used frigate, star charts,
+  or a rumor of where a relic lies.
 - **The wild things:** threats that belong to no power, at war with everyone. **Pirate havens** (8 hull, two shots of 2)
   appear in empty systems near the settled worlds from turn 30, another every 22 turns (up to 2–5 by galaxy size); each
   sends out raiders who hold the orbits of established, unguarded colonies (population 3 or more, founded 12 or more

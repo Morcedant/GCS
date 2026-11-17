@@ -1,13 +1,14 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS } from "./data.js";
-import { newGame, endTurn, gunsMax, gunsUp, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, DEPOT_RAID, TRADERS } from "./data.js";
+import { newGame, endTurn, gunsMax, gunsUp, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
 import { crisisTurn, crisisState } from "./crisis.js";
-import { wildsTurn, wildsState, wildsLevel, setWildsLevel } from "./wilds.js";
+import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
+import { tradersTurn, convoyValue } from "./traders.js";
 import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
@@ -387,6 +388,8 @@ function fleetHTML() {
     h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit. Keep warships here: the battle at the end of the turn knocks the guns out, and a world under siege can't repair them, so you can land next turn." : ""}${!war ? " You're not at war with them." : ""}</p>
       <p class="small muted" style="margin-top:-4px">Troops: ${tr} transport${tr === 1 ? "" : "s"} × ${per} = ${o.troops}. Defense: ${defParts} = ${o.defense}. ${o.troops >= o.defense ? "<b class=\"good\">Enough: the landing takes it.</b>" : `<b class="bad">Not enough: ${fmt(o.defense - o.troops)} more troops needed, or the transports are lost.</b>`}</p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops</button>`;
   }
+  // Raiding an enemy's fuel depot.
+  if (canRaidDepot(S, f.id)) h += `<h3>Their fuel depot</h3><p class="small muted" style="margin-top:-4px">Take its fuel: this fleet and its tankers fill up, and the depot gives them no supply for ${DEPOT_RAID.cut} turns.</p><button class="btn wide" data-depotraid>Raid the depot</button>`;
   // The Corridor Engine's gate (an open game): from the Engine world to any of your worlds.
   const gt = gateTargets(S, f.id);
   if (gt.length) { const E = engineHeld(S), shut = S.turn < E.gate;
@@ -675,7 +678,7 @@ function diplomacyHTML() {
   const offers = S.offers.filter((o) => o.to === me.id);
   for (const o of offers) {
     const F = faction(S, o.from);
-    h += `<div class="offer"><p><b style="color:${F.color}">${esc(F.name)}</b> ${o.what === "peace" ? "offers peace." : "proposes a trade treaty: +3 credits a turn each."}</p><div class="btn-row"><button class="btn primary" data-offer="${S.offers.indexOf(o)}:yes">Accept</button><button class="btn" data-offer="${S.offers.indexOf(o)}:no">Decline</button></div></div>`;
+    h += `<div class="offer"><p><b style="color:${F.color}">${esc(F.name)}</b> ${o.what === "peace" ? "offers peace." : o.what === "patrol" ? "proposes a pirate patrol pact: your warships guard each other's worlds from raiders, and you share pirate bounties." : "proposes a trade treaty: +3 credits a turn each."}</p><div class="btn-row"><button class="btn primary" data-offer="${S.offers.indexOf(o)}:yes">Accept</button><button class="btn" data-offer="${S.offers.indexOf(o)}:no">Decline</button></div></div>`;
   }
   const met = S.factions.filter((F) => F.id !== me.id && me.met[F.id]);
   if (!met.length) h += `<p class="muted">You haven't met anyone yet. Send out scouts.</p>`;
@@ -686,7 +689,7 @@ function diplomacyHTML() {
       <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}</b> · ${esc(P.title || "")}: ${esc(P.text || "")}</p>
       <p class="small">${r.status === "war" ? `<b class="bad">At war</b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied</b>" : "<b>At peace</b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}</b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.</p>
       ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:</p><ul class="small mem">${mem.map((m) => `<li class="${m.d >= 0 ? "good" : "bad"}">${esc(m.text)} <span class="muted">(turn ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})</span></li>`).join("")}</ul>` : ""}
-      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace</button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}</button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}</button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}</button>`}</div>` : ""}</div>`;
+      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace</button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}</button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}</button><button class="btn" data-dip="${F.id}:${r.patrol ? "endPatrol" : "patrol"}" title="Your warships guard each other's worlds from raiders, and you share pirate bounties">${r.patrol ? "End the pirate patrol pact" : "Propose a pirate patrol pact"}</button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}</button>`}</div>` : ""}</div>`;
   }
   return h;
 }
@@ -745,6 +748,7 @@ function bindChrome() {
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.relic) { const r = useRelic(S, me.id, d.relic); if (r.error) toast(r.error, true); else { toast(`The Outer Reach is open: ${r.systems} new systems beyond the rim.`); draw(); } }
     else if (d.shard) { const r = useRelic(S, me.id, "shard", { from: sel.id, to: d.shard }); if (r.error) toast(r.error, true); else toast(`A new corridor: ${S.systems[sel.id].name} to ${S.systems[d.shard].name}.`); }
+    else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
@@ -758,9 +762,11 @@ function bindChrome() {
       else {
         const r = propose(S, me.id, fid, what);
         if (r.error) toast(r.error, true);
-        else { reportSince(what === "peace" ? `Peace with ${F.name}?` : what === "trade" ? `A trade treaty with ${F.name}?` : `Trade with ${F.name}`, since);
+        else { reportSince(what === "peace" ? `Peace with ${F.name}?` : what === "trade" ? `A trade treaty with ${F.name}?` : what === "patrol" ? `A pirate patrol pact with ${F.name}?` : what === "endPatrol" ? `The patrol pact with ${F.name}` : `Trade with ${F.name}`, since);
           report = report || { title: F.name, lines: [] };
           if (what === "endTrade") report.lines.push(`The trade treaty with ${F.name} is over: +3 credits a turn less for each of you.`);
+          else if (what === "patrol" && r.accepted) report.lines.push(`A pirate patrol pact: your warships and theirs guard each other's worlds from raiders, and each of you gets half the bounty when the other destroys a pirate ship.`);
+          else if (what === "endPatrol") report.lines.push(`The pirate patrol pact with ${F.name} is over.`);
           else if (what === "endAlliance") report.lines.push(`The alliance with ${F.name} is over. They won't forget it soon.`);
           else if (what === "alliance" && r.accepted) report.lines.push(`If either of you is attacked, the other joins the war, and you see what their worlds see.`);
           else if (!r.accepted) report.lines.push(`${F.name} refuse${what === "peace" ? ": the war goes on" : ""}. ${F.relations[me.id].score < 0 ? "They don't trust you yet." : "Ask again later."}`); }
@@ -815,6 +821,7 @@ function doEndTurn() {
     if (!S.winner) directivesTurn(S);
     if (!S.winner) crisisTurn(S);
     if (!S.winner) wildsTurn(S);
+    if (!S.winner) tradersTurn(S);
     if (!S.winner) eventsTurn(S);
     if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
@@ -890,7 +897,7 @@ function showGalEvent() {
 // ---------- envoys: the rivals' messages ----------
 function showEnvoy() {
   const m = currentEnvoy(S); if (!m) return;
-  const head = { hello: "First contact", demand: "A demand", warn: "A warning", alliance: "An offer of alliance", joint: "A call to war", gift: "A gift", war: "A declaration of war", callToArms: "A call to arms" }[m.kind];
+  const head = { ransom: "A ransom", tribute: "A demand for tribute", trader: "A merchant's offer", hello: "First contact", demand: "A demand", warn: "A warning", alliance: "An offer of alliance", joint: "A call to war", gift: "A gift", war: "A declaration of war", callToArms: "A call to arms" }[m.kind];
   modal(`<p class="small muted envoy-kicker"><span class="dot" style="background:${m.color}"></span>${esc(head)} · from ${esc(m.name)} · they are ${esc(m.attitude)}</p>
     <h1>${esc(m.leader[0].toUpperCase() + m.leader.slice(1))}</h1><p class="small muted" style="margin-top:-6px">${esc(m.title)}</p>
     <blockquote class="envoy">${esc(m.text)}</blockquote>
@@ -1100,6 +1107,8 @@ function showHelp(back) {
       <li><b>Advances:</b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.</li>
       <li><b>Anomalies</b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.</li>
       <li><b>Relics</b> (♦): eleven artifacts of the old empires, hidden in ruins and anomalies. End a fleet's turn at one to recover it; take a world to take its relics. The Founders' Star Chart opens the Outer Reach beyond the rim. See them on the Empire tab.</li>
+      <li><b>Pirate ransom and tribute:</b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts</b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.</li>
+      <li><b>Traders:</b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot</b> to fill its tanks and cut the depot's supply.</li>
       <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>
       <li><b>Invading:</b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.</li>
       <li><b>Diplomacy:</b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.</li>

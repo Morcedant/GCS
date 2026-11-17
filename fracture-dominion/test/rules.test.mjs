@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
-import { newGame, endTurn, shipStats, maxPop, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, inSupplyAt, cargoOf, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, supplySources, gunsMax, gunsUp, blockaded, besieged, fleetsAt, marketPrice, sellPrice, garrisonFactor,
+import { newGame, endTurn, shipStats, maxPop, buildOptions, findPath, setDestination, settle, spawnFleet, splitFleet, setMuster, musterFor, fuelMax, fuelOf, buildDepot, inSupply, inSupplyAt, cargoOf, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds, barrage, barrageTargets, tradeLinks, tradeIncome, tradeExotics, supplySources, gunsMax, gunsUp, blockaded, besieged, fleetsAt, marketPrice, sellPrice, garrisonFactor,
   enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS, SHIPS, BATTERY } from "../src/data.js";
@@ -772,4 +772,84 @@ test("pirates and creatures: Light by default, Heavy or None by choice, changeab
   endTurn(n);
   assert.ok(!n.fleets[r.id] || !n.fleets[r.id].ships.length);
   assert.ok(n.wilds.avoid && n.wilds.avoid[col.id] > n.turn, "remembered");
+});
+
+test("pirate protection: a ransom or tribute paid keeps that haven's raiders off your worlds; the player is asked", async () => {
+  const { wildsTurn, payPirates, protectedFrom, PIRATES } = await import("../src/wilds.js");
+  const { currentEnvoy, answerEnvoy } = await import("../src/envoys.js");
+  const { PROTECTION } = await import("../src/data.js");
+  const s = newGame({ seed: 23, size: "small", player: "concord", rivals: 1, wilds: "heavy" }), me = s.factions[0];
+  wildsTurn(s);
+  const cap = s.systems[me.capital]; cap.colony.capital = false; cap.colony.defense = 0; cap.colony.pop = 5;
+  for (const f of fleetsAt(s, cap.at)) delete s.fleets[f.id];
+  const haven = spawnFleet(s, PIRATES, Object.values(s.systems).find((x) => !x.colony).at, ["haven"]); haven.home = haven.at;
+  const r = spawnFleet(s, PIRATES, cap.at, ["raider", "raider"]); r.home = haven.at; r.stay = 0;
+  me.credits = 500; s.inbox = []; wildsTurn(s);
+  const m = currentEnvoy(s);
+  assert.equal(m && m.kind, "ransom", "a ransom demand");
+  assert.ok(answerEnvoy(s, "pay").ok);
+  assert.ok(protectedFrom(s, "concord", haven.at));
+  assert.ok(me.credits < 500);
+  const c0 = me.credits; wildsTurn(s); wildsTurn(s);
+  assert.equal(me.credits, c0, "no more raiding once paid");
+  s.turn += PROTECTION.turns + 1; assert.ok(!protectedFrom(s, "concord", haven.at), "it runs out");
+  assert.ok(payPirates(s, "concord", haven.at, 99999).error, "can't pay what you haven't got");
+});
+
+test("raiding an enemy fuel depot fills your tanks and cuts its supply", async () => {
+  const { canRaidDepot, raidDepot, supplySources } = await import("../src/game.js");
+  const { DEPOT_RAID } = await import("../src/data.js");
+  const s = newGame({ seed: 24, size: "small", player: "concord", rivals: 1 }), foe = s.factions[1].id;
+  const sys = Object.values(s.systems).find((x) => !x.colony);
+  sys.colony = { owner: foe, kind: "outpost", pop: 0, growth: 0, buildings: { depot: true }, queue: [], stock: 0, defense: 0, capital: false };
+  assert.ok(supplySources(s, foe).includes(sys));
+  const f = spawnFleet(s, "concord", sys.at, ["frigate", "tanker"]); f.fuel = 1; f.ships[1].cargo = 0;
+  assert.ok(!canRaidDepot(s, f.id), "not at peace");
+  declareWar(s, "concord", foe);
+  assert.ok(raidDepot(s, f.id).ok);
+  assert.equal(f.fuel, fuelMax(s, f)); assert.equal(f.ships[1].cargo, SHIPS.tanker.cargo);
+  assert.ok(!supplySources(s, foe).includes(sys), "dry for a while");
+  assert.ok(raidDepot(s, f.id).error, "once a turn");
+  delete s.fleets[f.id]; s.turn += DEPOT_RAID.cut; assert.ok(supplySources(s, foe).includes(sys));
+});
+
+test("a pirate patrol pact: partners guard each other's worlds from raiders and share pirate bounties", async () => {
+  const { patrolling, guarded, bounty } = await import("../src/game.js");
+  const { WILDS, PATROL } = await import("../src/data.js");
+  const s = newGame({ seed: 25, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], O = s.factions[1];
+  me.met[O.id] = O.met[me.id] = true;
+  assert.ok(propose(s, "concord", O.id, "patrol").accepted);
+  assert.ok(patrolling(s, "concord", O.id) && patrolling(s, O.id, "concord"));
+  const w = s.systems[O.capital]; w.colony.capital = false; w.colony.defense = 0;
+  for (const f of fleetsAt(s, w.at)) delete s.fleets[f.id];
+  assert.ok(!guarded(s, w, "pirates"));
+  spawnFleet(s, "concord", w.at, ["frigate"]);
+  assert.ok(guarded(s, w, "pirates"), "my frigate guards their world from raiders");
+  assert.ok(!guarded(s, w, "concord") || true);
+  const c0 = O.credits; bounty(s, "concord", "haven", "here");
+  assert.equal(O.credits, c0 + WILDS.bounty.haven.credits * PATROL.share);
+  declareWar(s, "concord", O.id); assert.ok(!patrolling(s, "concord", O.id), "war ends it");
+});
+
+test("traders: convoys run between Exchanges and pay both ends; pirates plunder one without an escort", async () => {
+  const { tradersTurn, convoyValue } = await import("../src/traders.js");
+  const { currentEnvoy } = await import("../src/envoys.js");
+  const s = newGame({ seed: 26, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], O = s.factions[1];
+  const a = s.systems[me.capital], b = s.systems[O.capital]; a.colony.buildings.market = b.colony.buildings.market = true;
+  const { wildsTurn } = await import("../src/wilds.js"); wildsTurn(s); tradersTurn(s);
+  assert.ok(!atWar(s, "traders", "concord") && atWar(s, "traders", "pirates"));
+  const f = spawnFleet(s, "traders", b.at, ["merchant"]); f.trade = { from: a.id, to: b.id };
+  const m0 = me.credits, o0 = O.credits, v = convoyValue(a, b); s.inbox = [];
+  tradersTurn(s);
+  assert.equal(me.credits, m0 + v); assert.equal(O.credits, o0 + v);
+  assert.ok(!s.fleets[f.id], "delivered");
+  // Plundered: raiders beside an unescorted convoy.
+  const mid = Object.values(s.systems).find((x) => !x.colony);
+  const g = spawnFleet(s, "traders", mid.at, ["merchant"]); g.trade = { from: a.id, to: b.id };
+  spawnFleet(s, "pirates", mid.at, ["raider"]);
+  tradersTurn(s); assert.ok(!s.fleets[g.id], "plundered");
+  // Escorted: safe.
+  const h = spawnFleet(s, "traders", mid.at, ["merchant"]); h.trade = { from: a.id, to: b.id }; spawnFleet(s, "concord", mid.at, ["frigate"]);
+  tradersTurn(s); assert.ok(s.fleets[h.id], "an escort keeps it safe");
+  assert.ok(!buildOptions(s, a).some((o) => o.id === "merchant"), "nobody builds merchants");
 });

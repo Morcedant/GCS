@@ -60,6 +60,7 @@ export const SHIPS = {
   haven: { name: "Pirate haven", cost: 0, upkeep: 0, speed: 0, hull: 8, skill: 12, dmg: 2, shots: 2, sensors: 2, wild: true, text: "A fortified pirate base in an empty system. It sends out raiders until someone burns it." },
   swarm: { name: "Crystal swarm", cost: 0, upkeep: 0, speed: 0, hull: 5, skill: 11, dmg: 1, shots: 3, sensors: 1, wild: true, text: "Living crystal that nests on rich worlds and shreds anything that comes near. It never leaves." },
   leviathan: { name: "Void leviathan", cost: 0, upkeep: 0, speed: 1, hull: 12, skill: 12, dmg: 3, sensors: 2, wild: true, text: "A creature the size of a moon, drifting between the stars. It fights whatever it finds." },
+  merchant: { name: "Merchant convoy", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, fuel: 99, trader: true, text: "Free traders, carrying goods between the Exchanges. They pay both ends when they arrive, if the pirates don't get them first." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
@@ -206,6 +207,25 @@ export const WILD_LEVELS = {
     havens: { small: 2, medium: 3, large: 4, vast: 5 }, havenEvery: 22, raidersPerHaven: 2, raidEvery: 5, raidMax: 5,
     swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathans: 2, leviathanFirst: 40 },
 };
+/**
+ * Pirate protection: raiders holding a world demand a ransom (ransomBase + ransomPerPop × population) to leave it;
+ * a new haven demands tribute from the powers near it (tributeBase + tributePerTurn × the turn). Either buys
+ * `turns` turns in which that haven's raiders leave all your worlds alone.
+ */
+export const PROTECTION = { ransomBase: 15, ransomPerPop: 6, tributeBase: 25, tributePerTurn: 0.4, turns: 20 };
+/** Raiding an enemy's fuel depot: the fleet and its tankers fill up, and the depot gives no supply for `cut` turns. */
+export const DEPOT_RAID = { cut: 5 };
+/** A pirate patrol pact: partners' warships guard each other's worlds against raiders, and each partner gets `share` of
+ * the bounty when the other destroys a pirate ship. */
+export const PATROL = { share: 0.5, regard: 0.3 };
+/**
+ * Traders: a convoy leaves a colony with an Exchange every `every` turns or so for another colony with an Exchange
+ * within `range` hexes whose owner isn't at war with the sender (perPower convoys on the lanes per living power at most),
+ * and pays both ends base + perHex × distance when it arrives. Raiders within `hunt` hexes go after convoys with no
+ * warships beside them, and plunder one that ends its turn within `reach` hexes of them. A convoy reaching one of your
+ * worlds sometimes offers a deal (`offer` chance).
+ */
+export const TRADERS = { every: 15, range: 10, maxPerExchange: 1, perPower: 2, base: 4, perHex: 1, hunt: 4, reach: 1, offer: 0.35, color: "#e6a8d7", name: "The Free Traders" };
 /** Raiders who lose ships at a world stay away from it this many turns. */
 export const RAID_AVOID = 15;
 export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };

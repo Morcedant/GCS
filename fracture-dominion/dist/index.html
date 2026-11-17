@@ -201,7 +201,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 21:19 UTC";
+const BUILD = "2026-11-17 21:32 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -331,6 +331,7 @@ const SHIPS = {
   haven: { name: "Pirate haven", cost: 0, upkeep: 0, speed: 0, hull: 8, skill: 12, dmg: 2, shots: 2, sensors: 2, wild: true, text: "A fortified pirate base in an empty system. It sends out raiders until someone burns it." },
   swarm: { name: "Crystal swarm", cost: 0, upkeep: 0, speed: 0, hull: 5, skill: 11, dmg: 1, shots: 3, sensors: 1, wild: true, text: "Living crystal that nests on rich worlds and shreds anything that comes near. It never leaves." },
   leviathan: { name: "Void leviathan", cost: 0, upkeep: 0, speed: 1, hull: 12, skill: 12, dmg: 3, sensors: 2, wild: true, text: "A creature the size of a moon, drifting between the stars. It fights whatever it finds." },
+  merchant: { name: "Merchant convoy", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, fuel: 99, trader: true, text: "Free traders, carrying goods between the Exchanges. They pay both ends when they arrive, if the pirates don't get them first." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
@@ -477,6 +478,25 @@ const WILD_LEVELS = {
     havens: { small: 2, medium: 3, large: 4, vast: 5 }, havenEvery: 22, raidersPerHaven: 2, raidEvery: 5, raidMax: 5,
     swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathans: 2, leviathanFirst: 40 },
 };
+/**
+ * Pirate protection: raiders holding a world demand a ransom (ransomBase + ransomPerPop × population) to leave it;
+ * a new haven demands tribute from the powers near it (tributeBase + tributePerTurn × the turn). Either buys
+ * `turns` turns in which that haven's raiders leave all your worlds alone.
+ */
+const PROTECTION = { ransomBase: 15, ransomPerPop: 6, tributeBase: 25, tributePerTurn: 0.4, turns: 20 };
+/** Raiding an enemy's fuel depot: the fleet and its tankers fill up, and the depot gives no supply for `cut` turns. */
+const DEPOT_RAID = { cut: 5 };
+/** A pirate patrol pact: partners' warships guard each other's worlds against raiders, and each partner gets `share` of
+ * the bounty when the other destroys a pirate ship. */
+const PATROL = { share: 0.5, regard: 0.3 };
+/**
+ * Traders: a convoy leaves a colony with an Exchange every `every` turns or so for another colony with an Exchange
+ * within `range` hexes whose owner isn't at war with the sender (perPower convoys on the lanes per living power at most),
+ * and pays both ends base + perHex × distance when it arrives. Raiders within `hunt` hexes go after convoys with no
+ * warships beside them, and plunder one that ends its turn within `reach` hexes of them. A convoy reaching one of your
+ * worlds sometimes offers a deal (`offer` chance).
+ */
+const TRADERS = { every: 15, range: 10, maxPerExchange: 1, perPower: 2, base: 4, perHex: 1, hunt: 4, reach: 1, offer: 0.35, color: "#e6a8d7", name: "The Free Traders" };
 /** Raiders who lose ships at a world stay away from it this many turns. */
 const RAID_AVOID = 15;
 const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
@@ -720,12 +740,12 @@ function newGame(opts) {
 // The Wardens (the late-game crisis, crisis.js) are a power of their own, kept out of s.factions: they have no worlds,
 // no diplomacy and no score, and they're at war with everyone.
 // The wild things (wilds.js: pirates, and the creatures of the deep) are kept out of s.factions the same way.
-const faction = (s, id) => s.factions.find((f) => f.id === id) || (s.crisis && s.crisis.F && s.crisis.F.id === id ? s.crisis.F : undefined) || (s.wilds && s.wilds[id]) || undefined;
+const faction = (s, id) => s.factions.find((f) => f.id === id) || (s.crisis && s.crisis.F && s.crisis.F.id === id ? s.crisis.F : undefined) || (s.wilds && s.wilds[id]) || (id === "traders" ? s.traders : undefined) || undefined;
 /** The Wardens, the pirates and the creatures of the deep: at war with every power, never with each other. */
 const isWild = (id) => id === "wardens" || id === "pirates" || id === "beasts";
 /** The level of an advance (repeatable research) a power has. */
 const advLevel = (s, fid, id) => { const F = faction(s, fid); return (F && F.research.adv && F.research.adv[id]) || 0; };
-const has = (s, fid, tech) => faction(s, fid).research.done.includes(tech);
+const has = (s, fid, tech) => { const F = faction(s, fid); return !!F && F.research.done.includes(tech); };
 const player = (s) => s.factions[0];
 function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
 /** Discoveries (systems charted, ruins surveyed, contacts, technologies) are never trimmed from the log. */
@@ -739,10 +759,11 @@ function log(s, fid, text, kind = "info") {
 function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
 function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
-const atWar = (s, a, b) => a !== b && (isWild(a) !== isWild(b) || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
+// The free traders (traders.js) are at peace with everyone but the pirates.
+const atWar = (s, a, b) => a !== b && (a === "traders" || b === "traders" ? a === "pirates" || b === "pirates" : isWild(a) !== isWild(b) || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
 
 /** Does this faction have this prototype fitted? */
-const proto = (s, fid, id) => !!((faction(s, fid).protos || {})[id]);
+const proto = (s, fid, id) => { const F = faction(s, fid); return !!(F && (F.protos || {})[id]); };
 function shipStats(s, fid, type) {
   const base = SHIPS[type], warship = base.skill > 0;
   // The Heart of the Wardens grows with the galaxy it wakes in (crisis.js): more hull, more guns.
@@ -769,14 +790,14 @@ function setFocus(s, fid, kind, n) {
 /** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
 /** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
-const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || x.colony.buildings.depot) && !blockaded(s, x));
+const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || (x.colony.buildings.depot && !(x.colony.depotCut > s.turn))) && !blockaded(s, x));
 /** A supply point is cut while an enemy at war has warships there. */
 const cutAt = (s, fid, hex) => fleetsAt(s, hex).some((o) => armed(o) && atWar(s, fid, o.owner));
 const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) => t + (x.cargo ?? SHIPS.tanker.cargo), 0);
 /** Tankers parked (not moving) with fuel aboard, their system not cut: forward supply points. */
 const tankerPoints = (s, fid) => fleetsOf(s, fid).filter((f) => !f.path.length && cargoOf(f) > 0 && !cutAt(s, fid, f.at));
 const baseSupplyAt = (s, fid, hex) => supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
-const inSupplyAt = (s, fid, hex) => fid === "vael" || isWild(fid) || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
+const inSupplyAt = (s, fid, hex) => fid === "vael" || isWild(fid) || fid === "traders" || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
 /** Draw a unit of fuel from a fleet's own tankers (the fullest first); false if they're dry. */
 function drawCargo(f) {
   const t = f.ships.filter((x) => x.type === "tanker" && (x.cargo ?? SHIPS.tanker.cargo) > 0).sort((a, b) => (b.cargo ?? 12) - (a.cargo ?? 12))[0];
@@ -786,7 +807,7 @@ function drawCargo(f) {
 function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hulls (the Vael) feed themselves
 // ---- fuel ----
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
-const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) ? Infinity : Math.min(...f.ships.map((x) => SHIPS[x.type].fuel || 99)) + 2 * advLevel(s, f.owner, "tanks"));
+const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) || f.owner === "traders" ? Infinity : Math.min(...f.ships.map((x) => SHIPS[x.type].fuel || 99)) + 2 * advLevel(s, f.owner, "tanks"));
 const fuelOf = (s, f) => Math.min(fuelMax(s, f), f.fuel ?? fuelMax(s, f));
 /** Buy a Fuel depot at an outpost of yours, with credits (an outpost has no industry). */
 function buildDepot(s, fid, sysId) {
@@ -962,7 +983,7 @@ function totals(s, fid) {
 function buildOptions(s, sys) {
   const c = sys.colony, fid = c.owner, out = [];
   if (c.kind !== "colony") return out;
-  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && !d.wild && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
+  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && !d.wild && !d.trader && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (d.outpost || c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;   // a depot is for outposts (buildDepot)
     if (d.wonder && !c.capital) continue;
@@ -1211,7 +1232,7 @@ const gunsUp = (sys) => !!(sys.colony && (sys.colony.buildings.battery || sys.co
 const blockaded = (s, sys) => besieged(s, sys) && !gunsUp(sys);
 function guarded(s, sys, attacker) {
   return (sys.colony.buildings.battery || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0
-    || fleetsAt(s, sys.at).some((o) => o.owner === sys.colony.owner && armed(o));
+    || fleetsAt(s, sys.at).some((o) => armed(o) && (o.owner === sys.colony.owner || (attacker === "pirates" && patrolling(s, o.owner, sys.colony.owner))));
 }
 function invade(s, fleetId) {
   const f = s.fleets[fleetId], o = invasionOdds(s, fleetId);
@@ -1229,6 +1250,26 @@ function invade(s, fleetId) {
   sys.colony.pop = Math.max(1, sys.colony.pop - 1);
   log(s, f.owner, `The landing on ${sys.name} failed.`, "war");
   return { ok: true, taken: false };
+}
+/** Partners in a pirate patrol pact (a power counts as patrolling with itself). */
+const patrolling = (s, a, b) => a === b || !!(faction(s, a) && faction(s, a).relations && faction(s, a).relations[b] && faction(s, a).relations[b].patrol);
+/** Raid an enemy's fuel depot: an armed fleet at war with the owner, holding the system unopposed, takes its fuel (the
+ * fleet and its tankers fill up) and leaves it dry: no supply from it for DEPOT_RAID.cut turns. Once a fleet a turn. */
+function canRaidDepot(s, fleetId) {
+  const f = s.fleets[fleetId], sys = f && s.sysAt[f.at] && s.systems[s.sysAt[f.at]], c = sys && sys.colony;
+  return !!(c && c.buildings.depot && c.owner !== f.owner && armed(f) && atWar(s, f.owner, c.owner) && !guarded(s, sys, f.owner) && f.depotRaid !== s.turn && !(c.depotCut > s.turn));
+}
+function raidDepot(s, fleetId) {
+  const f = s.fleets[fleetId];
+  if (!f) return { error: "No such fleet." };
+  if (!canRaidDepot(s, fleetId)) return { error: "Raid an enemy's fuel depot: be at war with them, with warships in its system and none of theirs." };
+  const sys = s.systems[s.sysAt[f.at]], c = sys.colony;
+  f.fuel = fuelMax(s, f); for (const x of f.ships) if (x.type === "tanker") x.cargo = SHIPS.tanker.cargo;
+  c.depotCut = s.turn + DEPOT_RAID.cut; f.depotRaid = s.turn;
+  remember(s, c.owner, f.owner, `raided our fuel depot at ${sys.name}`, -4);
+  log(s, f.owner, `Your fleet raided the fuel depot at ${sys.name}: its tanks are full, and the depot gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
+  log(s, c.owner, `${faction(s, f.owner).name} raided your fuel depot at ${sys.name}: it gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
+  return { ok: true };
 }
 /**
  * A targeted barrage: warships holding an enemy world's orbit (its guns down, no warships of its own there) destroy one
@@ -1378,6 +1419,12 @@ function bounty(s, fid, type, where) {
   K.credits = round1(K.credits + (b.credits || 0)); K.research.progress += b.research || 0; K.exotics += b.exotics || 0;
   K.stats.wild = (K.stats.wild || 0) + 1;
   const got = [b.credits && `${b.credits} credits`, b.research && `${b.research} research`, b.exotics && `${b.exotics} exotics`].filter(Boolean).join(", ");
+  // A pirate patrol pact: each partner gets a share of a pirate bounty.
+  if (type === "raider" || type === "haven") for (const P of s.factions) if (P.alive && P.id !== fid && patrolling(s, fid, P.id)) {
+    const c = Math.round((b.credits || 0) * PATROL.share), r = Math.round((b.research || 0) * PATROL.share);
+    P.credits = round1(P.credits + c); P.research.progress += r;
+    if (!P.ai && (c || r)) log(s, P.id, `Your patrol partner ${K.name} destroyed ${type === "haven" ? "a pirate haven" : "a raider"} at ${where}: your share is ${[c && `${c} credits`, r && `${r} research`].filter(Boolean).join(" and ")}.`, "explore");
+  }
   if (got && (type !== "raider" || !K.ai)) log(s, fid, `${K.name} destroyed ${type === "haven" ? "a pirate haven" : `a ${SHIPS[type].name.toLowerCase()}`} at ${where}: ${got}.`, type === "raider" ? "war" : "explore");
 }
 // ---- diplomacy ----
@@ -1398,6 +1445,7 @@ function declareWar(s, a, b, joining) {
   const betrayal = allied(s, a, b);
   A.relations[b].status = "war"; B.relations[a].status = "war"; A.relations[b].treaty = B.relations[a].treaty = false;
   A.relations[b].allied = B.relations[a].allied = false;
+  A.relations[b].patrol = B.relations[a].patrol = false;
   A.relations[b].turnsAtWar = B.relations[a].turnsAtWar = 0;
   remember(s, b, a, betrayal ? "broke our alliance and declared war on us" : joining ? `joined the war against us, for ${faction(s, joining).name}` : "declared war on us", betrayal ? -50 : -30);
   log(s, a, `${A.name} declared war on ${B.name}${betrayal ? ", breaking their alliance" : joining ? `, honouring its alliance with ${faction(s, joining).name}` : ""}.`, "war");
@@ -1431,6 +1479,14 @@ function propose(s, from, to, what) {
     if (rel.allied) return { error: "You're already allies." };
     yes = !B.ai || rel.score >= 20;
     if (yes) { A.relations[to].allied = B.relations[from].allied = true; remember(s, to, from, "became our ally", 8); log(s, from, `${A.name} and ${B.name} are allies now: if either is attacked, the other joins the war.`, "diplo"); }
+  } else if (what === "patrol") {
+    if (rel.status === "war") return { error: "Not while you're at war." };
+    if (rel.patrol) return { error: "You already patrol together." };
+    yes = !B.ai || rel.score >= -5;
+    if (yes) { A.relations[to].patrol = B.relations[from].patrol = true; remember(s, to, from, "joined us in a pirate patrol pact", 4); log(s, from, `${A.name} and ${B.name} agreed a pirate patrol pact: their warships guard each other's worlds from raiders, and they share pirate bounties.`, "diplo"); }
+  } else if (what === "endPatrol") {
+    if (!rel.patrol) return { error: "You don't patrol together." };
+    A.relations[to].patrol = B.relations[from].patrol = false; remember(s, to, from, "ended our pirate patrol pact", -4); yes = true;
   } else if (what === "endAlliance") {
     if (!rel.allied) return { error: "You're not allies." };
     A.relations[to].allied = B.relations[from].allied = false; remember(s, to, from, "ended our alliance", -15); yes = true;
@@ -1525,6 +1581,7 @@ function endTurn(s, aiTurn) {
   for (const A of s.factions) for (const [bid, r] of Object.entries(A.relations)) {
     if (r.status === "war") r.turnsAtWar++;
     if (r.treaty) r.score = Math.min(40, r.score + 0.5);
+    if (r.patrol) r.score = Math.min(40, r.score + PATROL.regard);
     const B = faction(s, bid);
     if (A.alive && B.alive && coloniesOf(s, A.id).some((x) => coloniesOf(s, bid).some((y) => distance(x.at, y.at) <= 3))) r.score = Math.max(-60, r.score - 0.4);
   }
@@ -1570,10 +1627,10 @@ function economy(s, F) {
   // Pirate, creature and Warden ships were never anyone's to build (an old bug listed them): any queued are struck off,
   // their industry returned, and any built are gone.
   for (const sys of coloniesOf(s, F.id)) {
-    const c = sys.colony, bad = c.queue.filter((q) => q.kind === "ship" && SHIPS[q.id] && (SHIPS[q.id].wild || SHIPS[q.id].warden));
+    const c = sys.colony, bad = c.queue.filter((q) => q.kind === "ship" && SHIPS[q.id] && (SHIPS[q.id].wild || SHIPS[q.id].warden || SHIPS[q.id].trader));
     if (bad.length) { c.queue = c.queue.filter((q) => !bad.includes(q)); c.stock += bad.reduce((n, q) => n + q.progress, 0); }
   }
-  for (const f of fleetsOf(s, F.id)) { f.ships = f.ships.filter((x) => !SHIPS[x.type].wild && !SHIPS[x.type].warden); if (!f.ships.length) delete s.fleets[f.id]; }
+  for (const f of fleetsOf(s, F.id)) { f.ships = f.ships.filter((x) => !SHIPS[x.type].wild && !SHIPS[x.type].warden && !SHIPS[x.type].trader); if (!f.ships.length) delete s.fleets[f.id]; }
   // Each world: production, growth, defenses.
   for (const sys of coloniesOf(s, F.id)) {
     const c = sys.colony, y = yields(s, sys);
@@ -1701,7 +1758,10 @@ function placeRelics(s) {
   s.relics = {}; s.relicsReach = [];
   const R = makeRng("relics:" + s.seed);
   const homes = new Set(s.factions.map((F) => F.capital));
-  const sites = Object.values(s.systems).filter((x) => (x.ruins || x.anomaly) && !homes.has(x.id) && !x.colony).sort((a, b) => (a.id < b.id ? -1 : 1));
+  // Not on a homeworld's doorstep: sites 3 or more hexes from every homeworld (unless there are too few).
+  const far0 = (x) => Math.min(...[...homes].map((h) => distance(s.systems[h].at, x.at)));
+  const all = Object.values(s.systems).filter((x) => (x.ruins || x.anomaly) && !homes.has(x.id) && !x.colony).sort((a, b) => (a.id < b.id ? -1 : 1));
+  const sites = all.filter((x) => far0(x) >= 3).length >= 5 ? all.filter((x) => far0(x) >= 3) : all;
   const rest = Object.keys(RELICS).filter((id) => id !== "chart");
   for (let i = 0; i < REACH.reserved && rest.length > 1; i++) s.relicsReach.push(rest.splice(R.int(rest.length), 1)[0]);
   // The Star Chart lies at the site farthest from every homeworld: no one stumbles on it in the first turns.
@@ -2485,6 +2545,7 @@ function newHaven(s, R) {
   const f = spawnFleet(s, PIRATES, pick.k, ["haven"]); f.home = pick.k; f.born = s.turn;
   const near = Object.values(s.systems).filter((x) => x.colony && distance(x.at, pick.k) <= WILDS.raidRange).sort((a, b) => distance(a.at, pick.k) - distance(b.at, pick.k));
   const where = pick.name || `an asteroid field near ${near[0] ? near[0].name : "the frontier"}`;
+  for (const fid of new Set(near.map((x) => x.colony.owner))) demandTribute(s, fid, f, where, R);
   for (const fid of new Set(near.map((x) => x.colony.owner))) log(s, fid, `Pirates have set up a haven at ${where}, close to your worlds. Its raiders will come for weak worlds until someone burns it (a bounty of ${WILDS.bounty.haven.credits} credits and ${WILDS.bounty.haven.research} research).`, "war");
 }
 
@@ -2500,17 +2561,28 @@ function launchRaiders(s, haven) {
 
 /** Worth a raid: an established colony (population preyPop or more, and not newly founded). Outposts and young colonies
  * have nothing worth taking, so the frontier can still be settled. */
-const worthRaiding = (s, x) => !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns)
+const worthRaiding = (s, x, home) => !protectedFrom(s, x.colony && x.colony.owner, home) && !!(x.colony && x.colony.kind === "colony" && x.colony.pop >= WILDS.preyPop && !(x.colony.founded && s.turn - x.colony.founded < WILDS.youngTurns)
   && !(s.wilds && s.wilds.avoid && s.wilds.avoid[x.id] > s.turn));   // a world that cost them ships: they stay away a while
 /** Raiders: hold an unguarded orbit for a few turns, taking credits each turn (the blockade halves the world's yields
  * too); hurt or done, go home; otherwise pick the next weak world within reach of the haven. */
+/** The nearest merchant convoy within TRADERS.hunt hexes with no warships beside it, and where to meet it: a hex or two
+ * along its way. */
+function convoyPrey(s, f) {
+  const c = fleetsOf(s, "traders").filter((x) => distance(x.at, f.at) <= TRADERS.hunt && !fleetsAt(s, x.at).some((o) => o.owner !== "traders" && o.owner !== PIRATES && o.ships.some((y) => SHIPS[y.type].skill > 0)))
+    .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  return c ? (c.path.length ? c.path[Math.min(c.path.length - 1, 1)].hex : c.at) : null;
+}
 function raid(s, f, R) {
+  const hurt0 = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
+  // On the way somewhere, or between raids: a convoy in reach is worth turning for.
+  if (!hurt0 && !(f.stay > 0)) { const meet = convoyPrey(s, f); if (meet && meet !== f.at && setDestination(s, f.id, meet).ok) return; }
   if (f.path.length) return;
   const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
   const hurt = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
-  if (sys && worthRaiding(s, sys) && !guarded(s, sys, PIRATES) && !hurt && (f.stay || 0) < WILDS.raidStay) {
+  if (sys && worthRaiding(s, sys, f.home) && !guarded(s, sys, PIRATES) && !hurt && (f.stay || 0) < WILDS.raidStay) {
     const c = sys.colony, F = faction(s, c.owner), take = Math.min(Math.max(0, Math.floor(F.credits)), WILDS.raidCredits + (c.kind === "colony" ? c.pop * WILDS.raidPerPop : 0));
     f.stay = (f.stay || 0) + 1;
+    if (f.stay === 1 && !f.asked) { f.asked = true; demandRansom(s, f, sys, R); if (!s.fleets[f.id] || f.stay >= WILDS.raidStay) return; }
     if (take > 0) { F.credits -= take; log(s, F.id, `Pirate raiders hold the orbit of ${sys.name} and took ${take} credits. Send warships, or give it guns.`, "war"); }
     else if (f.stay === 1) log(s, F.id, `Pirate raiders hold the orbit of ${sys.name}: it's blockaded until they're driven off.`, "war");
     return;
@@ -2519,7 +2591,8 @@ function raid(s, f, R) {
   const haven = s.fleets && havens(s).find((h) => h.at === f.home);
   if (hurt && haven && f.at !== haven.at) { setDestination(s, f.id, haven.at); return; }
   const from = haven ? haven.at : f.at;
-  const prey = Object.values(s.systems).filter((x) => worthRaiding(s, x) && x !== sys && distance(x.at, from) <= WILDS.raidRange && !guarded(s, x, PIRATES))
+  f.asked = false;
+  const prey = Object.values(s.systems).filter((x) => worthRaiding(s, x, f.home) && x !== sys && distance(x.at, from) <= WILDS.raidRange && !guarded(s, x, PIRATES))
     .map((x) => ({ x, v: (x.colony.kind === "colony" ? x.colony.pop : 1) - distance(x.at, f.at) * 0.5 })).sort((a, b) => b.v - a.v).slice(0, 3);
   const pick = prey[R.int(Math.max(1, prey.length))];
   if (pick && setDestination(s, f.id, pick.x.at).ok) return;
@@ -2547,6 +2620,107 @@ function wander(s, f, R) {
   const near = Object.values(s.systems).filter((x) => x.at !== f.at && distance(x.at, f.at) <= 6);
   for (let i = 0; i < 4 && near.length; i++) { const x = near[R.int(near.length)]; if (setDestination(s, f.id, x.at).ok) { f.stay = 0; if (x.colony && seenBy(s, f.at)) log(s, x.colony.owner, `The void leviathan is drifting toward ${x.name}.`, "war"); return; } }
 }
+
+// ---- protection: ransom and tribute ----
+/** A power that paid a haven (ransom or tribute) is left alone by its raiders until the turn it paid for. */
+const protectedFrom = (s, fid, home) => !!(fid && home && s.wilds && s.wilds.paid && s.wilds.paid[fid] && s.wilds.paid[fid][home] > s.turn);
+/** Pay a haven: its raiders leave the payer's worlds alone for PROTECTION.turns, and any holding one of them leave now. */
+function payPirates(s, fid, home, n) {
+  const F = faction(s, fid); if (!F || F.credits < n) return { error: `That takes ${n} credits.` };
+  if (!havens(s).some((h) => h.at === home) && !fleetsOf(s, PIRATES).some((r) => r.home === home)) return { error: "Those pirates are gone." };
+  F.credits -= n; F.stats.tribute = (F.stats.tribute || 0) + n;
+  const W = s.wilds; W.paid = W.paid || {}; W.paid[fid] = W.paid[fid] || {}; W.paid[fid][home] = s.turn + PROTECTION.turns;
+  for (const r of fleetsOf(s, PIRATES)) if (r.home === home && s.sysAt[r.at] && s.systems[s.sysAt[r.at]].colony && s.systems[s.sysAt[r.at]].colony.owner === fid) r.stay = WILDS.raidStay;
+  return { ok: true, until: W.paid[fid][home] };
+}
+const ransomOf = (sys) => PROTECTION.ransomBase + PROTECTION.ransomPerPop * (sys.colony.pop || 0);
+const tributeOf = (s) => Math.round(PROTECTION.tributeBase + PROTECTION.tributePerTurn * s.turn);
+/** The player is asked (a message); a computer power pays if it's rich, and otherwise fights. */
+function demandRansom(s, f, sys, R) {
+  const fid = sys.colony.owner, F = faction(s, fid), n = ransomOf(sys);
+  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.6) payPirates(s, fid, f.home, n); return; }
+  (s.inbox = s.inbox || []).push({ kind: "ransom", from: PIRATES, ctx: { n, world: sys.id, home: f.home }, turn: s.turn });
+}
+function demandTribute(s, fid, haven, where, R) {
+  const F = faction(s, fid), n = tributeOf(s);
+  if (!F || !F.alive) return;
+  if (F.ai) { if (F.credits >= n * 3 && R.next() < 0.4) payPirates(s, fid, haven.at, n); return; }
+  (s.inbox = s.inbox || []).push({ kind: "tribute", from: PIRATES, ctx: { n, where, home: haven.at }, turn: s.turn });
+}
+
+// ---- traders.js ----
+// The free traders: merchant convoys that belong to no power. A colony with an Exchange sends one now and then to
+// another colony with an Exchange, of its own power or another's at peace with it; when it arrives, both worlds'
+// owners are paid. They're at peace with every power and at war only with the pirates, whose raiders go after a convoy
+// with no warships beside it (game.js atWar; wilds.js raid). A convoy that reaches one of the player's worlds sometimes
+// offers a deal (envoys.js TRADER_OFFERS).
+
+
+
+const TRADERS_ID = "traders";
+const traderPower = () => ({ id: TRADERS_ID, name: TRADERS.name, color: TRADERS.color, ai: true, alive: true, trader: true, capital: null, credits: 0, exotics: 0,
+  research: { current: null, progress: 0, done: [] }, explored: {}, visible: {}, relations: {}, met: {}, stats: { built: 0, lost: 0, won: 0 },
+  focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} });
+const exchanges = (s) => Object.values(s.systems).filter((x) => x.colony && x.colony.kind === "colony" && x.colony.buildings.market);
+/** What a convoy pays each end when it arrives. */
+const convoyValue = (from, to) => Math.round(TRADERS.base + TRADERS.perHex * distance(from.at, to.at));
+const escorted = (s, hex) => fleetsAt(s, hex).some((o) => o.owner !== TRADERS_ID && o.owner !== "pirates" && armed(o));
+
+/** Once a turn, after the pirates have moved: plunder, arrivals, and new convoys. */
+function tradersTurn(s) {
+  if (s.winner) return;
+  if (!s.traders) s.traders = traderPower();
+  const R = rng(s), me = player(s);
+  for (const f of fleetsOf(s, TRADERS_ID)) {
+    const from = s.systems[f.trade.from], to = s.systems[f.trade.to];
+    // Pirates in the same hex, and no warships beside it: plundered.
+    if (Object.values(s.fleets).some((o) => o.owner === "pirates" && armed(o) && distance(o.at, f.at) <= TRADERS.reach) && !escorted(s, f.at)) {
+      delete s.fleets[f.id]; s.tradeStats = s.tradeStats || { arrived: 0, plundered: 0 }; s.tradeStats.plundered++;
+      for (const fid of new Set([from && from.colony && from.colony.owner, to && to.colony && to.colony.owner].filter(Boolean)))
+        log(s, fid, `Pirates plundered a merchant convoy bound from ${from ? from.name : "?"} to ${to ? to.name : "?"}. Warships beside a convoy keep it safe.`, "war");
+      continue;
+    }
+    // The other end is gone, or at war with the sender now: the convoy goes home, or (if that's gone too) disbands.
+    if (!to || !to.colony || !from || !from.colony || atWar(s, from.colony.owner, to.colony.owner)) { delete s.fleets[f.id]; continue; }
+    if (f.at === to.at) {
+      const v = convoyValue(from, to);
+      for (const fid of new Set([from.colony.owner, to.colony.owner])) { const F = faction(s, fid); F.credits += v; F.stats.tradeIn = (F.stats.tradeIn || 0) + v; }
+      s.tradeStats = s.tradeStats || { arrived: 0, plundered: 0 }; s.tradeStats.arrived++;
+      if (from.colony.owner === me.id || to.colony.owner === me.id) log(s, me.id, `A merchant convoy from ${from.name} reached ${to.name}: +${v} credits${from.colony.owner === to.colony.owner ? "" : " (and as much for the other world's owner)"}.`, "trade");
+      if (to.colony.owner === me.id && R.next() < TRADERS.offer) offer(s, to, R);
+      delete s.fleets[f.id];
+      continue;
+    }
+    if (!f.path.length) setDestination(s, f.id, to.at);
+  }
+  // New convoys: from each Exchange, now and then, up to a few on the lanes at once.
+  const ex = exchanges(s), cap = TRADERS.perPower * s.factions.filter((F) => F.alive).length;
+  for (const from of ex) {
+    if (fleetsOf(s, TRADERS_ID).length >= cap) break;
+    if ((s.turn + from.id.length + Number(from.id.slice(1))) % TRADERS.every !== 0) continue;
+    if (fleetsOf(s, TRADERS_ID).filter((f) => f.trade.from === from.id).length >= TRADERS.maxPerExchange) continue;
+    const dests = ex.filter((x) => x !== from && distance(x.at, from.at) <= TRADERS.range && !atWar(s, from.colony.owner, x.colony.owner));
+    if (!dests.length) continue;
+    const to = dests[R.int(dests.length)], f = spawnFleet(s, TRADERS_ID, from.at, ["merchant"]);
+    f.trade = { from: from.id, to: to.id }; f.dest = to.at;
+    if (setDestination(s, f.id, to.at).error) delete s.fleets[f.id];
+  }
+  R.save();
+}
+
+/** A deal for the player, from a convoy that just reached one of their worlds. */
+function offer(s, world, R) {
+  const me = player(s), kinds = ["buyExotics", "frigate", "charts"];
+  if (me.exotics >= 2) kinds.push("sellExotics");
+  const site = Object.values(s.systems).filter((x) => x.relic && !me.explored[x.at] && distance(x.at, world.at) <= 14).sort((a, b) => distance(a.at, world.at) - distance(b.at, world.at))[0];
+  if (site) kinds.push("rumor", "rumor");
+  const kind = kinds[R.int(kinds.length)];
+  const n = { buyExotics: 30, sellExotics: 36, frigate: 30, rumor: 25, charts: 20 }[kind];
+  (s.inbox = s.inbox || []).push({ kind: "trader", from: TRADERS_ID, ctx: { offer: kind, n, world: world.id, site: site ? site.id : null }, turn: s.turn });
+}
+
+const convoysOf = (s) => fleetsOf(s, TRADERS_ID);
+const SHIP_MERCHANT = SHIPS.merchant;
 
 // ---- events.js ----
 // Galactic events: every few turns something happens to the player's empire that asks for a decision. Each event is a
@@ -2725,6 +2899,7 @@ function chooseEvent(s, optId) {
 
 
 
+
 const enMe = (s) => player(s);
 const enP = (fid) => PERSONALITIES[fid] || PERSONALITIES.concord;
 const enRivals = (s) => s.factions.filter((f) => f.id !== enMe(s).id && f.alive && enMe(s).met[f.id]);
@@ -2773,7 +2948,7 @@ const CANDIDATES = {
 /** Once a turn: now and then (every four turns at most), one rival has something to say. */
 function envoysTurn(s) {
   if (s.winner) return;
-  s.inbox = (s.inbox || []).filter((m) => ["hello", "war", "callToArms"].includes(m.kind) || s.turn - m.turn <= 3);
+  s.inbox = (s.inbox || []).filter((m) => ["hello", "war", "callToArms"].includes(m.kind) || s.turn - m.turn <= (OUTSIDERS[m.kind] ? 1 : 3));
   if (s.turn < 8 || s.turn - (s.lastEnvoy || 0) < 4 || s.inbox.some((m) => CANDIDATES[m.kind])) return;
   const R = rng(s);
   if (R.next() > 0.4) { R.save(); return; }
@@ -2844,9 +3019,53 @@ const ANSWERS = {
 };
 const CALL_TO_ARMS = "{them} have attacked us. By our alliance, we call on {you} to stand with us. Will you?";
 
+/**
+ * Messages from outside the powers: the pirates (a ransom when their raiders hold one of your worlds, tribute when a
+ * haven sets up near you) and the free traders (a deal, when a convoy reaches one of your worlds). Their answers are
+ * built for the message; `apply` returns what came of it.
+ */
+const OUTSIDERS = {
+  ransom: { leader: "The raider captain", title: "Pirates", attitude: "hostile",
+    text: (s, c) => `We hold the sky over ${s.systems[c.world].name}. ${c.n} credits and we're gone, and we'll leave every world of yours alone for ${PROTECTION.turns} turns. Or we stay, and take it a little at a time.`,
+    options: (s, c) => [
+      { id: "pay", label: `Pay the ransom (${c.n} credits)`, does: `Their raiders leave ${s.systems[c.world].name} now, and let your worlds be for ${PROTECTION.turns} turns.`,
+        apply: (s) => { const r = payPirates(s, enMe(s).id, c.home, c.n); return r.error ? `You can't: ${r.error}` : `You pay. The raiders break orbit, laughing. They'll leave your worlds alone until turn ${r.until}.`; } },
+      { id: "refuse", label: "Refuse", does: "They stay and take credits each turn until warships drive them off (lose a ship there and they stay away 15 turns).", apply: () => "The raiders settle in to take what they can. Send warships." },
+    ] },
+  tribute: { leader: "The haven's master", title: "Pirates", attitude: "hostile",
+    text: (s, c) => `We've made a home at ${c.where}, close to your worlds. A gift of ${c.n} credits and our ships won't trouble yours for ${PROTECTION.turns} turns. No gift, and we'll come calling.`,
+    options: (s, c) => [
+      { id: "pay", label: `Pay tribute (${c.n} credits)`, does: `Their raiders leave your worlds alone for ${PROTECTION.turns} turns.`, apply: (s) => { const r = payPirates(s, enMe(s).id, c.home, c.n); return r.error ? `You can't: ${r.error}` : `The tribute is paid. Their raiders will leave your worlds be until turn ${r.until}.`; } },
+      { id: "refuse", label: "Refuse", does: "Their raiders may come for your established worlds. Burn the haven for a bounty (100 credits, 50 research).", apply: () => "No tribute. You'll deal with them another way." },
+    ] },
+  trader: { leader: "A merchant captain", title: "The Free Traders", attitude: "friendly",
+    text: (s, c) => `Our convoy made ${s.systems[c.world].name} safe and sound. Before we go, a little business? ${TRADER_OFFERS[c.offer].pitch(s, c)}`,
+    options: (s, c) => [{ id: "deal", label: TRADER_OFFERS[c.offer].label(s, c), does: TRADER_OFFERS[c.offer].does(s, c), apply: (s) => TRADER_OFFERS[c.offer].apply(s, c) },
+      { id: "no", label: "No, thank you", does: "They go on their way.", apply: () => "The merchants shrug and go on their way. There'll be another convoy." }] },
+};
+/** What a trader convoy can offer the player. */
+const TRADER_OFFERS = {
+  buyExotics: { pitch: () => "Exotic matter, two units, fresh from the far Exchanges.", label: (s, c) => `Buy 2 exotics for ${c.n} credits`, does: () => "+2 exotics.",
+    apply: (s, c) => { const me = enMe(s); if (me.credits < c.n) return "You haven't the credits."; me.credits -= c.n; me.exotics += 2; return `+2 exotics, for ${c.n} credits.`; } },
+  sellExotics: { pitch: () => "We'd buy exotics from you, two units, at a good price.", label: (s, c) => `Sell 2 exotics for ${c.n} credits`, does: () => "−2 exotics.",
+    apply: (s, c) => { const me = enMe(s); if (me.exotics < 2) return "You haven't two exotics to sell."; me.exotics -= 2; me.credits += c.n; return `Sold: +${c.n} credits.`; } },
+  frigate: { pitch: () => "A frigate, a little used, crew not included. She flies.", label: (s, c) => `Buy the frigate for ${c.n} credits`, does: (s, c) => `A frigate joins you at ${s.systems[c.world].name}.`,
+    apply: (s, c) => { const me = enMe(s); if (me.credits < c.n) return "You haven't the credits."; me.credits -= c.n; spawnFleet(s, me.id, s.systems[c.world].at, ["frigate"]); return `The frigate is yours, in orbit over ${s.systems[c.world].name}.`; } },
+  rumor: { pitch: () => "A rumor, for a price: where something of the old empires still lies.", label: (s, c) => `Buy the rumor for ${c.n} credits`, does: () => "You learn where a hidden relic lies.",
+    apply: (s, c) => { const me = enMe(s), x = s.systems[c.site]; if (me.credits < c.n) return "You haven't the credits."; if (!x || !x.relic) return "The rumor's gone stale: someone got there first."; me.credits -= c.n; for (const k of Object.keys(s.hexes)) if (distance(k, x.at) <= 1) me.explored[k] = 1; x.rumored = me.id; return `They swear by it: a relic of the old empires lies at ${x.name}. The first fleet to end its turn there recovers it.`; } },
+  charts: { pitch: () => "Star charts of the lanes around here, the ones we fly.", label: (s, c) => `Buy the charts for ${c.n} credits`, does: () => "Every hex within 6 of here is charted for you.",
+    apply: (s, c) => { const me = enMe(s); if (me.credits < c.n) return "You haven't the credits."; me.credits -= c.n; const at = s.systems[c.world].at; for (const k of Object.keys(s.hexes)) if (distance(k, at) <= 6) me.explored[k] = 1; return "The charts are yours: everything within 6 hexes is mapped."; } },
+};
+
 /** The message waiting for the player: who sends it, what they say, the answers. */
 function currentEnvoy(s) {
   const m = (s.inbox || [])[0]; if (!m) return null;
+  if (OUTSIDERS[m.kind]) {
+    const O = OUTSIDERS[m.kind], F = faction(s, m.from);
+    if ((m.kind === "ransom" || m.kind === "tribute") && !fleetsOf(s, "pirates").some((r) => r.home === m.ctx.home || r.at === m.ctx.home)) { s.inbox.shift(); return currentEnvoy(s); }
+    return { from: m.from, name: F ? F.name : O.title, color: F ? F.color : "#999", leader: O.leader, title: O.title, kind: m.kind, text: O.text(s, m.ctx), attitude: O.attitude,
+      options: O.options(s, m.ctx).map((o) => ({ id: o.id, label: o.label, does: o.does })) };
+  }
   const F = faction(s, m.from); if (!F || !F.alive) { s.inbox.shift(); return currentEnvoy(s); }
   const ctx = { ...m.ctx, them: m.ctx.them || m.ctx.enemy };
   const text = m.kind === "callToArms" ? CALL_TO_ARMS.replace("{them}", faction(s, m.ctx.enemy).name).replace("{you}", enMe(s).name)
@@ -2858,6 +3077,12 @@ function currentEnvoy(s) {
 /** The player's answer: what it does, and what came of it. */
 function answerEnvoy(s, optId) {
   const m = (s.inbox || [])[0]; if (!m) return { error: "No message is waiting." };
+  if (OUTSIDERS[m.kind]) {
+    const O = OUTSIDERS[m.kind], o = O.options(s, m.ctx).find((x) => x.id === optId); if (!o) return { error: "No such answer." };
+    s.inbox.shift(); const text = o.apply(s);
+    log(s, enMe(s).id, `${O.leader} (${O.title}): you answered "${o.label}". ${text}`, "diplo");
+    return { ok: true, name: O.title, choice: o.label, text };
+  }
   const o = ANSWERS[m.kind].find((x) => x.id === optId); if (!o) return { error: "No such answer." };
   const F = faction(s, m.from), R = rng(s);
   s.inbox.shift();
@@ -2934,6 +3159,11 @@ function diplomacy(s, F, diff) {
       const coalition = E && E.owner === oid ? s.factions.filter((X) => X.alive && X.id !== oid && !allied(s, X.id, oid)).reduce((t, X) => t + militaryPower(s, X.id), 0) : 0;
       if (E && E.owner === oid && s.turn - E.built >= 8 && mine > 6 && mine >= theirs * 0.2 && coalition >= theirs * 0.9 / diff && s.turn % 4 === 0) {
         declareWar(s, F.id, oid); log(s, null, `${F.name} joins the war on ${O.name}, holder of the Corridor Engine.`, "war"); continue;
+      }
+      // A pirate patrol pact, while pirates are about.
+      if (!r.patrol && r.score >= 0 && s.turn % 9 === 0 && s.wilds && fleetsOf(s, "pirates").length) {
+        if (O.ai) propose(s, F.id, oid, "patrol");
+        else if (!s.offers.some((o) => o.from === F.id && o.what === "patrol")) { s.offers.push({ from: F.id, to: oid, what: "patrol", turn: s.turn }); log(s, oid, `${F.name} propose a pirate patrol pact.`, "diplo"); }
       }
       if (!r.treaty && r.score >= 0 && s.turn % 7 === 0) {
         if (O.ai) propose(s, F.id, oid, "trade");
@@ -3064,6 +3294,7 @@ function fleets(s, F) {
       // A rival's Corridor Engine (an open game): with no troops coming to take it, bring it down.
       const noTroops = !fleetsOf(s, F.id).some((x) => x.ships.some((y) => y.type === "transport"));
       const bt = barrageTargets(s, f.id), aim = [noTroops ? "engine" : null, "shipyard", "battery"].find((b) => b && bt.includes(b));
+      if (canRaidDepot(s, f.id)) raidDepot(s, f.id);   // an enemy's fuel depot, unguarded: take its fuel
       if (aim && f.barraged !== s.turn) { barrage(s, f.id, aim); if (!f.path.length) continue; }
       if (f.path.length) continue;
       if (huntWardens(s, F, f, 3)) continue;
@@ -3098,7 +3329,7 @@ function fleets(s, F) {
  * fleet can beat, for the bounty and to keep its worlds safe. */
 function huntWilds(s, F, f, reach) {
   const power = (fl, fid) => fl.ships.reduce((t, x) => { const st = shipStats(s, fid, x.type); return t + (st.skill ? (fl.owner === F.id ? st.hull : x.hull) * st.dmg * (st.shots || 1) : 0); }, 0);
-  const mine = power(f, F.id), cols = coloniesOf(s, F.id); if (!cols.length || f.ships.length < 2) return false;
+  const mine = power(f, F.id), cols = s.factions.filter((P) => P.alive && patrolling(s, F.id, P.id)).flatMap((P) => coloniesOf(s, P.id)); if (!cols.length || f.ships.length < 2) return false;
   const pick = [...fleetsOf(s, "pirates"), ...fleetsOf(s, "beasts")].filter((w) => F.explored[w.at] && armed(w))
     .map((w) => ({ w, near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at), still: w.ships.some((x) => !SHIPS[x.type].speed) }))
     .filter((x) => x.near <= reach + (x.still ? 2 : 0) && power(x.w, x.w.owner) * 1.4 <= mine).sort((a, b) => a.d - b.d)[0];
@@ -3119,6 +3350,7 @@ function huntWardens(s, F, f, reach) {
 
 // ---- ui.js ----
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
+
 
 
 
@@ -3505,6 +3737,8 @@ function fleetHTML() {
     h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit. Keep warships here: the battle at the end of the turn knocks the guns out, and a world under siege can't repair them, so you can land next turn." : ""}${!war ? " You're not at war with them." : ""}<\/p>
       <p class="small muted" style="margin-top:-4px">Troops: ${tr} transport${tr === 1 ? "" : "s"} × ${per} = ${o.troops}. Defense: ${defParts} = ${o.defense}. ${o.troops >= o.defense ? "<b class=\"good\">Enough: the landing takes it.<\/b>" : `<b class="bad">Not enough: ${fmt(o.defense - o.troops)} more troops needed, or the transports are lost.<\/b>`}<\/p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops<\/button>`;
   }
+  // Raiding an enemy's fuel depot.
+  if (canRaidDepot(S, f.id)) h += `<h3>Their fuel depot<\/h3><p class="small muted" style="margin-top:-4px">Take its fuel: this fleet and its tankers fill up, and the depot gives them no supply for ${DEPOT_RAID.cut} turns.<\/p><button class="btn wide" data-depotraid>Raid the depot<\/button>`;
   // The Corridor Engine's gate (an open game): from the Engine world to any of your worlds.
   const gt = gateTargets(S, f.id);
   if (gt.length) { const E = engineHeld(S), shut = S.turn < E.gate;
@@ -3793,7 +4027,7 @@ function diplomacyHTML() {
   const offers = S.offers.filter((o) => o.to === me.id);
   for (const o of offers) {
     const F = faction(S, o.from);
-    h += `<div class="offer"><p><b style="color:${F.color}">${esc(F.name)}<\/b> ${o.what === "peace" ? "offers peace." : "proposes a trade treaty: +3 credits a turn each."}<\/p><div class="btn-row"><button class="btn primary" data-offer="${S.offers.indexOf(o)}:yes">Accept<\/button><button class="btn" data-offer="${S.offers.indexOf(o)}:no">Decline<\/button><\/div><\/div>`;
+    h += `<div class="offer"><p><b style="color:${F.color}">${esc(F.name)}<\/b> ${o.what === "peace" ? "offers peace." : o.what === "patrol" ? "proposes a pirate patrol pact: your warships guard each other's worlds from raiders, and you share pirate bounties." : "proposes a trade treaty: +3 credits a turn each."}<\/p><div class="btn-row"><button class="btn primary" data-offer="${S.offers.indexOf(o)}:yes">Accept<\/button><button class="btn" data-offer="${S.offers.indexOf(o)}:no">Decline<\/button><\/div><\/div>`;
   }
   const met = S.factions.filter((F) => F.id !== me.id && me.met[F.id]);
   if (!met.length) h += `<p class="muted">You haven't met anyone yet. Send out scouts.<\/p>`;
@@ -3804,7 +4038,7 @@ function diplomacyHTML() {
       <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}<\/b> · ${esc(P.title || "")}: ${esc(P.text || "")}<\/p>
       <p class="small">${r.status === "war" ? `<b class="bad">At war<\/b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied<\/b>" : "<b>At peace<\/b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}<\/b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.<\/p>
       ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:<\/p><ul class="small mem">${mem.map((m) => `<li class="${m.d >= 0 ? "good" : "bad"}">${esc(m.text)} <span class="muted">(turn ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})<\/span><\/li>`).join("")}<\/ul>` : ""}
-      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace<\/button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}<\/button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}<\/button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}<\/button>`}<\/div>` : ""}<\/div>`;
+      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace<\/button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}<\/button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}<\/button><button class="btn" data-dip="${F.id}:${r.patrol ? "endPatrol" : "patrol"}" title="Your warships guard each other's worlds from raiders, and you share pirate bounties">${r.patrol ? "End the pirate patrol pact" : "Propose a pirate patrol pact"}<\/button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}<\/button>`}<\/div>` : ""}<\/div>`;
   }
   return h;
 }
@@ -3863,6 +4097,7 @@ function bindChrome() {
     else if (d.mkt) { const r = tradeExotics(S, me.id, +d.mkt); if (r.error) toast(r.error, true); else toast(`${r.credits < 0 ? "Bought" : "Sold"} ${r.units} exotic${r.units === 1 ? "" : "s"} for ${Math.abs(r.credits)} credits.`); }
     else if (d.relic) { const r = useRelic(S, me.id, d.relic); if (r.error) toast(r.error, true); else { toast(`The Outer Reach is open: ${r.systems} new systems beyond the rim.`); draw(); } }
     else if (d.shard) { const r = useRelic(S, me.id, "shard", { from: sel.id, to: d.shard }); if (r.error) toast(r.error, true); else toast(`A new corridor: ${S.systems[sel.id].name} to ${S.systems[d.shard].name}.`); }
+    else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
@@ -3876,9 +4111,11 @@ function bindChrome() {
       else {
         const r = propose(S, me.id, fid, what);
         if (r.error) toast(r.error, true);
-        else { reportSince(what === "peace" ? `Peace with ${F.name}?` : what === "trade" ? `A trade treaty with ${F.name}?` : `Trade with ${F.name}`, since);
+        else { reportSince(what === "peace" ? `Peace with ${F.name}?` : what === "trade" ? `A trade treaty with ${F.name}?` : what === "patrol" ? `A pirate patrol pact with ${F.name}?` : what === "endPatrol" ? `The patrol pact with ${F.name}` : `Trade with ${F.name}`, since);
           report = report || { title: F.name, lines: [] };
           if (what === "endTrade") report.lines.push(`The trade treaty with ${F.name} is over: +3 credits a turn less for each of you.`);
+          else if (what === "patrol" && r.accepted) report.lines.push(`A pirate patrol pact: your warships and theirs guard each other's worlds from raiders, and each of you gets half the bounty when the other destroys a pirate ship.`);
+          else if (what === "endPatrol") report.lines.push(`The pirate patrol pact with ${F.name} is over.`);
           else if (what === "endAlliance") report.lines.push(`The alliance with ${F.name} is over. They won't forget it soon.`);
           else if (what === "alliance" && r.accepted) report.lines.push(`If either of you is attacked, the other joins the war, and you see what their worlds see.`);
           else if (!r.accepted) report.lines.push(`${F.name} refuse${what === "peace" ? ": the war goes on" : ""}. ${F.relations[me.id].score < 0 ? "They don't trust you yet." : "Ask again later."}`); }
@@ -3933,6 +4170,7 @@ function doEndTurn() {
     if (!S.winner) directivesTurn(S);
     if (!S.winner) crisisTurn(S);
     if (!S.winner) wildsTurn(S);
+    if (!S.winner) tradersTurn(S);
     if (!S.winner) eventsTurn(S);
     if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
@@ -4008,7 +4246,7 @@ function showGalEvent() {
 // ---------- envoys: the rivals' messages ----------
 function showEnvoy() {
   const m = currentEnvoy(S); if (!m) return;
-  const head = { hello: "First contact", demand: "A demand", warn: "A warning", alliance: "An offer of alliance", joint: "A call to war", gift: "A gift", war: "A declaration of war", callToArms: "A call to arms" }[m.kind];
+  const head = { ransom: "A ransom", tribute: "A demand for tribute", trader: "A merchant's offer", hello: "First contact", demand: "A demand", warn: "A warning", alliance: "An offer of alliance", joint: "A call to war", gift: "A gift", war: "A declaration of war", callToArms: "A call to arms" }[m.kind];
   modal(`<p class="small muted envoy-kicker"><span class="dot" style="background:${m.color}"><\/span>${esc(head)} · from ${esc(m.name)} · they are ${esc(m.attitude)}<\/p>
     <h1>${esc(m.leader[0].toUpperCase() + m.leader.slice(1))}<\/h1><p class="small muted" style="margin-top:-6px">${esc(m.title)}<\/p>
     <blockquote class="envoy">${esc(m.text)}<\/blockquote>
@@ -4218,6 +4456,8 @@ function showHelp(back) {
       <li><b>Advances:<\/b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.<\/li>
       <li><b>Anomalies<\/b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.<\/li>
       <li><b>Relics<\/b> (♦): eleven artifacts of the old empires, hidden in ruins and anomalies. End a fleet's turn at one to recover it; take a world to take its relics. The Founders' Star Chart opens the Outer Reach beyond the rim. See them on the Empire tab.<\/li>
+      <li><b>Pirate ransom and tribute:<\/b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts<\/b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.<\/li>
+      <li><b>Traders:<\/b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot<\/b> to fill its tanks and cut the depot's supply.<\/li>
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.<\/li>
