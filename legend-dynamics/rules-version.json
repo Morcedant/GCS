@@ -6,6 +6,18 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: a strategy guide",
+      "items": [
+        "A new strategy guide (Menu → Strategy guide, or /dominion/strategy.html): how you win and lose, and an opening for your first 30 turns that works for every people.",
+        "Three complete plans to follow: the Corridor Engine (every technology in order, with its cost), conquest (fleets, sieges, troops, supply and refits), and the highest score. Plus a plan for holding the Engine in open games.",
+        "Each people's best plan, and how the economy, battles (with hit chances), defense, pirates, creatures and the Wardens, exploring, diplomacy and difficulty work.",
+        "A list of common mistakes.",
+        "Its numbers come from the game's own data, so they stay right when the rules change."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: each people's own ships, and a new token sheet",
       "items": [
         "Every people now builds its ships in its own style, with its own outlines and class names. The Concord fly Aegis-class cruisers and Sovereign-class dreadnoughts; the Tessan, Magistrates and Dynasts; the Kel, Mandibles and Hivemothers; the Hegemony, Praetors and Imperators; the Vael, Mantas and Abyssals. All eight ship types have names.",

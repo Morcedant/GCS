@@ -206,7 +206,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 22:57 UTC";
+const BUILD = "2026-11-17 23:20 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -4887,6 +4887,7 @@ function showMenu() {
     <button class="btn" id="m-guide">The starter guide<\/button>
     <button class="btn" id="m-guide-go">${guideOn() ? "Restart" : "Start"} the guide<\/button>
     <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist<\/button>
+    <a class="btn" href="strategy.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Strategy guide: how to win<\/a>
     <a class="btn" href="tokens.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Printable ship tokens<\/a>
     <button class="btn" id="m-export">Save code (copy)<\/button>
     <button class="btn" id="m-load">Load a saved game<\/button>

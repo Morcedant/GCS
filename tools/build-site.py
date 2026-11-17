@@ -363,6 +363,8 @@ def main():
     if dom.exists(): write("dominion/index.html", dom.read_text())
     toks = ROOT / "fracture-dominion" / "dist" / "tokens.html"   # the printable ship tokens (the game's menu links to them)
     if toks.exists(): write("dominion/tokens.html", toks.read_text())
+    guide = ROOT / "fracture-dominion" / "dist" / "strategy.html"   # the strategy guide (the game's menu links to it)
+    if guide.exists(): write("dominion/strategy.html", guide.read_text())
     # Cloudflare Pages: always check for a newer copy of the pages, so a new upload shows at once.
     write("_headers", "/*\n  Cache-Control: no-cache\n")
     write("playtest/index.html", page("/playtest", "Playtest · Legend Dynamics", "Played a Legend Dynamics playtest? How to play in two minutes, and four questions about how it went.",

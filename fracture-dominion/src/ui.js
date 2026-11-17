@@ -1185,6 +1185,7 @@ function showMenu() {
     <button class="btn" id="m-guide">The starter guide</button>
     <button class="btn" id="m-guide-go">${guideOn() ? "Restart" : "Start"} the guide</button>
     <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist</button>
+    <a class="btn" href="strategy.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Strategy guide: how to win</a>
     <a class="btn" href="tokens.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Printable ship tokens</a>
     <button class="btn" id="m-export">Save code (copy)</button>
     <button class="btn" id="m-load">Load a saved game</button>

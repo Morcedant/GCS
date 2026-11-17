@@ -155,6 +155,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **The guide:** a first game, step by step: a coach card walks a new player through the first turns (research,
   building, the scout, a second colony, ending a turn, the ways to win, directives and campaigns, Focus, stances and
   supply), rings what to use next and moves on by itself. On by default for a first game; the menu restarts it.
+- **The strategy guide** (`strategy.mjs` writes `dist/strategy.html`; the menu links to it): how to win, an opening
+  for every people, three plans to victory (the Corridor Engine, conquest, score) and one for open games, each people's
+  plan, and how the economy, battles, defense, threats, exploring and diplomacy work. Its numbers come from data.js.
 - **Each people's own ships:** every power builds its eight ship types in its own style, with its own outlines and
   class names (data.js FLEET_STYLES): the Concord's angular, modular hulls (Wayfarer, Lancer, Aegis, Sovereign,
   Marathon, Wellspring, Mayflower, Homestead), the Tessan's sweeping curves (Envoy, Courtier, Magistrate, Dynast…), the
