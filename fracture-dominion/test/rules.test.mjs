@@ -735,3 +735,15 @@ test("the Star Chart opens the Outer Reach; the Gate Shard opens a corridor", as
   assert.ok(s.adj[cap.id].includes(tg.id));
   assert.ok(useRelic(s, "concord", "shard", { from: cap.id, to: shardTargets(s, "concord", cap.id)[0]?.id }).error, "then it rests");
 });
+
+test("pirate, creature and Warden ships can't be built; any queued in an old save are struck off", async () => {
+  const { buildOptions } = await import("../src/game.js");
+  const s = newGame({ seed: 20, size: "small", player: "concord", rivals: 1 }), cap = s.systems[s.factions[0].capital];
+  const ids = buildOptions(s, cap).filter((o) => o.kind === "ship").map((o) => o.id);
+  for (const w of ["raider", "haven", "swarm", "leviathan", "sentinel", "colossus", "heart"]) assert.ok(!ids.includes(w), w);
+  cap.colony.queue.push({ kind: "ship", id: "swarm", name: "Crystal swarm", cost: 0, progress: 0 }, { kind: "ship", id: "raider", name: "Raider", cost: 0, progress: 0 });
+  const f = spawnFleet(s, "concord", cap.at, ["raider"]);
+  endTurn(s);
+  assert.ok(!cap.colony.queue.some((q) => q.id === "swarm" || q.id === "raider"));
+  assert.ok(!s.fleets[f.id]);
+});

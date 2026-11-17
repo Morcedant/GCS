@@ -286,7 +286,7 @@ export function totals(s, fid) {
 export function buildOptions(s, sys) {
   const c = sys.colony, fid = c.owner, out = [];
   if (c.kind !== "colony") return out;
-  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
+  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && !d.wild && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (d.outpost || c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;   // a depot is for outposts (buildDepot)
     if (d.wonder && !c.capital) continue;
@@ -888,6 +888,13 @@ function economy(s, F) {
       if (tech.id === "shields") for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) x.hull += 1;
     }
   }
+  // Pirate, creature and Warden ships were never anyone's to build (an old bug listed them): any queued are struck off,
+  // their industry returned, and any built are gone.
+  for (const sys of coloniesOf(s, F.id)) {
+    const c = sys.colony, bad = c.queue.filter((q) => q.kind === "ship" && SHIPS[q.id] && (SHIPS[q.id].wild || SHIPS[q.id].warden));
+    if (bad.length) { c.queue = c.queue.filter((q) => !bad.includes(q)); c.stock += bad.reduce((n, q) => n + q.progress, 0); }
+  }
+  for (const f of fleetsOf(s, F.id)) { f.ships = f.ships.filter((x) => !SHIPS[x.type].wild && !SHIPS[x.type].warden); if (!f.ships.length) delete s.fleets[f.id]; }
   // Each world: production, growth, defenses.
   for (const sys of coloniesOf(s, F.id)) {
     const c = sys.colony, y = yields(s, sys);
