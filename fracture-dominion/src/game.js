@@ -80,29 +80,42 @@ export function currentFit(s, fid) {
 }
 /** A ship's systems: its own fit, or (a ship being built now, or anyone without a fit) the power's current research. */
 export const fitOf = (s, fid, ship) => (ship && ship.fit) || currentFit(s, fid);
+/** The early systems any Shipyard can fit; everything else needs a Drydock. */
+export const SHIPYARD_FIT = ["sensors", "foldDrives", "shields"];
+const missingKeys = (s, fid, ship) => {
+  if (!ship || !ship.fit) return [];
+  const now = currentFit(s, fid), base = SHIPS[ship.type];
+  return Object.keys(FIT).filter((k) => (now[k] || 0) > (ship.fit[k] || 0) && (base.skill > 0 || ["sensors", "foldDrives", "scanners", "tanks"].includes(k)));
+};
+/** Whether a ship's missing systems need a drydock (anything beyond the early ones a shipyard fits). */
+export const needsDrydock = (s, fid, ship) => missingKeys(s, fid, ship).some((k) => !SHIPYARD_FIT.includes(k));
 /** What research a ship is missing: the names, for the panels; [] when it's up to date. */
 export function missingFit(s, fid, ship) {
   if (!ship || !ship.fit) return [];
   const now = currentFit(s, fid), base = SHIPS[ship.type];
   return Object.keys(FIT).filter((k) => (now[k] || 0) > (ship.fit[k] || 0) && (base.skill > 0 || ["sensors", "foldDrives", "scanners", "tanks"].includes(k))).map((k) => FIT[k]);
 }
-/** Refit a ship with everything its power has researched: its hull grows with any new armor. */
-export function refitShip(s, fid, ship) {
-  const was = shipStats(s, fid, ship.type, ship).hull;
-  ship.fit = currentFit(s, fid);
+/** Refit a ship with everything its power has researched (or, with `keys`, only those systems): its hull grows with any
+ * new armor. */
+export function refitShip(s, fid, ship, keys) {
+  const was = shipStats(s, fid, ship.type, ship).hull, now = currentFit(s, fid);
+  ship.fit = keys ? { ...ship.fit, ...Object.fromEntries(keys.map((k) => [k, now[k]])) } : now;
   ship.hull = Math.max(1, ship.hull + Math.max(0, shipStats(s, fid, ship.type, ship).hull - was));
 }
 /** A fleet with ships that need a refit. */
 export const needsRefit = (s, f) => f.ships.some((x) => missingFit(s, f.owner, x).length);
-/** The nearest drydock of a power's that can refit now (no enemy warships in its orbit), or null. */
-export const nearestDrydock = (s, fid, hex) => coloniesOf(s, fid).filter((x) => x.colony.buildings.drydock && !besieged(s, x)).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0] || null;
+/** The nearest drydock of a power's that can refit now (no enemy warships in its orbit), or null. With `shipyardOk`, a
+ * world with a Shipyard will do too (for ships that only lack the early systems). */
+export const nearestDrydock = (s, fid, hex, shipyardOk = false) => coloniesOf(s, fid).filter((x) => (x.colony.buildings.drydock || (shipyardOk && x.colony.buildings.shipyard)) && !besieged(s, x)).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0] || null;
+/** Where these ships can be refitted, nearest first: a drydock, or (if they only lack early systems) any shipyard. */
+export const refitPlace = (s, fid, hex, ships) => nearestDrydock(s, fid, hex, !ships.some((x) => needsDrydock(s, fid, x)));
 /** Send a fleet to the nearest drydock for a refit; with onlyOld, split off just its out-of-date ships and send those. */
 export function sendToDrydock(s, fleetId, onlyOld = false) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
-  const dock = nearestDrydock(s, f.owner, f.at);
-  if (!dock) return { error: "You have no drydock that can refit now: build one (Orbital shipyards) at a colony." };
+  const dock = refitPlace(s, f.owner, f.at, f.ships.filter((x) => missingFit(s, f.owner, x).length));
+  if (!dock) return { error: "Nowhere can refit them now: a Shipyard fits the early systems (sensors, drives, shields); everything else needs a Drydock (Orbital shipyards)." };
   if (!needsRefit(s, f)) return { error: "These ships are up to date." };
-  if (f.at === dock.at) return { error: `They're at the drydock at ${dock.name}: they're refitted at the end of the turn.` };
+  if (f.at === dock.at) return { error: `They're at ${dock.name}: they're refitted at the end of the turn.` };
   let go = f;
   const old = f.ships.filter((x) => missingFit(s, f.owner, x).length);
   if (onlyOld && old.length < f.ships.length) {
@@ -1091,6 +1104,12 @@ function economy(s, F) {
     const step = free && here.colony.buildings.drydock ? Infinity : free && here.colony.buildings.station ? YARDS.station : 1;
     // A drydock refits every ship there with what's been researched since it was built.
     if (free && here.colony.buildings.drydock) { const n = f.ships.filter((x) => missingFit(s, F.id, x).length).length; if (n) { for (const x of f.ships) refitShip(s, F.id, x); f.refitTrip = false; if (!F.ai) log(s, F.id, `${n} ship${n === 1 ? "" : "s"} refitted at the drydock at ${here.name}: their systems are up to date.`, "build"); } }
+    // A shipyard fits the early systems (sensors, drives, shields); the rest waits for a drydock.
+    else if (free && here.colony.buildings.shipyard) {
+      const early = f.ships.filter((x) => missingKeys(s, F.id, x).some((k) => SHIPYARD_FIT.includes(k)));
+      if (early.length) { for (const x of early) refitShip(s, F.id, x, SHIPYARD_FIT); if (!f.ships.some((x) => missingFit(s, F.id, x).length)) f.refitTrip = false;
+        if (!F.ai) log(s, F.id, `${early.length} ship${early.length === 1 ? "" : "s"} refitted at the shipyard at ${here.name} with the early systems${f.ships.some((x) => needsDrydock(s, F.id, x)) ? "; the rest needs a drydock" : ""}.`, "build"); }
+    }
     if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).

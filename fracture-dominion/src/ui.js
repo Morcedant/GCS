@@ -1,7 +1,7 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
 import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, DEPOT_RAID, TRADERS, OUTPOST_TRADE } from "./data.js";
-import { newGame, endTurn, gunsMax, gunsUp, missingFit, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { newGame, endTurn, gunsMax, gunsUp, missingFit, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
@@ -342,8 +342,8 @@ function fleetListHTML(me) {
     ? `<details class="fleet-group"${open ? " open" : ""}><summary><b>${title} (${list.length})</b> <span class="small muted">${list.reduce((t, f) => t + f.ships.length, 0)} ships</span></summary>${list.map(row).join("")}</details>`
     : `<p class="small"><b>${title} (${list.length})</b></p>${list.map(row).join("")}`;
   const oldShips = all.reduce((t, f) => t + f.ships.filter((x) => missingFit(S, me.id, x).length).length, 0), oldFleets = all.filter((f) => needsRefit(S, f)), dock = coloniesOf(S, me.id).some((x) => x.colony.buildings.drydock);
-  const refits = `<div class="card refits"><p class="small"><b>Refits:</b> ${oldShips ? `${oldShips} ship${oldShips === 1 ? "" : "s"} in ${oldFleets.length} fleet${oldFleets.length === 1 ? "" : "s"} ${oldShips === 1 ? "is" : "are"} out of date (⚙ below).` : "every ship is up to date."}${dock ? "" : " You have no Drydock yet (Orbital shipyards): research reaches ships in service only there."}</p>
-    <div class="btn-row">${oldShips && dock ? `<button class="btn primary" data-alldock>Send all out-of-date ships to drydock</button>` : ""}<button class="btn" data-autorefit>${me.autoRefit ? "✓ " : ""}Standing order: idle fleets go for refits</button></div>
+  const refits = `<div class="card refits"><p class="small"><b>Refits:</b> ${oldShips ? `${oldShips} ship${oldShips === 1 ? "" : "s"} in ${oldFleets.length} fleet${oldFleets.length === 1 ? "" : "s"} ${oldShips === 1 ? "is" : "are"} out of date (⚙ below).` : "every ship is up to date."}${dock ? "" : " You have no Drydock yet (Orbital shipyards): until then, Shipyards fit the early systems (sensors, drives, shields), and the rest waits."}</p>
+    <div class="btn-row">${oldShips ? `<button class="btn primary" data-alldock>Send all out-of-date ships for refits</button>` : ""}<button class="btn" data-autorefit>${me.autoRefit ? "✓ " : ""}Standing order: idle fleets go for refits</button></div>
     <p class="small muted">"Send all" splits the out-of-date ships off their fleets. The standing order sends whole fleets, but only idle ones (not those holding position).</p></div>`;
   return `<h3>Fleets (${all.length})</h3>${refits}${group("War fleets", war, war.length <= 12)}${group("Scouts, transports and colony ships", other, false)}`;
 }
@@ -401,10 +401,10 @@ function fleetHTML() {
   }
   // Systems: research reaches a ship only at a drydock.
   if (mine) { const old = f.ships.filter((x) => missingFit(S, me.id, x).length);
-    if (old.length) { const miss = [...new Set(old.flatMap((x) => missingFit(S, me.id, x)))], dock = coloniesOf(S, me.id).filter((x) => x.colony.buildings.drydock).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+    if (old.length) { const miss = [...new Set(old.flatMap((x) => missingFit(S, me.id, x)))], dock = refitPlace(S, me.id, f.at, old), yardOnly = !old.some((x) => needsDrydock(S, me.id, x));
       const atDock = dock && dock.at === f.at;
-      h += `<p class="small bad"><b>Refit needed:</b> ${old.length} of these ships ${old.length === 1 ? "lacks" : "lack"} ${esc(miss.join(", "))}. ${atDock ? `They're at the drydock at ${esc(dock.name)}: refitted at the end of this turn.` : dock ? `The nearest drydock is at ${esc(dock.name)}, ${distance(dock.at, f.at)} hexes away.` : "Build a Drydock (Orbital shipyards) at a colony: research reaches existing ships only there."}</p>`
-        + (dock && !atDock ? `<div class="btn-row"><button class="btn primary" data-todock="all">Send the fleet to ${esc(dock.name)}</button>${old.length < f.ships.length ? `<button class="btn" data-todock="old">Send only the ${old.length} out of date</button>` : ""}</div>` : ""); } }
+      h += `<p class="small bad"><b>Refit needed:</b> ${old.length} of these ships ${old.length === 1 ? "lacks" : "lack"} ${esc(miss.join(", "))}. ${atDock ? `They're at ${esc(dock.name)}: refitted at the end of this turn.` : dock ? `The nearest ${yardOnly ? "shipyard or drydock" : "drydock"} that can do it is at ${esc(dock.name)}, ${distance(dock.at, f.at)} hexes away.` : yardOnly ? "No shipyard or drydock of yours can refit now." : "That needs a Drydock (Orbital shipyards); a Shipyard fits only the early systems (sensors, drives, shields)."}</p>`
+        + (dock && !atDock ? `<div class="btn-row"><button class="btn primary" data-todock="all">Send the fleet to ${esc(dock.name)} for a refit</button>${old.length < f.ships.length ? `<button class="btn" data-todock="old">Send only the ${old.length} out of date</button>` : ""}</div>` : ""); } }
   // Raiding an enemy's fuel depot.
   if (canRaidDepot(S, f.id)) h += `<h3>Their fuel depot</h3><p class="small muted" style="margin-top:-4px">Take its fuel: this fleet and its tankers fill up, and the depot gives them no supply for ${DEPOT_RAID.cut} turns.</p><button class="btn wide" data-depotraid>Raid the depot</button>`;
   // The Corridor Engine's gate (an open game): from the Engine world to any of your worlds.
@@ -669,7 +669,7 @@ function protosHTML() {
 }
 function researchHTML() {
   const me = player(S), R = me.research, cur = researchItem(S, me.id), t = totals(S, me.id);
-  let h = `<h2>Research</h2><p class="small muted">What improves ships (sensors, drives, shields, targeting, armor, fire control) is built into new ships at once; ships already in service get it when they end a turn at a Drydock.</p>`;
+  let h = `<h2>Research</h2><p class="small muted">What improves ships is built into new ships at once. Ships already in service get it when they end a turn at a Drydock; a Shipyard fits the early systems (Deep sensors, Fold drives, Deflector shields).</p>`;
   h += cur ? `<p><b>${esc(cur.name)}</b>: ${Math.floor(R.progress)} / ${cur.cost}${t.sci ? ` · ${Math.ceil((cur.cost - R.progress) / t.sci)} turns` : ""}</p>${bar(R.progress, cur.cost)}` : `<p class="bad">Choose what to research next.${R.progress ? ` ${Math.floor(R.progress)} points are waiting.` : ""}</p>`;
   for (const field of ["Physics", "Industry", "Society"]) {
     h += `<h3>${field}</h3><div class="techs">` + TECHS.filter((x) => x.field === field).map((x) => {
@@ -1128,7 +1128,7 @@ function showHelp(back) {
       <li><b>Advances:</b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.</li>
       <li><b>Anomalies</b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.</li>
       <li><b>Relics</b> (♦): eleven artifacts of the old empires, hidden in ruins and anomalies. End a fleet's turn at one to recover it; take a world to take its relics. The Founders' Star Chart opens the Outer Reach beyond the rim. See them on the Empire tab.</li>
-      <li><b>Refits:</b> research that improves ships goes into new ones; ships already in service get it at a Drydock. A fleet's panel says when its ships need a refit.</li>
+      <li><b>Refits:</b> research that improves ships goes into new ones; ships already in service get it at a Drydock (a Shipyard fits the early systems: sensors, drives, shields). A fleet's panel says when its ships need a refit.</li>
       <li><b>Pirate ransom and tribute:</b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts</b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.</li>
       <li><b>Traders:</b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot</b> to fill its tanks and cut the depot's supply.</li>
       <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>

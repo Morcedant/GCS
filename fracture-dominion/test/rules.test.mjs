@@ -945,10 +945,10 @@ test("sending out-of-date ships to drydock: a whole fleet, only its old ships, e
   const s = newGame({ seed: 31, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
   const away = Object.values(s.systems).find((x) => !x.colony && distance(x.at, cap.at) >= 3 && findPath(s, "concord", x.at, cap.at));
   const f = spawnFleet(s, "concord", away.at, ["frigate", "frigate"]);
-  me.research.done.push("shields");
+  me.research.done.push("shields", "targeting");
   f.ships.push(spawnFleet(s, "concord", away.at, ["frigate"]).ships[0]); for (const g of fleetsAt(s, away.at)) if (g !== f) delete s.fleets[g.id];
   assert.ok(needsRefit(s, f));
-  assert.ok(sendToDrydock(s, f.id).error, "no drydock yet");
+  assert.ok(sendToDrydock(s, f.id).error, "targeting needs a drydock, and there's none yet");
   me.research.done.push("orbitalYards"); cap.colony.buildings.drydock = true;
   assert.equal(nearestDrydock(s, "concord", away.at), cap);
   // Only the old ones: split off and sent; the new frigate stays.
@@ -966,4 +966,21 @@ test("sending out-of-date ships to drydock: a whole fleet, only its old ships, e
   assert.ok(hf && (hf.dest === cap.at || hf.at === cap.at), "sent (it may have joined the others on the way)");
   const kf = Object.values(s.fleets).find((x) => x.ships.includes(k.ships[0]));
   assert.ok(kf && kf.at === away.at, "holding position");
+});
+
+test("shipyards fit the early systems (sensors, drives, shields); the rest waits for a drydock", async () => {
+  const { missingFit, needsDrydock, sendToDrydock } = await import("../src/game.js");
+  const s = newGame({ seed: 32, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
+  assert.ok(cap.colony.buildings.shipyard && !cap.colony.buildings.drydock);
+  const f = spawnFleet(s, "concord", cap.at, ["frigate"]), x = f.ships[0], h0 = shipStats(s, "concord", "frigate", x).hull;
+  me.research.done.push("shields", "foldDrives", "targeting");
+  assert.ok(needsDrydock(s, "concord", x));
+  endTurn(s);
+  assert.deepEqual(missingFit(s, "concord", x), ["Targeting computers"], "the shipyard fitted drives and shields");
+  assert.equal(shipStats(s, "concord", "frigate", x).hull, h0 + 1);
+  // Only early systems missing: sent to the nearest shipyard.
+  const away = Object.values(s.systems).find((y) => !y.colony && distance(y.at, cap.at) >= 3 && findPath(s, "concord", y.at, cap.at));
+  const g = spawnFleet(s, "concord", away.at, ["frigate"]); g.ships[0].fit = { ...g.ships[0].fit, shields: false };
+  assert.ok(!needsDrydock(s, "concord", g.ships[0]));
+  const r = sendToDrydock(s, g.id); assert.ok(r.ok && r.dock === cap.name);
 });

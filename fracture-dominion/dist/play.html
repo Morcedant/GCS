@@ -203,7 +203,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 21:56 UTC";
+const BUILD = "2026-11-17 22:00 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -788,29 +788,42 @@ function currentFit(s, fid) {
 }
 /** A ship's systems: its own fit, or (a ship being built now, or anyone without a fit) the power's current research. */
 const fitOf = (s, fid, ship) => (ship && ship.fit) || currentFit(s, fid);
+/** The early systems any Shipyard can fit; everything else needs a Drydock. */
+const SHIPYARD_FIT = ["sensors", "foldDrives", "shields"];
+const missingKeys = (s, fid, ship) => {
+  if (!ship || !ship.fit) return [];
+  const now = currentFit(s, fid), base = SHIPS[ship.type];
+  return Object.keys(FIT).filter((k) => (now[k] || 0) > (ship.fit[k] || 0) && (base.skill > 0 || ["sensors", "foldDrives", "scanners", "tanks"].includes(k)));
+};
+/** Whether a ship's missing systems need a drydock (anything beyond the early ones a shipyard fits). */
+const needsDrydock = (s, fid, ship) => missingKeys(s, fid, ship).some((k) => !SHIPYARD_FIT.includes(k));
 /** What research a ship is missing: the names, for the panels; [] when it's up to date. */
 function missingFit(s, fid, ship) {
   if (!ship || !ship.fit) return [];
   const now = currentFit(s, fid), base = SHIPS[ship.type];
   return Object.keys(FIT).filter((k) => (now[k] || 0) > (ship.fit[k] || 0) && (base.skill > 0 || ["sensors", "foldDrives", "scanners", "tanks"].includes(k))).map((k) => FIT[k]);
 }
-/** Refit a ship with everything its power has researched: its hull grows with any new armor. */
-function refitShip(s, fid, ship) {
-  const was = shipStats(s, fid, ship.type, ship).hull;
-  ship.fit = currentFit(s, fid);
+/** Refit a ship with everything its power has researched (or, with `keys`, only those systems): its hull grows with any
+ * new armor. */
+function refitShip(s, fid, ship, keys) {
+  const was = shipStats(s, fid, ship.type, ship).hull, now = currentFit(s, fid);
+  ship.fit = keys ? { ...ship.fit, ...Object.fromEntries(keys.map((k) => [k, now[k]])) } : now;
   ship.hull = Math.max(1, ship.hull + Math.max(0, shipStats(s, fid, ship.type, ship).hull - was));
 }
 /** A fleet with ships that need a refit. */
 const needsRefit = (s, f) => f.ships.some((x) => missingFit(s, f.owner, x).length);
-/** The nearest drydock of a power's that can refit now (no enemy warships in its orbit), or null. */
-const nearestDrydock = (s, fid, hex) => coloniesOf(s, fid).filter((x) => x.colony.buildings.drydock && !besieged(s, x)).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0] || null;
+/** The nearest drydock of a power's that can refit now (no enemy warships in its orbit), or null. With `shipyardOk`, a
+ * world with a Shipyard will do too (for ships that only lack the early systems). */
+const nearestDrydock = (s, fid, hex, shipyardOk = false) => coloniesOf(s, fid).filter((x) => (x.colony.buildings.drydock || (shipyardOk && x.colony.buildings.shipyard)) && !besieged(s, x)).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0] || null;
+/** Where these ships can be refitted, nearest first: a drydock, or (if they only lack early systems) any shipyard. */
+const refitPlace = (s, fid, hex, ships) => nearestDrydock(s, fid, hex, !ships.some((x) => needsDrydock(s, fid, x)));
 /** Send a fleet to the nearest drydock for a refit; with onlyOld, split off just its out-of-date ships and send those. */
 function sendToDrydock(s, fleetId, onlyOld = false) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
-  const dock = nearestDrydock(s, f.owner, f.at);
-  if (!dock) return { error: "You have no drydock that can refit now: build one (Orbital shipyards) at a colony." };
+  const dock = refitPlace(s, f.owner, f.at, f.ships.filter((x) => missingFit(s, f.owner, x).length));
+  if (!dock) return { error: "Nowhere can refit them now: a Shipyard fits the early systems (sensors, drives, shields); everything else needs a Drydock (Orbital shipyards)." };
   if (!needsRefit(s, f)) return { error: "These ships are up to date." };
-  if (f.at === dock.at) return { error: `They're at the drydock at ${dock.name}: they're refitted at the end of the turn.` };
+  if (f.at === dock.at) return { error: `They're at ${dock.name}: they're refitted at the end of the turn.` };
   let go = f;
   const old = f.ships.filter((x) => missingFit(s, f.owner, x).length);
   if (onlyOld && old.length < f.ships.length) {
@@ -1799,6 +1812,12 @@ function economy(s, F) {
     const step = free && here.colony.buildings.drydock ? Infinity : free && here.colony.buildings.station ? YARDS.station : 1;
     // A drydock refits every ship there with what's been researched since it was built.
     if (free && here.colony.buildings.drydock) { const n = f.ships.filter((x) => missingFit(s, F.id, x).length).length; if (n) { for (const x of f.ships) refitShip(s, F.id, x); f.refitTrip = false; if (!F.ai) log(s, F.id, `${n} ship${n === 1 ? "" : "s"} refitted at the drydock at ${here.name}: their systems are up to date.`, "build"); } }
+    // A shipyard fits the early systems (sensors, drives, shields); the rest waits for a drydock.
+    else if (free && here.colony.buildings.shipyard) {
+      const early = f.ships.filter((x) => missingKeys(s, F.id, x).some((k) => SHIPYARD_FIT.includes(k)));
+      if (early.length) { for (const x of early) refitShip(s, F.id, x, SHIPYARD_FIT); if (!f.ships.some((x) => missingFit(s, F.id, x).length)) f.refitTrip = false;
+        if (!F.ai) log(s, F.id, `${early.length} ship${early.length === 1 ? "" : "s"} refitted at the shipyard at ${here.name} with the early systems${f.ships.some((x) => needsDrydock(s, F.id, x)) ? "; the rest needs a drydock" : ""}.`, "build"); }
+    }
     if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
@@ -3428,7 +3447,7 @@ function fleets(s, F) {
       // Out of date: to the nearest drydock, for a refit with what's been researched since these ships were built
       // (before going on the attack; a world of ours under siege comes first).
       if (f.ships.some((x) => missingFit(s, F.id, x).length)) {
-        const dock = coloniesOf(s, F.id).filter((x) => x.colony.buildings.drydock && !besieged(s, x)).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+        const dock = refitPlace(s, F.id, f.at, f.ships.filter((x) => missingFit(s, F.id, x).length));
         if (dock && distance(dock.at, f.at) <= 12) { if (f.at !== dock.at) setDestination(s, f.id, dock.at); continue; }
       }
       if (enemies.length) {
@@ -3817,8 +3836,8 @@ function fleetListHTML(me) {
     ? `<details class="fleet-group"${open ? " open" : ""}><summary><b>${title} (${list.length})<\/b> <span class="small muted">${list.reduce((t, f) => t + f.ships.length, 0)} ships<\/span><\/summary>${list.map(row).join("")}<\/details>`
     : `<p class="small"><b>${title} (${list.length})<\/b><\/p>${list.map(row).join("")}`;
   const oldShips = all.reduce((t, f) => t + f.ships.filter((x) => missingFit(S, me.id, x).length).length, 0), oldFleets = all.filter((f) => needsRefit(S, f)), dock = coloniesOf(S, me.id).some((x) => x.colony.buildings.drydock);
-  const refits = `<div class="card refits"><p class="small"><b>Refits:<\/b> ${oldShips ? `${oldShips} ship${oldShips === 1 ? "" : "s"} in ${oldFleets.length} fleet${oldFleets.length === 1 ? "" : "s"} ${oldShips === 1 ? "is" : "are"} out of date (⚙ below).` : "every ship is up to date."}${dock ? "" : " You have no Drydock yet (Orbital shipyards): research reaches ships in service only there."}<\/p>
-    <div class="btn-row">${oldShips && dock ? `<button class="btn primary" data-alldock>Send all out-of-date ships to drydock<\/button>` : ""}<button class="btn" data-autorefit>${me.autoRefit ? "✓ " : ""}Standing order: idle fleets go for refits<\/button><\/div>
+  const refits = `<div class="card refits"><p class="small"><b>Refits:<\/b> ${oldShips ? `${oldShips} ship${oldShips === 1 ? "" : "s"} in ${oldFleets.length} fleet${oldFleets.length === 1 ? "" : "s"} ${oldShips === 1 ? "is" : "are"} out of date (⚙ below).` : "every ship is up to date."}${dock ? "" : " You have no Drydock yet (Orbital shipyards): until then, Shipyards fit the early systems (sensors, drives, shields), and the rest waits."}<\/p>
+    <div class="btn-row">${oldShips ? `<button class="btn primary" data-alldock>Send all out-of-date ships for refits<\/button>` : ""}<button class="btn" data-autorefit>${me.autoRefit ? "✓ " : ""}Standing order: idle fleets go for refits<\/button><\/div>
     <p class="small muted">"Send all" splits the out-of-date ships off their fleets. The standing order sends whole fleets, but only idle ones (not those holding position).<\/p><\/div>`;
   return `<h3>Fleets (${all.length})<\/h3>${refits}${group("War fleets", war, war.length <= 12)}${group("Scouts, transports and colony ships", other, false)}`;
 }
@@ -3876,10 +3895,10 @@ function fleetHTML() {
   }
   // Systems: research reaches a ship only at a drydock.
   if (mine) { const old = f.ships.filter((x) => missingFit(S, me.id, x).length);
-    if (old.length) { const miss = [...new Set(old.flatMap((x) => missingFit(S, me.id, x)))], dock = coloniesOf(S, me.id).filter((x) => x.colony.buildings.drydock).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+    if (old.length) { const miss = [...new Set(old.flatMap((x) => missingFit(S, me.id, x)))], dock = refitPlace(S, me.id, f.at, old), yardOnly = !old.some((x) => needsDrydock(S, me.id, x));
       const atDock = dock && dock.at === f.at;
-      h += `<p class="small bad"><b>Refit needed:<\/b> ${old.length} of these ships ${old.length === 1 ? "lacks" : "lack"} ${esc(miss.join(", "))}. ${atDock ? `They're at the drydock at ${esc(dock.name)}: refitted at the end of this turn.` : dock ? `The nearest drydock is at ${esc(dock.name)}, ${distance(dock.at, f.at)} hexes away.` : "Build a Drydock (Orbital shipyards) at a colony: research reaches existing ships only there."}<\/p>`
-        + (dock && !atDock ? `<div class="btn-row"><button class="btn primary" data-todock="all">Send the fleet to ${esc(dock.name)}<\/button>${old.length < f.ships.length ? `<button class="btn" data-todock="old">Send only the ${old.length} out of date<\/button>` : ""}<\/div>` : ""); } }
+      h += `<p class="small bad"><b>Refit needed:<\/b> ${old.length} of these ships ${old.length === 1 ? "lacks" : "lack"} ${esc(miss.join(", "))}. ${atDock ? `They're at ${esc(dock.name)}: refitted at the end of this turn.` : dock ? `The nearest ${yardOnly ? "shipyard or drydock" : "drydock"} that can do it is at ${esc(dock.name)}, ${distance(dock.at, f.at)} hexes away.` : yardOnly ? "No shipyard or drydock of yours can refit now." : "That needs a Drydock (Orbital shipyards); a Shipyard fits only the early systems (sensors, drives, shields)."}<\/p>`
+        + (dock && !atDock ? `<div class="btn-row"><button class="btn primary" data-todock="all">Send the fleet to ${esc(dock.name)} for a refit<\/button>${old.length < f.ships.length ? `<button class="btn" data-todock="old">Send only the ${old.length} out of date<\/button>` : ""}<\/div>` : ""); } }
   // Raiding an enemy's fuel depot.
   if (canRaidDepot(S, f.id)) h += `<h3>Their fuel depot<\/h3><p class="small muted" style="margin-top:-4px">Take its fuel: this fleet and its tankers fill up, and the depot gives them no supply for ${DEPOT_RAID.cut} turns.<\/p><button class="btn wide" data-depotraid>Raid the depot<\/button>`;
   // The Corridor Engine's gate (an open game): from the Engine world to any of your worlds.
@@ -4144,7 +4163,7 @@ function protosHTML() {
 }
 function researchHTML() {
   const me = player(S), R = me.research, cur = researchItem(S, me.id), t = totals(S, me.id);
-  let h = `<h2>Research<\/h2><p class="small muted">What improves ships (sensors, drives, shields, targeting, armor, fire control) is built into new ships at once; ships already in service get it when they end a turn at a Drydock.<\/p>`;
+  let h = `<h2>Research<\/h2><p class="small muted">What improves ships is built into new ships at once. Ships already in service get it when they end a turn at a Drydock; a Shipyard fits the early systems (Deep sensors, Fold drives, Deflector shields).<\/p>`;
   h += cur ? `<p><b>${esc(cur.name)}<\/b>: ${Math.floor(R.progress)} / ${cur.cost}${t.sci ? ` · ${Math.ceil((cur.cost - R.progress) / t.sci)} turns` : ""}<\/p>${bar(R.progress, cur.cost)}` : `<p class="bad">Choose what to research next.${R.progress ? ` ${Math.floor(R.progress)} points are waiting.` : ""}<\/p>`;
   for (const field of ["Physics", "Industry", "Society"]) {
     h += `<h3>${field}<\/h3><div class="techs">` + TECHS.filter((x) => x.field === field).map((x) => {
@@ -4603,7 +4622,7 @@ function showHelp(back) {
       <li><b>Advances:<\/b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.<\/li>
       <li><b>Anomalies<\/b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.<\/li>
       <li><b>Relics<\/b> (♦): eleven artifacts of the old empires, hidden in ruins and anomalies. End a fleet's turn at one to recover it; take a world to take its relics. The Founders' Star Chart opens the Outer Reach beyond the rim. See them on the Empire tab.<\/li>
-      <li><b>Refits:<\/b> research that improves ships goes into new ones; ships already in service get it at a Drydock. A fleet's panel says when its ships need a refit.<\/li>
+      <li><b>Refits:<\/b> research that improves ships goes into new ones; ships already in service get it at a Drydock (a Shipyard fits the early systems: sensors, drives, shields). A fleet's panel says when its ships need a refit.<\/li>
       <li><b>Pirate ransom and tribute:<\/b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts<\/b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.<\/li>
       <li><b>Traders:<\/b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot<\/b> to fill its tanks and cut the depot's supply.<\/li>
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
