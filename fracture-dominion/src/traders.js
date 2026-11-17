@@ -4,7 +4,7 @@
 // with no warships beside it (game.js atWar; wilds.js raid). A convoy that reaches one of the player's worlds sometimes
 // offers a deal (envoys.js TRADER_OFFERS).
 import { distance } from "./hex.js";
-import { TRADERS, SHIPS } from "./data.js";
+import { TRADERS, SHIPS, OUTPOST_TRADE } from "./data.js";
 import { player, faction, fleetsOf, fleetsAt, spawnFleet, setDestination, log, rng, atWar, armed } from "./game.js";
 
 const TRADERS_ID = "traders";
@@ -21,6 +21,16 @@ export function tradersTurn(s) {
   if (s.winner) return;
   if (!s.traders) s.traders = traderPower();
   const R = rng(s), me = player(s);
+  // Convoys refuel at outposts along the way: each fuel depot or station within a hex sells it fuel, once a convoy.
+  const pumps = Object.values(s.systems).filter((x) => x.colony && x.colony.kind === "outpost" && (x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn));
+  let sold = 0;
+  for (const f of fleetsOf(s, TRADERS_ID)) for (const x of pumps) {
+    if (distance(x.at, f.at) > 1 || (f.fuelled || []).includes(x.id) || fleetsAt(s, x.at).some((o) => armed(o) && atWar(s, o.owner, x.colony.owner))) continue;
+    (f.fuelled = f.fuelled || []).push(x.id);
+    const F = faction(s, x.colony.owner); F.credits += OUTPOST_TRADE.convoy; F.stats.fuelSold = (F.stats.fuelSold || 0) + OUTPOST_TRADE.convoy;
+    if (F.id === me.id) sold += OUTPOST_TRADE.convoy;
+  }
+  if (sold) log(s, me.id, `Your outposts sold fuel to passing merchant convoys: +${sold} credits.`, "trade");
   for (const f of fleetsOf(s, TRADERS_ID)) {
     const from = s.systems[f.trade.from], to = s.systems[f.trade.to];
     // Pirates in the same hex, and no warships beside it: plundered.

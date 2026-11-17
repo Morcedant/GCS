@@ -877,3 +877,26 @@ test("orbital stations and batteries anywhere: an outpost buys them with credits
   // A colony can queue one too.
   assert.ok(buildOptions(s, s.systems[me.capital]).some((x) => x.id === "station"));
 });
+
+test("outposts sell fuel and exotics for credits, and fuel to passing convoys; not while blockaded or raided dry", async () => {
+  const { outpostSales } = await import("../src/game.js");
+  const { tradersTurn } = await import("../src/traders.js");
+  const { OUTPOST_TRADE } = await import("../src/data.js");
+  const s = newGame({ seed: 28, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], foe = s.factions[1].id;
+  const o = Object.values(s.systems).find((x) => !x.colony && x.world === "gas") || Object.values(s.systems).find((x) => !x.colony);
+  o.exotics = true; o.colony = { owner: "concord", kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+  assert.equal(outpostSales(s, o).total, OUTPOST_TRADE.base + OUTPOST_TRADE.exotics, "exotics exports");
+  o.colony.buildings.depot = true;
+  assert.equal(outpostSales(s, o).fuel, OUTPOST_TRADE.fuel + (o.world === "gas" ? OUTPOST_TRADE.gas : 0), "fuel sales");
+  assert.equal(yields(s, o).cr, outpostSales(s, o).total);
+  o.colony.depotCut = s.turn + 3; assert.equal(outpostSales(s, o).fuel, 0, "raided dry"); o.colony.depotCut = 0;
+  // A convoy refuelling here pays once.
+  tradersTurn(s);
+  const a = s.systems[me.capital]; a.colony.buildings.market = true;
+  const c = spawnFleet(s, "traders", o.at, ["merchant"]); c.trade = { from: a.id, to: a.id }; c.path = [{ hex: a.at, cost: 1 }];
+  const c0 = me.credits; tradersTurn(s); assert.equal(me.credits, c0 + OUTPOST_TRADE.convoy);
+  const c1 = me.credits; c.at = o.at; tradersTurn(s); assert.ok(me.credits - c1 < OUTPOST_TRADE.convoy || !s.fleets[c.id], "once a convoy");
+  // Blockaded: nothing.
+  declareWar(s, "concord", foe); spawnFleet(s, foe, o.at, ["frigate"]);
+  assert.equal(outpostSales(s, o).total, 0);
+});

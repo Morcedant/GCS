@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within, hexagon } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -123,6 +123,14 @@ export function buildDepot(s, fid, sysId) {
   F.credits = round1(F.credits - FUEL.depotCost); c.buildings.depot = true;
   log(s, fid, `A fuel depot opened at ${sys.name}: the outpost gives supply, and fleets refuel there.`, "build");
   return { ok: true };
+}
+/** An outpost's sales a turn: { fuel, exotics, total } in credits. */
+export function outpostSales(s, sys) {
+  const c = sys.colony; if (!c || c.kind !== "outpost") return { fuel: 0, exotics: 0, total: 0 };
+  if (blockaded(s, sys)) return { fuel: 0, exotics: 0, total: 0, blockaded: true };
+  const pumps = (c.buildings.depot || c.buildings.station) && !(c.depotCut > s.turn);
+  const fuel = pumps ? OUTPOST_TRADE.fuel + (sys.world === "gas" ? OUTPOST_TRADE.gas : 0) : 0, exotics = sys.exotics ? OUTPOST_TRADE.exotics : 0;
+  return { fuel, exotics, total: OUTPOST_TRADE.base + fuel + exotics };
 }
 /** What an outpost of yours can buy with credits: the `anywhere` buildings it hasn't got, whose technology you have. */
 export function outpostOptions(s, sysId) {
@@ -281,7 +289,7 @@ export function yields(s, sys) {
     cr += tradeIncome(s, sys);
     if (engineActive(s, fid)) cr += ENGINE.tradePerColony;   // the corridor network
     if (blockaded(s, sys)) { ind *= SIEGE.industry; cr *= SIEGE.credits; }
-  } else cr = 0.5;
+  } else cr = outpostSales(s, sys).total;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
   return { ind: round1(ind), sci: round1(sci), cr: round1(cr), exo, upkeep };

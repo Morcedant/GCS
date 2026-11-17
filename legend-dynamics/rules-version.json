@@ -6,6 +6,18 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: outposts sell fuel and exotics",
+      "items": [
+        "An outpost with a fuel depot or station sells fuel: +2 credits a turn, or +3 on a gas giant.",
+        "An outpost on an exotics deposit exports them: +2 credits a turn, on top of the exotics it produces.",
+        "Merchant convoys refuel at outposts with a depot or station within a hex of their route, paying the owner 2 credits each time.",
+        "A blockaded outpost sells nothing, and neither does one whose depot has been raided dry.",
+        "Each outpost's panel shows what it earns."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: orbital stations, and guns over outposts",
       "items": [
         "Orbital station (needs Orbital shipyards, 90): build one over a colony or an outpost. It has light guns (4 hull, one shot of 2, or +4 hull added to a battery's).",

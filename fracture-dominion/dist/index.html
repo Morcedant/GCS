@@ -201,7 +201,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-17 21:36 UTC";
+const BUILD = "2026-11-17 21:38 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -426,6 +426,9 @@ const SUPPLY = { range: 3, graceTurns: 1 };
 /** Outposts have no industry: what they get (an Orbital battery or station, `anywhere` buildings) is bought with credits,
  * at `rate` credits per point of the building's cost. */
 const OUTPOST_BUY = { rate: 1.5 };
+/** What an outpost sells: fuel (with a fuel depot or a station; more from a gas giant's volatiles), exotics (from a
+ * deposit), and fuel to each passing merchant convoy. Nothing while blockaded, or while a raided depot is dry. */
+const OUTPOST_TRADE = { base: 0.5, fuel: 2, gas: 1, exotics: 2, convoy: 2 };
 const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2 };
 // A supply point (a colony, a fuel depot, a parked tanker) with an enemy's warships in its system is cut: it gives no supply.
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
@@ -824,6 +827,14 @@ function buildDepot(s, fid, sysId) {
   log(s, fid, `A fuel depot opened at ${sys.name}: the outpost gives supply, and fleets refuel there.`, "build");
   return { ok: true };
 }
+/** An outpost's sales a turn: { fuel, exotics, total } in credits. */
+function outpostSales(s, sys) {
+  const c = sys.colony; if (!c || c.kind !== "outpost") return { fuel: 0, exotics: 0, total: 0 };
+  if (blockaded(s, sys)) return { fuel: 0, exotics: 0, total: 0, blockaded: true };
+  const pumps = (c.buildings.depot || c.buildings.station) && !(c.depotCut > s.turn);
+  const fuel = pumps ? OUTPOST_TRADE.fuel + (sys.world === "gas" ? OUTPOST_TRADE.gas : 0) : 0, exotics = sys.exotics ? OUTPOST_TRADE.exotics : 0;
+  return { fuel, exotics, total: OUTPOST_TRADE.base + fuel + exotics };
+}
 /** What an outpost of yours can buy with credits: the `anywhere` buildings it hasn't got, whose technology you have. */
 function outpostOptions(s, sysId) {
   const sys = s.systems[sysId], c = sys && sys.colony; if (!c || c.kind !== "outpost") return [];
@@ -981,7 +992,7 @@ function yields(s, sys) {
     cr += tradeIncome(s, sys);
     if (engineActive(s, fid)) cr += ENGINE.tradePerColony;   // the corridor network
     if (blockaded(s, sys)) { ind *= SIEGE.industry; cr *= SIEGE.credits; }
-  } else cr = 0.5;
+  } else cr = outpostSales(s, sys).total;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
   return { ind: round1(ind), sci: round1(sci), cr: round1(cr), exo, upkeep };
@@ -2691,6 +2702,16 @@ function tradersTurn(s) {
   if (s.winner) return;
   if (!s.traders) s.traders = traderPower();
   const R = rng(s), me = player(s);
+  // Convoys refuel at outposts along the way: each fuel depot or station within a hex sells it fuel, once a convoy.
+  const pumps = Object.values(s.systems).filter((x) => x.colony && x.colony.kind === "outpost" && (x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn));
+  let sold = 0;
+  for (const f of fleetsOf(s, TRADERS_ID)) for (const x of pumps) {
+    if (distance(x.at, f.at) > 1 || (f.fuelled || []).includes(x.id) || fleetsAt(s, x.at).some((o) => armed(o) && atWar(s, o.owner, x.colony.owner))) continue;
+    (f.fuelled = f.fuelled || []).push(x.id);
+    const F = faction(s, x.colony.owner); F.credits += OUTPOST_TRADE.convoy; F.stats.fuelSold = (F.stats.fuelSold || 0) + OUTPOST_TRADE.convoy;
+    if (F.id === me.id) sold += OUTPOST_TRADE.convoy;
+  }
+  if (sold) log(s, me.id, `Your outposts sold fuel to passing merchant convoys: +${sold} credits.`, "trade");
   for (const f of fleetsOf(s, TRADERS_ID)) {
     const from = s.systems[f.trade.from], to = s.systems[f.trade.to];
     // Pirates in the same hex, and no warships beside it: plundered.
@@ -3684,6 +3705,8 @@ function systemHTML() {
   if (!c) h += `<p>${w.outpostOnly ? "No one can live here, but an outpost can claim it." : w.needs && !has(S, me.id, w.needs) ? `Needs <b>${esc(TECHS.find((t) => t.id === w.needs).name)}<\/b> to settle; an outpost can claim it now.` : "Unclaimed. A colony ship can settle it."}<\/p>`;
   else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}<\/b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && gunsMax(S, c) ? ` Orbital guns: ${c.defense} / ${gunsMax(S, c)} hull${c.buildings.battery ? `, an Orbital battery (${BATTERY.shots} shots of ${BATTERY.dmg} a round)` : ""}.` : ""}${seen ? siegeHTML(sys, false) : ""}<\/p>`;
   else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.<\/p>`
+    + (() => { const o = outpostSales(S, sys); return o.blockaded ? `<p class="small bad"><b>Blockaded:<\/b> enemy warships in orbit, so it sells nothing.<\/p>`
+      : `<p class="small"><b>Sales:<\/b> +${fmt(o.total)} credits a turn (${[`${OUTPOST_TRADE.base} base`, o.fuel && `fuel ${o.fuel}${sys.world === "gas" ? ", with the gas giant's volatiles" : ""}`, o.exotics && `exotics exports ${o.exotics}`].filter(Boolean).join(", ")})${c.buildings.depot || c.buildings.station ? `, and +${OUTPOST_TRADE.convoy} from each merchant convoy that refuels here` : ". A fuel depot or station would sell fuel"}.${c.depotCut > S.turn ? ` <b class="bad">The depot was raided: dry until turn ${c.depotCut}.<\/b>` : ""}<\/p>`; })()
     + (c.buildings.station && !c.buildings.depot ? `<p class="small good">Its station gives supply within ${supplyRange(S, me.id)} hexes, and fleets refuel here: no fuel depot needed.<\/p>` : c.buildings.depot ? `<p class="small good"><b>Fuel depot.<\/b> It gives supply within ${supplyRange(S, me.id)} hexes, and fleets refuel here.<\/p>`
       : `<p class="small"><b>No fuel depot:<\/b> an outpost gives supply only with one.<\/p><button class="btn" data-depot ${me.credits < FUEL.depotCost ? "disabled" : ""}>Build a fuel depot (${FUEL.depotCost} credits)<\/button>`)
     + (gunsMax(S, c) ? `<p class="small">Orbital guns ${c.defense} / ${gunsMax(S, c)} hull.<\/p>` : "")

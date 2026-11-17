@@ -155,6 +155,9 @@ export const SUPPLY = { range: 3, graceTurns: 1 };
 /** Outposts have no industry: what they get (an Orbital battery or station, `anywhere` buildings) is bought with credits,
  * at `rate` credits per point of the building's cost. */
 export const OUTPOST_BUY = { rate: 1.5 };
+/** What an outpost sells: fuel (with a fuel depot or a station; more from a gas giant's volatiles), exotics (from a
+ * deposit), and fuel to each passing merchant convoy. Nothing while blockaded, or while a raided depot is dry. */
+export const OUTPOST_TRADE = { base: 0.5, fuel: 2, gas: 1, exotics: 2, convoy: 2 };
 export const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2 };
 // A supply point (a colony, a fuel depot, a parked tanker) with an enemy's warships in its system is cut: it gives no supply.
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty

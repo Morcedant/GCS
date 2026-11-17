@@ -85,6 +85,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   outpost: light guns (4 hull, one shot of 2; +4 hull to a battery's), ships there repaired to full each turn, 2 hexes
   more sight, and supply like a fuel depot. Outposts have no industry, so they buy an Orbital battery or station with
   credits (1.5 per point of cost: 150 and 135). Computer powers fortify frontier outposts near their enemies.
+- **Outpost trade:** an outpost earns 0.5 credits a turn, +2 selling fuel with a fuel depot or station (+1 more on a
+  gas giant, for its volatiles), +2 exporting exotics from a deposit, and +2 from each merchant convoy that refuels
+  within a hex of it. Blockaded, or with its depot raided dry, it sells nothing.
 - **Sieges:** warships in an enemy world's orbit besiege it. Its guns don't repair and what its yards finish waits. Once
   its guns are silent it's **blockaded**: its industry and credits are halved, it trades and grows nothing, it loses a population every 3 turns, and its garrison
   weakens (down to half). After 10 turns an ordinary colony starved to 3 population surrenders; a capital never does.
