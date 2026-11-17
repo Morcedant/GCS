@@ -18,8 +18,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   up to 160 late), **research pacts** (each trade treaty, up to three, +5% science), ruins, and the wrecks of pirates and
   creatures you destroy.
 - **More buildings:** Garrison barracks (+3 garrison; a siege wears it to no less than 80%), Deep-space observatory
-  (Deep sensors: +3 science, and it studies an anomaly within 4 hexes every 4 turns), Drydock (Orbital shipyards: your
-  ships there are repaired to full every turn) and Orbital habitat (Habitat domes: +2 population room).
+  (Deep sensors: +3 science, and it studies an anomaly within 4 hexes every 4 turns), Drydock (Orbital shipyards: the home
+  yard. Ships there are repaired to full every turn, ships built there cost 15% less, and ships there can be refitted a
+  class up, a frigate into a cruiser or a cruiser into a dreadnought, for the difference in cost in credits) and Orbital habitat (Habitat domes: +2 population room).
 - **Relics of the old empires:** eleven, one of each, hidden in ruins and anomalies (♦ marks one held or lost). The first
   fleet to end its turn at a relic's site recovers it, and it's kept at its finder's capital. A relic belongs to the
   world that keeps it: take the world, take the relic; burn the world and the relic lies in its ruins for anyone to find.
@@ -82,9 +83,13 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   round at skill 13 for 2 damage each, and 2 hull repaired a turn when no enemy holds the orbit. A pair of frigates or a
   lone cruiser dies against one; it takes a real fleet to silence it. Its troops add 2 to the world's garrison.
 - **Orbital stations, and guns anywhere:** an Orbital station (Orbital shipyards, 90) can go up over a colony or an
-  outpost: light guns (4 hull, one shot of 2; +4 hull to a battery's), ships there repaired to full each turn, 2 hexes
-  more sight, and supply like a fuel depot. Outposts have no industry, so they buy an Orbital battery or station with
+  outpost: a forward base with light guns (4 hull, one shot of 2; +4 hull to a battery's), ships there repaired 2 hull a
+  turn, 2 hexes more sight, and supply like a fuel depot. Outposts have no industry, so they buy an Orbital battery or station with
   credits (1.5 per point of cost: 150 and 135). Computer powers fortify frontier outposts near their enemies.
+- **Repairs:** at any world of yours a ship repairs 1 hull a turn (anywhere for the Vael, a Shipwright admiral's fleet, or
+  with the Living Keel); 2 a turn at an Orbital station; to full at a Drydock. Not while enemy warships hold the orbit
+  (then it's 1 a turn). New technology (shields, armor, plating) reaches every ship at once, so there's nothing to refit
+  for that.
 - **Outpost trade:** an outpost earns 0.5 credits a turn, +2 selling fuel with a fuel depot or station (+1 more on a
   gas giant, for its volatiles), +2 exporting exotics from a deposit, and +2 from each merchant convoy that refuels
   within a hex of it. Blockaded, or with its depot raided dry, it sells nothing.

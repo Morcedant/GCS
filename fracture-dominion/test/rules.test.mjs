@@ -900,3 +900,27 @@ test("outposts sell fuel and exotics for credits, and fuel to passing convoys; n
   declareWar(s, "concord", foe); spawnFleet(s, foe, o.at, ["frigate"]);
   assert.equal(outpostSales(s, o).total, 0);
 });
+
+test("yards: a station repairs 2 a turn, a drydock to full; a drydock builds 15% cheaper and refits ships up a class", async () => {
+  const { refitOptions, refit } = await import("../src/game.js");
+  const { YARDS } = await import("../src/data.js");
+  const s = newGame({ seed: 29, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
+  me.research.done.push("heavyHulls", "orbitalYards");
+  const full = shipStats(s, "concord", "cruiser").hull;
+  cap.colony.buildings.station = true;
+  const f = spawnFleet(s, "concord", cap.at, ["cruiser"]); f.ships[0].hull = 1; endTurn(s);
+  assert.equal(f.ships[0].hull, Math.min(full, 1 + YARDS.station), "a station: +2");
+  const plain = buildOptions(s, cap).find((o) => o.id === "frigate").cost;
+  cap.colony.buildings.drydock = true; f.ships[0].hull = 1; endTurn(s);
+  assert.equal(f.ships[0].hull, full, "a drydock: to full");
+  assert.equal(buildOptions(s, cap).find((o) => o.id === "frigate").cost, Math.round(plain * (1 - YARDS.discount)));
+  const g = spawnFleet(s, "concord", cap.at, ["frigate"]);
+  const o = refitOptions(s, g.id).find((x) => x.from === "frigate");
+  assert.ok(o && o.to === "cruiser");
+  me.credits = 1000; me.exotics = 5;
+  assert.ok(refit(s, g.id, "frigate").ok);
+  assert.equal(g.ships[0].type, "cruiser"); assert.equal(g.ships[0].hull, full);
+  assert.equal(me.credits, 1000 - o.credits); assert.equal(me.exotics, 5 - o.exotics);
+  assert.ok(!refitOptions(s, g.id).some((x) => x.from === "cruiser"), "a dreadnought needs Capital ships");
+  delete cap.colony.buildings.drydock; assert.equal(refitOptions(s, g.id).length, 0, "no drydock, no refits");
+});

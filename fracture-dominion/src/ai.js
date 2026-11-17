@@ -2,7 +2,7 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL } from "./data.js";
-import { outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { refitOptions, refit, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
@@ -20,6 +20,7 @@ export function aiTurn(s, F) {
   research(s, F);
   relics(s, F);
   outposts(s, F);
+  refits(s, F);
   diplomacy(s, F, diff);
   production(s, F, diff);
   fleets(s, F);
@@ -47,6 +48,10 @@ function outposts(s, F) {
     const o = outpostOptions(s, sys.id).sort((a, b) => (a.id === "battery" ? -1 : 1))[0];
     if (o && F.credits >= o.credits * 2.5) { buildAtOutpost(s, F.id, sys.id, o.id); return; }
   }
+}
+/** Drydocks: a rich power refits a frigate a turn into a cruiser (or a cruiser into a dreadnought) at its yards. */
+function refits(s, F) {
+  for (const f of fleetsOf(s, F.id)) for (const o of refitOptions(s, f.id)) if (F.credits >= o.credits * 3 && F.exotics >= o.exotics + 2) { refit(s, f.id, o.from); return; }
 }
 function relics(s, F) {
   if (!relicHeld(s, F.id, "shard")) return;

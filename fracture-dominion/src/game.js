@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within, hexagon } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, YARDS, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -131,6 +131,27 @@ export function outpostSales(s, sys) {
   const pumps = (c.buildings.depot || c.buildings.station) && !(c.depotCut > s.turn);
   const fuel = pumps ? OUTPOST_TRADE.fuel + (sys.world === "gas" ? OUTPOST_TRADE.gas : 0) : 0, exotics = sys.exotics ? OUTPOST_TRADE.exotics : 0;
   return { fuel, exotics, total: OUTPOST_TRADE.base + fuel + exotics };
+}
+/** Refits at a drydock: for each ship type in the fleet that can go up a class, { from, to, credits, exotics }. */
+export function refitOptions(s, fleetId) {
+  const f = s.fleets[fleetId], sys = f && s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
+  if (!sys || !sys.colony || sys.colony.owner !== f.owner || !sys.colony.buildings.drydock || besieged(s, sys)) return [];
+  return [...new Set(f.ships.map((x) => x.type))].filter((t) => YARDS.refits[t] && (!SHIPS[YARDS.refits[t]].needs || has(s, f.owner, SHIPS[YARDS.refits[t]].needs))).map((t) => {
+    const to = YARDS.refits[t];
+    return { from: t, to, credits: Math.round(Math.max(0, shipStats(s, f.owner, to).cost - shipStats(s, f.owner, t).cost) * (1 - YARDS.discount) * YARDS.refitRate), exotics: Math.max(0, (SHIPS[to].exotics || 0) - (SHIPS[t].exotics || 0)) };
+  });
+}
+/** Refit one ship of type `from` in this fleet to the next class up, at once: it comes out of the yard at full hull. */
+export function refit(s, fleetId, from) {
+  const f = s.fleets[fleetId], o = refitOptions(s, fleetId).find((x) => x.from === from), F = f && faction(s, f.owner);
+  if (!o) return { error: "Refits need a drydock of yours, with no enemy warships in orbit, and the technology for the bigger class." };
+  if (F.credits < o.credits) return { error: `The refit costs ${o.credits} credits.` };
+  if (F.exotics < o.exotics) return { error: `The refit needs ${o.exotics} exotics.` };
+  const ship = f.ships.filter((x) => x.type === from).sort((a, b) => a.hull - b.hull)[0];
+  F.credits = round1(F.credits - o.credits); F.exotics -= o.exotics;
+  ship.type = o.to; ship.hull = shipStats(s, f.owner, o.to).hull;
+  log(s, f.owner, `A ${SHIPS[from].name.toLowerCase()} came out of the drydock at ${s.systems[s.sysAt[f.at]].name} a ${SHIPS[o.to].name.toLowerCase()}.`, "build");
+  return { ok: true, to: o.to };
 }
 /** What an outpost of yours can buy with credits: the `anywhere` buildings it hasn't got, whose technology you have. */
 export function outpostOptions(s, sysId) {
@@ -311,7 +332,7 @@ export function totals(s, fid) {
 export function buildOptions(s, sys) {
   const c = sys.colony, fid = c.owner, out = [];
   if (c.kind !== "colony") return out;
-  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && !d.wild && !d.trader && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
+  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && !d.wild && !d.trader && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: Math.round(shipStats(s, fid, t).cost * (c.buildings.drydock ? 1 - YARDS.discount : 1)), exotics: d.exotics || 0 });
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (d.outpost || c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;   // a depot is for outposts (buildDepot)
     if (d.wonder && !c.capital) continue;
@@ -1029,8 +1050,10 @@ function economy(s, F) {
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {
     const home = s.sysAt[f.at] && s.systems[s.sysAt[f.at]].colony && s.systems[s.sysAt[f.at]].colony.owner === F.id;
-    const dock = home && (s.systems[s.sysAt[f.at]].colony.buildings.drydock || s.systems[s.sysAt[f.at]].colony.buildings.station) && !besieged(s, s.systems[s.sysAt[f.at]]);
-    if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = dock ? shipStats(s, F.id, x.type).hull : Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
+    // A drydock repairs to full; a station 2 a turn; any world of yours (and the Vael, a shipwright, the Living Keel) 1.
+    const here = home && s.systems[s.sysAt[f.at]], free = here && !besieged(s, here);
+    const step = free && here.colony.buildings.drydock ? Infinity : free && here.colony.buildings.station ? YARDS.station : 1;
+    if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
   if (s.turn % SCIENCE.observatoryEvery === 0) for (const sys of coloniesOf(s, F.id)) {

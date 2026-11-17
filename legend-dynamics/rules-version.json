@@ -6,6 +6,18 @@
     {
       "date": "2026-11-17",
       "kind": "site",
+      "title": "Dominion: stations and drydocks do different jobs",
+      "items": [
+        "Orbital stations are forward bases: ships there now repair 2 hull a turn, not to full. Their guns, sight and supply are unchanged.",
+        "The Drydock is the home yard. Ships there still repair to full every turn, ships built at that world now cost 15% less, and ships there can be refitted a class up: a frigate into a cruiser, or a cruiser into a dreadnought.",
+        "A refit costs the difference in price, paid in credits and exotics, and the ship comes out at full hull. Refits are on the fleet panel.",
+        "Every world of yours still repairs your ships 1 hull a turn.",
+        "The computer powers refit ships at their drydocks when they're rich."
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "kind": "site",
       "title": "Dominion: outposts sell fuel and exotics",
       "items": [
         "An outpost with a fuel depot or station sells fuel: +2 credits a turn, or +3 on a gas giant.",
