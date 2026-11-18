@@ -4,6 +4,16 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-18",
+      "kind": "site",
+      "title": "Dominion: the strategy guide, made general",
+      "items": [
+        "The strategy guide no longer gives specific advice: no build orders, research lists, fleet sizes or numbers to follow.",
+        "It covers the principles and the important steps to stay competitive instead: how the game is won, the early, middle and late game, choosing a path to victory, playing to your people's strengths, war, defense, threats, exploration, diplomacy, and common mistakes.",
+        "For how each rule works, it points to How to play in the game's Menu."
+      ]
+    },
+    {
       "date": "2026-11-17",
       "kind": "site",
       "title": "Dominion: a strategy guide",
