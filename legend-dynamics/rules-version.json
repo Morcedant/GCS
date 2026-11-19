@@ -6,6 +6,18 @@
     {
       "date": "2026-11-19",
       "kind": "site",
+      "title": "Dominion: a calmer early game",
+      "items": [
+        "The computer players no longer race to out-arm each other early on. Until about turn 75, a computer power that's at war with no one keeps a defensive fleet and builds up its worlds instead, then eases into the usual arms race.",
+        "They start no wars of their own before turn 50 on Normal (60 on Easy, 35 on Hard). If you attack them, they arm as usual.",
+        "In test games, computer rivals' fleets at turn 60 were about a quarter smaller than before, with more buildings. By turn 80 they're back to full strength.",
+        "To keep their stronger economies from ending the game sooner, they don't start building the Corridor Engine before turn 100 on Normal (120 on Easy, 80 on Hard). Games last about as long as before.",
+        "The Vael were never building faster than anyone else. Their ships move farther and heal anywhere, which makes their fleets seem to be everywhere."
+      ]
+    },
+    {
+      "date": "2026-11-19",
+      "kind": "site",
       "title": "Dominion: earlier victories are remembered",
       "items": [
         "If you win and keep ruling, the Objectives tab now shows the victory you played on from, for example \"Won by the Corridor Engine on turn 133\".",

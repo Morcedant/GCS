@@ -1,7 +1,7 @@
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors, hexLine } from "./hex.js";
-import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS } from "./data.js";
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM } from "./data.js";
 import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
@@ -109,7 +109,8 @@ function diplomacy(s, F, diff) {
       // While the Heart of the Wardens lives and a truce holds, no one starts a war.
       if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
       if (allied(s, F.id, oid)) continue;
-      if (s.turn > 25 && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
+      const warFrom = AI_CALM.warFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"];   // no early wars of their own
+      if (s.turn > warFrom && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
       // The holder of the Corridor Engine (an open game): after it's held a while, anyone strong enough comes for it.
       const E = engineHeld(s);
       // A coalition: everyone not allied with the holder, together, against it.
@@ -166,7 +167,11 @@ function production(s, F, diff) {
   const threat = Math.max(0, ...Object.keys(F.relations).filter((o) => faction(s, o).alive && F.met[o]).map((o) => militaryPower(s, o)));
   const power = militaryPower(s, F.id);
   const wardens = s.crisis && s.crisis.stage === "awake" ? militaryPower(s, "wardens") * 0.5 : 0;
-  const wantPower = Math.max(4, wardens, threat * (enemies.length ? 1.2 : 0.7)) * diff * (AGGRESSION[F.id] || 1);
+  const fullWant = Math.max(4, wardens, threat * (enemies.length ? 1.2 : 0.7)) * diff * (AGGRESSION[F.id] || 1);
+  // The early game, at peace: a defensive fleet, and the rest into the worlds (AI_CALM); easing into the arms race.
+  const calm = enemies.length ? 0 : Math.max(0, Math.min(1, (AI_CALM.until - s.turn) / AI_CALM.ramp));
+  const calmWant = Math.max(AI_CALM.floor, coloniesOf(s, F.id).length * AI_CALM.perColony) * diff;
+  const wantPower = calm ? Math.min(fullWant, calmWant + (fullWant - calmWant) * (1 - calm)) : fullWant;
   const best = (list) => list.find((x) => x);
   for (const sys of cols) {
     const c = sys.colony;
@@ -187,7 +192,7 @@ function production(s, F, diff) {
       c.pop >= 6 && !c.buildings.shipyard ? ["building", "shipyard"] : null,
       enemies.length && has(s, F.id, "batteries") && !c.buildings.battery ? ["building", "battery"] : null,
       sys.exotics && has(s, F.id, "refining") && !c.buildings.refinery ? ["building", "refinery"] : null,
-      c.capital && has(s, F.id, "engine") && !c.buildings.engine ? ["building", "engine"] : null,
+      c.capital && has(s, F.id, "engine") && !c.buildings.engine && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] ? ["building", "engine"] : null,
       ships && t.net > 2 && power < wantPower * 1.6 ? ["ship", has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
       !c.buildings.market ? ["building", "market"] : null,
     ]);

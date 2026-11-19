@@ -1038,3 +1038,32 @@ test("computer players with the stations option send an outpost ship to build a 
   const n = newGame({ seed: 35, size: "medium", player: "concord", rivals: 1, difficulty: "normal" });
   n.factions[1].research.done.push("orbitalYards"); assert.equal(stationTarget(n, n.factions[1]), null, "Normal: off");
 });
+
+test("the early game is calmer: at peace before turn 75 a computer power keeps a defensive fleet, starts no early wars, and paces its Engine", async () => {
+  const { aiTurn } = await import("../src/ai.js");
+  const { AI_CALM } = await import("../src/data.js");
+  const s = newGame({ seed: 36, size: "medium", player: "concord", rivals: 2 }), F = s.factions[1], O = s.factions[2];
+  F.met[O.id] = O.met[F.id] = true;
+  // A rival far stronger than it: before, it would race to match; now, at peace, it builds its worlds.
+  for (let i = 0; i < 10; i++) spawnFleet(s, O.id, s.systems[O.capital].at, ["cruiser"]);
+  s.turn = 20; aiTurn(s, F);
+  const cap = s.systems[F.capital];
+  assert.ok(!cap.colony.queue.some((q) => q.kind === "ship" && SHIPS[q.id].skill > 0) || cap.colony.queue.some((q) => q.kind === "building"), "builds its world, not a war fleet");
+  // No early wars: angry and stronger, but too early.
+  F.relations[O.id].score = -60; for (let i = 0; i < 20; i++) spawnFleet(s, F.id, cap.at, ["cruiser"]);
+  s.turn = AI_CALM.warFrom.standard - 5; aiTurn(s, F); assert.ok(!atWar(s, F.id, O.id), "no war before turn " + AI_CALM.warFrom.standard);
+  // The Engine waits.
+  // The Engine waits: at peace, with everything else done, still not before engineFrom.
+  for (const f of Object.values(s.fleets)) if (f.owner === F.id || f.owner === O.id) delete s.fleets[f.id];
+  spawnFleet(s, F.id, cap.at, ["outpost"]); spawnFleet(s, F.id, cap.at, ["colony"]); spawnFleet(s, F.id, cap.at, ["scout"]); spawnFleet(s, F.id, cap.at, ["frigate", "frigate"]); F.credits = 500; F.relations[O.id].score = 0; F.relations[O.id].status = O.relations[F.id].status = "peace";
+  F.research.done.push("engine"); F.exotics = 30; for (const b of ["factory", "market", "lab"]) cap.colony.buildings[b] = true;
+  cap.colony.queue = []; s.turn = AI_CALM.engineFrom.standard - 10; aiTurn(s, F);
+  assert.ok(!cap.colony.queue.some((q) => q.id === "engine"), "not before turn " + AI_CALM.engineFrom.standard);
+  // After it: the Engine joins the queue once the more urgent things are done.
+  s.turn = AI_CALM.engineFrom.standard + 1; let queued = false;
+  for (let i = 0; i < 12 && !queued; i++) {
+    cap.colony.queue = []; aiTurn(s, F); queued = cap.colony.queue.some((q) => q.id === "engine");
+    for (const q of cap.colony.queue) if (q.kind === "building") cap.colony.buildings[q.id] = true;
+  }
+  assert.ok(queued, "then it builds it");
+});

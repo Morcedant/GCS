@@ -145,6 +145,10 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Prototypes:** your research arm sends field tests as directives; carried out, each leaves a unique upgrade (fold
   lances, ablative plating, long-range scanners, supply tenders, yard drones, an orbital shield grid, hab
   arcologies). Winning a campaign brings one; the computer powers field-test their own every 25 turns.
+- **A calmer early game:** before turn 75, a computer power at war with no one keeps a defensive fleet (2 strength per
+  world) and puts the rest into its worlds, easing into the usual arms race over the 20 turns before. It starts no wars
+  of its own before turn 50 (60 on Easy, 35 on Hard), and doesn't start building the Corridor Engine before turn 100
+  (120 on Easy, 80 on Hard), so the stronger economies a calm start gives it don't end the game sooner.
 - **Difficulty and the computer players:** Easy, Normal and Hard are presets for what the computer players do, and
   each option can be changed on the new-game form (then it's "Custom"; fixed for the game). Strength (fleet size and
   readiness for war): 0.7× / 1× / 1.35×. Build deep-space stations (Hard only: pickets in open space on the approaches

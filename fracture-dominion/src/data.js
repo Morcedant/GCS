@@ -363,6 +363,15 @@ export const AI_PRESETS = {
   normal: { strength: 1, stations: false, fortify: true, coalitions: true, raidDepots: true, payPirates: true },
   hard: { strength: 1.35, stations: true, fortify: true, coalitions: true, raidDepots: true, payPirates: false },
 };
+/**
+ * The early game: before turn `until`, a computer power at war with no one keeps a defensive fleet (`perColony` fleet
+ * strength for each of its worlds, at least `floor`) and puts the rest into its worlds, instead of matching the
+ * strongest power it has met. Over the `ramp` turns before `until` it eases into the usual arms race. At war, or
+ * after, it arms as usual. Difficulty's strength still scales it. Nor do they start wars of their own before
+ * `warFrom` (by strength: gentle Easy, standard Normal, fierce Hard), or start building the Corridor Engine before
+ * `engineFrom`: the stronger economies a calm early game gives them shouldn't end the game sooner.
+ */
+export const AI_CALM = { until: 75, ramp: 20, perColony: 2, floor: 4, warFrom: { gentle: 60, standard: 50, fierce: 35 }, engineFrom: { gentle: 120, standard: 100, fierce: 80 } };
 /** Deep-space stations for computer players: at most one per `perColonies` colonies, and `max` in all. */
 export const AI_STATIONS = { perColonies: 4, max: 4 };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
