@@ -206,7 +206,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-18 20:51 UTC";
+const BUILD = "2026-11-19 11:49 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -4675,6 +4675,7 @@ function showNewGame(canContinue, preset) {
     <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world<\/label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step<\/label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-guide">New here? The starter guide<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>
+    <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win<\/a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens<\/a><\/p>
     <p class="small muted">Version: ${esc(VERSION)}<\/p>`);
   // The difficulty sets the computer players' options; change any and it's Custom.
   const setAi = (o) => { $("ng-ai-strength").value = String(o.strength); document.querySelectorAll("[data-aiopt]").forEach((b) => { b.checked = !!o[b.dataset.aiopt]; }); };
@@ -4722,7 +4723,8 @@ function showStarter(canContinue) {
     <\/div>
     <div class="sg-keys"><span><kbd>Drag<\/kbd> pan<\/span><span><kbd>Scroll<\/kbd> zoom<\/span><span><kbd>Click<\/kbd> select<\/span><span><kbd>Right-click<\/kbd> move<\/span><span><kbd>N<\/kbd> next idle<\/span><span><kbd>Enter<\/kbd> end turn<\/span><\/div>
     <div class="btn-row"><button class="btn primary big" id="sg-first">Start my first game<\/button><button class="btn" id="sg-choose">Choose my own settings<\/button>${canContinue ? `<button class="btn" id="sg-continue">Continue your game<\/button>` : ""}<\/div>
-    <p class="small muted">The first game is set up to learn on: the Concord, a small galaxy, two easy rivals, and the First steps checklist.<\/p><\/div>`);
+    <p class="small muted">The first game is set up to learn on: the Concord, a small galaxy, two easy rivals, and the First steps checklist.<\/p>
+    <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win<\/a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens<\/a><\/p><\/div>`);
   $("sg-first").onclick = () => { const st = newGame({ player: "concord", size: "small", rivals: 2, difficulty: "easy" }); st.tutorial = { on: true, guide: true, ack: {}, seen: {} }; startGame(st); save(); };
   $("sg-choose").onclick = () => showNewGame(canContinue);
   if ($("sg-continue")) $("sg-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
