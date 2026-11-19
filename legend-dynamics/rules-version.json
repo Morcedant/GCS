@@ -4,6 +4,15 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-19",
+      "kind": "site",
+      "title": "Dominion: earlier victories are remembered",
+      "items": [
+        "If you win and keep ruling, the Objectives tab now shows the victory you played on from, for example \"Won by the Corridor Engine on turn 133\".",
+        "The end-of-game screen shows it too, when you finally retire or the game ends."
+      ]
+    },
+    {
       "date": "2026-11-18",
       "kind": "site",
       "title": "Dominion: the strategy guide, made general",

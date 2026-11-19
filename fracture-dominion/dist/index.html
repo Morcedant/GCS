@@ -205,7 +205,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-19 11:49 UTC";
+const BUILD = "2026-11-19 12:13 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -4142,13 +4142,17 @@ function engineChain() {
 }
 const ibar = (v, max, color) => `<span class="meter" style="display:inline-block;width:100px;vertical-align:middle;margin:0 6px 0 0"><span style="width:${Math.max(0, Math.min(100, (v / max) * 100))}%;background:${color}"><\/span><\/span>`;
 const stepLi = (state, text) => `<li class="${state}"><span>${state === "done" ? "✓" : state === "now" ? "▶" : "○"}<\/span>${text}<\/li>`;
+/** The victories you've already won and played on from: "by the Corridor Engine, turn 132". */
+const VICTORY_WAYS = { conquest: "by conquest", engine: "by the Corridor Engine", score: "on score" };
+const pastVictories = () => (S.kept || []).filter((k) => VICTORY_WAYS[k.reason]).map((k) => `won ${VICTORY_WAYS[k.reason]} on turn ${k.turn}`);
 function objectivesHTML() {
   const me = player(S), alive = S.factions.filter((f) => f.alive), rivals = alive.filter((f) => f.id !== me.id), all = S.factions.filter((f) => f.id !== me.id);
   const turnsLeft = RULES.maxTurns - S.turn;
   const ranked = alive.map((f) => ({ f, sc: score(S, f.id) })).sort((a, b) => b.sc - a.sc), myRank = ranked.findIndex((x) => x.f.id === me.id) + 1, mine = score(S, me.id), lead = ranked[0];
   let h = `<h2>Objectives<\/h2>`;
   h += `<div class="kv small" style="margin-bottom:10px"><span>Game<\/span><span>${S.mode === "open" ? `${turnText()}: no end but the one you choose (Menu → Retire)` : `${ibar(S.turn, RULES.maxTurns, "var(--gold)")} Turn ${S.turn} of ${RULES.maxTurns} (${turnsLeft} left)`}<\/span>
-    <span>Standing<\/span><span>Score <b>${mine}<\/b>, ${myRank === 1 ? `<b class="good">first<\/b> of ${alive.length}` : `<b>${ordinal(myRank)}<\/b> of ${alive.length}`}<\/span><\/div>`;
+    <span>Standing<\/span><span>Score <b>${mine}<\/b>, ${myRank === 1 ? `<b class="good">first<\/b> of ${alive.length}` : `<b>${ordinal(myRank)}<\/b> of ${alive.length}`}<\/span>${pastVictories().length ? `
+    <span>Victories<\/span><span class="gold">🏆 ${esc(pastVictories().map((v) => v[0].toUpperCase() + v.slice(1)).join("; "))}. You played on.<\/span>` : ""}<\/div>`;
   h += `<p class="small muted">Win one of three ways. Lose if your last world falls, or if a rival wins first.<\/p>`;
   const live = S.crisis && (S.crisis.stage === "stirring" || S.crisis.stage === "awake");
   if (live) h += crisisHTML();
@@ -4926,6 +4930,7 @@ function showEnd() {
   const why = { conquest: "by conquest", engine: "by finishing the Corridor Engine", score: `with the highest score at turn ${RULES.maxTurns}`, fallen: "", retired: `on your own terms, at turn ${S.turn}` }[S.winReason] || "";
   modal(`<h1>${won ? "Victory" : "Defeat"}<\/h1><p class="lede">${won ? `You win ${why}.` : W ? `${esc(W.name)} wins ${why}.` : "Your people have fallen."}<\/p>
     <table class="tbl"><tr><th>Faction<\/th><th>Worlds<\/th><th>Score<\/th><\/tr>${S.factions.map((F) => `<tr><td><span class="dot" style="background:${F.color}"><\/span>${esc(F.name)}${F.alive ? "" : " †"}<\/td><td>${coloniesOf(S, F.id).length}<\/td><td>${score(S, F.id)}<\/td><\/tr>`).join("")}<\/table>
+    ${pastVictories().length ? `<p class="gold">🏆 Earlier in this game you ${esc(pastVictories().join(", and "))}, and played on.<\/p>` : ""}
     ${won && S.winReason !== "retired" ? `<p class="small">Keep ruling and the game goes on in open rule, with no end but the one you choose. The directives and campaigns go on too.<\/p>` : ""}
     <div class="btn-row">${won && S.winReason !== "retired" ? `<button class="btn primary" id="end-keep">Keep ruling<\/button>` : ""}<button class="btn ${won && S.winReason !== "retired" ? "" : "primary"}" id="end-new">New game<\/button><button class="btn" id="end-look">Look at the map<\/button><\/div>${galaxyBox()}`);
   bindGalaxyBox();
