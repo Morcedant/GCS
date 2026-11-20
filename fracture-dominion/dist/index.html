@@ -205,7 +205,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-19 23:23 UTC";
+const BUILD = "2026-11-20 00:12 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -656,9 +656,12 @@ const AI_PRESETS = {
  * strongest power it has met. Over the `ramp` turns before `until` it eases into the usual arms race. At war, or
  * after, it arms as usual. Difficulty's strength still scales it. Nor do they start wars of their own before
  * `warFrom` (by strength: gentle Easy, standard Normal, fierce Hard), or start building the Corridor Engine before
- * `engineFrom`: the stronger economies a calm early game gives them shouldn't end the game sooner.
+ * `engineFrom`: the stronger economies a calm early game gives them shouldn't end the game sooner. Real provocation
+ * overrides the early-war turn: regard at `provoked` or worse, or a grave offence (a remembered act of `graveOffence`
+ * or worse, such as breaking an alliance) within the last `graveTurns` turns.
  */
-const AI_CALM = { until: 75, ramp: 20, perColony: 2, floor: 4, warFrom: { gentle: 60, standard: 50, fierce: 35 }, engineFrom: { gentle: 120, standard: 100, fierce: 80 } };
+const AI_CALM = { until: 75, ramp: 20, perColony: 2, floor: 4, warFrom: { gentle: 60, standard: 50, fierce: 35 }, engineFrom: { gentle: 120, standard: 100, fierce: 80 },
+  provoked: -40, graveOffence: -30, graveTurns: 20 };
 /** Deep-space stations for computer players: at most one per `perColonies` colonies, and `max` in all. */
 const AI_STATIONS = { perColonies: 4, max: 4 };
 const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
@@ -3496,8 +3499,9 @@ function diplomacy(s, F, diff) {
       // While the Heart of the Wardens lives and a truce holds, no one starts a war.
       if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
       if (allied(s, F.id, oid)) continue;
-      const warFrom = AI_CALM.warFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"];   // no early wars of their own
-      if (s.turn > warFrom && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
+      const warFrom = AI_CALM.warFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"];   // no early wars of their own...
+      const provoked = r.score <= AI_CALM.provoked || (r.memory || []).some((m) => m.d <= AI_CALM.graveOffence && s.turn - m.turn <= AI_CALM.graveTurns);   // ...unless provoked
+      if ((s.turn > warFrom || provoked) && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
       // The holder of the Corridor Engine (an open game): after it's held a while, anyone strong enough comes for it.
       const E = engineHeld(s);
       // A coalition: everyone not allied with the holder, together, against it.

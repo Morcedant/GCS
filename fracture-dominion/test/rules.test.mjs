@@ -1050,7 +1050,7 @@ test("the early game is calmer: at peace before turn 75 a computer power keeps a
   const cap = s.systems[F.capital];
   assert.ok(!cap.colony.queue.some((q) => q.kind === "ship" && SHIPS[q.id].skill > 0) || cap.colony.queue.some((q) => q.kind === "building"), "builds its world, not a war fleet");
   // No early wars: angry and stronger, but too early.
-  F.relations[O.id].score = -60; for (let i = 0; i < 20; i++) spawnFleet(s, F.id, cap.at, ["cruiser"]);
+  F.relations[O.id].score = -35; for (let i = 0; i < 20; i++) spawnFleet(s, F.id, cap.at, ["cruiser"]);
   s.turn = AI_CALM.warFrom.standard - 5; aiTurn(s, F); assert.ok(!atWar(s, F.id, O.id), "no war before turn " + AI_CALM.warFrom.standard);
   // The Engine waits.
   // The Engine waits: at peace, with everything else done, still not before engineFrom.
@@ -1066,4 +1066,19 @@ test("the early game is calmer: at peace before turn 75 a computer power keeps a
     for (const q of cap.colony.queue) if (q.kind === "building") cap.colony.buildings[q.id] = true;
   }
   assert.ok(queued, "then it builds it");
+});
+
+test("real provocation overrides the early-war turn: regard at −40 or a recent betrayal", async () => {
+  const { aiTurn } = await import("../src/ai.js");
+  const { remember } = await import("../src/game.js");
+  const { AI_CALM } = await import("../src/data.js");
+  const setup = () => { const s = newGame({ seed: 37, size: "small", player: "concord", rivals: 1 }), F = s.factions[1], me = s.factions[0];
+    F.met[me.id] = me.met[F.id] = true; for (let i = 0; i < 6; i++) spawnFleet(s, F.id, s.systems[F.capital].at, ["cruiser"]); F.credits = 900; s.turn = 20; return { s, F, me }; };
+  // Merely annoyed: waits.
+  let { s, F, me } = setup(); F.relations[me.id].score = -25; aiTurn(s, F); assert.ok(!atWar(s, F.id, me.id), "annoyed, but too early");
+  // Badly provoked: war now.
+  ({ s, F, me } = setup()); F.relations[me.id].score = AI_CALM.provoked - 5; aiTurn(s, F); assert.ok(atWar(s, F.id, me.id), "provoked: war");
+  // A recent grave offence: war now, even without the lowest regard.
+  ({ s, F, me } = setup()); F.relations[me.id].score = -25; remember(s, F.id, me.id, "broke our alliance", AI_CALM.graveOffence - 5);
+  F.relations[me.id].score = -25; aiTurn(s, F); assert.ok(atWar(s, F.id, me.id), "betrayed: war");
 });
