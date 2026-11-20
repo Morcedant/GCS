@@ -160,6 +160,12 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **The guide:** a first game, step by step: a coach card walks a new player through the first turns (research,
   building, the scout, a second colony, ending a turn, the ways to win, directives and campaigns, Focus, stances and
   supply), rings what to use next and moves on by itself. On by default for a first game; the menu restarts it.
+- **Music:** the game plays tracks from the shared table server's music bucket, folder `dominion/` (its address comes
+  from `legend-dynamics/table-server/server-url.txt` at build time). A track's mood is the first word of its file
+  name, or its `mood` in the folder's `tracks.json`: `exploration - 01.mp3` plays in peacetime, `war - 01.mp3` while
+  you're at war with a power, `crisis - 01.mp3` once the Wardens wake; any other track plays in any mood. Tracks are
+  shuffled, and a change of mood fades to the next. The ♪ button in the bar mutes it; the Menu has the volume, Next
+  track and what's playing. Browsers allow sound only after a click, so it starts with your first one.
 - **The strategy guide** (`strategy.mjs` writes `dist/strategy.html`; the menu links to it): general on purpose, with
   no build orders or exact numbers. How the game is won, principles, the important steps in the early, middle and late
   game, the paths to victory, playing to each people's strengths, and war, defense, threats, exploration, diplomacy

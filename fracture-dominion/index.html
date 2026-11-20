@@ -179,6 +179,9 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
   .ng-ai { margin: 8px 0; } .ng-ai summary { cursor: pointer; margin-bottom: 6px; }
   .ai-opt { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; font-size: 13px; } .ai-opt input { margin-top: 3px; flex: none; }
   .ai-opt span { display: flex; flex-direction: column; } .ai-opt small { font-size: 12px; }
+  .music-btn { min-width: 34px; font-size: 15px; } .music-btn.off { opacity: .5; }
+  .music-box { border: 1px solid var(--line, #2a3548); border-radius: 10px; padding: 8px 12px; margin: 0 0 12px; } .music-box h3 { margin: 0 0 4px; }
+  .music-box input[type=range] { width: 180px; vertical-align: middle; }
 </style>
 
 <div id="app" hidden>
@@ -186,6 +189,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
     <span id="bar-faction"></span>
     <span id="bar-stats"></span>
     <span id="bar-turn"></span>
+    <button class="btn small music-btn" id="music-btn" aria-label="Music on or off">♪</button>
     <button class="btn small" id="menu">Menu</button>
   </header>
   <div class="map-wrap">

@@ -43,7 +43,7 @@ function boot() {
   if (saved) showNewGame(true); else showStarter(false);
 }
 function startGame(state) {
-  S = state; sel = null; moveMode = false; tab = "selected";
+  S = state; sel = null; moveMode = false; tab = "selected"; music.mood = null; setTimeout(musicUpdate, 0);
   const cap = S.systems[player(S).capital];
   centerOn(cap.at); view.zoom = 1;
   select({ kind: "system", id: cap.id });
@@ -128,6 +128,85 @@ function territory() {
   }
   return own;
 }
+// ---------- music: tracks from the table server's dominion/ folder, by mood ----------
+// The mood follows the game: exploration in peacetime, war while you're at war with a power, crisis once the
+// Wardens are awake. A track's mood is its tracks.json "mood", or the first word of its file name ("war - 01.mp3");
+// anything else plays in any mood. Tracks play one after another, shuffled; a change of mood fades to the next.
+const MUSIC_SERVER = "__MUSIC_SERVER__";
+const MUSIC_MOODS = { exploration: "Exploration", war: "War", crisis: "Crisis" };
+const music = { tracks: null, loading: false, audio: null, mood: null, current: null, played: [], error: null, started: false,
+  prefs: (() => { try { return { on: true, volume: 0.4, ...(JSON.parse(localStorage.getItem("dominion.music.v1")) || {}) }; } catch { return { on: true, volume: 0.4 }; } })() };
+const savePrefs = () => { try { localStorage.setItem("dominion.music.v1", JSON.stringify(music.prefs)); } catch {} };
+const moodOf = (t) => { const m = String(t.mood || "").toLowerCase(), w = t.file.toLowerCase().split(/[\s._-]+/)[0]; return MUSIC_MOODS[m] ? m : MUSIC_MOODS[w] ? w : null; };
+/** What the game calls for now. */
+function gameMood() {
+  if (!S) return "exploration";
+  const c = crisisState(S); if (c && c.stage === "awake") return "crisis";
+  const me = player(S);
+  return S.factions.some((F) => F.id !== me.id && F.alive && atWar(S, me.id, F.id)) ? "war" : "exploration";
+}
+async function loadMusic() {
+  if (music.tracks || music.loading || !/^https:\/\//.test(MUSIC_SERVER)) { if (!/^https:\/\//.test(MUSIC_SERVER)) music.error = "No music server is set up."; return; }
+  music.loading = true;
+  try {
+    const r = await fetch(`${MUSIC_SERVER}/api/music?folder=dominion`); const b = await r.json();
+    music.tracks = (b.tracks || []).map((t) => ({ ...t, moodKey: moodOf(t) }));
+    if (!music.tracks.length) music.error = "No tracks yet: upload them to the dominion folder of the music bucket.";
+  } catch { music.error = "The music server couldn't be reached."; music.tracks = []; }
+  music.loading = false; musicUpdate();
+}
+/** A track for this mood: ones of that mood (or with none), not the one just played, least recently played first. */
+function pickTrack(mood) {
+  const all = music.tracks || []; if (!all.length) return null;
+  let pool = all.filter((t) => t.moodKey === mood); if (!pool.length) pool = all.filter((t) => !t.moodKey); if (!pool.length) pool = all;
+  const fresh = pool.filter((t) => !music.played.includes(t.file)); const from = fresh.length ? fresh : pool.filter((t) => t !== music.current) .length ? pool.filter((t) => t !== music.current) : pool;
+  if (!fresh.length) music.played = music.played.filter((f) => !pool.some((t) => t.file === f));
+  return from[Math.floor(Math.random() * from.length)];
+}
+function fade(a, to, ms, done) {
+  const from = a.volume, t0 = performance.now();
+  const step = (now) => { const k = Math.min(1, (now - t0) / ms); a.volume = Math.max(0, Math.min(1, from + (to - from) * k)); if (k < 1) requestAnimationFrame(step); else if (done) done(); };
+  requestAnimationFrame(step);
+}
+function playTrack(t) {
+  const old = music.audio, a = new Audio(t.src); a.volume = 0; a.preload = "auto";
+  a.addEventListener("ended", () => { if (music.audio === a) playTrack(pickTrack(music.mood) || t); });
+  a.addEventListener("error", () => { if (music.audio === a) { music.played.push(t.file); const n = pickTrack(music.mood); if (n && n !== t) playTrack(n); } });
+  music.audio = a; music.current = t; music.played.push(t.file);
+  a.play().then(() => { fade(a, music.prefs.volume, 2500); renderMusicNow(); }).catch(() => { music.started = false; });
+  if (old) fade(old, 0, 2000, () => { old.pause(); });
+}
+/** Keep the music in step with the game and the settings: call it on any change (after a turn, on a toggle). */
+function musicUpdate() {
+  if (!music.prefs.on) { if (music.audio) { const a = music.audio; music.audio = null; fade(a, 0, 800, () => a.pause()); } renderMusicNow(); return; }
+  if (!music.started) return;   // the browser plays sound only after the player has clicked something
+  if (!music.tracks) { loadMusic(); return; }
+  const mood = gameMood();
+  if (mood !== music.mood || !music.audio) { music.mood = mood; const t = pickTrack(mood); if (t) playTrack(t); }
+  renderMusicNow();
+}
+function musicStart() { if (music.started) return; music.started = true; musicUpdate(); }
+document.addEventListener("pointerdown", musicStart, { once: false });
+document.addEventListener("keydown", musicStart, { once: false });
+function renderMusicNow() {
+  const b = document.getElementById("music-btn"); if (b) { b.textContent = music.prefs.on ? "♪" : "♪̸"; b.title = music.prefs.on ? `Music on${music.current ? `: ${music.current.title}` : ""} (click to mute)` : "Music off (click to play)"; b.classList.toggle("off", !music.prefs.on); }
+  const n = document.getElementById("m-music-now"); if (n) n.textContent = musicStatus();
+}
+const musicStatus = () => !music.prefs.on ? "Music is off." : music.error ? music.error : music.current ? `Now playing: ${music.current.title}${music.current.moodKey ? ` (${MUSIC_MOODS[music.current.moodKey]})` : ""}.` : music.loading ? "Loading the music…" : "The music starts when you click.";
+function musicMenuHTML() {
+  return `<div class="music-box"><h3>Music</h3><label class="small check-line"><input type="checkbox" id="m-music-on" ${music.prefs.on ? "checked" : ""}> Play music</label>
+    <label class="small">Volume <input type="range" id="m-music-vol" min="0" max="1" step="0.05" value="${music.prefs.volume}"></label>
+    <div class="btn-row"><button class="btn small" id="m-music-skip">Next track</button></div>
+    <p class="small muted" id="m-music-now">${esc(musicStatus())}</p>
+    <p class="small muted">The mood follows the game: exploration in peacetime, war while you're at war, the crisis when the Wardens wake.</p></div>`;
+}
+function bindMusicMenu() {
+  if (!$("m-music-on")) return;
+  $("m-music-on").onchange = () => { music.prefs.on = $("m-music-on").checked; savePrefs(); music.started = true; musicUpdate(); };
+  $("m-music-vol").oninput = () => { music.prefs.volume = +$("m-music-vol").value; savePrefs(); if (music.audio) music.audio.volume = music.prefs.volume; };
+  $("m-music-skip").onclick = () => { music.started = true; if (!music.prefs.on) { music.prefs.on = true; savePrefs(); $("m-music-on").checked = true; } const t = pickTrack(gameMood()); if (t) { music.mood = gameMood(); playTrack(t); } else musicUpdate(); };
+}
+
 // ---------- ship outlines ----------
 const SHIP_PATHS = {};
 /** The biggest ship in a fleet: what the map draws for it. */
@@ -820,6 +899,8 @@ function bindChrome() {
   $("zoom-out").addEventListener("click", () => zoomBy(0.8));
   $("home").addEventListener("click", () => { if (S) { centerOn(S.systems[player(S).capital].at); draw(); } });
   $("menu").addEventListener("click", () => showMenu());
+  if ($("music-btn")) $("music-btn").addEventListener("click", (e) => { e.stopPropagation(); music.prefs.on = !music.prefs.on; savePrefs(); music.started = true; musicUpdate(); });
+  renderMusicNow();
   $("next").addEventListener("click", nextIdle);
   $("to-panel").addEventListener("click", () => document.querySelector(".side").scrollIntoView({ behavior: "smooth", block: "start" }));
   document.addEventListener("keydown", (e) => {
@@ -856,7 +937,7 @@ function doEndTurn() {
     if (!S.winner) eventsTurn(S);
     if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
-    save();
+    save(); musicUpdate();
     // News: what happened to you this turn.
     const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted ") && l.kind !== "turn");
     if (sel && sel.kind === "fleet" && !S.fleets[sel.id]) sel = null;
@@ -1185,7 +1266,7 @@ function bindGalaxyBox() {
   $("seed-replay").onclick = () => showNewGame(true, g.preset);
 }
 function showMenu() {
-  modal(`<h1>Menu</h1><div class="btn-row col">
+  modal(`<h1>Menu</h1>${musicMenuHTML()}<div class="btn-row col">
     <button class="btn" id="m-resume">Back to the game</button>
     <button class="btn" id="m-help">How to play</button>
     <button class="btn" id="m-guide">The starter guide</button>
@@ -1203,6 +1284,7 @@ function showMenu() {
   if ($("m-retire")) $("m-retire").onclick = () => { retire(S); save(); closeModal(); renderAll(); showEnd(); };
   bindGalaxyBox();
   $("m-resume").onclick = closeModal;
+  bindMusicMenu();
   $("m-help").onclick = () => showHelp(showMenu);
   $("m-guide").onclick = () => showStarter(true);
   $("m-guide-go").onclick = () => { closeModal(); startGuide(); };

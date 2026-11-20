@@ -4,6 +4,17 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-20",
+      "kind": "site",
+      "title": "Dominion: music",
+      "items": [
+        "Dominion plays music now. Tracks come from the dominion folder of the music bucket, and the mood follows the game: exploration in peacetime, war while you're at war, crisis once the Wardens wake.",
+        "Name tracks by mood: \"exploration - 01.mp3\", \"war - 01.mp3\", \"crisis - 01.mp3\". Anything else plays in any mood.",
+        "Tracks are shuffled, so the same one doesn't come round twice in a row, and a change of mood fades into the next track.",
+        "The ♪ button in the top bar turns the music on or off. The Menu has the volume, a Next track button, and what's playing. Your settings are remembered."
+      ]
+    },
+    {
       "date": "2026-11-19",
       "kind": "site",
       "title": "Dominion: provocation brings war, early game or not",

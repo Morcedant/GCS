@@ -9,6 +9,10 @@
  *
  * and the fan games, named as on the fan-games site: uss-pelion/   grimm/
  *
+ * and Fracture Lines: Dominion, the strategy game: dominion/. Its player picks a track by mood, from tracks.json's
+ * "mood" or the file name's first word: "exploration - 01.mp3" (at peace), "war - 01.mp3", "crisis - 01.mp3" (the
+ * Wardens awake); anything else plays in any mood.
+ *
  * The music pages list what's there, at once, with no rebuild. A track's title comes from its file name
  * ("01 - the-long-road.mp3" → "The Long Road"; a leading number sets the order). To give titles, moods and the like,
  * put a tracks.json in the folder (optional): { "intro": "…", "tracks": [{ "file", "title", "mood", "use", "credit",
@@ -18,10 +22,12 @@
  *   GET /api/music            → { folders: { F: count } }   how many tracks each setting has
  *   GET /music/F/FILE         the track (Range requests work, so the player can seek); ?download=1 saves it as a file
  */
-export const MUSIC_FOLDERS = ["trails-of-blood-and-dust", "fracture-lines", "the-shattered-crown", "aurora", "uss-pelion", "grimm"];
+export const MUSIC_FOLDERS = ["trails-of-blood-and-dust", "fracture-lines", "the-shattered-crown", "aurora", "uss-pelion", "grimm", "dominion"];
 /** The private fan games' folders: served by name, but left out of the public counts. */
 export const FAN_FOLDERS = ["uss-pelion", "grimm"];
-export const PUBLIC_FOLDERS = MUSIC_FOLDERS.filter((f) => !FAN_FOLDERS.includes(f));
+/** Folders that aren't a setting's music page (the strategy game's): served by name, left out of the counts too. */
+export const GAME_FOLDERS = ["dominion"];
+export const PUBLIC_FOLDERS = MUSIC_FOLDERS.filter((f) => !FAN_FOLDERS.includes(f) && !GAME_FOLDERS.includes(f));
 export const AUDIO_TYPES = { mp3: "audio/mpeg", m4a: "audio/mp4", aac: "audio/aac", ogg: "audio/ogg", oga: "audio/ogg", opus: "audio/ogg", wav: "audio/wav", flac: "audio/flac", webm: "audio/webm" };
 
 const SMALL = new Set(["a", "an", "and", "at", "by", "for", "in", "of", "on", "or", "the", "to", "with"]);

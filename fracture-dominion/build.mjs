@@ -11,7 +11,10 @@ const strip = (src) => src
 // A build stamp, shown on the new-game screen and in the menu, so it's plain which version a browser has.
 const BUILD_STAMP = new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC";
 const body = `const BUILD = ${JSON.stringify(BUILD_STAMP)};\n` + ORDER.map((m) => `// ---- ${m}.js ----\n` + strip(readFileSync(new URL(`src/${m}.js`, here), "utf8"))).join("\n");
-const page = readFileSync(new URL("index.html", here), "utf8").replace("/* APP */", () => `(() => {\n"use strict";\n${body.replace(/<\//g, "<\\/")}\n})();`);
+// The music comes from the shared table server, if one is deployed (its address in table-server/server-url.txt).
+let musicServer = ""; try { musicServer = readFileSync(new URL("../legend-dynamics/table-server/server-url.txt", here), "utf8").trim(); } catch {}
+if (!/^https:\/\/[\w.-]+(:\d+)?$/.test(musicServer)) musicServer = "";
+const page = readFileSync(new URL("index.html", here), "utf8").replace("/* APP */", () => `(() => {\n"use strict";\n${body.replace("__MUSIC_SERVER__", () => musicServer).replace(/<\//g, "<\\/")}\n})();`);
 mkdirSync(new URL("dist/", here), { recursive: true });
 writeFileSync(new URL("dist/index.html", here), page);
 // A standalone copy with its own document skeleton, for a website or opening from disk.

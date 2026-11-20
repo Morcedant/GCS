@@ -26,6 +26,7 @@ test("titles come from file names; only audio in the settings' folders is served
   assert.equal(titleFrom("BOSS theme.mp3"), "BOSS Theme");
   assert.ok(validKey("aurora/main-theme.mp3"));
   assert.ok(validKey("uss-pelion/01 - red alert.mp3") && validKey("grimm/the-woge.ogg"), "the fan games' folders");
+  assert.ok(validKey("dominion/war - 01.mp3"), "the strategy game's folder");
   for (const k of ["aurora/notes.txt", "elsewhere/x.mp3", "aurora/sub/x.mp3", "aurora/.hidden.mp3", "../x.mp3", "aurora/"]) assert.ok(!validKey(k), k);
 });
 
