@@ -385,12 +385,13 @@ export const RELIC_SCORE = 10;
  * Rift beacon on a world near it (`beacon`: credits and exotics), which opens it for everyone with a corridor in.
  */
 /**
- * Corridor collapses: from turn `first`, every `every` turns or so (a range), a corridor fails. Every power hears
- * `warn` turns ahead. Never one a system can't do without (each end keeps another corridor, and the network stays in
- * one piece). A scout that ends its turn within `surveyRange` hexes of either end, not moving, charts a new corridor
- * from that end to a system within `linkRange` (the one nearest the other end), and its power gets `research`.
+ * Corridor collapses: rare, and they hurt. From turn `first`, every `every` turns or so (a range), a corridor fails:
+ * one of the few that matter most (the longest detour without it, between settled worlds). Every power hears `warn`
+ * turns ahead. Never one a system can't do without (each end keeps another corridor, and the network stays in one
+ * piece). A new route takes a scout resting `surveyTurns` turns within `surveyRange` hexes of either end; it charts a
+ * corridor from that end to a system within `linkRange` (the one nearest the other end), and its power gets `research`.
  */
-export const COLLAPSE = { first: 45, every: [25, 40], warn: 4, surveyRange: 2, linkRange: 6, research: 40 };
+export const COLLAPSE = { first: 70, every: [60, 90], warn: 5, surveyRange: 2, surveyTurns: 3, linkRange: 6, research: 60 };
 export const SECTORS = { beacon: { credits: 200, exotics: 10, range: 3 }, first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
   kinds: {
     corsair: { name: "the Corsair Reach", wilds: true, density: 1, exotics: 0.45, ruins: 0.15, anomalies: 0.15, havens: 2,

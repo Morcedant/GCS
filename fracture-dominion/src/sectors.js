@@ -98,15 +98,19 @@ export function corridorsTurn(s) {
       C.breaks.push({ a, b, turn: s.turn, surveyed: null }); C.coming = null; C.at = null;
       // Fleets on their way re-plot without it.
       for (const f of Object.values(s.fleets)) if (f.dest && f.path.length) { const d = f.dest; if (!setDestination(s, f.id, d).ok) { f.path = []; f.dest = null; } }
-      secAnnounce(s, `The corridor between ${corrName(s, a, b)} has collapsed. Ships go the long way until someone charts a new route: a scout that ends its turn within ${COLLAPSE.surveyRange} hexes of either system, not moving, surveys a new corridor (worth ${COLLAPSE.research} research).`);
+      secAnnounce(s, `The corridor between ${corrName(s, a, b)} has collapsed. Ships go the long way until someone charts a new route: a scout resting ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either system charts a new corridor (worth ${COLLAPSE.research} research).`);
     }
     return;
   }
   if (s.turn < C.next) return;
   C.next = s.turn + COLLAPSE.every[0] + R.int(COLLAPSE.every[1] - COLLAPSE.every[0] + 1);
-  const pool = s.corridors.filter(([a, b]) => canCollapse(s, a, b));
+  // The ones that matter: the longest way round without them, between worlds people live on.
+  const hops = (a, b) => { const d = { [a]: 0 }, q = [a]; while (q.length) { const x = q.shift(); for (const y of s.adj[x]) { if ((x === a && y === b) || d[y] !== undefined) continue; d[y] = d[x] + 1; if (y === b) return d[y]; q.push(y); } } return 99; };
+  const pool = s.corridors.filter(([a, b]) => canCollapse(s, a, b))
+    .map(([a, b]) => ({ a, b, w: hops(a, b) + (s.systems[a].colony ? 2 : 0) + (s.systems[b].colony ? 2 : 0) + (s.systems[a].colony && s.systems[b].colony && s.systems[a].colony.owner !== s.systems[b].colony.owner ? 2 : 0) }))
+    .sort((p, q) => q.w - p.w || (p.a + p.b < q.a + q.b ? -1 : 1)).slice(0, 3);
   if (!pool.length) return;
-  const [a, b] = pool[R.int(pool.length)];
+  const { a, b } = pool[R.int(pool.length)];
   C.coming = [a, b]; C.at = s.turn + COLLAPSE.warn;
   secAnnounce(s, `The corridor between ${corrName(s, a, b)} is failing: it collapses in ${COLLAPSE.warn} turns (turn ${C.at}). Fleets that use it should finish crossing, or find another way.`);
 }
@@ -118,6 +122,8 @@ function surveys(s) {
     const scout = Object.values(s.fleets).find((f) => !isWild(f.owner) && f.owner !== "traders" && !f.path.length && f.ships.some((x) => x.type === "scout")
       && (distance(f.at, A.at) <= COLLAPSE.surveyRange || distance(f.at, B.at) <= COLLAPSE.surveyRange));
     if (!scout) continue;
+    br.work = (br.work || 0) + 1;   // charting takes a scout resting there a few turns
+    if (br.work < COLLAPSE.surveyTurns) { if (br.work === 1) log(s, scout.owner, `Your scout is charting a way around the collapse at ${A.name} and ${B.name}: ${COLLAPSE.surveyTurns - 1} more turn${COLLAPSE.surveyTurns === 2 ? "" : "s"} at rest there.`, "explore"); continue; }
     const [from, other] = distance(scout.at, A.at) <= distance(scout.at, B.at) ? [A, B] : [B, A];
     const to = Object.values(s.systems).filter((y) => y !== from && y !== other && !y.deep && !s.hexes[y.at].sealed && !s.adj[from.id].includes(y.id) && distance(y.at, from.at) <= COLLAPSE.linkRange
       && !(y.sector && SECTORS.kinds[y.sector] && SECTORS.kinds[y.sector].corridors === false))

@@ -1264,6 +1264,7 @@ test("corridor collapses: announced, never a world's last corridor, and a scout 
   // A scout at rest beside it charts a new corridor, for research.
   const me = s.factions[0], r0 = me.research.progress;
   spawnFleet(s, me.id, s.systems[c.a].at, ["scout"]);
+  for (let i = 1; i < COLLAPSE.surveyTurns; i++) { s.turn++; corridorsTurn(s); assert.equal(s.corridors.length, n0 - 1, "charting takes a few turns"); }
   s.turn++; corridorsTurn(s);
   assert.equal(s.corridors.length, n0);
   assert.equal(collapseState(s).breaks.length, 0);

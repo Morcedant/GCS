@@ -6,6 +6,16 @@
     {
       "date": "2026-11-20",
       "kind": "site",
+      "title": "Dominion: corridor collapses are rarer, and hit harder",
+      "items": [
+        "A corridor now fails from turn 70, every 60 to 90 turns: about twice in a standard game. Everyone gets 5 turns' warning.",
+        "It's always one of the corridors that matter most: the one with the longest way round without it, between settled worlds (most of all, between two powers).",
+        "Charting a new route takes a scout resting 3 turns near either end, and it's worth 60 research."
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "kind": "site",
       "title": "Dominion: fuel reserve, sealed sectors, corridor collapses",
       "items": [
         "A fuel reserve for every power, shown in the top bar. Colonies make a little fuel, a capital and gas giants more, and fuel depots and stations make the most. Each depot also lets you store 15 more. Fleets moving in supply, refuelling, filling tankers and burning hard all use it, and a short reserve slows your fleets. Raiding a depot steals from its owner's reserve.",

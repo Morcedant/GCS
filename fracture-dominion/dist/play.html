@@ -210,7 +210,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-20 22:21 UTC";
+const BUILD = "2026-11-20 22:23 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -680,12 +680,13 @@ const RELIC_SCORE = 10;
  * Rift beacon on a world near it (`beacon`: credits and exotics), which opens it for everyone with a corridor in.
  */
 /**
- * Corridor collapses: from turn `first`, every `every` turns or so (a range), a corridor fails. Every power hears
- * `warn` turns ahead. Never one a system can't do without (each end keeps another corridor, and the network stays in
- * one piece). A scout that ends its turn within `surveyRange` hexes of either end, not moving, charts a new corridor
- * from that end to a system within `linkRange` (the one nearest the other end), and its power gets `research`.
+ * Corridor collapses: rare, and they hurt. From turn `first`, every `every` turns or so (a range), a corridor fails:
+ * one of the few that matter most (the longest detour without it, between settled worlds). Every power hears `warn`
+ * turns ahead. Never one a system can't do without (each end keeps another corridor, and the network stays in one
+ * piece). A new route takes a scout resting `surveyTurns` turns within `surveyRange` hexes of either end; it charts a
+ * corridor from that end to a system within `linkRange` (the one nearest the other end), and its power gets `research`.
  */
-const COLLAPSE = { first: 45, every: [25, 40], warn: 4, surveyRange: 2, linkRange: 6, research: 40 };
+const COLLAPSE = { first: 70, every: [60, 90], warn: 5, surveyRange: 2, surveyTurns: 3, linkRange: 6, research: 60 };
 const SECTORS = { beacon: { credits: 200, exotics: 10, range: 3 }, first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
   kinds: {
     corsair: { name: "the Corsair Reach", wilds: true, density: 1, exotics: 0.45, ruins: 0.15, anomalies: 0.15, havens: 2,
@@ -3451,15 +3452,19 @@ function corridorsTurn(s) {
       C.breaks.push({ a, b, turn: s.turn, surveyed: null }); C.coming = null; C.at = null;
       // Fleets on their way re-plot without it.
       for (const f of Object.values(s.fleets)) if (f.dest && f.path.length) { const d = f.dest; if (!setDestination(s, f.id, d).ok) { f.path = []; f.dest = null; } }
-      secAnnounce(s, `The corridor between ${corrName(s, a, b)} has collapsed. Ships go the long way until someone charts a new route: a scout that ends its turn within ${COLLAPSE.surveyRange} hexes of either system, not moving, surveys a new corridor (worth ${COLLAPSE.research} research).`);
+      secAnnounce(s, `The corridor between ${corrName(s, a, b)} has collapsed. Ships go the long way until someone charts a new route: a scout resting ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either system charts a new corridor (worth ${COLLAPSE.research} research).`);
     }
     return;
   }
   if (s.turn < C.next) return;
   C.next = s.turn + COLLAPSE.every[0] + R.int(COLLAPSE.every[1] - COLLAPSE.every[0] + 1);
-  const pool = s.corridors.filter(([a, b]) => canCollapse(s, a, b));
+  // The ones that matter: the longest way round without them, between worlds people live on.
+  const hops = (a, b) => { const d = { [a]: 0 }, q = [a]; while (q.length) { const x = q.shift(); for (const y of s.adj[x]) { if ((x === a && y === b) || d[y] !== undefined) continue; d[y] = d[x] + 1; if (y === b) return d[y]; q.push(y); } } return 99; };
+  const pool = s.corridors.filter(([a, b]) => canCollapse(s, a, b))
+    .map(([a, b]) => ({ a, b, w: hops(a, b) + (s.systems[a].colony ? 2 : 0) + (s.systems[b].colony ? 2 : 0) + (s.systems[a].colony && s.systems[b].colony && s.systems[a].colony.owner !== s.systems[b].colony.owner ? 2 : 0) }))
+    .sort((p, q) => q.w - p.w || (p.a + p.b < q.a + q.b ? -1 : 1)).slice(0, 3);
   if (!pool.length) return;
-  const [a, b] = pool[R.int(pool.length)];
+  const { a, b } = pool[R.int(pool.length)];
   C.coming = [a, b]; C.at = s.turn + COLLAPSE.warn;
   secAnnounce(s, `The corridor between ${corrName(s, a, b)} is failing: it collapses in ${COLLAPSE.warn} turns (turn ${C.at}). Fleets that use it should finish crossing, or find another way.`);
 }
@@ -3471,6 +3476,8 @@ function surveys(s) {
     const scout = Object.values(s.fleets).find((f) => !isWild(f.owner) && f.owner !== "traders" && !f.path.length && f.ships.some((x) => x.type === "scout")
       && (distance(f.at, A.at) <= COLLAPSE.surveyRange || distance(f.at, B.at) <= COLLAPSE.surveyRange));
     if (!scout) continue;
+    br.work = (br.work || 0) + 1;   // charting takes a scout resting there a few turns
+    if (br.work < COLLAPSE.surveyTurns) { if (br.work === 1) log(s, scout.owner, `Your scout is charting a way around the collapse at ${A.name} and ${B.name}: ${COLLAPSE.surveyTurns - 1} more turn${COLLAPSE.surveyTurns === 2 ? "" : "s"} at rest there.`, "explore"); continue; }
     const [from, other] = distance(scout.at, A.at) <= distance(scout.at, B.at) ? [A, B] : [B, A];
     const to = Object.values(s.systems).filter((y) => y !== from && y !== other && !y.deep && !s.hexes[y.at].sealed && !s.adj[from.id].includes(y.id) && distance(y.at, from.at) <= COLLAPSE.linkRange
       && !(y.sector && SECTORS.kinds[y.sector] && SECTORS.kinds[y.sector].corridors === false))
@@ -5516,7 +5523,7 @@ function showHelp(back) {
       <li><b>The Wardens:<\/b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out.<\/li>
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
       <li><b>New sectors:<\/b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.<\/li>
-      <li><b>Corridor collapses:<\/b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). Ships then go the long way, until a scout rests a turn within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).<\/li>
+      <li><b>Corridor collapses:<\/b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). It's rare, and it's always one that matters. Ships then go the long way, until a scout rests ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).<\/li>
       <li><b>Fuel reserve:<\/b> the top bar's Fuel. Your colonies make a little and fuel depots and stations most, and each depot lets you store more. Fleets moving in supply, refuelling, filling tankers and burning hard spend it; run short and your fleets move slower and can't refuel. Burn hard (on a moving fleet's panel) for a hex a turn more.<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.<\/li>
