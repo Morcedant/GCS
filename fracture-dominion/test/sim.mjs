@@ -6,15 +6,16 @@ import { eventsTurn, currentEvent, chooseEvent } from "../src/events.js";
 import { crisisTurn, crisisState } from "../src/crisis.js";
 import { wildsTurn, wildsState } from "../src/wilds.js";
 import { tradersTurn } from "../src/traders.js";
+import { sectorsTurn } from "../src/sectors.js";
 import { envoysTurn, currentEnvoy, answerEnvoy } from "../src/envoys.js";
 import { admiralsOf } from "../src/game.js";
 const seed = +(process.argv[2] || 7), turns = +(process.argv[3] || 200), size = process.argv[4] || "medium";
-const s = newGame({ seed, size, player: "concord", rivals: 4, difficulty: "normal", mode: process.env.MODE || "standard" });
+const s = newGame({ seed, size, player: "concord", rivals: 4, difficulty: "normal", mode: process.env.MODE || "standard", sectors: process.env.SECTORS !== "off" });
 ensureDirectives(s);
 s.factions[0].ai = true;
 const t0 = Date.now(); let evs = 0; const msgs = {};
 for (let i = 0; i < turns && !s.winner; i++) {
-  endTurn(s, aiTurn); directivesTurn(s); crisisTurn(s); wildsTurn(s); tradersTurn(s); s.directives.reports = []; s.battleReports = [];
+  endTurn(s, aiTurn); directivesTurn(s); crisisTurn(s); wildsTurn(s); tradersTurn(s); sectorsTurn(s); s.directives.reports = []; s.battleReports = [];
   eventsTurn(s); if (s.galEvent) { const e = currentEvent(s); chooseEvent(s, e.options[s.turn % e.options.length].id); evs++; }
   envoysTurn(s); for (let m; (m = currentEnvoy(s)); ) { msgs[m.kind] = (msgs[m.kind] || 0) + 1; answerEnvoy(s, m.options[(s.turn + 1) % m.options.length].id); }
   if (process.env.CRISIS && s.crisis && s.crisis.stage === "awake" && s.turn % 5 === 0) { const c = crisisState(s); console.log(`  T${s.turn} heart ${c.hull}/${c.max} wave ${c.wave} warden ships ${c.ships}`); }
@@ -30,4 +31,5 @@ console.log(`alliances: ${s.factions.flatMap((A) => Object.entries(A.relations).
   if (s.mode === "open") { const ev = s.log.filter((l) => /Corridor Engine at|took the Corridor Engine/.test(l.text)).map((l) => `T${l.turn ?? "?"}: ${l.text.slice(0, 70)}`); console.log(`engine: ${ev.length} events; held now by ${s.engine ? s.engine.owner : "nobody"}; turns held ${s.factions.map((F) => `${F.id}:${F.stats.engineTurns || 0}`).join(" ")}`); for (const e of ev.slice(0, 12)) console.log("  " + e); }
   { const w = wildsState(s) || {}, kills = s.factions.map((F) => `${F.id}:${F.stats.wild || 0}/${F.stats.anomalies || 0}/${Object.values(F.research.adv || {}).reduce((t, x) => t + x, 0)}`).join(" ");
     console.log(`wilds: havens ${w.havens} raiders ${w.raiders} swarms ${w.swarms} leviathans ${w.leviathans}; raids ${s.log.filter((l) => /Pirate raiders hold/.test(l.text)).length}, fed ${s.log.filter((l) => /leviathan is feeding/.test(l.text)).length}, havens burned ${s.log.filter((l) => /destroyed a pirate haven/.test(l.text)).length}; kills/anomalies/advances ${kills}`); }
+{ const sec = s.sectors ? s.sectors.opened : []; console.log(`sectors: ${sec.map((o) => `${o.kind}@T${o.turn}(${o.systems}: ${Object.values(s.systems).filter((x) => x.sector === o.kind && x.colony).map((x) => x.colony.owner[0]).join("") || "-"})`).join(" ") || "-"}; radius ${s.radius}; husks ${fleetsOf(s, "beasts").filter((f) => f.ships.some((x) => x.type === "husk")).length}, sector havens ${fleetsOf(s, "pirates").filter((f) => f.sector).length}`); }
 console.log(`winner ${s.winner} (${s.winReason}) at turn ${s.turn}; wars ${wars}, battles ${battles}, worlds taken ${taken}; ${((Date.now() - t0) / s.turn).toFixed(1)} ms/turn; save ${Math.round(JSON.stringify(s).length / 1024)} KB`);

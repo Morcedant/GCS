@@ -6,6 +6,18 @@
     {
       "date": "2026-11-20",
       "kind": "site",
+      "title": "Dominion: new sectors",
+      "items": [
+        "The map grows in a long game. From turn 110, three rings of new space open beyond the rim. An open game opens another sector every 80 turns, up to four in all; a standard game gets one.",
+        "Each sector has its own character. The Corsair Reach is held by pirate havens and rich in exotics. The Warden Graveyard is full of ruins guarded by Warden husks, whose wrecks pay in research. The Golden Frontier has rich, open, good worlds and no guards. The Dead Zone has no corridors, thick nebula, and few worlds, almost all of them with exotics.",
+        "Every power hears 10 turns ahead which sector is coming. The Objectives tab tracks the sector that's coming and the ones already open, and a system's panel says which sector it's in.",
+        "New sectors can be turned off on the new-game form. The pirate and creature sectors only come when the game has pirates and creatures.",
+        "Long games run faster: the supply check now looks only at nearby worlds."
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "kind": "site",
       "title": "Dominion: extended play for music",
       "items": [
         "Give a track extended play in the dominion folder's tracks.json: \"repeat\": 3 plays it three times in a row, and \"loop\": true keeps it looping until the game's mood changes. Repeats are seamless.",

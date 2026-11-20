@@ -62,6 +62,7 @@ export const SHIPS = {
   raider: { name: "Raider", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, wild: true, text: "A pirate gunship: fast, lightly armed, and after your credits." },
   haven: { name: "Pirate haven", cost: 0, upkeep: 0, speed: 0, hull: 8, skill: 12, dmg: 2, shots: 2, sensors: 2, wild: true, text: "A fortified pirate base in an empty system. It sends out raiders until someone burns it." },
   swarm: { name: "Crystal swarm", cost: 0, upkeep: 0, speed: 0, hull: 5, skill: 11, dmg: 1, shots: 3, sensors: 1, wild: true, text: "Living crystal that nests on rich worlds and shreds anything that comes near. It never leaves." },
+  husk: { name: "Warden husk", cost: 0, upkeep: 0, speed: 0, hull: 10, skill: 12, dmg: 2, shots: 2, sensors: 1, wild: true, text: "A dead Warden machine from an older war, half-awake in the Graveyard. It fires on any warship that comes near, and its wreck is full of old science." },
   leviathan: { name: "Void leviathan", cost: 0, upkeep: 0, speed: 1, hull: 12, skill: 12, dmg: 3, sensors: 2, wild: true, text: "A creature the size of a moon, drifting between the stars. It fights whatever it finds." },
   merchant: { name: "Merchant convoy", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, fuel: 99, trader: true, text: "Free traders, carrying goods between the Exchanges. They pay both ends when they arrive, if the pirates don't get them first." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
@@ -87,6 +88,7 @@ export const SHIP_SHAPES = {
   raider: "M11 0 L-4 -6 L-9 -9 L-6 -2 L-10 0 L-6 2 L-9 9 L-4 6 Z M1 0 L-5 0",
   haven: "M0 -11 L10 -4 L7 9 L-7 9 L-10 -4 Z M0 -5 L4 -2 L3 4 L-3 4 L-4 -2 Z M10 -4 L12.5 -6 M-10 -4 L-12.5 -6 M7 9 L9 11.5 M-7 9 L-9 11.5",
   swarm: "M0 -11 L3 -3 L11 -4 L5 2 L8 10 L0 5 L-8 10 L-5 2 L-11 -4 L-3 -3 Z",
+  husk: "M0 -11 L9 -5 L9 5 L0 11 L-9 5 L-9 -5 Z M0 -5 L5 0 L0 5 L-5 0 Z M-9 -5 L-12 -9 M9 5 L11 10 M2 11 L3 13",
   leviathan: "M12 0 Q8 -8 -2 -7 Q-8 -6 -12 -10 Q-10 -3 -10 0 Q-10 3 -12 10 Q-8 6 -2 7 Q8 8 12 0 Z M6 -2 L4 -2 M-2 -7 Q0 0 -2 7",
   watcher: "M0 -10 L7 -4 L7 4 L0 10 L-7 4 L-7 -4 Z M0 -4 A4 4 0 1 0 0 4 A4 4 0 1 0 0 -4 M0 -1.5 A1.5 1.5 0 1 0 0 1.5 A1.5 1.5 0 1 0 0 -1.5",
   node: "M0 -11 L4 -4 L11 -4 L6 1 L8 9 L0 5 L-8 9 L-6 1 L-11 -4 L-4 -4 Z M0 -3 L3 0 L0 3 L-3 0 Z",
@@ -282,7 +284,7 @@ export const WILDS = {
   havenFirst: 30, havenEvery: 22, preyPop: 3, youngTurns: 12, havens: { small: 2, medium: 3, large: 4, vast: 5 }, raidEvery: 5, raidersPerHaven: 2,
   raidCredits: 12, raidPerPop: 3, raidStay: 3, raidRange: 6,
   swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathanFirst: 40, leviathanEvery: 35, leviathans: 2,
-  bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 } },
+  bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 }, husk: { credits: 20, research: 120, exotics: 1 } },
   pirates: { name: "Pirates", color: "#d8d14a" }, beasts: { name: "The creatures of the deep", color: "#4ec9b0" },
 };
 /**
@@ -364,6 +366,26 @@ export const RELICS = {
 };
 export const RELIC_SCORE = 10;
 /** The Outer Reach (the Star Chart): how many rings it adds, and how often its systems have ruins and anomalies. */
+/**
+ * New sectors: the map keeps growing in a long game. From turn `first`, and every `every` turns after in an open game,
+ * `rings` rings of new space open beyond the rim (none within `endGap` turns of a standard game's last turn). Every
+ * power hears `warn` turns ahead what kind of sector is coming. Each kind comes once (at most `max`); the pirate and
+ * creature kinds only when the game has them. Off at the new-game form with "New sectors: off".
+ *   density: systems, against the rest of the map; exotics, ruins, anomalies: the chance of each on a new system;
+ *   rich: the yields to pick from; habitable: more good worlds; nebula: how much more nebula; corridors: false for none
+ *   inside (one link to the old network); havens: pirate havens; husks: Warden husks, by map size.
+ */
+export const SECTORS = { first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
+  kinds: {
+    corsair: { name: "the Corsair Reach", wilds: true, density: 1, exotics: 0.45, ruins: 0.15, anomalies: 0.15, havens: 2,
+      text: "Pirate strongholds hold this sector, and its worlds are rich in exotics. Settle it with warships close." },
+    graveyard: { name: "the Warden Graveyard", wilds: true, density: 0.9, exotics: 0.3, ruins: 0.6, anomalies: 0.4, husks: { small: 2, medium: 3, large: 4, vast: 5 },
+      text: "The wreck-field of an older war: ruins everywhere, guarded by Warden husks that still fire. Their wrecks pay in research." },
+    frontier: { name: "the Golden Frontier", density: 1.3, exotics: 0.2, ruins: 0.15, anomalies: 0.2, rich: [1, 1.4, 1.4], habitable: true,
+      text: "Rich, open, good worlds and nothing guarding them. Whoever settles it first grows fastest, so expect a race and a war." },
+    deadzone: { name: "the Dead Zone", density: 0.6, exotics: 0.85, ruins: 0.3, anomalies: 0.3, nebula: 3, corridors: false,
+      text: "No corridors, thick nebula, few worlds, and almost every one of them full of exotics. Bring fuel tankers." },
+  } };
 export const REACH = { rings: 4, ruins: 0.25, anomalies: 0.25, exotics: 0.3, reserved: 4 };
 /**
  * Computer players: what each difficulty preset switches on, and how strong they are (fleet size and readiness for war).

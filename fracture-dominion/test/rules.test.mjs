@@ -1138,3 +1138,45 @@ test("send all ships to one place with one order, and undo it this turn", async 
   assert.ok(sendAllTo(s, "concord", target.at, "all").fleets >= 3); assert.equal(c.dest, target.at, "every ship");
   endTurn(s); assert.ok(undoSendAll(s, "concord").error, "only this turn");
 });
+
+test("new sectors: announced ahead, open beyond the rim with their own character, and come once each", async () => {
+  const { sectorsTurn, sectorsState } = await import("../src/sectors.js");
+  const { wildsTurn } = await import("../src/wilds.js");
+  const { SECTORS } = await import("../src/data.js");
+  const s = newGame({ seed: 21, size: "small", player: "concord", rivals: 1, mode: "open", wilds: "heavy" });
+  wildsTurn(s);
+  s.turn = SECTORS.first - SECTORS.warn - 1; sectorsTurn(s);
+  assert.equal(sectorsState(s).coming, null, "not announced too early");
+  s.turn = SECTORS.first - SECTORS.warn; sectorsTurn(s);
+  const c = sectorsState(s).coming; assert.ok(c && c.at === SECTORS.first, "announced with its turn");
+  assert.ok(s.log.some((l) => l.sector && l.text.includes(c.name)), "every power hears");
+  const r0 = s.radius, n0 = Object.keys(s.systems).length;
+  s.turn = SECTORS.first; sectorsTurn(s);
+  assert.equal(s.radius, r0 + SECTORS.rings);
+  const fresh = Object.values(s.systems).filter((x) => x.sector === c.kind);
+  assert.ok(fresh.length > 0 && Object.keys(s.systems).length === n0 + fresh.length);
+  assert.ok(fresh.every((x) => Math.max(Math.abs(+x.at.split(",")[0]), Math.abs(+x.at.split(",")[1])) > 0), "new systems");
+  // Every kind comes once in an open game, then no more.
+  const seen = new Set([c.kind]);
+  for (let i = 0; i < 6; i++) { s.turn += SECTORS.every; sectorsTurn(s); sectorsTurn(s); s.turn = (s.sectors.at || s.turn); sectorsTurn(s); if (s.sectors.opened.length) seen.add(s.sectors.opened.at(-1).kind); }
+  assert.equal(s.sectors.opened.length, Math.min(SECTORS.max, Object.keys(SECTORS.kinds).length));
+  assert.equal(seen.size, s.sectors.opened.length, "no kind twice");
+  // The kinds bring their guards: havens (not counted toward the setting's limit) and husks.
+  if (seen.has("corsair")) assert.ok(fleetsOf(s, "pirates").some((f) => f.sector === "corsair"));
+  if (seen.has("graveyard")) assert.ok(fleetsOf(s, "beasts").some((f) => f.ships[0].type === "husk"));
+  // The Dead Zone has no corridors inside it: one link to the rest at most.
+  const dz = new Set(Object.values(s.systems).filter((x) => x.sector === "deadzone").map((x) => x.id));
+  if (dz.size) assert.ok(s.corridors.filter(([a, b]) => dz.has(a) || dz.has(b)).length <= 1);
+});
+
+test("new sectors: a standard game gets one, none near its end, and the setting can turn them off", async () => {
+  const { sectorsTurn } = await import("../src/sectors.js");
+  const { SECTORS, RULES } = await import("../src/data.js");
+  const s = newGame({ seed: 22, size: "small", player: "concord", rivals: 1, wilds: "none" });
+  for (s.turn = 1; s.turn < RULES.maxTurns; s.turn++) sectorsTurn(s);
+  assert.equal(s.sectors.opened.length, 1);
+  assert.ok(!["corsair", "graveyard"].includes(s.sectors.opened[0].kind), "no pirate or creature sector with them off");
+  const off = newGame({ seed: 22, size: "small", player: "concord", rivals: 1, sectors: false });
+  for (off.turn = 1; off.turn < RULES.maxTurns; off.turn++) sectorsTurn(off);
+  assert.equal(off.sectors, undefined);
+});

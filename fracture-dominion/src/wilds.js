@@ -12,6 +12,8 @@ const power = (id) => ({ id, name: WILDS[id].name, color: WILDS[id].color, ai: t
   focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} });
 const seenBy = (s, hex) => player(s).visible[hex];
 const havens = (s) => fleetsOf(s, PIRATES).filter((f) => f.ships.some((x) => x.type === "haven"));
+/** The havens that count toward the setting's limit: not those a new sector opened with (sectors.js). */
+const ownHavens = (s) => havens(s).filter((f) => !f.sector);
 const isHaven = (f) => f.ships.some((x) => x.type === "haven");
 const colonyMin = (s, hex) => Math.min(99, ...Object.values(s.systems).filter((x) => x.colony).map((x) => distance(x.at, hex)));
 
@@ -20,8 +22,8 @@ export function wildsState(s) {
   if (!s.wilds) return null;
   const me = player(s), count = (fid, type) => fleetsOf(s, fid).filter((f) => f.ships.some((x) => x.type === type)).length;
   return { havens: count(PIRATES, "haven"), raiders: fleetsOf(s, PIRATES).filter((f) => !isHaven(f)).length,
-    swarms: count(BEASTS, "swarm"), leviathans: count(BEASTS, "leviathan"),
-    seen: [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)].filter((f) => me.explored[f.at] && (isHaven(f) || f.ships.some((x) => x.type === "swarm") || me.visible[f.at])).length };
+    swarms: count(BEASTS, "swarm"), leviathans: count(BEASTS, "leviathan"), husks: count(BEASTS, "husk"),
+    seen: [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)].filter((f) => me.explored[f.at] && (isHaven(f) || f.ships.some((x) => x.type === "swarm" || x.type === "husk") || me.visible[f.at])).length };
 }
 
 /** The game's setting: none, light (the default, and for games saved before there was a choice) or heavy. */
@@ -40,7 +42,7 @@ function prune(s) {
   if (wildsLevel(s) === "none") { for (const f of [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)]) delete s.fleets[f.id]; return; }
   const P = L(s), near = (f) => colonyMin(s, f.at);
   const cut = (list, max, also) => { list.sort((a, b) => near(a) - near(b)); while (list.length > max) { const f = list.shift(); if (also) also(f); delete s.fleets[f.id]; } };
-  cut(havens(s), P.havens[s.size] || 1, (h) => { for (const r of fleetsOf(s, PIRATES)) if (!isHaven(r) && r.home === h.at) delete s.fleets[r.id]; });
+  cut(ownHavens(s), P.havens[s.size] || 1, (h) => { for (const r of fleetsOf(s, PIRATES)) if (!isHaven(r) && r.home === h.at) delete s.fleets[r.id]; });
   for (const h of havens(s)) cut(fleetsOf(s, PIRATES).filter((r) => !isHaven(r) && r.home === h.at), P.raidersPerHaven);
   cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "swarm"), P.swarms[s.size] || 1);
   cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "leviathan"), P.leviathans);
@@ -60,7 +62,7 @@ export function wildsTurn(s) {
   const W = s.wilds, R = rng(s);
   if (s.turn >= W.nextHaven) {
     W.nextHaven = s.turn + P.havenEvery;
-    if (havens(s).length < (P.havens[s.size] || 1)) newHaven(s, R);
+    if (ownHavens(s).length < (P.havens[s.size] || 1)) newHaven(s, R);
   }
   if (s.turn >= W.nextLeviathan) {
     W.nextLeviathan = s.turn + WILDS.leviathanEvery;

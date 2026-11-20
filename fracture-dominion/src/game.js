@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within, hexagon } from "./hex.js";
-import { shipLabel, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, YARDS, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, AI_PRESETS, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES, CRISIS } from "./data.js";
+import { shipLabel, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, YARDS, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, AI_PRESETS, REACH, SECTORS, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES, CRISIS } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -16,7 +16,7 @@ export function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, sectorsOff: opts.sectors === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -200,13 +200,14 @@ export function setFocus(s, fid, kind, n) {
 /** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 export const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
 /** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
-export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || ((x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn))) && !blockaded(s, x));
+const isSupplySource = (s, x) => (x.colony.kind === "colony" || ((x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn))) && !blockaded(s, x);
+export const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => isSupplySource(s, x));
 /** A supply point is cut while an enemy at war has warships there. */
 const cutAt = (s, fid, hex) => fleetsAt(s, hex).some((o) => armed(o) && atWar(s, fid, o.owner));
 const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) => t + (x.cargo ?? SHIPS.tanker.cargo), 0);
 /** Tankers parked (not moving) with fuel aboard, their system not cut: forward supply points. */
 export const tankerPoints = (s, fid) => fleetsOf(s, fid).filter((f) => !f.path.length && cargoOf(f) > 0 && !cutAt(s, fid, f.at));
-const baseSupplyAt = (s, fid, hex) => supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
+const baseSupplyAt = (s, fid, hex) => { const r = supplyRange(s, fid); return coloniesOf(s, fid).some((x) => distance(x.at, hex) <= r && isSupplySource(s, x)); };
 export const inSupplyAt = (s, fid, hex) => fid === "vael" || isWild(fid) || fid === "traders" || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
 /** Draw a unit of fuel from a fleet's own tankers (the fullest first); false if they're dry. */
 function drawCargo(f) {
@@ -852,8 +853,8 @@ function battles(s) {
         for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
         // The Heart of the Wardens can't be fired on while its guard still stands, nor while its own Nodes do.
-        // Pirates and crystal swarms don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && u.ship.type === "swarm"))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
+        // Pirates, crystal swarms and Warden husks don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && (u.ship.type === "swarm" || u.ship.type === "husk")))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
@@ -1319,7 +1320,7 @@ export function useRelic(s, fid, id, opts = {}) {
   if (!r || relicOwner(s, id) !== fid) return { error: "You don't hold it." };
   if (id === "chart") {
     if (r.used) return { error: "The Star Chart has been used: the Outer Reach is open." };
-    r.used = s.turn; const n = expandGalaxy(s, F);
+    r.used = s.turn; const n = expandGalaxy(s, F).length;
     log(s, null, `The galaxy is larger than anyone knew. ${F.name} read the Founders' Star Chart, and the Outer Reach opens beyond the rim: ${n} new systems, uncharted.`, "explore");
     return { ok: true, systems: n };
   }
@@ -1339,44 +1340,59 @@ export const shardTargets = (s, fid, fromId) => { const a = s.systems[fromId], F
   return a ? Object.values(s.systems).filter((x) => x !== a && F.explored[x.at] && distance(x.at, a.at) <= 8 && !s.adj[a.id].includes(x.id)) : []; };
 /** The Outer Reach: REACH.rings new rings of hexes beyond the rim, with nebulae, rifts and new systems (ruins, anomalies,
  * and the relics kept back), linked into the corridor network. The chart's reader sees all of it. Returns the count. */
-export function expandGalaxy(s, reader) {
-  const R = makeRng("reach:" + s.seed + ":" + s.turn), R0 = s.radius, R1 = R0 + REACH.rings;
+export function expandGalaxy(s, reader, P = {}) {
+  const R = makeRng("reach:" + s.seed + ":" + s.turn + (P.kind ? ":" + P.kind : "")), R0 = s.radius, R1 = R0 + (P.rings || REACH.rings);
   const fresh = hexagon(R1).filter((k) => !s.hexes[k]);
   for (const k of fresh) s.hexes[k] = { terrain: "space" };
   const blob = (terrain, count, len) => { for (let i = 0; i < count; i++) { let k = fresh[R.int(fresh.length)]; for (let j = 0; j < len; j++) { if (s.hexes[k] && distance(k, "0,0") > R0 && distance(k, "0,0") < R1) s.hexes[k].terrain = terrain; const n = neighbors(k).filter((x) => s.hexes[x] && distance(x, "0,0") > R0); if (!n.length) break; k = n[R.int(n.length)]; } } };
-  blob("nebula", Math.round(R1 * 0.5), 6); blob("rift", Math.round(R1 * 0.25), 3);
-  const density = Object.keys(s.systems).length / (3 * R0 * (R0 + 1) + 1), want = Math.round(density * fresh.length);
+  blob("nebula", Math.round(R1 * 0.5 * (P.nebula || 1)), 6); blob("rift", Math.round(R1 * 0.25), 3);
+  const old = Object.values(s.systems).filter((x) => !x.deep);
+  const density = old.length / (3 * R0 * (R0 + 1) + 1), want = Math.round(density * fresh.length * (P.density || 1));
   const used = new Set(Object.values(s.systems).map((x) => x.name)), names = STAR_NAMES.filter((n) => !used.has(n));
   const syl = [["Ul", "Var", "Thes", "Ory", "Kae", "Mor", "Ix", "Sel", "Dra", "Ny", "Qor", "Ves"], ["dren", "os", "ith", "ara", "on", "ex", "uun", "ia", "el", "ok"]];
   const nameOf = () => { if (names.length) return names.splice(R.int(names.length), 1)[0]; let n; do n = syl[0][R.int(12)] + syl[1][R.int(10)]; while (used.has(n)); used.add(n); return n; };
+  const odds = (k) => (P[k] ?? REACH[k]);
   let made = [], tries = 0, next = Object.keys(s.systems).length;
   while (made.length < want && tries++ < 5000) {
     const k = fresh[R.int(fresh.length)];
     if (s.hexes[k].terrain === "rift" || distance(k, "0,0") > R1 - 1 || Object.keys(s.sysAt).some((h) => distance(h, k) < 3)) continue;
     let id = "s" + next++; while (s.systems[id]) id = "s" + next++;
-    const roll = R.next(), world = roll < 0.16 ? "terran" : roll < 0.3 ? "ocean" : roll < 0.46 ? "desert" : roll < 0.6 ? "arctic" : roll < 0.8 ? "barren" : "gas";
-    s.systems[id] = { id, name: nameOf(), at: k, world, size: 1 + R.int(4), rich: [0.6, 1, 1.4, 1.4][R.int(4)], exotics: R.next() < REACH.exotics, ruins: R.next() < REACH.ruins, colony: null, reach: true };
-    if (!s.systems[id].ruins && R.next() < REACH.anomalies) s.systems[id].anomaly = ANOMALY_KINDS[R.int(ANOMALY_KINDS.length)];
+    const roll = R.next(), world = P.habitable ? (roll < 0.3 ? "terran" : roll < 0.52 ? "ocean" : roll < 0.68 ? "desert" : roll < 0.8 ? "arctic" : roll < 0.9 ? "barren" : "gas")
+      : roll < 0.16 ? "terran" : roll < 0.3 ? "ocean" : roll < 0.46 ? "desert" : roll < 0.6 ? "arctic" : roll < 0.8 ? "barren" : "gas";
+    const rich = P.rich ? P.rich[R.int(P.rich.length)] : [0.6, 1, 1.4, 1.4][R.int(4)];
+    s.systems[id] = { id, name: nameOf(), at: k, world, size: 1 + R.int(4), rich, exotics: R.next() < odds("exotics"), ruins: R.next() < odds("ruins"), colony: null, reach: true };
+    if (P.kind) s.systems[id].sector = P.kind;
+    if (!s.systems[id].ruins && R.next() < odds("anomalies")) s.systems[id].anomaly = ANOMALY_KINDS[R.int(ANOMALY_KINDS.length)];
     s.hexes[k].terrain = "space"; s.sysAt[k] = id; s.adj[id] = []; made.push(s.systems[id]);
   }
-  // Corridors: each new system to its two nearest within 6, and the Reach joined to the old network at its nearest points.
   const link = (a, b) => { if (a === b || s.adj[a].includes(b)) return; s.adj[a].push(b); s.adj[b].push(a); s.corridors.push([a, b]); };
-  const all = Object.values(s.systems).filter((y) => !y.deep);   // deep-space stations sit off the corridors
-  for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
-  const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep);
-  const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
-  for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
-    const main = c[ids.find((i) => !s.systems[i].reach)]; let best = null;
-    for (const a of ids) if (c[a] === main) for (const b of ids) if (c[b] !== main) { const d = distance(s.systems[a].at, s.systems[b].at); if (!best || d < best[2]) best = [a, b, d]; }
-    link(best[0], best[1]);
+  if (P.corridors === false) {
+    // No corridors inside: a single one out, from the old map's nearest system.
+    let best = null;
+    for (const x of made) for (const y of old) { const d = distance(x.at, y.at); if (!best || d < best[2]) best = [x.id, y.id, d]; }
+    if (best) link(best[0], best[1]);
+  } else {
+    // Corridors: each new system to its two nearest within 6, and the new space joined to the old network at its nearest points.
+    const shut = (y) => y.sector && y.sector !== P.kind && SECTORS.kinds[y.sector] && SECTORS.kinds[y.sector].corridors === false;   // the Dead Zone stays shut
+    const all = Object.values(s.systems).filter((y) => !y.deep && !shut(y));   // deep-space stations sit off the corridors
+    for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
+    const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep && !shut(s.systems[i]));
+    const isNew = new Set(made.map((x) => x.id));
+    const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
+    for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
+      const main = c[ids.find((i) => !isNew.has(i))]; let best = null;
+      for (const a of ids) if (c[a] === main) for (const b of ids) if (c[b] !== main && isNew.has(b)) { const d = distance(s.systems[a].at, s.systems[b].at); if (!best || d < best[2]) best = [a, b, d]; }
+      if (!best) break;
+      link(best[0], best[1]);
+    }
   }
-  // The relics kept back go to the Reach's ruins and anomalies.
+  // The relics kept back go to the new space's ruins and anomalies.
   const sites = made.filter((x) => x.ruins || x.anomaly);
   for (const id of s.relicsReach || []) { const pool = sites.length ? sites : made; if (!pool.length) break; const x = pool.splice(R.int(pool.length), 1)[0]; x.relic = id; s.relics[id] = { at: null }; }
   s.relicsReach = [];
   s.radius = R1;
   if (reader) for (const k of fresh) reader.explored[k] = 1;
-  return made.length;
+  return made;
 }
 // ---- the Corridor Engine in an open game ----
 /** The Engine that stands (open games only), or null: { sys, owner, built, gate }. */

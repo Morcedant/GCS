@@ -209,7 +209,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-20 14:29 UTC";
+const BUILD = "2026-11-20 22:00 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -353,6 +353,7 @@ const SHIPS = {
   raider: { name: "Raider", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, wild: true, text: "A pirate gunship: fast, lightly armed, and after your credits." },
   haven: { name: "Pirate haven", cost: 0, upkeep: 0, speed: 0, hull: 8, skill: 12, dmg: 2, shots: 2, sensors: 2, wild: true, text: "A fortified pirate base in an empty system. It sends out raiders until someone burns it." },
   swarm: { name: "Crystal swarm", cost: 0, upkeep: 0, speed: 0, hull: 5, skill: 11, dmg: 1, shots: 3, sensors: 1, wild: true, text: "Living crystal that nests on rich worlds and shreds anything that comes near. It never leaves." },
+  husk: { name: "Warden husk", cost: 0, upkeep: 0, speed: 0, hull: 10, skill: 12, dmg: 2, shots: 2, sensors: 1, wild: true, text: "A dead Warden machine from an older war, half-awake in the Graveyard. It fires on any warship that comes near, and its wreck is full of old science." },
   leviathan: { name: "Void leviathan", cost: 0, upkeep: 0, speed: 1, hull: 12, skill: 12, dmg: 3, sensors: 2, wild: true, text: "A creature the size of a moon, drifting between the stars. It fights whatever it finds." },
   merchant: { name: "Merchant convoy", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, fuel: 99, trader: true, text: "Free traders, carrying goods between the Exchanges. They pay both ends when they arrive, if the pirates don't get them first." },
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
@@ -378,6 +379,7 @@ const SHIP_SHAPES = {
   raider: "M11 0 L-4 -6 L-9 -9 L-6 -2 L-10 0 L-6 2 L-9 9 L-4 6 Z M1 0 L-5 0",
   haven: "M0 -11 L10 -4 L7 9 L-7 9 L-10 -4 Z M0 -5 L4 -2 L3 4 L-3 4 L-4 -2 Z M10 -4 L12.5 -6 M-10 -4 L-12.5 -6 M7 9 L9 11.5 M-7 9 L-9 11.5",
   swarm: "M0 -11 L3 -3 L11 -4 L5 2 L8 10 L0 5 L-8 10 L-5 2 L-11 -4 L-3 -3 Z",
+  husk: "M0 -11 L9 -5 L9 5 L0 11 L-9 5 L-9 -5 Z M0 -5 L5 0 L0 5 L-5 0 Z M-9 -5 L-12 -9 M9 5 L11 10 M2 11 L3 13",
   leviathan: "M12 0 Q8 -8 -2 -7 Q-8 -6 -12 -10 Q-10 -3 -10 0 Q-10 3 -12 10 Q-8 6 -2 7 Q8 8 12 0 Z M6 -2 L4 -2 M-2 -7 Q0 0 -2 7",
   watcher: "M0 -10 L7 -4 L7 4 L0 10 L-7 4 L-7 -4 Z M0 -4 A4 4 0 1 0 0 4 A4 4 0 1 0 0 -4 M0 -1.5 A1.5 1.5 0 1 0 0 1.5 A1.5 1.5 0 1 0 0 -1.5",
   node: "M0 -11 L4 -4 L11 -4 L6 1 L8 9 L0 5 L-8 9 L-6 1 L-11 -4 L-4 -4 Z M0 -3 L3 0 L0 3 L-3 0 Z",
@@ -573,7 +575,7 @@ const WILDS = {
   havenFirst: 30, havenEvery: 22, preyPop: 3, youngTurns: 12, havens: { small: 2, medium: 3, large: 4, vast: 5 }, raidEvery: 5, raidersPerHaven: 2,
   raidCredits: 12, raidPerPop: 3, raidStay: 3, raidRange: 6,
   swarms: { small: 2, medium: 3, large: 5, vast: 7 }, leviathanFirst: 40, leviathanEvery: 35, leviathans: 2,
-  bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 } },
+  bounty: { haven: { credits: 100, research: 50 }, raider: { credits: 10, research: 0 }, swarm: { credits: 0, research: 90, exotics: 2 }, leviathan: { credits: 40, research: 160, exotics: 4 }, husk: { credits: 20, research: 120, exotics: 1 } },
   pirates: { name: "Pirates", color: "#d8d14a" }, beasts: { name: "The creatures of the deep", color: "#4ec9b0" },
 };
 /**
@@ -655,6 +657,26 @@ const RELICS = {
 };
 const RELIC_SCORE = 10;
 /** The Outer Reach (the Star Chart): how many rings it adds, and how often its systems have ruins and anomalies. */
+/**
+ * New sectors: the map keeps growing in a long game. From turn `first`, and every `every` turns after in an open game,
+ * `rings` rings of new space open beyond the rim (none within `endGap` turns of a standard game's last turn). Every
+ * power hears `warn` turns ahead what kind of sector is coming. Each kind comes once (at most `max`); the pirate and
+ * creature kinds only when the game has them. Off at the new-game form with "New sectors: off".
+ *   density: systems, against the rest of the map; exotics, ruins, anomalies: the chance of each on a new system;
+ *   rich: the yields to pick from; habitable: more good worlds; nebula: how much more nebula; corridors: false for none
+ *   inside (one link to the old network); havens: pirate havens; husks: Warden husks, by map size.
+ */
+const SECTORS = { first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
+  kinds: {
+    corsair: { name: "the Corsair Reach", wilds: true, density: 1, exotics: 0.45, ruins: 0.15, anomalies: 0.15, havens: 2,
+      text: "Pirate strongholds hold this sector, and its worlds are rich in exotics. Settle it with warships close." },
+    graveyard: { name: "the Warden Graveyard", wilds: true, density: 0.9, exotics: 0.3, ruins: 0.6, anomalies: 0.4, husks: { small: 2, medium: 3, large: 4, vast: 5 },
+      text: "The wreck-field of an older war: ruins everywhere, guarded by Warden husks that still fire. Their wrecks pay in research." },
+    frontier: { name: "the Golden Frontier", density: 1.3, exotics: 0.2, ruins: 0.15, anomalies: 0.2, rich: [1, 1.4, 1.4], habitable: true,
+      text: "Rich, open, good worlds and nothing guarding them. Whoever settles it first grows fastest, so expect a race and a war." },
+    deadzone: { name: "the Dead Zone", density: 0.6, exotics: 0.85, ruins: 0.3, anomalies: 0.3, nebula: 3, corridors: false,
+      text: "No corridors, thick nebula, few worlds, and almost every one of them full of exotics. Bring fuel tankers." },
+  } };
 const REACH = { rings: 4, ruins: 0.25, anomalies: 0.25, exotics: 0.3, reserved: 4 };
 /**
  * Computer players: what each difficulty preset switches on, and how strong they are (fleet size and readiness for war).
@@ -867,7 +889,7 @@ function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, sectorsOff: opts.sectors === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -1051,13 +1073,14 @@ function setFocus(s, fid, kind, n) {
 /** How far from its own colonies and fuel-depot outposts a faction's fleets stay in supply. */
 const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
 /** The worlds that give a faction supply: its colonies, and its outposts with a Fuel depot. */
-const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => (x.colony.kind === "colony" || ((x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn))) && !blockaded(s, x));
+const isSupplySource = (s, x) => (x.colony.kind === "colony" || ((x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn))) && !blockaded(s, x);
+const supplySources = (s, fid) => coloniesOf(s, fid).filter((x) => isSupplySource(s, x));
 /** A supply point is cut while an enemy at war has warships there. */
 const cutAt = (s, fid, hex) => fleetsAt(s, hex).some((o) => armed(o) && atWar(s, fid, o.owner));
 const cargoOf = (f) => f.ships.filter((x) => x.type === "tanker").reduce((t, x) => t + (x.cargo ?? SHIPS.tanker.cargo), 0);
 /** Tankers parked (not moving) with fuel aboard, their system not cut: forward supply points. */
 const tankerPoints = (s, fid) => fleetsOf(s, fid).filter((f) => !f.path.length && cargoOf(f) > 0 && !cutAt(s, fid, f.at));
-const baseSupplyAt = (s, fid, hex) => supplySources(s, fid).some((x) => distance(x.at, hex) <= supplyRange(s, fid));
+const baseSupplyAt = (s, fid, hex) => { const r = supplyRange(s, fid); return coloniesOf(s, fid).some((x) => distance(x.at, hex) <= r && isSupplySource(s, x)); };
 const inSupplyAt = (s, fid, hex) => fid === "vael" || isWild(fid) || fid === "traders" || baseSupplyAt(s, fid, hex) || tankerPoints(s, fid).some((t) => distance(t.at, hex) <= FUEL.tankerRange);
 /** Draw a unit of fuel from a fleet's own tankers (the fullest first); false if they're dry. */
 function drawCargo(f) {
@@ -1703,8 +1726,8 @@ function battles(s) {
         for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
         // The Heart of the Wardens can't be fired on while its guard still stands, nor while its own Nodes do.
-        // Pirates and crystal swarms don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && u.ship.type === "swarm"))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
+        // Pirates, crystal swarms and Warden husks don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && (u.ship.type === "swarm" || u.ship.type === "husk")))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
@@ -2170,7 +2193,7 @@ function useRelic(s, fid, id, opts = {}) {
   if (!r || relicOwner(s, id) !== fid) return { error: "You don't hold it." };
   if (id === "chart") {
     if (r.used) return { error: "The Star Chart has been used: the Outer Reach is open." };
-    r.used = s.turn; const n = expandGalaxy(s, F);
+    r.used = s.turn; const n = expandGalaxy(s, F).length;
     log(s, null, `The galaxy is larger than anyone knew. ${F.name} read the Founders' Star Chart, and the Outer Reach opens beyond the rim: ${n} new systems, uncharted.`, "explore");
     return { ok: true, systems: n };
   }
@@ -2190,44 +2213,59 @@ const shardTargets = (s, fid, fromId) => { const a = s.systems[fromId], F = fact
   return a ? Object.values(s.systems).filter((x) => x !== a && F.explored[x.at] && distance(x.at, a.at) <= 8 && !s.adj[a.id].includes(x.id)) : []; };
 /** The Outer Reach: REACH.rings new rings of hexes beyond the rim, with nebulae, rifts and new systems (ruins, anomalies,
  * and the relics kept back), linked into the corridor network. The chart's reader sees all of it. Returns the count. */
-function expandGalaxy(s, reader) {
-  const R = makeRng("reach:" + s.seed + ":" + s.turn), R0 = s.radius, R1 = R0 + REACH.rings;
+function expandGalaxy(s, reader, P = {}) {
+  const R = makeRng("reach:" + s.seed + ":" + s.turn + (P.kind ? ":" + P.kind : "")), R0 = s.radius, R1 = R0 + (P.rings || REACH.rings);
   const fresh = hexagon(R1).filter((k) => !s.hexes[k]);
   for (const k of fresh) s.hexes[k] = { terrain: "space" };
   const blob = (terrain, count, len) => { for (let i = 0; i < count; i++) { let k = fresh[R.int(fresh.length)]; for (let j = 0; j < len; j++) { if (s.hexes[k] && distance(k, "0,0") > R0 && distance(k, "0,0") < R1) s.hexes[k].terrain = terrain; const n = neighbors(k).filter((x) => s.hexes[x] && distance(x, "0,0") > R0); if (!n.length) break; k = n[R.int(n.length)]; } } };
-  blob("nebula", Math.round(R1 * 0.5), 6); blob("rift", Math.round(R1 * 0.25), 3);
-  const density = Object.keys(s.systems).length / (3 * R0 * (R0 + 1) + 1), want = Math.round(density * fresh.length);
+  blob("nebula", Math.round(R1 * 0.5 * (P.nebula || 1)), 6); blob("rift", Math.round(R1 * 0.25), 3);
+  const old = Object.values(s.systems).filter((x) => !x.deep);
+  const density = old.length / (3 * R0 * (R0 + 1) + 1), want = Math.round(density * fresh.length * (P.density || 1));
   const used = new Set(Object.values(s.systems).map((x) => x.name)), names = STAR_NAMES.filter((n) => !used.has(n));
   const syl = [["Ul", "Var", "Thes", "Ory", "Kae", "Mor", "Ix", "Sel", "Dra", "Ny", "Qor", "Ves"], ["dren", "os", "ith", "ara", "on", "ex", "uun", "ia", "el", "ok"]];
   const nameOf = () => { if (names.length) return names.splice(R.int(names.length), 1)[0]; let n; do n = syl[0][R.int(12)] + syl[1][R.int(10)]; while (used.has(n)); used.add(n); return n; };
+  const odds = (k) => (P[k] ?? REACH[k]);
   let made = [], tries = 0, next = Object.keys(s.systems).length;
   while (made.length < want && tries++ < 5000) {
     const k = fresh[R.int(fresh.length)];
     if (s.hexes[k].terrain === "rift" || distance(k, "0,0") > R1 - 1 || Object.keys(s.sysAt).some((h) => distance(h, k) < 3)) continue;
     let id = "s" + next++; while (s.systems[id]) id = "s" + next++;
-    const roll = R.next(), world = roll < 0.16 ? "terran" : roll < 0.3 ? "ocean" : roll < 0.46 ? "desert" : roll < 0.6 ? "arctic" : roll < 0.8 ? "barren" : "gas";
-    s.systems[id] = { id, name: nameOf(), at: k, world, size: 1 + R.int(4), rich: [0.6, 1, 1.4, 1.4][R.int(4)], exotics: R.next() < REACH.exotics, ruins: R.next() < REACH.ruins, colony: null, reach: true };
-    if (!s.systems[id].ruins && R.next() < REACH.anomalies) s.systems[id].anomaly = ANOMALY_KINDS[R.int(ANOMALY_KINDS.length)];
+    const roll = R.next(), world = P.habitable ? (roll < 0.3 ? "terran" : roll < 0.52 ? "ocean" : roll < 0.68 ? "desert" : roll < 0.8 ? "arctic" : roll < 0.9 ? "barren" : "gas")
+      : roll < 0.16 ? "terran" : roll < 0.3 ? "ocean" : roll < 0.46 ? "desert" : roll < 0.6 ? "arctic" : roll < 0.8 ? "barren" : "gas";
+    const rich = P.rich ? P.rich[R.int(P.rich.length)] : [0.6, 1, 1.4, 1.4][R.int(4)];
+    s.systems[id] = { id, name: nameOf(), at: k, world, size: 1 + R.int(4), rich, exotics: R.next() < odds("exotics"), ruins: R.next() < odds("ruins"), colony: null, reach: true };
+    if (P.kind) s.systems[id].sector = P.kind;
+    if (!s.systems[id].ruins && R.next() < odds("anomalies")) s.systems[id].anomaly = ANOMALY_KINDS[R.int(ANOMALY_KINDS.length)];
     s.hexes[k].terrain = "space"; s.sysAt[k] = id; s.adj[id] = []; made.push(s.systems[id]);
   }
-  // Corridors: each new system to its two nearest within 6, and the Reach joined to the old network at its nearest points.
   const link = (a, b) => { if (a === b || s.adj[a].includes(b)) return; s.adj[a].push(b); s.adj[b].push(a); s.corridors.push([a, b]); };
-  const all = Object.values(s.systems).filter((y) => !y.deep);   // deep-space stations sit off the corridors
-  for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
-  const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep);
-  const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
-  for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
-    const main = c[ids.find((i) => !s.systems[i].reach)]; let best = null;
-    for (const a of ids) if (c[a] === main) for (const b of ids) if (c[b] !== main) { const d = distance(s.systems[a].at, s.systems[b].at); if (!best || d < best[2]) best = [a, b, d]; }
-    link(best[0], best[1]);
+  if (P.corridors === false) {
+    // No corridors inside: a single one out, from the old map's nearest system.
+    let best = null;
+    for (const x of made) for (const y of old) { const d = distance(x.at, y.at); if (!best || d < best[2]) best = [x.id, y.id, d]; }
+    if (best) link(best[0], best[1]);
+  } else {
+    // Corridors: each new system to its two nearest within 6, and the new space joined to the old network at its nearest points.
+    const shut = (y) => y.sector && y.sector !== P.kind && SECTORS.kinds[y.sector] && SECTORS.kinds[y.sector].corridors === false;   // the Dead Zone stays shut
+    const all = Object.values(s.systems).filter((y) => !y.deep && !shut(y));   // deep-space stations sit off the corridors
+    for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
+    const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep && !shut(s.systems[i]));
+    const isNew = new Set(made.map((x) => x.id));
+    const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
+    for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
+      const main = c[ids.find((i) => !isNew.has(i))]; let best = null;
+      for (const a of ids) if (c[a] === main) for (const b of ids) if (c[b] !== main && isNew.has(b)) { const d = distance(s.systems[a].at, s.systems[b].at); if (!best || d < best[2]) best = [a, b, d]; }
+      if (!best) break;
+      link(best[0], best[1]);
+    }
   }
-  // The relics kept back go to the Reach's ruins and anomalies.
+  // The relics kept back go to the new space's ruins and anomalies.
   const sites = made.filter((x) => x.ruins || x.anomaly);
   for (const id of s.relicsReach || []) { const pool = sites.length ? sites : made; if (!pool.length) break; const x = pool.splice(R.int(pool.length), 1)[0]; x.relic = id; s.relics[id] = { at: null }; }
   s.relicsReach = [];
   s.radius = R1;
   if (reader) for (const k of fresh) reader.explored[k] = 1;
-  return made.length;
+  return made;
 }
 // ---- the Corridor Engine in an open game ----
 /** The Engine that stands (open games only), or null: { sys, owner, built, gate }. */
@@ -2930,6 +2968,8 @@ const power = (id) => ({ id, name: WILDS[id].name, color: WILDS[id].color, ai: t
   focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} });
 const seenBy = (s, hex) => player(s).visible[hex];
 const havens = (s) => fleetsOf(s, PIRATES).filter((f) => f.ships.some((x) => x.type === "haven"));
+/** The havens that count toward the setting's limit: not those a new sector opened with (sectors.js). */
+const ownHavens = (s) => havens(s).filter((f) => !f.sector);
 const isHaven = (f) => f.ships.some((x) => x.type === "haven");
 const colonyMin = (s, hex) => Math.min(99, ...Object.values(s.systems).filter((x) => x.colony).map((x) => distance(x.at, hex)));
 
@@ -2938,8 +2978,8 @@ function wildsState(s) {
   if (!s.wilds) return null;
   const me = player(s), count = (fid, type) => fleetsOf(s, fid).filter((f) => f.ships.some((x) => x.type === type)).length;
   return { havens: count(PIRATES, "haven"), raiders: fleetsOf(s, PIRATES).filter((f) => !isHaven(f)).length,
-    swarms: count(BEASTS, "swarm"), leviathans: count(BEASTS, "leviathan"),
-    seen: [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)].filter((f) => me.explored[f.at] && (isHaven(f) || f.ships.some((x) => x.type === "swarm") || me.visible[f.at])).length };
+    swarms: count(BEASTS, "swarm"), leviathans: count(BEASTS, "leviathan"), husks: count(BEASTS, "husk"),
+    seen: [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)].filter((f) => me.explored[f.at] && (isHaven(f) || f.ships.some((x) => x.type === "swarm" || x.type === "husk") || me.visible[f.at])).length };
 }
 
 /** The game's setting: none, light (the default, and for games saved before there was a choice) or heavy. */
@@ -2958,7 +2998,7 @@ function prune(s) {
   if (wildsLevel(s) === "none") { for (const f of [...fleetsOf(s, PIRATES), ...fleetsOf(s, BEASTS)]) delete s.fleets[f.id]; return; }
   const P = L(s), near = (f) => colonyMin(s, f.at);
   const cut = (list, max, also) => { list.sort((a, b) => near(a) - near(b)); while (list.length > max) { const f = list.shift(); if (also) also(f); delete s.fleets[f.id]; } };
-  cut(havens(s), P.havens[s.size] || 1, (h) => { for (const r of fleetsOf(s, PIRATES)) if (!isHaven(r) && r.home === h.at) delete s.fleets[r.id]; });
+  cut(ownHavens(s), P.havens[s.size] || 1, (h) => { for (const r of fleetsOf(s, PIRATES)) if (!isHaven(r) && r.home === h.at) delete s.fleets[r.id]; });
   for (const h of havens(s)) cut(fleetsOf(s, PIRATES).filter((r) => !isHaven(r) && r.home === h.at), P.raidersPerHaven);
   cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "swarm"), P.swarms[s.size] || 1);
   cut(fleetsOf(s, BEASTS).filter((f) => f.ships[0].type === "leviathan"), P.leviathans);
@@ -2978,7 +3018,7 @@ function wildsTurn(s) {
   const W = s.wilds, R = rng(s);
   if (s.turn >= W.nextHaven) {
     W.nextHaven = s.turn + P.havenEvery;
-    if (havens(s).length < (P.havens[s.size] || 1)) newHaven(s, R);
+    if (ownHavens(s).length < (P.havens[s.size] || 1)) newHaven(s, R);
   }
   if (s.turn >= W.nextLeviathan) {
     W.nextLeviathan = s.turn + WILDS.leviathanEvery;
@@ -3205,6 +3245,74 @@ function offer(s, world, R) {
 
 const convoysOf = (s) => fleetsOf(s, TRADERS_ID);
 const SHIP_MERCHANT = SHIPS.merchant;
+
+// ---- sectors.js ----
+// New sectors: in a long game the map keeps growing. From SECTORS.first, and every SECTORS.every turns after in an open
+// game, rings of new space open beyond the rim, each with a character of its own (SECTORS.kinds): a pirate stronghold,
+// a Warden graveyard, a rich frontier, a dead zone. Every power hears SECTORS.warn turns ahead what's coming.
+
+
+
+const SEC_PIRATES = "pirates", SEC_BEASTS = "beasts";
+const secAnnounce = (s, text) => { log(s, null, text, "explore"); s.log[s.log.length - 1].sector = true; };
+
+/** The kinds this game can still get: each once, the pirate and creature kinds only when the game has them. */
+function secKindsLeft(s) {
+  const had = new Set(((s.sectors && s.sectors.opened) || []).map((o) => o.kind));
+  return Object.keys(SECTORS.kinds).filter((k) => !had.has(k) && !(SECTORS.kinds[k].wilds && (s.wildsOff || !s.wilds)));
+}
+/** When the next sector opens (null: none to come in this game). */
+function secNextAt(s) {
+  const S = s.sectors, n = S.opened.length;
+  if (n >= SECTORS.max) return null;
+  const at = Math.max(SECTORS.first + n * SECTORS.every, S.last ? S.last + SECTORS.every : 0, s.turn + SECTORS.warn);
+  if (s.mode !== "open" && at > RULES.maxTurns - SECTORS.endGap) return null;
+  return at;
+}
+
+/** Where things stand, for the panels: what's opened, and what's coming (with its turn) once it's been announced. */
+function sectorsState(s) {
+  if (s.sectorsOff || !s.sectors) return null;
+  const S = s.sectors;
+  return { opened: S.opened.map((o) => ({ ...o, name: SECTORS.kinds[o.kind].name, text: SECTORS.kinds[o.kind].text })),
+    coming: S.coming ? { kind: S.coming, at: S.at, name: SECTORS.kinds[S.coming].name, text: SECTORS.kinds[S.coming].text } : null,
+    next: S.coming ? S.at : secNextAt(s) };
+}
+
+/** Once a turn, after the turn resolves. */
+function sectorsTurn(s) {
+  if (s.sectorsOff || s.winner) return;
+  if (!s.sectors) s.sectors = { opened: [], coming: null, at: null, last: null };
+  const S = s.sectors;
+  if (!S.coming) {
+    const at = secNextAt(s); if (at === null || s.turn < at - SECTORS.warn) return;
+    const left = secKindsLeft(s); if (!left.length) return;
+    const R = makeRng("sector:" + s.seed + ":" + S.opened.length); R.next(); R.next();   // its first draws lean one way on short seeds
+    S.coming = left[R.int(left.length)]; S.at = at;
+    const K = SECTORS.kinds[S.coming];
+    secAnnounce(s, `Long-range scans see past the rim: the corridors are reaching into new space. In ${at - s.turn} turns (turn ${at}), a new sector opens beyond the edge of the map: ${K.name}. ${K.text}`);
+    return;
+  }
+  if (s.turn < S.at) return;
+  const kind = S.coming, K = SECTORS.kinds[kind];
+  const made = expandGalaxy(s, null, { ...K, kind, rings: SECTORS.rings });
+  S.opened.push({ kind, turn: s.turn, systems: made.length }); S.coming = null; S.at = null; S.last = s.turn;
+  const R = makeRng("sector-wilds:" + s.seed + ":" + kind);
+  const empty = made.filter((x) => !fleetsAt(s, x.at).length);
+  const take = (pool, n, apart) => { const out = []; while (out.length < n && pool.length) { const x = pool.splice(R.int(pool.length), 1)[0]; if (out.every((o) => distance(o.at, x.at) >= apart)) out.push(x); } return out; };
+  let guard = "";
+  if (K.havens && s.wilds && !s.wildsOff) {
+    for (const x of take([...empty], K.havens, 5)) { const f = spawnFleet(s, SEC_PIRATES, x.at, ["haven"]); f.home = x.at; f.born = s.turn; f.sector = kind; }
+    guard = " Pirate havens hold it already.";
+  }
+  if (K.husks && s.wilds && !s.wildsOff) {
+    const n = K.husks[s.size] || 3, ruins = empty.filter((x) => x.ruins || x.anomaly), rest = empty.filter((x) => !(x.ruins || x.anomaly));
+    const at = take(ruins, n, 3); if (at.length < n) at.push(...take(rest, n - at.length, 3));
+    for (const x of at) { const f = spawnFleet(s, SEC_BEASTS, x.at, ["husk"]); f.home = x.at; f.sector = kind; }
+    guard = ` ${at.length} Warden husks still guard its ruins.`;
+  }
+  secAnnounce(s, `A new sector has opened beyond the rim: ${K.name}, ${made.length} uncharted systems.${guard} ${K.text}`);
+}
 
 // ---- events.js ----
 // Galactic events: every few turns something happens to the player's empire that asks for a decision. Each event is a
@@ -3919,6 +4027,7 @@ function huntWardens(s, F, f, reach) {
 
 
 
+
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
 /** "Turn 12 of 200", or in open rule "Turn 212 · open rule". */
 const turnText = () => (S.mode === "open" ? `Turn ${S.turn} · open rule` : `Turn ${S.turn} of ${RULES.maxTurns}`);
@@ -4306,6 +4415,7 @@ function systemHTML() {
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
   let h = `<h2>${esc(sys.name)}<\/h2><p class="muted">${sys.deep ? "A station in deep space: no world here, just the station" : `${esc(w.name)} world, size ${sys.size}`}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit<\/b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins<\/b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}<\/b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.<\/p>`;
   { const rid = Object.keys(S.relics || {}).find((id) => S.relics[id].at === sys.id); if (rid && (mine || seen)) h += `<p class="small gold"><b>${esc(RELICS[rid].name)}<\/b> is kept here. ${esc(RELICS[rid].text)}${mine ? "" : " Take the world to take it."}<\/p>`; }
+  if (sys.sector && SECTORS.kinds[sys.sector]) h += `<p class="small muted">In ${esc(SECTORS.kinds[sys.sector].name)}: ${esc(SECTORS.kinds[sys.sector].text)}<\/p>`;
   if (sys.relic && sys.relicLost && me.explored[sys.at]) h += `<p class="small gold"><b>${esc(RELICS[sys.relic].name)}<\/b> lies in the ruins here: the first fleet to end its turn here recovers it.<\/p>`;
   if (mine && relicHeld(S, me.id, "shard")) { const r = S.relics.shard, ready = !r.ready || S.turn >= r.ready, tg = shardTargets(S, me.id, sys.id).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at));
     h += `<h3>The Gate Shard<\/h3>` + (ready ? (tg.length ? `<p class="small muted" style="margin-top:-4px">Open a new corridor from ${esc(sys.name)} to:<\/p><div class="opts">${tg.slice(0, 10).map((x) => `<button class="opt" data-shard="${x.id}"><b>${esc(x.name)}<\/b> <small>${distance(x.at, sys.at)} hexes<\/small><\/button>`).join("")}<\/div>` : `<p class="small muted">No explored system within 8 hexes left to link.<\/p>`) : `<p class="small muted">Spent until turn ${r.ready}.<\/p>`); }
@@ -4495,6 +4605,7 @@ function objectivesHTML() {
     <span>${lead.f.id === me.id ? "Next best" : "Leader"}<\/span><span>${lead.f.id === me.id ? (ranked[1] ? `${me.met[ranked[1].f.id] ? esc(ranked[1].f.name) : "An unmet rival"}: ${ranked[1].sc} (you lead by ${gap})` : "No one") : `${me.met[lead.f.id] ? esc(lead.f.name) : "An unmet rival"}: ${lead.sc} (${gap} ahead of you)`}<\/span><\/div>
     <p class="small" style="margin-top:6px"><b class="good">Win:<\/b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.<\/p><\/div>`;
   if (!live) h += crisisHTML();
+  h += sectorsHTML();
   // The rivals' race.
   const threats = [];
   for (const f of rivals) {
@@ -4516,6 +4627,16 @@ function engineOpenHTML(me) {
   return `<p class="small ${mine ? "good" : "bad"}" style="margin-top:6px"><b>${mine ? "You hold the Corridor Engine" : `${esc(H.name)} holds the Corridor Engine`}<\/b> at ${esc(sys.name)}, since turn ${E.built}${on ? "" : `, <b class="bad">but enemy warships hold its orbit: it gives nothing until they're driven off<\/b>`}.
     ${mine ? `Free corridor travel, +${ENGINE.tradePerColony} credits on every colony, ${ENGINE.scorePerTurn} score a turn, and the gate (a fleet at ${esc(sys.name)} jumps to any of your worlds; ${S.turn >= E.gate ? "open now" : `opens on turn ${E.gate}`}). <b class="bad">Watch:<\/b> the other powers resent whoever holds it. Lose ${esc(sys.name)} and you lose the Engine; a barrage from its orbit destroys it.`
       : `Take ${esc(sys.name)} and it's yours; or hold its orbit with its guns down and destroy it with a barrage, and the race to build one starts again.`}<\/p>`;
+}
+/** New sectors, on the Objectives tab: the one coming (announced ahead), and those opened so far. */
+function sectorsHTML() {
+  const c = sectorsState(S); if (!c || (!c.coming && !c.opened.length && c.next === null)) return "";
+  const near = (kind) => { const xs = Object.values(S.systems).filter((x) => x.sector === kind); const ex = xs.filter((x) => player(S).explored[x.at]).length, mine = xs.filter((x) => x.colony && x.colony.owner === player(S).id).length; return `${xs.length} systems, ${ex} charted by you${mine ? `, <b class="good">${mine} yours<\/b>` : ""}`; };
+  const left = c.coming ? c.coming.at - S.turn : 0;
+  return `<div class="card obj"><h3 class="obj-h">New sectors ${c.coming ? `<span class="badge-status">Opening in ${left} turn${left === 1 ? "" : "s"}<\/span>` : ""}<\/h3>
+    ${c.coming ? `<p class="small"><b>${esc(c.coming.name[0].toUpperCase() + c.coming.name.slice(1))}<\/b> opens beyond the rim on turn ${c.coming.at}. ${esc(c.coming.text)}<\/p>` : ""}
+    ${c.opened.map((o) => `<p class="small"><b>${esc(o.name[0].toUpperCase() + o.name.slice(1))}<\/b>, opened on turn ${o.turn}: ${near(o.kind)}. <span class="muted">${esc(o.text)}<\/span><\/p>`).join("")}
+    ${!c.coming && c.next !== null ? `<p class="small muted">The map grows as the game goes on: the ${c.opened.length ? "next" : "first"} new sector opens around turn ${c.next}, and every power hears what kind ${SECTORS.warn} turns ahead.<\/p>` : ""}<\/div>`;
 }
 /** The late-game crisis, on the Objectives tab: the warning, then the Heart, its waves and who is fighting them. */
 function crisisHTML() {
@@ -4886,12 +5007,13 @@ function doEndTurn() {
     if (!S.winner) crisisTurn(S);
     if (!S.winner) wildsTurn(S);
     if (!S.winner) tradersTurn(S);
+    if (!S.winner) sectorsTurn(S);
     if (!S.winner) eventsTurn(S);
     if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
     save(); musicUpdate();
     // News: what happened to you this turn.
-    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted ") && l.kind !== "turn");
+    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || l.sector || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted ") && l.kind !== "turn");
     if (sel && sel.kind === "fleet" && !S.fleets[sel.id]) sel = null;
     renderAll();
     if (S.winner) { showEnd(); return; }
@@ -5008,6 +5130,7 @@ function showNewGame(canContinue, preset) {
     <\/details>
     <label>Pirates and creatures <select id="ng-wilds">${Object.entries(WILD_LEVELS).map(([k, v]) => `<option value="${k}" ${k === "light" ? "selected" : ""}>${v.name}<\/option>`).join("")}<\/select><\/label>
     <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world<\/label>
+    <label class="small check-line"><input type="checkbox" id="ng-sectors" checked> New sectors: from turn ${SECTORS.first}, new space opens beyond the rim, each sector with its own character (an open game keeps growing, every ${SECTORS.every} turns)<\/label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step<\/label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-guide">New here? The starter guide<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>
     <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win<\/a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens<\/a><\/p>
@@ -5020,7 +5143,7 @@ function showNewGame(canContinue, preset) {
   $("ng-diff").onchange = () => { setAi(AI_PRESETS[$("ng-diff").value]); markCustom(); };
   $("ng-ai-strength").onchange = markCustom; document.querySelectorAll("[data-aiopt]").forEach((b) => { b.onchange = markCustom; });
   if (preset) {
-    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; $("ng-sectors").checked = !preset.sectorsOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
     setAi({ ...(AI_PRESETS[preset.difficulty] || AI_PRESETS.normal), ...(preset.ai || {}) }); markCustom();
   }
@@ -5028,7 +5151,7 @@ function showNewGame(canContinue, preset) {
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, wilds: $("ng-wilds").value, ai: readAi() });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, sectors: $("ng-sectors").checked, wilds: $("ng-wilds").value, ai: readAi() });
     if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
@@ -5190,6 +5313,7 @@ function showHelp(back) {
       <li><b>Traders:<\/b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot<\/b> to fill its tanks and cut the depot's supply.<\/li>
       <li><b>The Wardens:<\/b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out.<\/li>
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
+      <li><b>New sectors:<\/b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Objectives tab tracks them.<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.<\/li>
       <li><b>Win<\/b> by conquest (the last people standing), by building the <b>Corridor Engine<\/b> (research it, then build it at your capital), or with the highest score at turn ${RULES.maxTurns}.<\/li>
@@ -5202,7 +5326,7 @@ function galaxyInfo() {
   const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
   const diff = difficultyLabel(S);
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, wilds: wildsLevel(S), ai: S.aiOpts || null } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, sectorsOff: !!S.sectorsOff, wilds: wildsLevel(S), ai: S.aiOpts || null } };
 }
 function galaxyBox() {
   const g = galaxyInfo();

@@ -89,6 +89,7 @@ const body = [
 
   sec("explore", "Exploration", ul([
     "<b>Keep exploring all game.</b> Ruins and anomalies give research, and some hide relics of the old empires.",
+    "<b>Plan for new sectors.</b> In a long game the map grows, and you hear what kind of sector is coming before it opens. Have scouts and settlers ready, and be ready to defend what you claim: a new sector is a fresh race.",
     "<b>Relics are powerful</b>, and they stay with the world that keeps them. Guard yours; a rival's can be taken.",
     "<b>The galaxy may be bigger than it looks.</b> Be ready to move if new space opens."])),
 

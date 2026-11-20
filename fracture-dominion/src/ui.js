@@ -1,6 +1,6 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE, CRISIS } from "./data.js";
+import { SECTORS, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE, CRISIS } from "./data.js";
 import { newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
@@ -9,6 +9,7 @@ import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
 import { crisisTurn, crisisState } from "./crisis.js";
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
+import { sectorsTurn, sectorsState } from "./sectors.js";
 import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
@@ -398,6 +399,7 @@ function systemHTML() {
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
   let h = `<h2>${esc(sys.name)}</h2><p class="muted">${sys.deep ? "A station in deep space: no world here, just the station" : `${esc(w.name)} world, size ${sys.size}`}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit</b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins</b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}</b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.</p>`;
   { const rid = Object.keys(S.relics || {}).find((id) => S.relics[id].at === sys.id); if (rid && (mine || seen)) h += `<p class="small gold"><b>${esc(RELICS[rid].name)}</b> is kept here. ${esc(RELICS[rid].text)}${mine ? "" : " Take the world to take it."}</p>`; }
+  if (sys.sector && SECTORS.kinds[sys.sector]) h += `<p class="small muted">In ${esc(SECTORS.kinds[sys.sector].name)}: ${esc(SECTORS.kinds[sys.sector].text)}</p>`;
   if (sys.relic && sys.relicLost && me.explored[sys.at]) h += `<p class="small gold"><b>${esc(RELICS[sys.relic].name)}</b> lies in the ruins here: the first fleet to end its turn here recovers it.</p>`;
   if (mine && relicHeld(S, me.id, "shard")) { const r = S.relics.shard, ready = !r.ready || S.turn >= r.ready, tg = shardTargets(S, me.id, sys.id).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at));
     h += `<h3>The Gate Shard</h3>` + (ready ? (tg.length ? `<p class="small muted" style="margin-top:-4px">Open a new corridor from ${esc(sys.name)} to:</p><div class="opts">${tg.slice(0, 10).map((x) => `<button class="opt" data-shard="${x.id}"><b>${esc(x.name)}</b> <small>${distance(x.at, sys.at)} hexes</small></button>`).join("")}</div>` : `<p class="small muted">No explored system within 8 hexes left to link.</p>`) : `<p class="small muted">Spent until turn ${r.ready}.</p>`); }
@@ -587,6 +589,7 @@ function objectivesHTML() {
     <span>${lead.f.id === me.id ? "Next best" : "Leader"}</span><span>${lead.f.id === me.id ? (ranked[1] ? `${me.met[ranked[1].f.id] ? esc(ranked[1].f.name) : "An unmet rival"}: ${ranked[1].sc} (you lead by ${gap})` : "No one") : `${me.met[lead.f.id] ? esc(lead.f.name) : "An unmet rival"}: ${lead.sc} (${gap} ahead of you)`}</span></div>
     <p class="small" style="margin-top:6px"><b class="good">Win:</b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.</p></div>`;
   if (!live) h += crisisHTML();
+  h += sectorsHTML();
   // The rivals' race.
   const threats = [];
   for (const f of rivals) {
@@ -608,6 +611,16 @@ function engineOpenHTML(me) {
   return `<p class="small ${mine ? "good" : "bad"}" style="margin-top:6px"><b>${mine ? "You hold the Corridor Engine" : `${esc(H.name)} holds the Corridor Engine`}</b> at ${esc(sys.name)}, since turn ${E.built}${on ? "" : `, <b class="bad">but enemy warships hold its orbit: it gives nothing until they're driven off</b>`}.
     ${mine ? `Free corridor travel, +${ENGINE.tradePerColony} credits on every colony, ${ENGINE.scorePerTurn} score a turn, and the gate (a fleet at ${esc(sys.name)} jumps to any of your worlds; ${S.turn >= E.gate ? "open now" : `opens on turn ${E.gate}`}). <b class="bad">Watch:</b> the other powers resent whoever holds it. Lose ${esc(sys.name)} and you lose the Engine; a barrage from its orbit destroys it.`
       : `Take ${esc(sys.name)} and it's yours; or hold its orbit with its guns down and destroy it with a barrage, and the race to build one starts again.`}</p>`;
+}
+/** New sectors, on the Objectives tab: the one coming (announced ahead), and those opened so far. */
+function sectorsHTML() {
+  const c = sectorsState(S); if (!c || (!c.coming && !c.opened.length && c.next === null)) return "";
+  const near = (kind) => { const xs = Object.values(S.systems).filter((x) => x.sector === kind); const ex = xs.filter((x) => player(S).explored[x.at]).length, mine = xs.filter((x) => x.colony && x.colony.owner === player(S).id).length; return `${xs.length} systems, ${ex} charted by you${mine ? `, <b class="good">${mine} yours</b>` : ""}`; };
+  const left = c.coming ? c.coming.at - S.turn : 0;
+  return `<div class="card obj"><h3 class="obj-h">New sectors ${c.coming ? `<span class="badge-status">Opening in ${left} turn${left === 1 ? "" : "s"}</span>` : ""}</h3>
+    ${c.coming ? `<p class="small"><b>${esc(c.coming.name[0].toUpperCase() + c.coming.name.slice(1))}</b> opens beyond the rim on turn ${c.coming.at}. ${esc(c.coming.text)}</p>` : ""}
+    ${c.opened.map((o) => `<p class="small"><b>${esc(o.name[0].toUpperCase() + o.name.slice(1))}</b>, opened on turn ${o.turn}: ${near(o.kind)}. <span class="muted">${esc(o.text)}</span></p>`).join("")}
+    ${!c.coming && c.next !== null ? `<p class="small muted">The map grows as the game goes on: the ${c.opened.length ? "next" : "first"} new sector opens around turn ${c.next}, and every power hears what kind ${SECTORS.warn} turns ahead.</p>` : ""}</div>`;
 }
 /** The late-game crisis, on the Objectives tab: the warning, then the Heart, its waves and who is fighting them. */
 function crisisHTML() {
@@ -978,12 +991,13 @@ function doEndTurn() {
     if (!S.winner) crisisTurn(S);
     if (!S.winner) wildsTurn(S);
     if (!S.winner) tradersTurn(S);
+    if (!S.winner) sectorsTurn(S);
     if (!S.winner) eventsTurn(S);
     if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
     save(); musicUpdate();
     // News: what happened to you this turn.
-    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted ") && l.kind !== "turn");
+    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || l.sector || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted ") && l.kind !== "turn");
     if (sel && sel.kind === "fleet" && !S.fleets[sel.id]) sel = null;
     renderAll();
     if (S.winner) { showEnd(); return; }
@@ -1100,6 +1114,7 @@ function showNewGame(canContinue, preset) {
     </details>
     <label>Pirates and creatures <select id="ng-wilds">${Object.entries(WILD_LEVELS).map(([k, v]) => `<option value="${k}" ${k === "light" ? "selected" : ""}>${v.name}</option>`).join("")}</select></label>
     <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world</label>
+    <label class="small check-line"><input type="checkbox" id="ng-sectors" checked> New sectors: from turn ${SECTORS.first}, new space opens beyond the rim, each sector with its own character (an open game keeps growing, every ${SECTORS.every} turns)</label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step</label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>
     <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win</a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens</a></p>
@@ -1112,7 +1127,7 @@ function showNewGame(canContinue, preset) {
   $("ng-diff").onchange = () => { setAi(AI_PRESETS[$("ng-diff").value]); markCustom(); };
   $("ng-ai-strength").onchange = markCustom; document.querySelectorAll("[data-aiopt]").forEach((b) => { b.onchange = markCustom; });
   if (preset) {
-    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; $("ng-sectors").checked = !preset.sectorsOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
     setAi({ ...(AI_PRESETS[preset.difficulty] || AI_PRESETS.normal), ...(preset.ai || {}) }); markCustom();
   }
@@ -1120,7 +1135,7 @@ function showNewGame(canContinue, preset) {
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, wilds: $("ng-wilds").value, ai: readAi() });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, sectors: $("ng-sectors").checked, wilds: $("ng-wilds").value, ai: readAi() });
     if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
@@ -1282,6 +1297,7 @@ function showHelp(back) {
       <li><b>Traders:</b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot</b> to fill its tanks and cut the depot's supply.</li>
       <li><b>The Wardens:</b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out.</li>
       <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>
+      <li><b>New sectors:</b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Objectives tab tracks them.</li>
       <li><b>Invading:</b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.</li>
       <li><b>Diplomacy:</b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.</li>
       <li><b>Win</b> by conquest (the last people standing), by building the <b>Corridor Engine</b> (research it, then build it at your capital), or with the highest score at turn ${RULES.maxTurns}.</li>
@@ -1294,7 +1310,7 @@ function galaxyInfo() {
   const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
   const diff = difficultyLabel(S);
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, wilds: wildsLevel(S), ai: S.aiOpts || null } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, sectorsOff: !!S.sectorsOff, wilds: wildsLevel(S), ai: S.aiOpts || null } };
 }
 function galaxyBox() {
   const g = galaxyInfo();
