@@ -6,6 +6,18 @@
     {
       "date": "2026-11-20",
       "kind": "site",
+      "title": "Dominion: fuel reserve, sealed sectors, corridor collapses",
+      "items": [
+        "A fuel reserve for every power, shown in the top bar. Colonies make a little fuel, a capital and gas giants more, and fuel depots and stations make the most. Each depot also lets you store 15 more. Fleets moving in supply, refuelling, filling tankers and burning hard all use it, and a short reserve slows your fleets. Raiding a depot steals from its owner's reserve.",
+        "Burn hard: a moving fleet can go a hex a turn faster, paid for from the reserve in supply or from its own tank beyond supply. Computer players burn hard to relieve a world under siege.",
+        "Sealed sectors: the Dead Zone and the Warden Graveyard can't be entered until a power researches Rift drives (a new Physics technology), or someone lights a Rift beacon on a world within 3 hexes of the sector (200 credits, 10 exotics). A beacon opens the sector to everyone and adds a corridor into it.",
+        "Corridor collapses: from turn 45, every 25 to 40 turns, a corridor fails, with 4 turns' warning and a red line on the map. It's never a world's last corridor. A scout that rests near either end charts a new corridor and earns 40 research. Collapses can be turned off on the new-game form.",
+        "Long games run faster."
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "kind": "site",
       "title": "Dominion: new sectors",
       "items": [
         "The map grows in a long game. From turn 110, three rings of new space open beyond the rim. An open game opens another sector every 80 turns, up to four in all; a standard game gets one.",

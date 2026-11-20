@@ -1180,3 +1180,93 @@ test("new sectors: a standard game gets one, none near its end, and the setting 
   for (off.turn = 1; off.turn < RULES.maxTurns; off.turn++) sectorsTurn(off);
   assert.equal(off.sectors, undefined);
 });
+
+test("fuel reserve: worlds and depots make it, moving and refuelling spend it, and burning hard is faster", async () => {
+  const { fuelIncome, fuelCap, fuelStock, setBurn, usesReserve, buildDepot, settle } = await import("../src/game.js");
+  const { FUEL } = await import("../src/data.js");
+  const s = newGame({ seed: 31, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const me = s.factions[0];
+  assert.ok(usesReserve(me.id) && !usesReserve("vael"));
+  assert.equal(fuelStock(s, me.id), FUEL.start);
+  const inc0 = fuelIncome(s, me.id), cap0 = fuelCap(s, me.id);
+  assert.equal(inc0, FUEL.perColony + FUEL.capital + (s.systems[me.capital].world === "gas" ? FUEL.gas : 0));
+  // A depot makes fuel and raises the cap.
+  const o = Object.values(s.systems).find((x) => !x.colony && x.world !== "gas" && distance(x.at, s.systems[me.capital].at) <= 4);
+  o.colony = { owner: me.id, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+  me.credits = 500; assert.ok(buildDepot(s, me.id, o.id).ok);
+  assert.equal(fuelIncome(s, me.id), inc0 + FUEL.perDepot);
+  assert.equal(fuelCap(s, me.id), cap0 + FUEL.capPerDepot);
+  // Burning hard: a hex a turn farther, paid from the reserve.
+  const cap = s.systems[me.capital];
+  const far = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "space" && distance(k, cap.at) === 3)[0];
+  const a = spawnFleet(s, me.id, cap.at, ["frigate", "frigate"]), b = spawnFleet(s, me.id, cap.at, ["frigate", "frigate"]);
+  a.stance = "x"; b.stance = "y";   // keep them apart
+  assert.ok(setDestination(s, a.id, far).ok && setDestination(s, b.id, far).ok);
+  assert.ok(setBurn(s, b.id, true).ok);
+  me.fuelStock = 30; endTurn(s, null);
+  const left = (f) => (s.fleets[f.id] ? s.fleets[f.id].path.reduce((t, x) => t + x.cost, 0) : 0);
+  assert.ok(left(b) < left(a) || !s.fleets[b.id], "the burning fleet got farther");
+  assert.ok(fuelStock(s, me.id) < 30 + fuelIncome(s, me.id), "and it cost fuel");
+  // An empty reserve: fleets in supply move slower.
+  const c = spawnFleet(s, me.id, cap.at, ["cruiser"]); setDestination(s, c.id, far);
+  me.fuelStock = 0; const before = c.path.length; endTurn(s, null);
+  assert.ok(s.fleets[c.id].dry === s.turn - 1 || s.fleets[c.id].dry === s.turn || before - (s.fleets[c.id].path.length) <= 2);
+  assert.ok(!setBurn(s, c.id, true).error);
+});
+
+test("sealed sectors: no way in without Rift drives or a Rift beacon; the beacon opens it for everyone", async () => {
+  const { sectorsTurn } = await import("../src/sectors.js");
+  const { wildsTurn } = await import("../src/wilds.js");
+  const { SECTORS } = await import("../src/data.js");
+  const { findPath, beaconSites, buildBeacon, canCrossSealed } = await import("../src/game.js");
+  // Find a seed whose first sector is a sealed one.
+  let s, kind;
+  for (let seed = 40; seed < 80 && !kind; seed++) {
+    s = newGame({ seed, size: "small", player: "concord", rivals: 1, mode: "open", wilds: "heavy" }); wildsTurn(s);
+    s.turn = SECTORS.first - SECTORS.warn; sectorsTurn(s);
+    if (SECTORS.kinds[s.sectors.coming].sealed) kind = s.sectors.coming;
+  }
+  assert.ok(kind, "a seed with a sealed first sector");
+  s.turn = SECTORS.first; sectorsTurn(s);
+  const me = s.factions[0], inside = Object.values(s.systems).find((x) => x.sector === kind);
+  assert.ok(s.hexes[inside.at].sealed);
+  assert.equal(findPath(s, me.id, s.systems[me.capital].at, inside.at), null, "sealed without drives");
+  me.research.done.push("riftDrives"); assert.ok(canCrossSealed(s, me.id));
+  assert.ok(findPath(s, me.id, s.systems[me.capital].at, inside.at), "Rift drives get in");
+  me.research.done = me.research.done.filter((t) => t !== "riftDrives");
+  // A beacon on a world near it opens it for everyone.
+  const rim = Object.keys(s.hexes).filter((k) => s.hexes[k].sealed);
+  const near = Object.values(s.systems).find((x) => !x.colony && !x.sector && !fleetsAt(s, x.at).length && rim.some((k) => distance(x.at, k) <= SECTORS.beacon.range));
+  assert.ok(near, "a system by the sealed rim");
+  near.colony = { owner: me.id, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+  assert.ok(beaconSites(s, me.id).some((o) => o.sys.id === near.id));
+  me.credits = 10; assert.ok(buildBeacon(s, me.id, near.id).error, "it costs");
+  me.credits = 500; me.exotics = 20; assert.ok(buildBeacon(s, me.id, near.id).ok);
+  assert.ok(!Object.values(s.hexes).some((h) => h.sealed === kind));
+  assert.ok(findPath(s, s.factions[1].id, s.systems[s.factions[1].capital].at, inside.at), "open to a rival too");
+});
+
+test("corridor collapses: announced, never a world's last corridor, and a scout charts a new route", async () => {
+  const { corridorsTurn, collapseState } = await import("../src/sectors.js");
+  const { COLLAPSE } = await import("../src/data.js");
+  const s = newGame({ seed: 33, size: "small", player: "concord", rivals: 1, wilds: "none", sectors: false });
+  const n0 = s.corridors.length;
+  s.turn = COLLAPSE.first; corridorsTurn(s);
+  const c = collapseState(s).coming; assert.ok(c && c.at === s.turn + COLLAPSE.warn);
+  assert.ok(s.adj[c.a].length >= 2 && s.adj[c.b].length >= 2);
+  s.turn = c.at; corridorsTurn(s);
+  assert.equal(s.corridors.length, n0 - 1); assert.ok(!s.adj[c.a].includes(c.b));
+  const br = collapseState(s).breaks[0]; assert.ok(br);
+  // Every system still reachable by corridors.
+  const ids = Object.keys(s.systems), seen = new Set([ids[0]]), st = [ids[0]];
+  while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (!seen.has(y)) { seen.add(y); st.push(y); } }
+  assert.equal(seen.size, ids.length);
+  // A scout at rest beside it charts a new corridor, for research.
+  const me = s.factions[0], r0 = me.research.progress;
+  spawnFleet(s, me.id, s.systems[c.a].at, ["scout"]);
+  s.turn++; corridorsTurn(s);
+  assert.equal(s.corridors.length, n0);
+  assert.equal(collapseState(s).breaks.length, 0);
+  assert.equal(me.research.progress, r0 + COLLAPSE.research);
+  const off = newGame({ seed: 33, size: "small", player: "concord", rivals: 1, collapses: false }); off.turn = COLLAPSE.first; corridorsTurn(off); assert.equal(off.collapse, undefined);
+});

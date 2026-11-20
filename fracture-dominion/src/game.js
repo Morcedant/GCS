@@ -16,7 +16,7 @@ export function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, sectorsOff: opts.sectors === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, sectorsOff: opts.sectors === false, collapsesOff: opts.collapses === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -70,7 +70,7 @@ export function log(s, fid, text, kind = "info") {
 }
 export function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 export function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
-export function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
+export function fleetsAt(s, hex) { const out = []; for (const id in s.fleets) { const f = s.fleets[id]; if (f.at === hex) out.push(f); } return out; }
 // The free traders (traders.js) are at peace with everyone but the pirates.
 export const atWar = (s, a, b) => a !== b && (a === "traders" || b === "traders" ? a === "pirates" || b === "pirates" : isWild(a) !== isWild(b) || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
 
@@ -220,6 +220,49 @@ export function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // liv
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
 export const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) || f.owner === "traders" ? Infinity : Math.min(...f.ships.map((x) => (SHIPS[x.type].fuel || 99) + 2 * (fitOf(s, f.owner, x).tanks || 0))));
 export const fuelOf = (s, f) => Math.min(fuelMax(s, f), f.fuel ?? fuelMax(s, f));
+// ---- the fuel reserve ----
+/** Who keeps a fuel reserve: every power but the Vael (living hulls), the wild things and the traders. */
+export const usesReserve = (fid) => fid !== "vael" && !isWild(fid) && fid !== "traders";
+const isDepot = (s, x) => (x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn) && !blockaded(s, x);
+/** The fuel a power's worlds make a turn: colonies a little, capitals and gas giants more, depots and stations most. */
+export function fuelIncome(s, fid) {
+  if (!usesReserve(fid)) return 0;
+  let n = 0;
+  for (const x of coloniesOf(s, fid)) {
+    if (blockaded(s, x)) continue;
+    const gas = x.world === "gas" ? FUEL.gas : 0;
+    if (x.colony.kind === "colony") n += FUEL.perColony + (x.colony.capital ? FUEL.capital : 0) + gas;
+    if (isDepot(s, x)) n += FUEL.perDepot + gas;
+  }
+  return round1(n);
+}
+/** How much fuel a power can store: more with every working depot or station. */
+export const fuelCap = (s, fid) => FUEL.capBase + FUEL.capPerDepot * coloniesOf(s, fid).filter((x) => isDepot(s, x)).length;
+export const fuelStock = (s, fid) => { const F = faction(s, fid); return F ? F.fuelStock ?? FUEL.start : 0; };
+/** Take up to n from the reserve; returns what was taken. */
+function drawReserve(s, fid, n) {
+  if (!usesReserve(fid)) return n;
+  const F = faction(s, fid), have = fuelStock(s, fid), d = Math.min(have, n);
+  F.fuelStock = round1(have - d); return d;
+}
+/** What it costs to fill a fleet's tank from the reserve now. */
+export const refuelCost = (s, f) => { const mx = fuelMax(s, f); return mx === Infinity || !usesReserve(f.owner) ? 0 : round1((mx - fuelOf(s, f)) * f.ships.length * FUEL.refuelPer); };
+/** A fleet in supply refuels from the reserve, as far as the reserve allows. */
+function refuel(s, f) {
+  const mx = fuelMax(s, f);
+  if (mx === Infinity || !usesReserve(f.owner) || !f.ships.length) { f.fuel = mx; return; }
+  const miss = mx - fuelOf(s, f); if (miss <= 0) { delete f.dry; return; }
+  const per = f.ships.length * FUEL.refuelPer, units = Math.min(miss, Math.floor((fuelStock(s, f.owner) + 1e-9) / per));
+  if (units > 0) { drawReserve(s, f.owner, units * per); f.fuel = fuelOf(s, f) + units; }
+  if (units < miss) f.dry = s.turn; else delete f.dry;
+}
+/** Burn hard: the fleet moves FUEL.burnSpeed farther each turn until it arrives, at a cost in fuel. */
+export const burnCost = (s, f) => round1(f.ships.length * FUEL.burnPer);
+export function setBurn(s, fleetId, on) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  if (!usesReserve(f.owner)) return { error: "Living hulls swim at their own pace: they can't be pushed." };
+  f.burn = !!on; return { ok: true };
+}
 /** Buy a Fuel depot at an outpost of yours, with credits (an outpost has no industry). */
 export function buildDepot(s, fid, sysId) {
   const sys = s.systems[sysId], c = sys && sys.colony, F = faction(s, fid);
@@ -520,15 +563,41 @@ export function setResearch(s, fid, techId) {
 // ---- movement ----
 const corridorCost = (s, fid) => (engineActive(s, fid) ? 0 : has(s, fid, "corridorTheory") ? 0.25 : 1);
 /** The cheapest path from a hex to another: [{ hex, cost }] steps (the first step's hex is the next hex). */
+/** Sealed sectors: only the wild things, and powers with Rift drives, cross into one before a Rift beacon opens it. */
+export const canCrossSealed = (s, fid) => isWild(fid) || has(s, fid, "riftDrives");
+/** Where a power could build a Rift beacon: its worlds within SECTORS.beacon.range of a sealed sector. */
+export function beaconSites(s, fid) {
+  const sealed = Object.keys(s.hexes).filter((k) => s.hexes[k].sealed); if (!sealed.length) return [];
+  return coloniesOf(s, fid).filter((x) => !blockaded(s, x)).map((x) => { const near = sealed.filter((k) => distance(k, x.at) <= SECTORS.beacon.range); return near.length ? { sys: x, kind: s.hexes[near[0]].sealed } : null; }).filter(Boolean);
+}
+/** Build a Rift beacon: the sealed sector next to this world opens for everyone, with a corridor from here into it. */
+export function buildBeacon(s, fid, sysId) {
+  const F = faction(s, fid), site = beaconSites(s, fid).find((o) => o.sys.id === sysId);
+  if (!site) return { error: `A Rift beacon goes on a world of yours within ${SECTORS.beacon.range} hexes of a sealed sector.` };
+  const B = SECTORS.beacon;
+  if (F.credits < B.credits || F.exotics < B.exotics) return { error: `A Rift beacon costs ${B.credits} credits and ${B.exotics} exotics.` };
+  F.credits = round1(F.credits - B.credits); F.exotics -= B.exotics;
+  const kind = site.kind;
+  for (const h of Object.values(s.hexes)) if (h.sealed === kind) delete h.sealed;
+  const inner = Object.values(s.systems).filter((x) => x.sector === kind).sort((a, b) => distance(a.at, site.sys.at) - distance(b.at, site.sys.at))[0];
+  if (inner && !s.adj[site.sys.id].includes(inner.id)) { s.adj[site.sys.id].push(inner.id); s.adj[inner.id].push(site.sys.id); s.corridors.push([site.sys.id, inner.id]); }
+  site.sys.colony.beacon = s.turn;
+  (s.sectors.unsealed = s.sectors.unsealed || {})[kind] = { turn: s.turn, by: fid, at: site.sys.id };
+  const name = SECTORS.kinds[kind] ? SECTORS.kinds[kind].name : "the sealed sector";
+  log(s, null, `${F.name} lit a Rift beacon at ${site.sys.name}: ${name} is open to every power now${inner ? `, with a corridor from ${site.sys.name} to ${inner.name}` : ""}.`, "explore");
+  s.log[s.log.length - 1].sector = true;
+  return { ok: true };
+}
 export function findPath(s, fid, from, to) {
   if (!s.hexes[to] || s.hexes[to].terrain === "rift") return null;
-  const dist = { [from]: 0 }, prev = {}, open = [[0, from]], cc = corridorCost(s, fid);
+  if (s.hexes[to].sealed && !canCrossSealed(s, fid)) return null;
+  const dist = { [from]: 0 }, prev = {}, open = [[0, from]], cc = corridorCost(s, fid), cross = canCrossSealed(s, fid);
   while (open.length) {
     open.sort((a, b) => a[0] - b[0]);
     const [d, k] = open.shift();
     if (k === to) break;
     if (d > dist[k]) continue;
-    const steps = neighbors(k).filter((n) => s.hexes[n] && s.hexes[n].terrain !== "rift").map((n) => [n, s.hexes[n].terrain === "nebula" ? 2 : 1]);
+    const steps = neighbors(k).filter((n) => s.hexes[n] && s.hexes[n].terrain !== "rift" && (!s.hexes[n].sealed || cross)).map((n) => [n, s.hexes[n].terrain === "nebula" ? 2 : 1]);
     const sid = s.sysAt[k];
     if (sid) for (const o of s.adj[sid]) steps.push([s.systems[o].at, cc]);
     for (const [n, c] of steps) {
@@ -562,6 +631,7 @@ export function setDestination(s, fleetId, hex) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   if (hex === f.at) { f.path = []; f.dest = null; return { ok: true }; }
   const path = findPath(s, f.owner, f.at, hex);
+  if (!path && s.hexes[hex] && s.hexes[hex].sealed && !canCrossSealed(s, f.owner)) return { error: "That sector is sealed: it takes Rift drives, or a Rift beacon on a world near it, to get in." };
   if (!path) return { error: "No way there." };
   f.path = path; f.dest = hex; return { ok: true, turns: Math.ceil(path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(s, f)) };
 }
@@ -603,15 +673,23 @@ function moveFleets(s) {
     let mp = fleetSpeed(s, f);
     // Fuel: a turn's travel beyond supply burns one; with none left the fleet crawls.
     const out = f.path.length && !inSupply(s, f) && fuelMax(s, f) !== Infinity;
-    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else if (!drawCargo(f)) mp = Math.min(mp, FUEL.fumesSpeed); }   // a tanker along tops it up
+    let fumes = false;
+    // In supply, a fleet on the move draws on the reserve; short of it, it goes slower.
+    if (f.path.length && !out && usesReserve(f.owner) && fuelMax(s, f) !== Infinity) { const c = round1(f.ships.length * FUEL.movePer); if (fuelStock(s, f.owner) >= c) drawReserve(s, f.owner, c); else { mp = Math.max(1, mp - FUEL.shortSlow); f.dry = s.turn; } }
+    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else if (!drawCargo(f)) { mp = Math.min(mp, FUEL.fumesSpeed); fumes = true; } }   // a tanker along tops it up
+    // Burning hard: an extra turn of its own fuel beyond supply, or fuel from the reserve within it.
+    if (f.burn && f.path.length && !fumes && usesReserve(f.owner)) {
+      if (out) { if (fuelOf(s, f) > 0) { f.fuel = fuelOf(s, f) - 1; mp += FUEL.burnSpeed; } }
+      else { const c = burnCost(s, f); if (fuelStock(s, f.owner) >= c) { drawReserve(s, f.owner, c); mp += FUEL.burnSpeed; } else f.dry = s.turn; }
+    }
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) {
       const step = f.path[0];
       // A fleet stops where an enemy at war guards the hex.
       mp -= step.cost; f.at = step.hex; f.path.shift();
       if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; }
     }
-    if (!f.path.length) f.dest = null;
-    if (inSupply(s, f)) f.fuel = fuelMax(s, f);   // refuelled
+    if (!f.path.length) { f.dest = null; delete f.burn; }
+    if (inSupply(s, f)) refuel(s, f);   // refuelled, from the reserve
   }
   // Fleets of one faction resting in the same hex join up.
   const byHex = {};
@@ -696,7 +774,7 @@ export function invasionOdds(s, fleetId) {
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
-export const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && atWar(s, f.owner, sys.colony.owner));
+export const besieged = (s, sys) => { for (const id in s.fleets) { const f = s.fleets[id]; if (f.at === sys.at && armed(f) && atWar(s, f.owner, sys.colony.owner)) return true; } return false; };
 /** A world's orbital guns at full strength: an Orbital battery's, or a capital's smaller ones; the shield grid adds hull. */
 export function gunsMax(s, c) {
   const grid = proto(s, c.owner, "grid");
@@ -743,9 +821,12 @@ export function raidDepot(s, fleetId) {
   const sys = s.systems[s.sysAt[f.at]], c = sys.colony;
   f.fuel = fuelMax(s, f); for (const x of f.ships) if (x.type === "tanker") x.cargo = SHIPS.tanker.cargo;
   c.depotCut = s.turn + DEPOT_RAID.cut; f.depotRaid = s.turn;
+  // The depot's stores: a share of its owner's reserve goes into the raider's.
+  const took = usesReserve(c.owner) ? drawReserve(s, c.owner, Math.min(DEPOT_RAID.steal, fuelStock(s, c.owner))) : 0;
+  if (took && usesReserve(f.owner)) { const R = faction(s, f.owner); R.fuelStock = round1(Math.min(fuelCap(s, f.owner) + took, fuelStock(s, f.owner) + took)); }
   remember(s, c.owner, f.owner, `raided our fuel depot at ${sys.name}`, -4);
-  log(s, f.owner, `Your fleet raided the fuel depot at ${sys.name}: its tanks are full, and the depot gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
-  log(s, c.owner, `${faction(s, f.owner).name} raided your fuel depot at ${sys.name}: it gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
+  log(s, f.owner, `Your fleet raided the fuel depot at ${sys.name}: its tanks are full${took && usesReserve(f.owner) ? `, ${took} fuel went into your reserve` : ""}, and the depot gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
+  log(s, c.owner, `${faction(s, f.owner).name} raided your fuel depot at ${sys.name}: ${took ? `${took} fuel taken from your reserve, and ` : ""}it gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
   return { ok: true };
 }
 /**
@@ -1217,7 +1298,9 @@ function economy(s, F) {
   }
   // Tankers: those in supply from a colony or depot fill up; a parked one pays a unit of fuel for each fleet of ours it
   // alone keeps in supply.
-  for (const f of fleetsOf(s, F.id)) if (baseSupplyAt(s, F.id, f.at)) for (const x of f.ships) if (x.type === "tanker") x.cargo = SHIPS.tanker.cargo;
+  for (const f of fleetsOf(s, F.id)) if (baseSupplyAt(s, F.id, f.at)) for (const x of f.ships) if (x.type === "tanker") { const want = SHIPS.tanker.cargo - (x.cargo ?? SHIPS.tanker.cargo); if (want > 0) x.cargo = (x.cargo ?? SHIPS.tanker.cargo) + Math.floor(drawReserve(s, F.id, want)); }
+  // The fuel reserve: what the worlds made this turn, up to what the depots can store.
+  if (usesReserve(F.id)) F.fuelStock = round1(Math.min(fuelCap(s, F.id), fuelStock(s, F.id) + fuelIncome(s, F.id)));
   for (const f of fleetsOf(s, F.id)) {
     if (F.id === "vael" || baseSupplyAt(s, F.id, f.at)) continue;
     const tp = tankerPoints(s, F.id).filter((t) => distance(t.at, f.at) <= FUEL.tankerRange).sort((a, b) => cargoOf(b) - cargoOf(a))[0];
@@ -1343,7 +1426,7 @@ export const shardTargets = (s, fid, fromId) => { const a = s.systems[fromId], F
 export function expandGalaxy(s, reader, P = {}) {
   const R = makeRng("reach:" + s.seed + ":" + s.turn + (P.kind ? ":" + P.kind : "")), R0 = s.radius, R1 = R0 + (P.rings || REACH.rings);
   const fresh = hexagon(R1).filter((k) => !s.hexes[k]);
-  for (const k of fresh) s.hexes[k] = { terrain: "space" };
+  for (const k of fresh) s.hexes[k] = P.sealed ? { terrain: "space", sealed: P.kind } : { terrain: "space" };
   const blob = (terrain, count, len) => { for (let i = 0; i < count; i++) { let k = fresh[R.int(fresh.length)]; for (let j = 0; j < len; j++) { if (s.hexes[k] && distance(k, "0,0") > R0 && distance(k, "0,0") < R1) s.hexes[k].terrain = terrain; const n = neighbors(k).filter((x) => s.hexes[x] && distance(x, "0,0") > R0); if (!n.length) break; k = n[R.int(n.length)]; } } };
   blob("nebula", Math.round(R1 * 0.5 * (P.nebula || 1)), 6); blob("rift", Math.round(R1 * 0.25), 3);
   const old = Object.values(s.systems).filter((x) => !x.deep);
@@ -1366,20 +1449,22 @@ export function expandGalaxy(s, reader, P = {}) {
     s.hexes[k].terrain = "space"; s.sysAt[k] = id; s.adj[id] = []; made.push(s.systems[id]);
   }
   const link = (a, b) => { if (a === b || s.adj[a].includes(b)) return; s.adj[a].push(b); s.adj[b].push(a); s.corridors.push([a, b]); };
-  if (P.corridors === false) {
+  if (P.sealed && P.corridors === false) {
+    // Sealed, with no corridors inside: nothing at all until it's opened.
+  } else if (P.corridors === false) {
     // No corridors inside: a single one out, from the old map's nearest system.
     let best = null;
     for (const x of made) for (const y of old) { const d = distance(x.at, y.at); if (!best || d < best[2]) best = [x.id, y.id, d]; }
     if (best) link(best[0], best[1]);
   } else {
     // Corridors: each new system to its two nearest within 6, and the new space joined to the old network at its nearest points.
-    const shut = (y) => y.sector && y.sector !== P.kind && SECTORS.kinds[y.sector] && SECTORS.kinds[y.sector].corridors === false;   // the Dead Zone stays shut
-    const all = Object.values(s.systems).filter((y) => !y.deep && !shut(y));   // deep-space stations sit off the corridors
+    const shut = (y) => y.sector && y.sector !== P.kind && SECTORS.kinds[y.sector] && (SECTORS.kinds[y.sector].corridors === false || s.hexes[y.at].sealed);   // the Dead Zone stays shut, and a sealed sector till it's opened
+    const all = P.sealed ? made : Object.values(s.systems).filter((y) => !y.deep && !shut(y));   // deep-space stations sit off the corridors; a sealed sector links only inside itself
     for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
     const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep && !shut(s.systems[i]));
     const isNew = new Set(made.map((x) => x.id));
     const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
-    for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
+    for (let [c, n] = comp(), guard = 0; !P.sealed && n > 1 && guard < 200; [c, n] = comp(), guard++) {
       const main = c[ids.find((i) => !isNew.has(i))]; let best = null;
       for (const a of ids) if (c[a] === main) for (const b of ids) if (c[b] !== main && isNew.has(b)) { const d = distance(s.systems[a].at, s.systems[b].at); if (!best || d < best[2]) best = [a, b, d]; }
       if (!best) break;

@@ -30,9 +30,12 @@ export const key = (q, r) => q + "," + r;
 export const parse = (k) => { const [q, r] = k.split(",").map(Number); return { q, r }; };
 const DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
 export const neighbors = (k) => { const { q, r } = parse(k); return DIRS.map(([dq, dr]) => key(q + dq, r + dr)); };
+// Distances are asked for constantly: each hex key's coordinates are read once and kept.
+const HEX_QR = new Map();
+const qrOf = (k) => { let v = HEX_QR.get(k); if (!v) { const i = k.indexOf(","); v = [+k.slice(0, i), +k.slice(i + 1)]; if (HEX_QR.size < 200000) HEX_QR.set(k, v); } return v; };
 export const distance = (a, b) => {
-  const A = parse(a), B = parse(b);
-  return (Math.abs(A.q - B.q) + Math.abs(A.q + A.r - B.q - B.r) + Math.abs(A.r - B.r)) / 2;
+  const A = qrOf(a), B = qrOf(b);
+  return (Math.abs(A[0] - B[0]) + Math.abs(A[0] + A[1] - B[0] - B[1]) + Math.abs(A[1] - B[1])) / 2;
 };
 /** All hexes of a hexagonal map of this radius. */
 export function hexagon(radius) {

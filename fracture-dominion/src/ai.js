@@ -1,9 +1,9 @@
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors, hexLine } from "./hex.js";
-import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM } from "./data.js";
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS } from "./data.js";
 import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed } from "./game.js";
 
 const PRIORITY = {
   // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
@@ -20,17 +20,27 @@ export function aiTurn(s, F) {
   const diff = aiOpt(s, "strength") || DIFF[s.difficulty] || 1;
   research(s, F);
   relics(s, F);
+  beacons(s, F);
   outposts(s, F);
   diplomacy(s, F, diff);
   production(s, F, diff);
   fleets(s, F);
 }
 
+/** A Rift beacon, when a world of ours sits by a sealed sector and the treasury can spare it (without Rift drives,
+ * or with them but rich enough to want the corridor in). */
+function beacons(s, F) {
+  const B = SECTORS.beacon, site = beaconSites(s, F.id)[0];
+  if (site && F.exotics >= B.exotics + 5 && F.credits >= B.credits + (has(s, F.id, "riftDrives") ? 300 : 120)) buildBeacon(s, F.id, site.sys.id);
+}
 function research(s, F) {
   if (F.research.current) return;
   const avail = availableTechs(s, F.id);
   // Every technology done (or nothing left worth more): an advance, the cheapest level first.
   if (!avail.length) { const adv = availableAdvances(s, F.id).sort((a, b) => a.cost - b.cost)[0]; if (adv) setResearch(s, F.id, adv.id); return; }
+  // A sealed sector out there (or announced): Rift drives, to get in first.
+  const sealedNear = Object.values(s.hexes).some((h) => h.sealed) || !!(s.sectors && s.sectors.coming && SECTORS.kinds[s.sectors.coming].sealed);
+  if (sealedNear && avail.some((t) => t.id === "riftDrives")) { setResearch(s, F.id, "riftDrives"); return; }
   const pri = PRIORITY[F.id] || [];
   const want = pri.find((id) => avail.some((t) => t.id === id)) || [...avail].sort((a, b) => a.cost - b.cost)[0].id;
   // Late in the game, the Corridor Engine.
@@ -136,7 +146,7 @@ function diplomacy(s, F, diff) {
 function settleTargets(s, F, kind) {
   const cols = coloniesOf(s, F.id); if (!cols.length) return [];
   const claimed = new Set(fleetsOf(s, F.id).filter((f) => f.dest).map((f) => f.dest));
-  return Object.values(s.systems).filter((sys) => F.explored[sys.at] && canSettle(s, F.id, sys, kind) && !claimed.has(sys.at)
+  return Object.values(s.systems).filter((sys) => F.explored[sys.at] && canSettle(s, F.id, sys, kind) && !claimed.has(sys.at) && !(s.hexes[sys.at].sealed && !canCrossSealed(s, F.id))
     && !fleetsAt(s, sys.at).some((f) => f.owner !== F.id && armed(f)))
     .map((sys) => {
       const d = Math.min(...cols.map((c) => distance(c.at, sys.at)));
@@ -181,6 +191,7 @@ function production(s, F, diff) {
     const pick = best([
       ships && settleTargets(s, F, "colony").length && count(s, F, "colony") < (s.turn < 60 ? 2 : 1) && cols.length < 14 ? ["ship", "colony"] : null,
       ships && s.turn < 50 && count(s, F, "scout") < 2 ? ["ship", "scout"] : null,
+      ships && count(s, F, "scout") < 1 && s.collapse && s.collapse.breaks.some((x) => !x.surveyed) ? ["ship", "scout"] : null,   // a scout to chart around a collapse
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
       ships && c.capital && count(s, F, "outpost") < 1 && F.credits >= 150 && stationTarget(s, F) ? ["ship", "outpost"] : null,   // for a deep-space station
       c.capital && has(s, F.id, "orbitalYards") && !c.buildings.drydock ? ["building", "drydock"] : null,   // one, at the capital: the refits
@@ -244,6 +255,10 @@ function fleets(s, F) {
       continue;
     }
     if (types.size === 1 && types.has("scout")) {
+      // A collapsed corridor nearby, not yet charted around: survey it (research, and the route back).
+      const br = s.collapse && s.collapse.breaks.filter((x) => !x.surveyed).flatMap((x) => [s.systems[x.a], s.systems[x.b]]).filter((y) => y && F.explored[y.at] && distance(y.at, f.at) <= 12).sort((p, q) => distance(p.at, f.at) - distance(q.at, f.at))[0];
+      if (br && distance(br.at, f.at) > 1) { if (f.dest !== br.at) setDestination(s, f.id, br.at); continue; }
+      if (br) { f.path = []; f.dest = null; continue; }   // there: rest a turn and chart it
       if (!f.path.length) { const k = nearestUnexplored(s, F, f.at); if (k) setDestination(s, f.id, k); }
       continue;
     }
@@ -278,7 +293,7 @@ function fleets(s, F) {
       const relief = coloniesOf(s, F.id).filter((sys) => besieged(s, sys)).map((sys) => ({ sys, d: distance(f.at, sys.at),
         foe: fleetsAt(s, sys.at).filter((g) => armed(g) && atWar(s, g.owner, F.id)).reduce((t, g) => t + g.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? x.hull : 0), 0), 0) }))
         .filter((x) => x.foe <= mineHull * 1.2).sort((a, b) => a.d - b.d)[0];
-      if (relief) { if (relief.sys.at !== f.at) setDestination(s, f.id, relief.sys.at); continue; }
+      if (relief) { if (relief.sys.at !== f.at && setDestination(s, f.id, relief.sys.at).ok && usesReserve(F.id) && fuelStock(s, F.id) > fuelCap(s, F.id) / 2) f.burn = true; continue; }   // burn hard to the rescue while the reserve allows
       // Out of date: to the nearest drydock, for a refit with what's been researched since these ships were built
       // (before going on the attack; a world of ours under siege comes first).
       if (f.ships.some((x) => missingFit(s, F.id, x).length)) {

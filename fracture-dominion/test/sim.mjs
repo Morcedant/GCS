@@ -1,25 +1,25 @@
 // An all-computer game, for balance and bugs: node test/sim.mjs [seed] [turns] [size]
-import { newGame, endTurn, coloniesOf, fleetsOf, score, militaryPower, faction } from "../src/game.js";
+import { newGame, endTurn, coloniesOf, fleetsOf, score, militaryPower, faction, fuelCap, fuelIncome } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { ensureDirectives, directivesTurn } from "../src/orders.js";
 import { eventsTurn, currentEvent, chooseEvent } from "../src/events.js";
 import { crisisTurn, crisisState } from "../src/crisis.js";
 import { wildsTurn, wildsState } from "../src/wilds.js";
 import { tradersTurn } from "../src/traders.js";
-import { sectorsTurn } from "../src/sectors.js";
+import { sectorsTurn, corridorsTurn } from "../src/sectors.js";
 import { envoysTurn, currentEnvoy, answerEnvoy } from "../src/envoys.js";
 import { admiralsOf } from "../src/game.js";
 const seed = +(process.argv[2] || 7), turns = +(process.argv[3] || 200), size = process.argv[4] || "medium";
-const s = newGame({ seed, size, player: "concord", rivals: 4, difficulty: "normal", mode: process.env.MODE || "standard", sectors: process.env.SECTORS !== "off" });
+const s = newGame({ seed, size, player: "concord", rivals: 4, difficulty: "normal", mode: process.env.MODE || "standard", sectors: process.env.SECTORS !== "off", collapses: process.env.COLLAPSES !== "off" });
 ensureDirectives(s);
 s.factions[0].ai = true;
 const t0 = Date.now(); let evs = 0; const msgs = {};
 for (let i = 0; i < turns && !s.winner; i++) {
-  endTurn(s, aiTurn); directivesTurn(s); crisisTurn(s); wildsTurn(s); tradersTurn(s); sectorsTurn(s); s.directives.reports = []; s.battleReports = [];
+  endTurn(s, aiTurn); directivesTurn(s); crisisTurn(s); wildsTurn(s); tradersTurn(s); sectorsTurn(s); corridorsTurn(s); s.directives.reports = []; s.battleReports = [];
   eventsTurn(s); if (s.galEvent) { const e = currentEvent(s); chooseEvent(s, e.options[s.turn % e.options.length].id); evs++; }
   envoysTurn(s); for (let m; (m = currentEnvoy(s)); ) { msgs[m.kind] = (msgs[m.kind] || 0) + 1; answerEnvoy(s, m.options[(s.turn + 1) % m.options.length].id); }
   if (process.env.CRISIS && s.crisis && s.crisis.stage === "awake" && s.turn % 5 === 0) { const c = crisisState(s); console.log(`  T${s.turn} heart ${c.hull}/${c.max} wave ${c.wave} warden ships ${c.ships}`); }
-  if (s.turn % 25 === 0 || s.winner) console.log(`T${s.turn} ` + s.factions.map((F) => `${F.id}:${F.alive ? "" : "†"}c${coloniesOf(s, F.id).length} p${coloniesOf(s, F.id).reduce((t, x) => t + (x.colony.pop || 0), 0)} m${militaryPower(s, F.id)} t${F.research.done.length} $${Math.round(F.credits)} x${F.exotics} s${score(s, F.id)}`).join(" | "));
+  if (s.turn % 25 === 0 || s.winner) console.log(`T${s.turn} ` + s.factions.map((F) => `${F.id}:${F.alive ? "" : "†"}c${coloniesOf(s, F.id).length} p${coloniesOf(s, F.id).reduce((t, x) => t + (x.colony.pop || 0), 0)} m${militaryPower(s, F.id)} t${F.research.done.length} $${Math.round(F.credits)} x${F.exotics} f${F.fuelStock ?? "-"}/${fuelCap(s, F.id)}+${fuelIncome(s, F.id)} dry${fleetsOf(s, F.id).filter((f) => f.dry === s.turn).length} s${score(s, F.id)}`).join(" | "));
 }
 const wars = s.log.filter((l) => /declared war/.test(l.text)).length, battles = s.log.filter((l) => /^Battle/.test(l.text)).length, taken = s.log.filter((l) => / took /.test(l.text)).length;
 const C = s.directives; console.log(`campaigns: ${(C.past || []).map((p) => p.id + ":" + p.over).concat(C.campaign ? [C.campaign.id + ":" + (C.campaign.over || C.campaign.threads.length)] : []).join(" ")}; directives done ${C.history.filter((h) => h.result === "done").length}, lost ${C.history.filter((h) => h.result !== "done").length}; prototypes ${Object.keys(s.factions[0].protos || {}).join(",") || "-"}`);

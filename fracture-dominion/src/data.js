@@ -176,6 +176,7 @@ export const TECHS = [
   { id: "foldDrives", name: "Fold drives", field: "Physics", cost: 300, needs: ["sensors"], text: "+1 speed for every ship." },
   { id: "shields", name: "Deflector shields", field: "Physics", cost: 375, needs: ["sensors"], text: "+1 hull for every warship." },
   { id: "targeting", name: "Targeting computers", field: "Physics", cost: 450, needs: ["shields"], text: "+1 to every ship's and battery's skill." },
+  { id: "riftDrives", name: "Rift drives", field: "Physics", cost: 600, needs: ["foldDrives"], text: "Your ships can cross into sealed sectors (the Dead Zone, the Warden Graveyard) without a Rift beacon." },
   { id: "corridorTheory", name: "Corridor theory", field: "Physics", cost: 800, needs: ["foldDrives", "targeting"], text: "Moving along a corridor costs nothing." },
   { id: "engine", name: "The Corridor Engine", field: "Physics", cost: 1500, needs: ["corridorTheory", "refining"], text: "Lets your capital build the Corridor Engine: the science victory. In an open game it's the galaxy's great prize instead, and only one can stand at a time." },
   { id: "automation", name: "Automated factories", field: "Industry", cost: 175, needs: [], text: "+1 industry on every world." },
@@ -244,7 +245,13 @@ export const YARDS = { station: 2, discount: 0.15 };
 /** What an outpost sells: fuel (with a fuel depot or a station; more from a gas giant's volatiles), exotics (from a
  * deposit), and fuel to each passing merchant convoy. Nothing while blockaded, or while a raided depot is dry. */
 export const OUTPOST_TRADE = { base: 0.5, fuel: 2, gas: 1, exotics: 2, convoy: 2 };
-export const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2 };
+export const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2,
+  // The fuel reserve: each power's stock of fuel. Colonies make a little (a capital and gas giants more); each fuel depot
+  // or station makes more and raises how much can be stored. Refuelling a fleet in supply costs `refuelPer` a ship for
+  // each turn of fuel put back; filling a tanker, one a unit. A fleet told to burn hard moves `burnSpeed` hexes farther
+  // a turn: `burnPer` a ship from the reserve in supply, or an extra turn of its own fuel beyond it. Moving in supply
+  // costs `movePer` a ship a turn from the reserve; a power whose reserve can't pay moves its fleets `shortSlow` slower.
+  start: 30, perColony: 0.2, capital: 1, gas: 1, perDepot: 1, capBase: 40, capPerDepot: 15, refuelPer: 0.5, burnPer: 0.5, burnSpeed: 1, movePer: 0.3, shortSlow: 1 };
 // A supply point (a colony, a fuel depot, a parked tanker) with an enemy's warships in its system is cut: it gives no supply.
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
 // partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
@@ -307,7 +314,7 @@ export const WILD_LEVELS = {
  */
 export const PROTECTION = { ransomBase: 15, ransomPerPop: 6, tributeBase: 25, tributePerTurn: 0.4, turns: 20 };
 /** Raiding an enemy's fuel depot: the fleet and its tankers fill up, and the depot gives no supply for `cut` turns. */
-export const DEPOT_RAID = { cut: 5 };
+export const DEPOT_RAID = { cut: 5, steal: 15 };
 /** A pirate patrol pact: partners' warships guard each other's worlds against raiders, and each partner gets `share` of
  * the bounty when the other destroys a pirate ship. */
 export const PATROL = { share: 0.5, regard: 0.3 };
@@ -374,16 +381,25 @@ export const RELIC_SCORE = 10;
  *   density: systems, against the rest of the map; exotics, ruins, anomalies: the chance of each on a new system;
  *   rich: the yields to pick from; habitable: more good worlds; nebula: how much more nebula; corridors: false for none
  *   inside (one link to the old network); havens: pirate havens; husks: Warden husks, by map size.
+ * A sealed sector can't be entered at all until a power researches Rift drives (its own ships only) or someone builds a
+ * Rift beacon on a world near it (`beacon`: credits and exotics), which opens it for everyone with a corridor in.
  */
-export const SECTORS = { first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
+/**
+ * Corridor collapses: from turn `first`, every `every` turns or so (a range), a corridor fails. Every power hears
+ * `warn` turns ahead. Never one a system can't do without (each end keeps another corridor, and the network stays in
+ * one piece). A scout that ends its turn within `surveyRange` hexes of either end, not moving, charts a new corridor
+ * from that end to a system within `linkRange` (the one nearest the other end), and its power gets `research`.
+ */
+export const COLLAPSE = { first: 45, every: [25, 40], warn: 4, surveyRange: 2, linkRange: 6, research: 40 };
+export const SECTORS = { beacon: { credits: 200, exotics: 10, range: 3 }, first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
   kinds: {
     corsair: { name: "the Corsair Reach", wilds: true, density: 1, exotics: 0.45, ruins: 0.15, anomalies: 0.15, havens: 2,
       text: "Pirate strongholds hold this sector, and its worlds are rich in exotics. Settle it with warships close." },
-    graveyard: { name: "the Warden Graveyard", wilds: true, density: 0.9, exotics: 0.3, ruins: 0.6, anomalies: 0.4, husks: { small: 2, medium: 3, large: 4, vast: 5 },
+    graveyard: { name: "the Warden Graveyard", wilds: true, sealed: true, density: 0.9, exotics: 0.3, ruins: 0.6, anomalies: 0.4, husks: { small: 2, medium: 3, large: 4, vast: 5 },
       text: "The wreck-field of an older war: ruins everywhere, guarded by Warden husks that still fire. Their wrecks pay in research." },
     frontier: { name: "the Golden Frontier", density: 1.3, exotics: 0.2, ruins: 0.15, anomalies: 0.2, rich: [1, 1.4, 1.4], habitable: true,
       text: "Rich, open, good worlds and nothing guarding them. Whoever settles it first grows fastest, so expect a race and a war." },
-    deadzone: { name: "the Dead Zone", density: 0.6, exotics: 0.85, ruins: 0.3, anomalies: 0.3, nebula: 3, corridors: false,
+    deadzone: { name: "the Dead Zone", sealed: true, density: 0.6, exotics: 0.85, ruins: 0.3, anomalies: 0.3, nebula: 3, corridors: false,
       text: "No corridors, thick nebula, few worlds, and almost every one of them full of exotics. Bring fuel tankers." },
   } };
 export const REACH = { rings: 4, ruins: 0.25, anomalies: 0.25, exotics: 0.3, reserved: 4 };

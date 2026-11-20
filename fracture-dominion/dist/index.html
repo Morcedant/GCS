@@ -209,7 +209,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-20 22:00 UTC";
+const BUILD = "2026-11-20 22:21 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -243,9 +243,12 @@ const key = (q, r) => q + "," + r;
 const parse = (k) => { const [q, r] = k.split(",").map(Number); return { q, r }; };
 const DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
 const neighbors = (k) => { const { q, r } = parse(k); return DIRS.map(([dq, dr]) => key(q + dq, r + dr)); };
+// Distances are asked for constantly: each hex key's coordinates are read once and kept.
+const HEX_QR = new Map();
+const qrOf = (k) => { let v = HEX_QR.get(k); if (!v) { const i = k.indexOf(","); v = [+k.slice(0, i), +k.slice(i + 1)]; if (HEX_QR.size < 200000) HEX_QR.set(k, v); } return v; };
 const distance = (a, b) => {
-  const A = parse(a), B = parse(b);
-  return (Math.abs(A.q - B.q) + Math.abs(A.q + A.r - B.q - B.r) + Math.abs(A.r - B.r)) / 2;
+  const A = qrOf(a), B = qrOf(b);
+  return (Math.abs(A[0] - B[0]) + Math.abs(A[0] + A[1] - B[0] - B[1]) + Math.abs(A[1] - B[1])) / 2;
 };
 /** All hexes of a hexagonal map of this radius. */
 function hexagon(radius) {
@@ -467,6 +470,7 @@ const TECHS = [
   { id: "foldDrives", name: "Fold drives", field: "Physics", cost: 300, needs: ["sensors"], text: "+1 speed for every ship." },
   { id: "shields", name: "Deflector shields", field: "Physics", cost: 375, needs: ["sensors"], text: "+1 hull for every warship." },
   { id: "targeting", name: "Targeting computers", field: "Physics", cost: 450, needs: ["shields"], text: "+1 to every ship's and battery's skill." },
+  { id: "riftDrives", name: "Rift drives", field: "Physics", cost: 600, needs: ["foldDrives"], text: "Your ships can cross into sealed sectors (the Dead Zone, the Warden Graveyard) without a Rift beacon." },
   { id: "corridorTheory", name: "Corridor theory", field: "Physics", cost: 800, needs: ["foldDrives", "targeting"], text: "Moving along a corridor costs nothing." },
   { id: "engine", name: "The Corridor Engine", field: "Physics", cost: 1500, needs: ["corridorTheory", "refining"], text: "Lets your capital build the Corridor Engine: the science victory. In an open game it's the galaxy's great prize instead, and only one can stand at a time." },
   { id: "automation", name: "Automated factories", field: "Industry", cost: 175, needs: [], text: "+1 industry on every world." },
@@ -535,7 +539,13 @@ const YARDS = { station: 2, discount: 0.15 };
 /** What an outpost sells: fuel (with a fuel depot or a station; more from a gas giant's volatiles), exotics (from a
  * deposit), and fuel to each passing merchant convoy. Nothing while blockaded, or while a raided depot is dry. */
 const OUTPOST_TRADE = { base: 0.5, fuel: 2, gas: 1, exotics: 2, convoy: 2 };
-const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2 };
+const FUEL = { depotCost: 60, foundWithDepot: 40, fumesSpeed: 1, tankerRange: 2,
+  // The fuel reserve: each power's stock of fuel. Colonies make a little (a capital and gas giants more); each fuel depot
+  // or station makes more and raises how much can be stored. Refuelling a fleet in supply costs `refuelPer` a ship for
+  // each turn of fuel put back; filling a tanker, one a unit. A fleet told to burn hard moves `burnSpeed` hexes farther
+  // a turn: `burnPer` a ship from the reserve in supply, or an extra turn of its own fuel beyond it. Moving in supply
+  // costs `movePer` a ship a turn from the reserve; a power whose reserve can't pay moves its fleets `shortSlow` slower.
+  start: 30, perColony: 0.2, capital: 1, gas: 1, perDepot: 1, capBase: 40, capPerDepot: 15, refuelPer: 0.5, burnPer: 0.5, burnSpeed: 1, movePer: 0.3, shortSlow: 1 };
 // A supply point (a colony, a fuel depot, a parked tanker) with an enemy's warships in its system is cut: it gives no supply.
 // Trade: a colony earns credits for each trade link, another colony within range that's its own power's or a treaty
 // partner's (an Exchange doubles it). A blockaded world (under siege) has no trade, and is no partner for anyone.
@@ -598,7 +608,7 @@ const WILD_LEVELS = {
  */
 const PROTECTION = { ransomBase: 15, ransomPerPop: 6, tributeBase: 25, tributePerTurn: 0.4, turns: 20 };
 /** Raiding an enemy's fuel depot: the fleet and its tankers fill up, and the depot gives no supply for `cut` turns. */
-const DEPOT_RAID = { cut: 5 };
+const DEPOT_RAID = { cut: 5, steal: 15 };
 /** A pirate patrol pact: partners' warships guard each other's worlds against raiders, and each partner gets `share` of
  * the bounty when the other destroys a pirate ship. */
 const PATROL = { share: 0.5, regard: 0.3 };
@@ -665,16 +675,25 @@ const RELIC_SCORE = 10;
  *   density: systems, against the rest of the map; exotics, ruins, anomalies: the chance of each on a new system;
  *   rich: the yields to pick from; habitable: more good worlds; nebula: how much more nebula; corridors: false for none
  *   inside (one link to the old network); havens: pirate havens; husks: Warden husks, by map size.
+ * A sealed sector can't be entered at all until a power researches Rift drives (its own ships only) or someone builds a
+ * Rift beacon on a world near it (`beacon`: credits and exotics), which opens it for everyone with a corridor in.
  */
-const SECTORS = { first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
+/**
+ * Corridor collapses: from turn `first`, every `every` turns or so (a range), a corridor fails. Every power hears
+ * `warn` turns ahead. Never one a system can't do without (each end keeps another corridor, and the network stays in
+ * one piece). A scout that ends its turn within `surveyRange` hexes of either end, not moving, charts a new corridor
+ * from that end to a system within `linkRange` (the one nearest the other end), and its power gets `research`.
+ */
+const COLLAPSE = { first: 45, every: [25, 40], warn: 4, surveyRange: 2, linkRange: 6, research: 40 };
+const SECTORS = { beacon: { credits: 200, exotics: 10, range: 3 }, first: 110, every: 80, warn: 10, rings: 3, max: 4, endGap: 40,
   kinds: {
     corsair: { name: "the Corsair Reach", wilds: true, density: 1, exotics: 0.45, ruins: 0.15, anomalies: 0.15, havens: 2,
       text: "Pirate strongholds hold this sector, and its worlds are rich in exotics. Settle it with warships close." },
-    graveyard: { name: "the Warden Graveyard", wilds: true, density: 0.9, exotics: 0.3, ruins: 0.6, anomalies: 0.4, husks: { small: 2, medium: 3, large: 4, vast: 5 },
+    graveyard: { name: "the Warden Graveyard", wilds: true, sealed: true, density: 0.9, exotics: 0.3, ruins: 0.6, anomalies: 0.4, husks: { small: 2, medium: 3, large: 4, vast: 5 },
       text: "The wreck-field of an older war: ruins everywhere, guarded by Warden husks that still fire. Their wrecks pay in research." },
     frontier: { name: "the Golden Frontier", density: 1.3, exotics: 0.2, ruins: 0.15, anomalies: 0.2, rich: [1, 1.4, 1.4], habitable: true,
       text: "Rich, open, good worlds and nothing guarding them. Whoever settles it first grows fastest, so expect a race and a war." },
-    deadzone: { name: "the Dead Zone", density: 0.6, exotics: 0.85, ruins: 0.3, anomalies: 0.3, nebula: 3, corridors: false,
+    deadzone: { name: "the Dead Zone", sealed: true, density: 0.6, exotics: 0.85, ruins: 0.3, anomalies: 0.3, nebula: 3, corridors: false,
       text: "No corridors, thick nebula, few worlds, and almost every one of them full of exotics. Bring fuel tankers." },
   } };
 const REACH = { rings: 4, ruins: 0.25, anomalies: 0.25, exotics: 0.3, reserved: 4 };
@@ -889,7 +908,7 @@ function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, sectorsOff: opts.sectors === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, sectorsOff: opts.sectors === false, collapsesOff: opts.collapses === false, wildsOff: opts.wilds === false || opts.wilds === "none", wildsLevel: typeof opts.wilds === "string" ? opts.wilds : opts.wilds === false ? "none" : "light", size: opts.size || "medium", difficulty: opts.difficulty || "normal", aiOpts: { ...(AI_PRESETS[opts.difficulty] || AI_PRESETS.normal), ...(opts.ai || {}) }, radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -943,7 +962,7 @@ function log(s, fid, text, kind = "info") {
 }
 function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
-function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
+function fleetsAt(s, hex) { const out = []; for (const id in s.fleets) { const f = s.fleets[id]; if (f.at === hex) out.push(f); } return out; }
 // The free traders (traders.js) are at peace with everyone but the pirates.
 const atWar = (s, a, b) => a !== b && (a === "traders" || b === "traders" ? a === "pirates" || b === "pirates" : isWild(a) !== isWild(b) || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
 
@@ -1093,6 +1112,49 @@ function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hul
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
 const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) || f.owner === "traders" ? Infinity : Math.min(...f.ships.map((x) => (SHIPS[x.type].fuel || 99) + 2 * (fitOf(s, f.owner, x).tanks || 0))));
 const fuelOf = (s, f) => Math.min(fuelMax(s, f), f.fuel ?? fuelMax(s, f));
+// ---- the fuel reserve ----
+/** Who keeps a fuel reserve: every power but the Vael (living hulls), the wild things and the traders. */
+const usesReserve = (fid) => fid !== "vael" && !isWild(fid) && fid !== "traders";
+const isDepot = (s, x) => (x.colony.buildings.depot || x.colony.buildings.station) && !(x.colony.depotCut > s.turn) && !blockaded(s, x);
+/** The fuel a power's worlds make a turn: colonies a little, capitals and gas giants more, depots and stations most. */
+function fuelIncome(s, fid) {
+  if (!usesReserve(fid)) return 0;
+  let n = 0;
+  for (const x of coloniesOf(s, fid)) {
+    if (blockaded(s, x)) continue;
+    const gas = x.world === "gas" ? FUEL.gas : 0;
+    if (x.colony.kind === "colony") n += FUEL.perColony + (x.colony.capital ? FUEL.capital : 0) + gas;
+    if (isDepot(s, x)) n += FUEL.perDepot + gas;
+  }
+  return round1(n);
+}
+/** How much fuel a power can store: more with every working depot or station. */
+const fuelCap = (s, fid) => FUEL.capBase + FUEL.capPerDepot * coloniesOf(s, fid).filter((x) => isDepot(s, x)).length;
+const fuelStock = (s, fid) => { const F = faction(s, fid); return F ? F.fuelStock ?? FUEL.start : 0; };
+/** Take up to n from the reserve; returns what was taken. */
+function drawReserve(s, fid, n) {
+  if (!usesReserve(fid)) return n;
+  const F = faction(s, fid), have = fuelStock(s, fid), d = Math.min(have, n);
+  F.fuelStock = round1(have - d); return d;
+}
+/** What it costs to fill a fleet's tank from the reserve now. */
+const refuelCost = (s, f) => { const mx = fuelMax(s, f); return mx === Infinity || !usesReserve(f.owner) ? 0 : round1((mx - fuelOf(s, f)) * f.ships.length * FUEL.refuelPer); };
+/** A fleet in supply refuels from the reserve, as far as the reserve allows. */
+function refuel(s, f) {
+  const mx = fuelMax(s, f);
+  if (mx === Infinity || !usesReserve(f.owner) || !f.ships.length) { f.fuel = mx; return; }
+  const miss = mx - fuelOf(s, f); if (miss <= 0) { delete f.dry; return; }
+  const per = f.ships.length * FUEL.refuelPer, units = Math.min(miss, Math.floor((fuelStock(s, f.owner) + 1e-9) / per));
+  if (units > 0) { drawReserve(s, f.owner, units * per); f.fuel = fuelOf(s, f) + units; }
+  if (units < miss) f.dry = s.turn; else delete f.dry;
+}
+/** Burn hard: the fleet moves FUEL.burnSpeed farther each turn until it arrives, at a cost in fuel. */
+const burnCost = (s, f) => round1(f.ships.length * FUEL.burnPer);
+function setBurn(s, fleetId, on) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  if (!usesReserve(f.owner)) return { error: "Living hulls swim at their own pace: they can't be pushed." };
+  f.burn = !!on; return { ok: true };
+}
 /** Buy a Fuel depot at an outpost of yours, with credits (an outpost has no industry). */
 function buildDepot(s, fid, sysId) {
   const sys = s.systems[sysId], c = sys && sys.colony, F = faction(s, fid);
@@ -1393,15 +1455,41 @@ function setResearch(s, fid, techId) {
 // ---- movement ----
 const corridorCost = (s, fid) => (engineActive(s, fid) ? 0 : has(s, fid, "corridorTheory") ? 0.25 : 1);
 /** The cheapest path from a hex to another: [{ hex, cost }] steps (the first step's hex is the next hex). */
+/** Sealed sectors: only the wild things, and powers with Rift drives, cross into one before a Rift beacon opens it. */
+const canCrossSealed = (s, fid) => isWild(fid) || has(s, fid, "riftDrives");
+/** Where a power could build a Rift beacon: its worlds within SECTORS.beacon.range of a sealed sector. */
+function beaconSites(s, fid) {
+  const sealed = Object.keys(s.hexes).filter((k) => s.hexes[k].sealed); if (!sealed.length) return [];
+  return coloniesOf(s, fid).filter((x) => !blockaded(s, x)).map((x) => { const near = sealed.filter((k) => distance(k, x.at) <= SECTORS.beacon.range); return near.length ? { sys: x, kind: s.hexes[near[0]].sealed } : null; }).filter(Boolean);
+}
+/** Build a Rift beacon: the sealed sector next to this world opens for everyone, with a corridor from here into it. */
+function buildBeacon(s, fid, sysId) {
+  const F = faction(s, fid), site = beaconSites(s, fid).find((o) => o.sys.id === sysId);
+  if (!site) return { error: `A Rift beacon goes on a world of yours within ${SECTORS.beacon.range} hexes of a sealed sector.` };
+  const B = SECTORS.beacon;
+  if (F.credits < B.credits || F.exotics < B.exotics) return { error: `A Rift beacon costs ${B.credits} credits and ${B.exotics} exotics.` };
+  F.credits = round1(F.credits - B.credits); F.exotics -= B.exotics;
+  const kind = site.kind;
+  for (const h of Object.values(s.hexes)) if (h.sealed === kind) delete h.sealed;
+  const inner = Object.values(s.systems).filter((x) => x.sector === kind).sort((a, b) => distance(a.at, site.sys.at) - distance(b.at, site.sys.at))[0];
+  if (inner && !s.adj[site.sys.id].includes(inner.id)) { s.adj[site.sys.id].push(inner.id); s.adj[inner.id].push(site.sys.id); s.corridors.push([site.sys.id, inner.id]); }
+  site.sys.colony.beacon = s.turn;
+  (s.sectors.unsealed = s.sectors.unsealed || {})[kind] = { turn: s.turn, by: fid, at: site.sys.id };
+  const name = SECTORS.kinds[kind] ? SECTORS.kinds[kind].name : "the sealed sector";
+  log(s, null, `${F.name} lit a Rift beacon at ${site.sys.name}: ${name} is open to every power now${inner ? `, with a corridor from ${site.sys.name} to ${inner.name}` : ""}.`, "explore");
+  s.log[s.log.length - 1].sector = true;
+  return { ok: true };
+}
 function findPath(s, fid, from, to) {
   if (!s.hexes[to] || s.hexes[to].terrain === "rift") return null;
-  const dist = { [from]: 0 }, prev = {}, open = [[0, from]], cc = corridorCost(s, fid);
+  if (s.hexes[to].sealed && !canCrossSealed(s, fid)) return null;
+  const dist = { [from]: 0 }, prev = {}, open = [[0, from]], cc = corridorCost(s, fid), cross = canCrossSealed(s, fid);
   while (open.length) {
     open.sort((a, b) => a[0] - b[0]);
     const [d, k] = open.shift();
     if (k === to) break;
     if (d > dist[k]) continue;
-    const steps = neighbors(k).filter((n) => s.hexes[n] && s.hexes[n].terrain !== "rift").map((n) => [n, s.hexes[n].terrain === "nebula" ? 2 : 1]);
+    const steps = neighbors(k).filter((n) => s.hexes[n] && s.hexes[n].terrain !== "rift" && (!s.hexes[n].sealed || cross)).map((n) => [n, s.hexes[n].terrain === "nebula" ? 2 : 1]);
     const sid = s.sysAt[k];
     if (sid) for (const o of s.adj[sid]) steps.push([s.systems[o].at, cc]);
     for (const [n, c] of steps) {
@@ -1435,6 +1523,7 @@ function setDestination(s, fleetId, hex) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   if (hex === f.at) { f.path = []; f.dest = null; return { ok: true }; }
   const path = findPath(s, f.owner, f.at, hex);
+  if (!path && s.hexes[hex] && s.hexes[hex].sealed && !canCrossSealed(s, f.owner)) return { error: "That sector is sealed: it takes Rift drives, or a Rift beacon on a world near it, to get in." };
   if (!path) return { error: "No way there." };
   f.path = path; f.dest = hex; return { ok: true, turns: Math.ceil(path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(s, f)) };
 }
@@ -1476,15 +1565,23 @@ function moveFleets(s) {
     let mp = fleetSpeed(s, f);
     // Fuel: a turn's travel beyond supply burns one; with none left the fleet crawls.
     const out = f.path.length && !inSupply(s, f) && fuelMax(s, f) !== Infinity;
-    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else if (!drawCargo(f)) mp = Math.min(mp, FUEL.fumesSpeed); }   // a tanker along tops it up
+    let fumes = false;
+    // In supply, a fleet on the move draws on the reserve; short of it, it goes slower.
+    if (f.path.length && !out && usesReserve(f.owner) && fuelMax(s, f) !== Infinity) { const c = round1(f.ships.length * FUEL.movePer); if (fuelStock(s, f.owner) >= c) drawReserve(s, f.owner, c); else { mp = Math.max(1, mp - FUEL.shortSlow); f.dry = s.turn; } }
+    if (out) { if (fuelOf(s, f) > 0) f.fuel = fuelOf(s, f) - 1; else if (!drawCargo(f)) { mp = Math.min(mp, FUEL.fumesSpeed); fumes = true; } }   // a tanker along tops it up
+    // Burning hard: an extra turn of its own fuel beyond supply, or fuel from the reserve within it.
+    if (f.burn && f.path.length && !fumes && usesReserve(f.owner)) {
+      if (out) { if (fuelOf(s, f) > 0) { f.fuel = fuelOf(s, f) - 1; mp += FUEL.burnSpeed; } }
+      else { const c = burnCost(s, f); if (fuelStock(s, f.owner) >= c) { drawReserve(s, f.owner, c); mp += FUEL.burnSpeed; } else f.dry = s.turn; }
+    }
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) {
       const step = f.path[0];
       // A fleet stops where an enemy at war guards the hex.
       mp -= step.cost; f.at = step.hex; f.path.shift();
       if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; }
     }
-    if (!f.path.length) f.dest = null;
-    if (inSupply(s, f)) f.fuel = fuelMax(s, f);   // refuelled
+    if (!f.path.length) { f.dest = null; delete f.burn; }
+    if (inSupply(s, f)) refuel(s, f);   // refuelled, from the reserve
   }
   // Fleets of one faction resting in the same hex join up.
   const byHex = {};
@@ -1569,7 +1666,7 @@ function invasionOdds(s, fleetId) {
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
-const besieged = (s, sys) => fleetsAt(s, sys.at).some((f) => armed(f) && atWar(s, f.owner, sys.colony.owner));
+const besieged = (s, sys) => { for (const id in s.fleets) { const f = s.fleets[id]; if (f.at === sys.at && armed(f) && atWar(s, f.owner, sys.colony.owner)) return true; } return false; };
 /** A world's orbital guns at full strength: an Orbital battery's, or a capital's smaller ones; the shield grid adds hull. */
 function gunsMax(s, c) {
   const grid = proto(s, c.owner, "grid");
@@ -1616,9 +1713,12 @@ function raidDepot(s, fleetId) {
   const sys = s.systems[s.sysAt[f.at]], c = sys.colony;
   f.fuel = fuelMax(s, f); for (const x of f.ships) if (x.type === "tanker") x.cargo = SHIPS.tanker.cargo;
   c.depotCut = s.turn + DEPOT_RAID.cut; f.depotRaid = s.turn;
+  // The depot's stores: a share of its owner's reserve goes into the raider's.
+  const took = usesReserve(c.owner) ? drawReserve(s, c.owner, Math.min(DEPOT_RAID.steal, fuelStock(s, c.owner))) : 0;
+  if (took && usesReserve(f.owner)) { const R = faction(s, f.owner); R.fuelStock = round1(Math.min(fuelCap(s, f.owner) + took, fuelStock(s, f.owner) + took)); }
   remember(s, c.owner, f.owner, `raided our fuel depot at ${sys.name}`, -4);
-  log(s, f.owner, `Your fleet raided the fuel depot at ${sys.name}: its tanks are full, and the depot gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
-  log(s, c.owner, `${faction(s, f.owner).name} raided your fuel depot at ${sys.name}: it gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
+  log(s, f.owner, `Your fleet raided the fuel depot at ${sys.name}: its tanks are full${took && usesReserve(f.owner) ? `, ${took} fuel went into your reserve` : ""}, and the depot gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
+  log(s, c.owner, `${faction(s, f.owner).name} raided your fuel depot at ${sys.name}: ${took ? `${took} fuel taken from your reserve, and ` : ""}it gives no supply for ${DEPOT_RAID.cut} turns.`, "war");
   return { ok: true };
 }
 /**
@@ -2090,7 +2190,9 @@ function economy(s, F) {
   }
   // Tankers: those in supply from a colony or depot fill up; a parked one pays a unit of fuel for each fleet of ours it
   // alone keeps in supply.
-  for (const f of fleetsOf(s, F.id)) if (baseSupplyAt(s, F.id, f.at)) for (const x of f.ships) if (x.type === "tanker") x.cargo = SHIPS.tanker.cargo;
+  for (const f of fleetsOf(s, F.id)) if (baseSupplyAt(s, F.id, f.at)) for (const x of f.ships) if (x.type === "tanker") { const want = SHIPS.tanker.cargo - (x.cargo ?? SHIPS.tanker.cargo); if (want > 0) x.cargo = (x.cargo ?? SHIPS.tanker.cargo) + Math.floor(drawReserve(s, F.id, want)); }
+  // The fuel reserve: what the worlds made this turn, up to what the depots can store.
+  if (usesReserve(F.id)) F.fuelStock = round1(Math.min(fuelCap(s, F.id), fuelStock(s, F.id) + fuelIncome(s, F.id)));
   for (const f of fleetsOf(s, F.id)) {
     if (F.id === "vael" || baseSupplyAt(s, F.id, f.at)) continue;
     const tp = tankerPoints(s, F.id).filter((t) => distance(t.at, f.at) <= FUEL.tankerRange).sort((a, b) => cargoOf(b) - cargoOf(a))[0];
@@ -2216,7 +2318,7 @@ const shardTargets = (s, fid, fromId) => { const a = s.systems[fromId], F = fact
 function expandGalaxy(s, reader, P = {}) {
   const R = makeRng("reach:" + s.seed + ":" + s.turn + (P.kind ? ":" + P.kind : "")), R0 = s.radius, R1 = R0 + (P.rings || REACH.rings);
   const fresh = hexagon(R1).filter((k) => !s.hexes[k]);
-  for (const k of fresh) s.hexes[k] = { terrain: "space" };
+  for (const k of fresh) s.hexes[k] = P.sealed ? { terrain: "space", sealed: P.kind } : { terrain: "space" };
   const blob = (terrain, count, len) => { for (let i = 0; i < count; i++) { let k = fresh[R.int(fresh.length)]; for (let j = 0; j < len; j++) { if (s.hexes[k] && distance(k, "0,0") > R0 && distance(k, "0,0") < R1) s.hexes[k].terrain = terrain; const n = neighbors(k).filter((x) => s.hexes[x] && distance(x, "0,0") > R0); if (!n.length) break; k = n[R.int(n.length)]; } } };
   blob("nebula", Math.round(R1 * 0.5 * (P.nebula || 1)), 6); blob("rift", Math.round(R1 * 0.25), 3);
   const old = Object.values(s.systems).filter((x) => !x.deep);
@@ -2239,20 +2341,22 @@ function expandGalaxy(s, reader, P = {}) {
     s.hexes[k].terrain = "space"; s.sysAt[k] = id; s.adj[id] = []; made.push(s.systems[id]);
   }
   const link = (a, b) => { if (a === b || s.adj[a].includes(b)) return; s.adj[a].push(b); s.adj[b].push(a); s.corridors.push([a, b]); };
-  if (P.corridors === false) {
+  if (P.sealed && P.corridors === false) {
+    // Sealed, with no corridors inside: nothing at all until it's opened.
+  } else if (P.corridors === false) {
     // No corridors inside: a single one out, from the old map's nearest system.
     let best = null;
     for (const x of made) for (const y of old) { const d = distance(x.at, y.at); if (!best || d < best[2]) best = [x.id, y.id, d]; }
     if (best) link(best[0], best[1]);
   } else {
     // Corridors: each new system to its two nearest within 6, and the new space joined to the old network at its nearest points.
-    const shut = (y) => y.sector && y.sector !== P.kind && SECTORS.kinds[y.sector] && SECTORS.kinds[y.sector].corridors === false;   // the Dead Zone stays shut
-    const all = Object.values(s.systems).filter((y) => !y.deep && !shut(y));   // deep-space stations sit off the corridors
+    const shut = (y) => y.sector && y.sector !== P.kind && SECTORS.kinds[y.sector] && (SECTORS.kinds[y.sector].corridors === false || s.hexes[y.at].sealed);   // the Dead Zone stays shut, and a sealed sector till it's opened
+    const all = P.sealed ? made : Object.values(s.systems).filter((y) => !y.deep && !shut(y));   // deep-space stations sit off the corridors; a sealed sector links only inside itself
     for (const x of made) all.filter((y) => y !== x).map((y) => [y, distance(x.at, y.at)]).sort((p, q) => p[1] - q[1]).filter(([, d]) => d <= 6).slice(0, 2).forEach(([y]) => link(x.id, y.id));
     const ids = Object.keys(s.systems).filter((i) => !s.systems[i].deep && !shut(s.systems[i]));
     const isNew = new Set(made.map((x) => x.id));
     const comp = () => { const c = {}; let n = 0; for (const a of ids) if (c[a] === undefined) { const st = [a]; c[a] = n; while (st.length) { const x = st.pop(); for (const y of s.adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };
-    for (let [c, n] = comp(), guard = 0; n > 1 && guard < 200; [c, n] = comp(), guard++) {
+    for (let [c, n] = comp(), guard = 0; !P.sealed && n > 1 && guard < 200; [c, n] = comp(), guard++) {
       const main = c[ids.find((i) => !isNew.has(i))]; let best = null;
       for (const a of ids) if (c[a] === main) for (const b of ids) if (c[b] !== main && isNew.has(b)) { const d = distance(s.systems[a].at, s.systems[b].at); if (!best || d < best[2]) best = [a, b, d]; }
       if (!best) break;
@@ -3274,7 +3378,7 @@ function secNextAt(s) {
 function sectorsState(s) {
   if (s.sectorsOff || !s.sectors) return null;
   const S = s.sectors;
-  return { opened: S.opened.map((o) => ({ ...o, name: SECTORS.kinds[o.kind].name, text: SECTORS.kinds[o.kind].text })),
+  return { opened: S.opened.map((o) => ({ ...o, name: SECTORS.kinds[o.kind].name, text: SECTORS.kinds[o.kind].text, sealed: !!SECTORS.kinds[o.kind].sealed && !(S.unsealed && S.unsealed[o.kind]), unsealed: S.unsealed && S.unsealed[o.kind] })),
     coming: S.coming ? { kind: S.coming, at: S.at, name: SECTORS.kinds[S.coming].name, text: SECTORS.kinds[S.coming].text } : null,
     next: S.coming ? S.at : secNextAt(s) };
 }
@@ -3290,7 +3394,7 @@ function sectorsTurn(s) {
     const R = makeRng("sector:" + s.seed + ":" + S.opened.length); R.next(); R.next();   // its first draws lean one way on short seeds
     S.coming = left[R.int(left.length)]; S.at = at;
     const K = SECTORS.kinds[S.coming];
-    secAnnounce(s, `Long-range scans see past the rim: the corridors are reaching into new space. In ${at - s.turn} turns (turn ${at}), a new sector opens beyond the edge of the map: ${K.name}. ${K.text}`);
+    secAnnounce(s, `Long-range scans see past the rim: the corridors are reaching into new space. In ${at - s.turn} turns (turn ${at}), a new sector opens beyond the edge of the map: ${K.name}. ${K.text}${K.sealed ? " It will be sealed: getting in takes Rift drives, or a Rift beacon." : ""}`);
     return;
   }
   if (s.turn < S.at) return;
@@ -3311,7 +3415,72 @@ function sectorsTurn(s) {
     for (const x of at) { const f = spawnFleet(s, SEC_BEASTS, x.at, ["husk"]); f.home = x.at; f.sector = kind; }
     guard = ` ${at.length} Warden husks still guard its ruins.`;
   }
-  secAnnounce(s, `A new sector has opened beyond the rim: ${K.name}, ${made.length} uncharted systems.${guard} ${K.text}`);
+  secAnnounce(s, `A new sector has opened beyond the rim: ${K.name}, ${made.length} uncharted systems.${guard} ${K.text}${K.sealed ? ` It is sealed: no ship can cross into it without Rift drives (a Physics technology), until someone lights a Rift beacon on a world within ${SECTORS.beacon.range} hexes of it (${SECTORS.beacon.credits} credits and ${SECTORS.beacon.exotics} exotics), which opens it to everyone.` : ""}`);
+}
+
+// ---- corridor collapses ----
+const corrName = (s, a, b) => `${s.systems[a].name} and ${s.systems[b].name}`;
+/** A corridor that can fail: both ends ordinary systems with another corridor each, and the network still whole without it. */
+function canCollapse(s, a, b) {
+  const A = s.systems[a], B = s.systems[b];
+  if (!A || !B || A.deep || B.deep || s.adj[a].length < 2 || s.adj[b].length < 2) return false;
+  // Is b still reachable from a without this corridor (by corridors alone)?
+  const seen = new Set([a]), st = [a];
+  while (st.length) { const x = st.pop(); for (const y of s.adj[x]) { if ((x === a && y === b) || (x === b && y === a) || seen.has(y)) continue; if (y === b) return true; seen.add(y); st.push(y); } }
+  return false;
+}
+/** Where things stand, for the map and panels: the corridor failing (and when), and the breaks not yet charted around. */
+function collapseState(s) {
+  const C = s.collapse; if (!C) return null;
+  return { coming: C.coming ? { a: C.coming[0], b: C.coming[1], at: C.at } : null, breaks: C.breaks.filter((x) => !x.surveyed) };
+}
+/** Once a turn, after the turn resolves: warn, collapse, and let scouts chart new routes. */
+function corridorsTurn(s) {
+  if (s.collapsesOff || s.winner) return;
+  if (!s.collapse) s.collapse = { next: COLLAPSE.first, coming: null, at: null, breaks: [] };
+  const C = s.collapse, R = makeRng("collapse:" + s.seed + ":" + s.turn); R.next(); R.next();
+  surveys(s);
+  if (C.coming) {
+    const [a, b] = C.coming;
+    if (!s.adj[a] || !s.adj[a].includes(b)) { C.coming = null; C.at = null; }   // gone already (a relic, a razed world)
+    else if (s.turn >= C.at) {
+      if (!canCollapse(s, a, b)) { C.coming = null; C.at = null; secAnnounce(s, `The corridor between ${corrName(s, a, b)} steadied: it holds, for now.`); return; }
+      s.adj[a] = s.adj[a].filter((x) => x !== b); s.adj[b] = s.adj[b].filter((x) => x !== a);
+      s.corridors = s.corridors.filter(([x, y]) => !((x === a && y === b) || (x === b && y === a)));
+      C.breaks.push({ a, b, turn: s.turn, surveyed: null }); C.coming = null; C.at = null;
+      // Fleets on their way re-plot without it.
+      for (const f of Object.values(s.fleets)) if (f.dest && f.path.length) { const d = f.dest; if (!setDestination(s, f.id, d).ok) { f.path = []; f.dest = null; } }
+      secAnnounce(s, `The corridor between ${corrName(s, a, b)} has collapsed. Ships go the long way until someone charts a new route: a scout that ends its turn within ${COLLAPSE.surveyRange} hexes of either system, not moving, surveys a new corridor (worth ${COLLAPSE.research} research).`);
+    }
+    return;
+  }
+  if (s.turn < C.next) return;
+  C.next = s.turn + COLLAPSE.every[0] + R.int(COLLAPSE.every[1] - COLLAPSE.every[0] + 1);
+  const pool = s.corridors.filter(([a, b]) => canCollapse(s, a, b));
+  if (!pool.length) return;
+  const [a, b] = pool[R.int(pool.length)];
+  C.coming = [a, b]; C.at = s.turn + COLLAPSE.warn;
+  secAnnounce(s, `The corridor between ${corrName(s, a, b)} is failing: it collapses in ${COLLAPSE.warn} turns (turn ${C.at}). Fleets that use it should finish crossing, or find another way.`);
+}
+/** Scouts at rest near a break chart a new corridor from the nearer end, toward the other. */
+function surveys(s) {
+  for (const br of s.collapse.breaks) {
+    if (br.surveyed) continue;
+    const A = s.systems[br.a], B = s.systems[br.b]; if (!A || !B) { br.surveyed = { turn: s.turn }; continue; }
+    const scout = Object.values(s.fleets).find((f) => !isWild(f.owner) && f.owner !== "traders" && !f.path.length && f.ships.some((x) => x.type === "scout")
+      && (distance(f.at, A.at) <= COLLAPSE.surveyRange || distance(f.at, B.at) <= COLLAPSE.surveyRange));
+    if (!scout) continue;
+    const [from, other] = distance(scout.at, A.at) <= distance(scout.at, B.at) ? [A, B] : [B, A];
+    const to = Object.values(s.systems).filter((y) => y !== from && y !== other && !y.deep && !s.hexes[y.at].sealed && !s.adj[from.id].includes(y.id) && distance(y.at, from.at) <= COLLAPSE.linkRange
+      && !(y.sector && SECTORS.kinds[y.sector] && SECTORS.kinds[y.sector].corridors === false))
+      .sort((p, q) => distance(p.at, other.at) - distance(q.at, other.at) || distance(p.at, from.at) - distance(q.at, from.at))[0];
+    if (!to) { br.surveyed = { turn: s.turn, none: true }; continue; }
+    s.adj[from.id].push(to.id); s.adj[to.id].push(from.id); s.corridors.push([from.id, to.id]);
+    const F = faction(s, scout.owner); F.research.progress += COLLAPSE.research; F.stats.surveys = (F.stats.surveys || 0) + 1;
+    br.surveyed = { turn: s.turn, by: scout.owner, from: from.id, to: to.id };
+    secAnnounce(s, `${F.name}${/s$/.test(F.name) ? "'" : "'s"} scout charted a new corridor around the collapse: ${from.name} to ${to.name}.`);
+    log(s, scout.owner, `Your scout charted a new corridor, ${from.name} to ${to.name}: +${COLLAPSE.research} research.`, "research");
+  }
 }
 
 // ---- events.js ----
@@ -3704,17 +3873,27 @@ function aiTurn(s, F) {
   const diff = aiOpt(s, "strength") || DIFF[s.difficulty] || 1;
   research(s, F);
   relics(s, F);
+  beacons(s, F);
   outposts(s, F);
   diplomacy(s, F, diff);
   production(s, F, diff);
   fleets(s, F);
 }
 
+/** A Rift beacon, when a world of ours sits by a sealed sector and the treasury can spare it (without Rift drives,
+ * or with them but rich enough to want the corridor in). */
+function beacons(s, F) {
+  const B = SECTORS.beacon, site = beaconSites(s, F.id)[0];
+  if (site && F.exotics >= B.exotics + 5 && F.credits >= B.credits + (has(s, F.id, "riftDrives") ? 300 : 120)) buildBeacon(s, F.id, site.sys.id);
+}
 function research(s, F) {
   if (F.research.current) return;
   const avail = availableTechs(s, F.id);
   // Every technology done (or nothing left worth more): an advance, the cheapest level first.
   if (!avail.length) { const adv = availableAdvances(s, F.id).sort((a, b) => a.cost - b.cost)[0]; if (adv) setResearch(s, F.id, adv.id); return; }
+  // A sealed sector out there (or announced): Rift drives, to get in first.
+  const sealedNear = Object.values(s.hexes).some((h) => h.sealed) || !!(s.sectors && s.sectors.coming && SECTORS.kinds[s.sectors.coming].sealed);
+  if (sealedNear && avail.some((t) => t.id === "riftDrives")) { setResearch(s, F.id, "riftDrives"); return; }
   const pri = PRIORITY[F.id] || [];
   const want = pri.find((id) => avail.some((t) => t.id === id)) || [...avail].sort((a, b) => a.cost - b.cost)[0].id;
   // Late in the game, the Corridor Engine.
@@ -3820,7 +3999,7 @@ function diplomacy(s, F, diff) {
 function settleTargets(s, F, kind) {
   const cols = coloniesOf(s, F.id); if (!cols.length) return [];
   const claimed = new Set(fleetsOf(s, F.id).filter((f) => f.dest).map((f) => f.dest));
-  return Object.values(s.systems).filter((sys) => F.explored[sys.at] && canSettle(s, F.id, sys, kind) && !claimed.has(sys.at)
+  return Object.values(s.systems).filter((sys) => F.explored[sys.at] && canSettle(s, F.id, sys, kind) && !claimed.has(sys.at) && !(s.hexes[sys.at].sealed && !canCrossSealed(s, F.id))
     && !fleetsAt(s, sys.at).some((f) => f.owner !== F.id && armed(f)))
     .map((sys) => {
       const d = Math.min(...cols.map((c) => distance(c.at, sys.at)));
@@ -3865,6 +4044,7 @@ function production(s, F, diff) {
     const pick = best([
       ships && settleTargets(s, F, "colony").length && count(s, F, "colony") < (s.turn < 60 ? 2 : 1) && cols.length < 14 ? ["ship", "colony"] : null,
       ships && s.turn < 50 && count(s, F, "scout") < 2 ? ["ship", "scout"] : null,
+      ships && count(s, F, "scout") < 1 && s.collapse && s.collapse.breaks.some((x) => !x.surveyed) ? ["ship", "scout"] : null,   // a scout to chart around a collapse
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
       ships && c.capital && count(s, F, "outpost") < 1 && F.credits >= 150 && stationTarget(s, F) ? ["ship", "outpost"] : null,   // for a deep-space station
       c.capital && has(s, F.id, "orbitalYards") && !c.buildings.drydock ? ["building", "drydock"] : null,   // one, at the capital: the refits
@@ -3928,6 +4108,10 @@ function fleets(s, F) {
       continue;
     }
     if (types.size === 1 && types.has("scout")) {
+      // A collapsed corridor nearby, not yet charted around: survey it (research, and the route back).
+      const br = s.collapse && s.collapse.breaks.filter((x) => !x.surveyed).flatMap((x) => [s.systems[x.a], s.systems[x.b]]).filter((y) => y && F.explored[y.at] && distance(y.at, f.at) <= 12).sort((p, q) => distance(p.at, f.at) - distance(q.at, f.at))[0];
+      if (br && distance(br.at, f.at) > 1) { if (f.dest !== br.at) setDestination(s, f.id, br.at); continue; }
+      if (br) { f.path = []; f.dest = null; continue; }   // there: rest a turn and chart it
       if (!f.path.length) { const k = nearestUnexplored(s, F, f.at); if (k) setDestination(s, f.id, k); }
       continue;
     }
@@ -3962,7 +4146,7 @@ function fleets(s, F) {
       const relief = coloniesOf(s, F.id).filter((sys) => besieged(s, sys)).map((sys) => ({ sys, d: distance(f.at, sys.at),
         foe: fleetsAt(s, sys.at).filter((g) => armed(g) && atWar(s, g.owner, F.id)).reduce((t, g) => t + g.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? x.hull : 0), 0), 0) }))
         .filter((x) => x.foe <= mineHull * 1.2).sort((a, b) => a.d - b.d)[0];
-      if (relief) { if (relief.sys.at !== f.at) setDestination(s, f.id, relief.sys.at); continue; }
+      if (relief) { if (relief.sys.at !== f.at && setDestination(s, f.id, relief.sys.at).ok && usesReserve(F.id) && fuelStock(s, F.id) > fuelCap(s, F.id) / 2) f.burn = true; continue; }   // burn hard to the rescue while the reserve allows
       // Out of date: to the nearest drydock, for a refit with what's been researched since these ships were built
       // (before going on the attack; a world of ours under siege comes first).
       if (f.ships.some((x) => missingFit(s, F.id, x).length)) {
@@ -4286,6 +4470,7 @@ function draw() {
     if (!explored) { ctx.fillStyle = "#0a0d16"; ctx.fill(); ctx.strokeStyle = "rgba(90,110,160,.08)"; ctx.stroke(); continue; }
     ctx.fillStyle = h.terrain === "nebula" ? "rgba(120,70,160,.32)" : h.terrain === "rift" ? "rgba(150,30,30,.45)" : "rgba(30,40,70,.35)";
     ctx.fill();
+    if (h.sealed) { ctx.fillStyle = "rgba(90,200,220,.13)"; ctx.fill(); }
     if (own[k]) { ctx.fillStyle = colorOf(own[k].owner) + (visible ? "33" : "22"); ctx.fill(); }
     if (!visible) { ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.fill(); }
     ctx.strokeStyle = h.terrain === "rift" ? "rgba(220,70,60,.6)" : "rgba(120,140,200,.16)"; ctx.lineWidth = 1; ctx.stroke();
@@ -4298,6 +4483,14 @@ function draw() {
     if (!me.explored[A.at] || !me.explored[B.at]) continue;
     const p = toPixel(A.at, size), q = toPixel(B.at, size);
     ctx.strokeStyle = "rgba(110,200,230,.28)"; ctx.setLineDash([6, 5]);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+  }
+  // A corridor failing (red), and collapsed ones not yet charted around (faint red, dotted).
+  const cs = collapseState(S);
+  if (cs) for (const [x, failing] of [...(cs.coming ? [[cs.coming, true]] : []), ...cs.breaks.map((b) => [b, false])]) {
+    const A = S.systems[x.a], B = S.systems[x.b]; if (!A || !B || !me.explored[A.at] || !me.explored[B.at]) continue;
+    const p = toPixel(A.at, size), q = toPixel(B.at, size);
+    ctx.strokeStyle = failing ? "rgba(255,110,90,.75)" : "rgba(255,110,90,.3)"; ctx.setLineDash(failing ? [6, 5] : [2, 6]);
     ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
   }
   ctx.setLineDash([]);
@@ -4380,6 +4573,7 @@ function renderBar() {
     `<span title="Industry from all your worlds"><b>Industry<\/b> ${fmt(t.ind)}<\/span>`,
     `<span title="Research each turn"><b>Science<\/b> ${fmt(t.sci)}${tech ? ` → ${esc(tech.name)} ${Math.floor((R.progress / tech.cost) * 100)}%` : ` <i class="neg">pick research<\/i>`}<\/span>`,
     `<span title="Exotics: for cruisers, dreadnoughts and great works"><b>Exotics<\/b> ${me.exotics} <i>${signed(t.exo)}<\/i><\/span>`,
+    usesReserve(me.id) ? `<span title="Fuel reserve: made by your colonies and (most) by fuel depots and stations, which also raise how much you can store. Fleets moving in supply, refuelling, filling tankers and burning hard draw on it; short of it, your fleets move slower and can't refuel."><b>Fuel<\/b> <span class="${fuelStock(S, me.id) < 10 ? "neg" : ""}">${fmt(fuelStock(S, me.id))}<\/span><small>/${fuelCap(S, me.id)}<\/small> <i>${signed(fuelIncome(S, me.id))}<\/i><\/span>` : "",
   ].join("");
   $("bar-turn").textContent = turnText();
   const idle = idleThings().length; $("next").textContent = idle ? `Next (${idle})` : "Next"; $("next").title = "Idle fleets, and worlds with nothing to build (N)";
@@ -4416,6 +4610,9 @@ function systemHTML() {
   let h = `<h2>${esc(sys.name)}<\/h2><p class="muted">${sys.deep ? "A station in deep space: no world here, just the station" : `${esc(w.name)} world, size ${sys.size}`}${sys.rich !== 1 ? `, ${sys.rich > 1 ? "rich" : "poor"} in minerals` : ""}${sys.exotics ? ", <b class=\"exo\">exotics deposit<\/b>" : ""}${sys.ruins ? ", <b class=\"gold\">ancient ruins<\/b>" : ""}${sys.anomaly ? `, <b style="color:#9fd8ff">an anomaly: ${esc(sys.anomaly)}<\/b> (a scout that ends its turn here surveys it for about ${anomalyValue(S)} research)` : ""}.<\/p>`;
   { const rid = Object.keys(S.relics || {}).find((id) => S.relics[id].at === sys.id); if (rid && (mine || seen)) h += `<p class="small gold"><b>${esc(RELICS[rid].name)}<\/b> is kept here. ${esc(RELICS[rid].text)}${mine ? "" : " Take the world to take it."}<\/p>`; }
   if (sys.sector && SECTORS.kinds[sys.sector]) h += `<p class="small muted">In ${esc(SECTORS.kinds[sys.sector].name)}: ${esc(SECTORS.kinds[sys.sector].text)}<\/p>`;
+  if (S.hexes[sys.at].sealed) h += `<p class="small ${canCrossSealed(S, me.id) ? "good" : "bad"}"><b>Sealed.<\/b> ${canCrossSealed(S, me.id) ? "Your Rift drives carry your ships in; no one else's can cross until a Rift beacon opens it." : `No ship of yours can cross into this sector: research Rift drives, or light a Rift beacon on a world of yours within ${SECTORS.beacon.range} hexes of it.`}<\/p>`;
+  if (mine && beaconSites(S, me.id).some((o) => o.sys.id === sys.id)) { const B = SECTORS.beacon, ok = me.credits >= B.credits && me.exotics >= B.exotics;
+    h += `<h3>Rift beacon<\/h3><p class="small muted" style="margin-top:-4px">A sealed sector lies within ${B.range} hexes. A beacon opens it to every power, with a corridor from here into it. You'd be first there, but not alone.<\/p><button class="btn" data-beacon ${ok ? "" : "disabled"}>Light a Rift beacon (${B.credits} credits, ${B.exotics} exotics)<\/button>`; }
   if (sys.relic && sys.relicLost && me.explored[sys.at]) h += `<p class="small gold"><b>${esc(RELICS[sys.relic].name)}<\/b> lies in the ruins here: the first fleet to end its turn here recovers it.<\/p>`;
   if (mine && relicHeld(S, me.id, "shard")) { const r = S.relics.shard, ready = !r.ready || S.turn >= r.ready, tg = shardTargets(S, me.id, sys.id).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at));
     h += `<h3>The Gate Shard<\/h3>` + (ready ? (tg.length ? `<p class="small muted" style="margin-top:-4px">Open a new corridor from ${esc(sys.name)} to:<\/p><div class="opts">${tg.slice(0, 10).map((x) => `<button class="opt" data-shard="${x.id}"><b>${esc(x.name)}<\/b> <small>${distance(x.at, sys.at)} hexes<\/small><\/button>`).join("")}<\/div>` : `<p class="small muted">No explored system within 8 hexes left to link.<\/p>`) : `<p class="small muted">Spent until turn ${r.ready}.<\/p>`); }
@@ -4425,8 +4622,8 @@ function systemHTML() {
   else if (c.kind === "outpost") h += `<p>Your outpost${sys.exotics ? ": +1 exotics a turn" : ""}. It extends your territory.<\/p>`
     + (() => { const o = outpostSales(S, sys); return o.blockaded ? `<p class="small bad"><b>Blockaded:<\/b> enemy warships in orbit, so it sells nothing.<\/p>`
       : `<p class="small"><b>Sales:<\/b> +${fmt(o.total)} credits a turn (${[`${OUTPOST_TRADE.base} base`, o.fuel && `fuel ${o.fuel}${sys.world === "gas" ? ", with the gas giant's volatiles" : ""}`, o.exotics && `exotics exports ${o.exotics}`].filter(Boolean).join(", ")})${c.buildings.depot || c.buildings.station ? `, and +${OUTPOST_TRADE.convoy} from each merchant convoy that refuels here` : ". A fuel depot or station would sell fuel"}.${c.depotCut > S.turn ? ` <b class="bad">The depot was raided: dry until turn ${c.depotCut}.<\/b>` : ""}<\/p>`; })()
-    + (c.buildings.station && !c.buildings.depot ? `<p class="small good">Its station gives supply within ${supplyRange(S, me.id)} hexes, and fleets refuel here: no fuel depot needed.<\/p>` : c.buildings.depot ? `<p class="small good"><b>Fuel depot.<\/b> It gives supply within ${supplyRange(S, me.id)} hexes, and fleets refuel here.<\/p>`
-      : `<p class="small"><b>No fuel depot:<\/b> an outpost gives supply only with one.<\/p><button class="btn" data-depot ${me.credits < FUEL.depotCost ? "disabled" : ""}>Build a fuel depot (${FUEL.depotCost} credits)<\/button>`)
+    + (c.buildings.station && !c.buildings.depot ? `<p class="small good">Its station gives supply within ${supplyRange(S, me.id)} hexes, and fleets refuel here: no fuel depot needed.<\/p>` : c.buildings.depot ? `<p class="small good"><b>Fuel depot.<\/b> It gives supply within ${supplyRange(S, me.id)} hexes, fleets refuel here, and it adds ${FUEL.perDepot + (sys.world === "gas" ? FUEL.gas : 0)} fuel a turn to your reserve and ${FUEL.capPerDepot} to what you can store.<\/p>`
+      : `<p class="small"><b>No fuel depot:<\/b> an outpost gives supply only with one. A depot also makes ${FUEL.perDepot + (sys.world === "gas" ? FUEL.gas : 0)} fuel a turn for your reserve and lets you store ${FUEL.capPerDepot} more.<\/p><button class="btn" data-depot ${me.credits < FUEL.depotCost ? "disabled" : ""}>Build a fuel depot (${FUEL.depotCost} credits)<\/button>`)
     + (gunsMax(S, c) ? `<p class="small">Orbital guns ${c.defense} / ${gunsMax(S, c)} hull.<\/p>` : "")
     + ["battery", "station"].filter((b) => c.buildings[b]).map((b) => `<p class="small good"><b>${esc(BUILDINGS[b].name)}.<\/b> ${esc(BUILDINGS[b].text)}<\/p>`).join("")
     + (() => { const o = outpostOptions(S, sys.id); const locked = ["battery", "station"].filter((b) => !c.buildings[b] && !o.some((x) => x.id === b));
@@ -4483,7 +4680,7 @@ function fleetHTML() {
     return `<li><b>${shipSVG(t, F.color, 22, f.owner)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(shipLabel(f.owner, t))}<\/b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each<\/span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}<\/span>${list.length > 1 ? `<details class="small"><summary>Each ship<\/summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}<\/div>`).join("")}<\/details>` : ""}<\/li>`; }).join("")}<\/ul>`;
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.<\/p>`;
   if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
-    h += `<div class="kv"><span>Fuel<\/span><b class="${fu ? "" : "bad"}">${fu} / ${mx}<\/b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}<\/div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? "In supply: the tank stays full." : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.<\/p>`; }
+    h += `<div class="kv"><span>Fuel<\/span><b class="${fu ? "" : "bad"}">${fu} / ${mx}<\/b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}<\/div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? (f.dry === S.turn ? `<b class="bad">In supply, but your fuel reserve is short:<\/b> it refuels and moves at full speed only when the reserve can pay.` : "In supply: it refuels from your fuel reserve.") : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.<\/p>`; }
   // Fuel tankers: what they carry, and what they're doing with it.
   const tk = f.ships.filter((x) => x.type === "tanker").length;
   if (mine && tk) { const cg = cargoOf(f), max = tk * SHIPS.tanker.cargo, point = tankerPoints(S, me.id).includes(f), cut = !f.path.length && cg > 0 && !point;
@@ -4501,7 +4698,7 @@ function fleetHTML() {
     h += `<h3>Battle stance<\/h3><div class="opts">${Object.entries(STANCES).map(([k, x]) => `<button class="opt ${(f.stance || "balanced") === k ? "on" : ""}" data-stance="${k}" aria-pressed="${(f.stance || "balanced") === k}"><b>${esc(x.name)}<\/b><small>${esc(x.text)}<\/small><\/button>`).join("")}<\/div>`;
   }
   if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
-    h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).<\/p>${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.<\/p>` : ""}`; }
+    h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).<\/p>${mine && usesReserve(me.id) ? `<div class="btn-row"><button class="btn small ${f.burn ? "primary" : ""}" data-burn aria-pressed="${!!f.burn}" title="Burn hard: +${FUEL.burnSpeed} hex a turn until it arrives. In supply each turn costs ${burnCost(S, f)} fuel from your reserve; beyond it, an extra turn of the fleet's own fuel.">${f.burn ? "Burning hard ✓" : "Burn hard"}<\/button><span class="small muted">${f.burn ? `+${FUEL.burnSpeed} hex a turn; ${burnCost(S, f)} reserve fuel a turn in supply, an extra turn of its own beyond.` : `+${FUEL.burnSpeed} hex a turn for ${burnCost(S, f)} fuel a turn.`}<\/span><\/div>` : ""}${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.<\/p>` : ""}`; }
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}<\/button>${f.path.length ? `<button class="btn" data-stop>Stop<\/button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}<\/button>`}<\/div>`;
   if (!sys && mine && f.ships.some((x) => x.type === "outpost") && S.hexes[f.at].terrain !== "rift") {
     const c = canFoundStation(S, f.id);
@@ -4635,7 +4832,7 @@ function sectorsHTML() {
   const left = c.coming ? c.coming.at - S.turn : 0;
   return `<div class="card obj"><h3 class="obj-h">New sectors ${c.coming ? `<span class="badge-status">Opening in ${left} turn${left === 1 ? "" : "s"}<\/span>` : ""}<\/h3>
     ${c.coming ? `<p class="small"><b>${esc(c.coming.name[0].toUpperCase() + c.coming.name.slice(1))}<\/b> opens beyond the rim on turn ${c.coming.at}. ${esc(c.coming.text)}<\/p>` : ""}
-    ${c.opened.map((o) => `<p class="small"><b>${esc(o.name[0].toUpperCase() + o.name.slice(1))}<\/b>, opened on turn ${o.turn}: ${near(o.kind)}. <span class="muted">${esc(o.text)}<\/span><\/p>`).join("")}
+    ${c.opened.map((o) => `<p class="small"><b>${esc(o.name[0].toUpperCase() + o.name.slice(1))}<\/b>, opened on turn ${o.turn}: ${near(o.kind)}. ${o.sealed ? `<b class="${canCrossSealed(S, player(S).id) ? "good" : "bad"}">Sealed${canCrossSealed(S, player(S).id) ? ": your Rift drives get you in" : `: research Rift drives, or light a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes`}.<\/b> ` : o.unsealed ? `<span class="good">Opened by a Rift beacon on turn ${o.unsealed.turn}.<\/span> ` : ""}<span class="muted">${esc(o.text)}<\/span><\/p>`).join("")}
     ${!c.coming && c.next !== null ? `<p class="small muted">The map grows as the game goes on: the ${c.opened.length ? "next" : "first"} new sector opens around turn ${c.next}, and every power hears what kind ${SECTORS.warn} turns ahead.<\/p>` : ""}<\/div>`;
 }
 /** The late-game crisis, on the Objectives tab: the warning, then the Heart, its waves and who is fighting them. */
@@ -4910,6 +5107,8 @@ function bindChrome() {
     else if (d.rush !== undefined) { const r = rush(S, sel.id); if (r.error) toast(r.error, true); }
     else if (d.move !== undefined) { moveMode = !moveMode; if (moveMode) toast("Click where to send this fleet. Esc cancels."); }
     else if (d.stop !== undefined) setDestination(S, sel.id, S.fleets[sel.id].at);
+    else if (d.beacon !== undefined) { const r = buildBeacon(S, me.id, sel.id); if (r.error) toast(r.error, true); else toast("The Rift beacon is lit: the sector is open."); }
+    else if (d.burn !== undefined) { const f = S.fleets[sel.id], r = setBurn(S, f.id, !f.burn); if (r.error) toast(r.error, true); else toast(f.burn ? "Burning hard: faster, at a cost in fuel." : "Cruising: back to normal speed."); }
     else if (d.sentry !== undefined) { const f = S.fleets[sel.id]; f.sentry = !f.sentry; if (f.sentry) nextIdle(); }
     else if (d.settle !== undefined) { const since = mark(), at = S.fleets[sel.id].at, nm = S.systems[S.sysAt[at]].name, r = settle(S, sel.id, { depot: d.settle === "depot" }); if (!r.error) reportSince(`${nm}`, since); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
     else if (d.invade !== undefined) {
@@ -5008,6 +5207,7 @@ function doEndTurn() {
     if (!S.winner) wildsTurn(S);
     if (!S.winner) tradersTurn(S);
     if (!S.winner) sectorsTurn(S);
+    if (!S.winner) corridorsTurn(S);
     if (!S.winner) eventsTurn(S);
     if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
@@ -5130,6 +5330,7 @@ function showNewGame(canContinue, preset) {
     <\/details>
     <label>Pirates and creatures <select id="ng-wilds">${Object.entries(WILD_LEVELS).map(([k, v]) => `<option value="${k}" ${k === "light" ? "selected" : ""}>${v.name}<\/option>`).join("")}<\/select><\/label>
     <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world<\/label>
+    <label class="small check-line"><input type="checkbox" id="ng-collapses" checked> Corridor collapses: now and then a corridor fails (with a few turns' warning), and scouts chart new routes around it<\/label>
     <label class="small check-line"><input type="checkbox" id="ng-sectors" checked> New sectors: from turn ${SECTORS.first}, new space opens beyond the rim, each sector with its own character (an open game keeps growing, every ${SECTORS.every} turns)<\/label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step<\/label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-guide">New here? The starter guide<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>
@@ -5143,7 +5344,7 @@ function showNewGame(canContinue, preset) {
   $("ng-diff").onchange = () => { setAi(AI_PRESETS[$("ng-diff").value]); markCustom(); };
   $("ng-ai-strength").onchange = markCustom; document.querySelectorAll("[data-aiopt]").forEach((b) => { b.onchange = markCustom; });
   if (preset) {
-    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; $("ng-sectors").checked = !preset.sectorsOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff; $("ng-sectors").checked = !preset.sectorsOff; $("ng-collapses").checked = !preset.collapsesOff; if (preset.wilds) $("ng-wilds").value = preset.wilds;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
     setAi({ ...(AI_PRESETS[preset.difficulty] || AI_PRESETS.normal), ...(preset.ai || {}) }); markCustom();
   }
@@ -5151,7 +5352,7 @@ function showNewGame(canContinue, preset) {
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, sectors: $("ng-sectors").checked, wilds: $("ng-wilds").value, ai: readAi() });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked, sectors: $("ng-sectors").checked, collapses: $("ng-collapses").checked, wilds: $("ng-wilds").value, ai: readAi() });
     if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
@@ -5254,7 +5455,7 @@ const GUIDE = [
   { id: "objectives", target: '[data-tab="objectives"]', tab: "objectives", title: "Three ways to win", text: "The Objectives tab: conquest (the last power standing), the Corridor Engine (research it, then build it at your capital), or the best score at turn 200. It shows how close everyone is.", done: () => S.tutorial.seen && S.tutorial.seen.objectives },
   { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "Directives and campaigns", text: "Your people send directives (the Mission tab): each pays credits, and each is a race against a rival. From turn 8, campaigns: three in a row, each against your nearest rival. Your research arm sends field tests that leave a prototype upgrade.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
   { id: "empire", target: '[data-tab="empire"]', tab: "empire", title: "Focus", text: "The Empire tab: share three Focus points between industry, science, credits and defense (2 at most to one). Change it whenever you like. Your prototypes are listed here too.", done: () => S.tutorial.seen && S.tutorial.seen.empire },
-  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels. A fuel tanker extends your lines: travelling with a fleet it tops up the tank; parked, it keeps your fleets within 2 hexes in supply. Enemy warships in a supply point's system cut it, so defend your tankers and depots." },
+  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels from your fuel reserve (top bar): your colonies make a little, fuel depots and stations make most of it and raise how much you can store. Fleets moving in supply, refuelling, filling tankers and burning hard (a fleet's button: a hex a turn faster) all draw on it; short of fuel, your fleets move slower. More depots, more fleets kept moving. A fuel tanker extends your lines: travelling with a fleet it tops up the tank; parked, it keeps your fleets within 2 hexes in supply. Enemy warships in a supply point's system cut it, so defend your tankers and depots." },
   { id: "trade", read: true, title: "Trade and sieges", text: "Your colonies trade with each other and with treaty partners' worlds within 4 hexes, for credits (an Exchange doubles it; the Empire tab's market buys and sells exotics). Warships in an enemy's orbit besiege it: half its industry and credits, no trade, no growth, it starves, its garrison weakens, and an ordinary colony starved low enough surrenders. Your own worlds can be besieged too: break the siege with a fleet." },
   { id: "done", read: true, title: "The galaxy is yours", text: "That's the turn: research, build, move, end the turn. Next: a Factory and a Research lab at your capital, two or three frigates at home, and meet your neighbours (Diplomacy). Menu → Restart the guide brings this back any time." },
 ];
@@ -5313,7 +5514,9 @@ function showHelp(back) {
       <li><b>Traders:<\/b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot<\/b> to fill its tanks and cut the depot's supply.<\/li>
       <li><b>The Wardens:<\/b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out.<\/li>
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
-      <li><b>New sectors:<\/b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Objectives tab tracks them.<\/li>
+      <li><b>New sectors:<\/b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.<\/li>
+      <li><b>Corridor collapses:<\/b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). Ships then go the long way, until a scout rests a turn within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).<\/li>
+      <li><b>Fuel reserve:<\/b> the top bar's Fuel. Your colonies make a little and fuel depots and stations most, and each depot lets you store more. Fleets moving in supply, refuelling, filling tankers and burning hard spend it; run short and your fleets move slower and can't refuel. Burn hard (on a moving fleet's panel) for a hex a turn more.<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.<\/li>
       <li><b>Win<\/b> by conquest (the last people standing), by building the <b>Corridor Engine<\/b> (research it, then build it at your capital), or with the highest score at turn ${RULES.maxTurns}.<\/li>
@@ -5326,7 +5529,7 @@ function galaxyInfo() {
   const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
   const diff = difficultyLabel(S);
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, sectorsOff: !!S.sectorsOff, wilds: wildsLevel(S), ai: S.aiOpts || null } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff, sectorsOff: !!S.sectorsOff, collapsesOff: !!S.collapsesOff, wilds: wildsLevel(S), ai: S.aiOpts || null } };
 }
 function galaxyBox() {
   const g = galaxyInfo();
