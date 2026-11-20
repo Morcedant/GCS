@@ -6,6 +6,15 @@
     {
       "date": "2026-11-20",
       "kind": "site",
+      "title": "Dominion: a main theme",
+      "items": [
+        "Dominion can play a main theme when it starts up: on the title screen, or in a new game's first turn. Name the track \"theme - ….mp3\" in the dominion music folder.",
+        "The theme plays once per visit, through to its end, and then the game's own mood takes over: exploration, war or crisis."
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "kind": "site",
       "title": "Dominion: send all your ships somewhere in one click",
       "items": [
         "Every explored system's panel now has a \"Send your ships here\" section. \"Send all warships\" sends every fleet with a warship in it, including the transports and tankers travelling with them. \"Send every ship\" sends everything you have.",

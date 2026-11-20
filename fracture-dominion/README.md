@@ -176,7 +176,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Music:** the game plays tracks from the shared table server's music bucket, folder `dominion/` (its address comes
   from `legend-dynamics/table-server/server-url.txt` at build time). A track's mood is the first word of its file
   name, or its `mood` in the folder's `tracks.json`: `exploration - 01.mp3` plays in peacetime, `war - 01.mp3` while
-  you're at war with a power, `crisis - 01.mp3` once the Wardens wake; any other track plays in any mood. Tracks are
+  you're at war with a power, `crisis - 01.mp3` once the Wardens wake; any other track plays in any mood. The main theme, `theme - ….mp3`, plays
+  once a visit when the game starts up (the title screen, or a new game's first turn) and plays to its end before the
+  game's mood takes over. Tracks are
   shuffled, and a change of mood fades to the next. The ♪ button in the bar mutes it; the Menu has the volume, Next
   track and what's playing. Browsers allow sound only after a click, so it starts with your first one.
 - **The strategy guide** (`strategy.mjs` writes `dist/strategy.html`; the menu links to it): general on purpose, with

@@ -10,8 +10,8 @@
  * and the fan games, named as on the fan-games site: uss-pelion/   grimm/
  *
  * and Fracture Lines: Dominion, the strategy game: dominion/. Its player picks a track by mood, from tracks.json's
- * "mood" or the file name's first word: "exploration - 01.mp3" (at peace), "war - 01.mp3", "crisis - 01.mp3" (the
- * Wardens awake); anything else plays in any mood.
+ * "mood" or the file name's first word: "theme - ….mp3" (the main theme, once at the start), "exploration - 01.mp3"
+ * (at peace), "war - 01.mp3", "crisis - 01.mp3" (the Wardens awake); anything else plays in any mood.
  *
  * The music pages list what's there, at once, with no rebuild. A track's title comes from its file name
  * ("01 - the-long-road.mp3" → "The Long Road"; a leading number sets the order). To give titles, moods and the like,

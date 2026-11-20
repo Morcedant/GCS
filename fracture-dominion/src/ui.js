@@ -131,15 +131,19 @@ function territory() {
 // ---------- music: tracks from the table server's dominion/ folder, by mood ----------
 // The mood follows the game: exploration in peacetime, war while you're at war with a power, crisis once the
 // Wardens are awake. A track's mood is its tracks.json "mood", or the first word of its file name ("war - 01.mp3");
-// anything else plays in any mood. Tracks play one after another, shuffled; a change of mood fades to the next.
+// anything else plays in any mood. The main theme ("theme - ….mp3") plays once when the game first starts up, on the
+// title screen or in a new game's first turn, and plays through to its end before the game's mood takes over. Tracks play one after another, shuffled; a change of mood fades to the next.
 const MUSIC_SERVER = "__MUSIC_SERVER__";
-const MUSIC_MOODS = { exploration: "Exploration", war: "War", crisis: "Crisis" };
+const MUSIC_MOODS = { theme: "Main theme", exploration: "Exploration", war: "War", crisis: "Crisis" };
 const music = { tracks: null, loading: false, audio: null, mood: null, current: null, played: [], error: null, started: false,
   prefs: (() => { try { return { on: true, volume: 0.4, ...(JSON.parse(localStorage.getItem("dominion.music.v1")) || {}) }; } catch { return { on: true, volume: 0.4 }; } })() };
 const savePrefs = () => { try { localStorage.setItem("dominion.music.v1", JSON.stringify(music.prefs)); } catch {} };
 const moodOf = (t) => { const m = String(t.mood || "").toLowerCase(), w = t.file.toLowerCase().split(/[\s._-]+/)[0]; return MUSIC_MOODS[m] ? m : MUSIC_MOODS[w] ? w : null; };
 /** What the game calls for now. */
 function gameMood() {
+  // The main theme, once a visit: at the start, while there's a theme to play.
+  const hasTheme = (music.tracks || []).some((t) => t.moodKey === "theme");
+  if (hasTheme && !music.themeDone && (!S || S.turn <= 1 || document.getElementById("sg-first") || document.getElementById("ng-start"))) return "theme";
   if (!S) return "exploration";
   const c = crisisState(S); if (c && c.stage === "awake") return "crisis";
   const me = player(S);
@@ -158,7 +162,7 @@ async function loadMusic() {
 /** A track for this mood: ones of that mood (or with none), not the one just played, least recently played first. */
 function pickTrack(mood) {
   const all = music.tracks || []; if (!all.length) return null;
-  let pool = all.filter((t) => t.moodKey === mood); if (!pool.length) pool = all.filter((t) => !t.moodKey); if (!pool.length) pool = all;
+  let pool = all.filter((t) => t.moodKey === mood); if (!pool.length) pool = all.filter((t) => !t.moodKey); if (!pool.length) pool = all.filter((t) => t.moodKey !== "theme"); if (!pool.length) pool = all;
   const fresh = pool.filter((t) => !music.played.includes(t.file)); const from = fresh.length ? fresh : pool.filter((t) => t !== music.current) .length ? pool.filter((t) => t !== music.current) : pool;
   if (!fresh.length) music.played = music.played.filter((f) => !pool.some((t) => t.file === f));
   return from[Math.floor(Math.random() * from.length)];
@@ -170,7 +174,7 @@ function fade(a, to, ms, done) {
 }
 function playTrack(t) {
   const old = music.audio, a = new Audio(t.src); a.volume = 0; a.preload = "auto";
-  a.addEventListener("ended", () => { if (music.audio === a) playTrack(pickTrack(music.mood) || t); });
+  a.addEventListener("ended", () => { if (music.audio !== a) return; if (t.moodKey === "theme") { music.themeDone = true; music.mood = gameMood(); } playTrack(pickTrack(music.mood) || t); });
   a.addEventListener("error", () => { if (music.audio === a) { music.played.push(t.file); const n = pickTrack(music.mood); if (n && n !== t) playTrack(n); } });
   music.audio = a; music.current = t; music.played.push(t.file);
   a.play().then(() => { fade(a, music.prefs.volume, 2500); renderMusicNow(); }).catch(() => { music.started = false; });
@@ -182,7 +186,9 @@ function musicUpdate() {
   if (!music.started) return;   // the browser plays sound only after the player has clicked something
   if (!music.tracks) { loadMusic(); return; }
   const mood = gameMood();
-  if (mood !== music.mood || !music.audio) { music.mood = mood; const t = pickTrack(mood); if (t) playTrack(t); }
+  // The main theme plays through to its end; the game's mood waits for it.
+  const themePlaying = music.audio && music.current && music.current.moodKey === "theme" && !music.audio.ended;
+  if (!themePlaying && (mood !== music.mood || !music.audio)) { music.mood = mood; const t = pickTrack(mood); if (t) playTrack(t); }
   renderMusicNow();
 }
 function musicStart() { if (music.started) return; music.started = true; musicUpdate(); }
@@ -198,13 +204,13 @@ function musicMenuHTML() {
     <label class="small">Volume <input type="range" id="m-music-vol" min="0" max="1" step="0.05" value="${music.prefs.volume}"></label>
     <div class="btn-row"><button class="btn small" id="m-music-skip">Next track</button></div>
     <p class="small muted" id="m-music-now">${esc(musicStatus())}</p>
-    <p class="small muted">The mood follows the game: exploration in peacetime, war while you're at war, the crisis when the Wardens wake.</p></div>`;
+    <p class="small muted">The mood follows the game: the main theme at the start, exploration in peacetime, war while you're at war, the crisis when the Wardens wake.</p></div>`;
 }
 function bindMusicMenu() {
   if (!$("m-music-on")) return;
   $("m-music-on").onchange = () => { music.prefs.on = $("m-music-on").checked; savePrefs(); music.started = true; musicUpdate(); };
   $("m-music-vol").oninput = () => { music.prefs.volume = +$("m-music-vol").value; savePrefs(); if (music.audio) music.audio.volume = music.prefs.volume; };
-  $("m-music-skip").onclick = () => { music.started = true; if (!music.prefs.on) { music.prefs.on = true; savePrefs(); $("m-music-on").checked = true; } const t = pickTrack(gameMood()); if (t) { music.mood = gameMood(); playTrack(t); } else musicUpdate(); };
+  $("m-music-skip").onclick = () => { music.started = true; if (!music.prefs.on) { music.prefs.on = true; savePrefs(); $("m-music-on").checked = true; } const t = pickTrack(gameMood()); if (t) { if (music.current && music.current.moodKey === "theme") music.themeDone = true; music.mood = gameMood(); playTrack(pickTrack(music.mood) || t); } else musicUpdate(); };
 }
 
 // ---------- ship outlines ----------
