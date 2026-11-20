@@ -16,7 +16,7 @@
  * The music pages list what's there, at once, with no rebuild. A track's title comes from its file name
  * ("01 - the-long-road.mp3" → "The Long Road"; a leading number sets the order). To give titles, moods and the like,
  * put a tracks.json in the folder (optional): { "intro": "…", "tracks": [{ "file", "title", "mood", "use", "credit",
- * "license", "loop" }] }. Listed tracks come first, in its order; any others follow by name.
+ * "license", "loop", "repeat" }] }. ("loop": true and "repeat": 2–20 give a track extended play in Dominion's player.) Listed tracks come first, in its order; any others follow by name.
  *
  *   GET /api/music?folder=F   → { folder, intro, tracks: [{ file, title, mood?, use?, credit?, license?, loop?, bytes, src, download }] }
  *   GET /api/music            → { folders: { F: count } }   how many tracks each setting has
@@ -60,6 +60,8 @@ export function buildList(objects, manifest, folder, base) {
     const out = { file: t.file, title: str(t.title) || titleFrom(t.file), bytes: /** @type {any} */ (files.get(t.file)).size, src, download: src + "?download=1" };
     for (const k of ["mood", "use", "credit", "license"]) { const v = str(t[k]); if (v) /** @type {any} */ (out)[k] = v; }
     if (t.loop === true) /** @type {any} */ (out).loop = true;
+    // How many times in a row to play it (the strategy game's player): a whole number from 2 to 20.
+    if (Number.isInteger(t.repeat) && t.repeat >= 2 && t.repeat <= 20) /** @type {any} */ (out).repeat = t.repeat;
     return out;
   });
 }

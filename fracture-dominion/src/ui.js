@@ -174,9 +174,18 @@ function fade(a, to, ms, done) {
 }
 function playTrack(t) {
   const old = music.audio, a = new Audio(t.src); a.volume = 0; a.preload = "auto";
+  // Extended play: a track marked "loop" loops until the game's mood changes; "repeat": n plays it n times in a row;
+  // and the Menu's Loop this track keeps the current one going. The browser loops it seamlessly.
+  music.loopNow = false; a.plays = 1; a.last = 0;
+  a.loop = !!((t.loop && t.moodKey !== "theme") || (t.repeat && t.repeat > 1));   // the main theme ends, so the game's mood can begin
+  a.addEventListener("timeupdate", () => {
+    if (a.currentTime + 1 < a.last) { a.plays++; renderMusicNow(); if (!(t.loop && t.moodKey !== "theme") && !music.loopNow && t.repeat && a.plays >= t.repeat) a.loop = false; }
+    a.last = a.currentTime;
+  });
   a.addEventListener("ended", () => { if (music.audio !== a) return; if (t.moodKey === "theme") { music.themeDone = true; music.mood = gameMood(); } playTrack(pickTrack(music.mood) || t); });
   a.addEventListener("error", () => { if (music.audio === a) { music.played.push(t.file); const n = pickTrack(music.mood); if (n && n !== t) playTrack(n); } });
   music.audio = a; music.current = t; music.played.push(t.file);
+  if (document.getElementById("m-music-loop")) document.getElementById("m-music-loop").checked = false;
   a.play().then(() => { fade(a, music.prefs.volume, 2500); renderMusicNow(); }).catch(() => { music.started = false; });
   if (old) fade(old, 0, 2000, () => { old.pause(); });
 }
@@ -198,17 +207,23 @@ function renderMusicNow() {
   const b = document.getElementById("music-btn"); if (b) { b.textContent = music.prefs.on ? "♪" : "♪̸"; b.title = music.prefs.on ? `Music on${music.current ? `: ${music.current.title}` : ""} (click to mute)` : "Music off (click to play)"; b.classList.toggle("off", !music.prefs.on); }
   const n = document.getElementById("m-music-now"); if (n) n.textContent = musicStatus();
 }
-const musicStatus = () => !music.prefs.on ? "Music is off." : music.error ? music.error : music.current ? `Now playing: ${music.current.title}${music.current.moodKey ? ` (${MUSIC_MOODS[music.current.moodKey]})` : ""}.` : music.loading ? "Loading the music…" : "The music starts when you click.";
+const musicStatus = () => {
+  if (!music.prefs.on) return "Music is off."; if (music.error) return music.error;
+  const t = music.current, a = music.audio; if (!t) return music.loading ? "Loading the music…" : "The music starts when you click.";
+  const ext = music.loopNow || t.loop ? " · looping" : t.repeat > 1 && a ? ` · play ${Math.min(a.plays, t.repeat)} of ${t.repeat}` : "";
+  return `Now playing: ${t.title}${t.moodKey ? ` (${MUSIC_MOODS[t.moodKey]})` : ""}${ext}.`;
+};
 function musicMenuHTML() {
   return `<div class="music-box"><h3>Music</h3><label class="small check-line"><input type="checkbox" id="m-music-on" ${music.prefs.on ? "checked" : ""}> Play music</label>
     <label class="small">Volume <input type="range" id="m-music-vol" min="0" max="1" step="0.05" value="${music.prefs.volume}"></label>
-    <div class="btn-row"><button class="btn small" id="m-music-skip">Next track</button></div>
+    <div class="btn-row"><button class="btn small" id="m-music-skip">Next track</button><label class="small check-line" style="margin:0"><input type="checkbox" id="m-music-loop" ${music.loopNow ? "checked" : ""}> Loop this track</label></div>
     <p class="small muted" id="m-music-now">${esc(musicStatus())}</p>
     <p class="small muted">The mood follows the game: the main theme at the start, exploration in peacetime, war while you're at war, the crisis when the Wardens wake.</p></div>`;
 }
 function bindMusicMenu() {
   if (!$("m-music-on")) return;
   $("m-music-on").onchange = () => { music.prefs.on = $("m-music-on").checked; savePrefs(); music.started = true; musicUpdate(); };
+  $("m-music-loop").onchange = () => { music.loopNow = $("m-music-loop").checked; if (music.audio) music.audio.loop = music.loopNow || !!(music.current && (music.current.loop || (music.current.repeat > 1 && music.audio.plays < music.current.repeat))); renderMusicNow(); };
   $("m-music-vol").oninput = () => { music.prefs.volume = +$("m-music-vol").value; savePrefs(); if (music.audio) music.audio.volume = music.prefs.volume; };
   $("m-music-skip").onclick = () => { music.started = true; if (!music.prefs.on) { music.prefs.on = true; savePrefs(); $("m-music-on").checked = true; } const t = pickTrack(gameMood()); if (t) { if (music.current && music.current.moodKey === "theme") music.themeDone = true; music.mood = gameMood(); playTrack(pickTrack(music.mood) || t); } else musicUpdate(); };
 }

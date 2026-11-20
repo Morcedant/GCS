@@ -178,7 +178,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   name, or its `mood` in the folder's `tracks.json`: `exploration - 01.mp3` plays in peacetime, `war - 01.mp3` while
   you're at war with a power, `crisis - 01.mp3` once the Wardens wake; any other track plays in any mood. The main theme, `theme - ….mp3`, plays
   once a visit when the game starts up (the title screen, or a new game's first turn) and plays to its end before the
-  game's mood takes over. Tracks are
+  game's mood takes over. Extended play: in `tracks.json`, `"repeat": 3` plays a track three times in a row and
+  `"loop": true` loops it until the game's mood changes (seamlessly; the main theme only repeats, never loops
+  endlessly), and the Menu's Loop this track keeps the current one going. Tracks are
   shuffled, and a change of mood fades to the next. The ♪ button in the bar mutes it; the Menu has the volume, Next
   track and what's playing. Browsers allow sound only after a click, so it starts with your first one.
 - **The strategy guide** (`strategy.mjs` writes `dist/strategy.html`; the menu links to it): general on purpose, with

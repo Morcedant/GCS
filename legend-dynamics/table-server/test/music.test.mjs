@@ -53,3 +53,10 @@ test("the routes: a folder's list, the counts, a track, a range of it, a downloa
   // No bucket bound yet: an empty list, not an error page.
   b = await (await musicFetch(new Request("https://srv/api/music?folder=aurora"), {}, h)).json(); assert.deepEqual(b.tracks, []);
 });
+
+test("a track's repeat count passes through, in range only", async () => {
+  const { buildList } = await import("../src/music.js");
+  const objs = [{ key: "dominion/war - a.mp3", size: 1 }, { key: "dominion/war - b.mp3", size: 1 }, { key: "dominion/war - c.mp3", size: 1 }];
+  const list = buildList(objs, { tracks: [{ file: "war - a.mp3", repeat: 3 }, { file: "war - b.mp3", repeat: 99 }, { file: "war - c.mp3", loop: true }] }, "dominion", "https://x");
+  assert.equal(list[0].repeat, 3); assert.equal(list[1].repeat, undefined, "out of range: ignored"); assert.equal(list[2].loop, true);
+});

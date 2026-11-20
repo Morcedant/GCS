@@ -6,6 +6,16 @@
     {
       "date": "2026-11-20",
       "kind": "site",
+      "title": "Dominion: extended play for music",
+      "items": [
+        "Give a track extended play in the dominion folder's tracks.json: \"repeat\": 3 plays it three times in a row, and \"loop\": true keeps it looping until the game's mood changes. Repeats are seamless.",
+        "The Menu's music card has a Loop this track switch for whatever is playing, and shows \"play 2 of 3\" or \"looping\".",
+        "The main theme can repeat, but never loops forever, so the game's mood always takes over."
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "kind": "site",
       "title": "Dominion: a main theme",
       "items": [
         "Dominion can play a main theme when it starts up: on the title screen, or in a new game's first turn. Name the track \"theme - ….mp3\" in the dominion music folder.",

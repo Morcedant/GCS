@@ -635,6 +635,7 @@ function buildList(objects, manifest, folder, base) {
       if (v) out[k] = v;
     }
     if (t.loop === true) out.loop = true;
+    if (Number.isInteger(t.repeat) && t.repeat >= 2 && t.repeat <= 20) out.repeat = t.repeat;
     return out;
   });
 }
