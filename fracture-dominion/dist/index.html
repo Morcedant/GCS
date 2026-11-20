@@ -209,7 +209,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-20 11:46 UTC";
+const BUILD = "2026-11-20 12:48 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -358,6 +358,8 @@ const SHIPS = {
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
+  watcher: { name: "Watcher", cost: 0, upkeep: 0, speed: 0, hull: 6, skill: 12, dmg: 2, sensors: 3, warden: true, text: "A Warden machine half-buried by a rift, dormant but watching. It fights whatever comes near. When the Wardens wake, it wakes as a Node." },
+  node: { name: "Warden Node", cost: 0, upkeep: 0, speed: 0, hull: 10, skill: 12, dmg: 2, shots: 2, sensors: 3, warden: true, text: "A Warden forge, built on a world they've burned. It sends out hunters and holds the system. While one stands, a new Heart can grow." },
   heart: { name: "Heart", cost: 0, upkeep: 0, speed: 0, hull: 20, skill: 14, dmg: 3, sensors: 3, warden: true, text: "The Wardens' mind and forge. It never moves, mends itself, and sends out the waves. Break it and they go dark." },
 };
 
@@ -377,6 +379,8 @@ const SHIP_SHAPES = {
   haven: "M0 -11 L10 -4 L7 9 L-7 9 L-10 -4 Z M0 -5 L4 -2 L3 4 L-3 4 L-4 -2 Z M10 -4 L12.5 -6 M-10 -4 L-12.5 -6 M7 9 L9 11.5 M-7 9 L-9 11.5",
   swarm: "M0 -11 L3 -3 L11 -4 L5 2 L8 10 L0 5 L-8 10 L-5 2 L-11 -4 L-3 -3 Z",
   leviathan: "M12 0 Q8 -8 -2 -7 Q-8 -6 -12 -10 Q-10 -3 -10 0 Q-10 3 -12 10 Q-8 6 -2 7 Q8 8 12 0 Z M6 -2 L4 -2 M-2 -7 Q0 0 -2 7",
+  watcher: "M0 -10 L7 -4 L7 4 L0 10 L-7 4 L-7 -4 Z M0 -4 A4 4 0 1 0 0 4 A4 4 0 1 0 0 -4 M0 -1.5 A1.5 1.5 0 1 0 0 1.5 A1.5 1.5 0 1 0 0 -1.5",
+  node: "M0 -11 L4 -4 L11 -4 L6 1 L8 9 L0 5 L-8 9 L-6 1 L-11 -4 L-4 -4 Z M0 -3 L3 0 L0 3 L-3 0 Z",
   heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
 };
 
@@ -606,7 +610,21 @@ const PATROL = { share: 0.5, regard: 0.3 };
 const TRADERS = { every: 15, range: 10, maxPerExchange: 1, perPower: 2, base: 4, perHex: 1, hunt: 4, reach: 1, offer: 0.35, color: "#e6a8d7", name: "The Free Traders" };
 /** Raiders who lose ships at a world stay away from it this many turns. */
 const RAID_AVOID = 15;
-const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
+/**
+ * The Wardens (crisis.js). The Signs: from `signsLead` turns before they wake, a dormant Watcher appears by a rift every
+ * `watcherEvery` turns, up to watchers[size]. Awake: the Heart sends waves; a burned world becomes a Node, and each
+ * Node sends hunters every `nodeEvery` turns. The Heart wakes with wakeNodes[size] Nodes of its own around it, and can't
+ * be harmed while one within `shieldRange` stands. Nodes and the Heart can only be worn down: a battle takes at most
+ * wear[type] of their full hull. Waves go for a power building the Corridor Engine (`engineHunt` of them) before anyone else.
+ * Breaking the Heart silences the waves, but while a Node stands, a new
+ * Heart grows at one after `regrow` turns, `regrowGain` times stronger. It's over only when the Heart and every Node
+ * are gone.
+ */
+const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0",
+  signsLead: 35, watcherEvery: 6, watchers: { small: 2, medium: 3, large: 4, vast: 5 }, nodeEvery: 8, regrow: 30, regrowGain: 1.25,
+  wakeNodes: { small: 2, medium: 3, large: 4, vast: 5 }, engineHunt: 0.5, perStrength: 300, maxStrength: 40,
+  wear: { node: 0.25, heart: 0.2 }, shieldRange: 6, maxNodes: { small: 5, medium: 8, large: 10, vast: 12 }, huntersPerStrength: 10,
+  bounty: { watcher: 40, node: 80 } };
 /**
  * The Corridor Engine in an open game: not a victory but the galaxy's great prize. Only one can stand. Its holder's
  * fleets travel corridors for nothing and can jump through the gate from the Engine world to any of its worlds (every
@@ -979,6 +997,8 @@ function shipStats(s, fid, type, ship) {
   const base = SHIPS[type], warship = base.skill > 0;
   // The Heart of the Wardens grows with the galaxy it wakes in (crisis.js): more hull, more guns.
   if (type === "heart") { const m = (s.crisis && s.crisis.m) || 1; return { ...base, hull: s.crisis && s.crisis.heartMax || base.hull * m, shots: 1 + m }; }
+  // Watchers and Nodes grow with it too: their hull and guns by the crisis's strength (set by the Signs, then the waking).
+  if (type === "watcher" || type === "node") { const m = (s.crisis && (s.crisis.m || s.crisis.mSigns)) || 1; return { ...base, hull: base.hull * m, shots: (base.shots || 1) + Math.floor(m / 2) }; }
   // Research comes through the ship's own systems (fitOf); a people's traits and relics reach every ship at once.
   const k = fitOf(s, fid, ship);
   return { ...base,
@@ -1633,8 +1653,16 @@ function battles(s) {
     const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
     if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat || sys.colony.buildings.station ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : sys.colony.buildings.station ? "Orbital station" : "Orbital guns" } }); }
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
+    // The Nodes the Heart raised around itself shield it (CRISIS.shieldRange); Nodes on burned worlds far off don't.
+    const nodesUp = !!(s.crisis && s.crisis.heart) && Object.values(s.fleets).some((f) => f.owner === "wardens" && distance(f.at, s.crisis.heart) <= CRISIS.shieldRange && f.ships.some((x) => x.type === "node" && x.hull > 0));
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
-    const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
+    // Warden Nodes and the Heart can only be worn down: a battle takes at most a share of their full hull (CRISIS.wear).
+    const hit = (u, n) => {
+      if (u.world) { u.world.colony.defense = Math.max(0, u.world.colony.defense - n); return; }
+      const w = CRISIS.wear[u.ship.type];
+      if (w) { const cap = Math.ceil(u.st.hull * w) - (u.taken || 0); n = Math.max(0, Math.min(n, cap)); u.taken = (u.taken || 0) + n; }
+      u.ship.hull -= n;
+    };
     // A battle the player is in is recorded roll by roll, for the battle pop-up.
     const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
     const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
@@ -1646,9 +1674,9 @@ function battles(s) {
       for (const u of live) {
         for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
-        // The Heart of the Wardens can't be fired on while its guard still stands.
+        // The Heart of the Wardens can't be fired on while its guard still stands, nor while its own Nodes do.
         // Pirates and crystal swarms don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && u.ship.type === "swarm"))) && !(v.ship && v.ship.type === "heart" && live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0)));
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && u.ship.type === "swarm"))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
@@ -1661,6 +1689,8 @@ function battles(s) {
             // Score: by what the machine was worth, against how hard the Wardens came (a hunter is worth less in a swarm).
             K.stats.wardenPts = (K.stats.wardenPts || 0) + (SHIPS[t.ship.type].hull * SHIPS[t.ship.type].dmg / 3) / ((s.crisis && s.crisis.m) || 1) * (K.glory ? 2 : 1);
             if (t.ship.type === "heart" && s.crisis) { s.crisis.heartBy = u.fid; s.crisis.heartWith = list.filter((x) => x !== "wardens"); }
+            // A Watcher or a Node: what it was built from teaches something (CRISIS.bounty, in research).
+            if (CRISIS.bounty[t.ship.type]) { K.research.progress += CRISIS.bounty[t.ship.type]; log(s, u.fid, `${K.name} destroyed a Warden ${SHIPS[t.ship.type].name.replace(/^Warden /, "")} at ${where}: +${CRISIS.bounty[t.ship.type]} research.`, "war"); }
           }
           // A pirate or a creature destroyed: its bounty (credits), and what its wreck teaches (research), to whoever did it.
           if (was > 0 && hp(t) <= 0 && (t.fid === "pirates" || t.fid === "beasts") && !isWild(u.fid)) bounty(s, u.fid, t.ship.type, where);
@@ -2551,7 +2581,10 @@ const cap = (t) => t[0].toUpperCase() + t.slice(1);
 
 // ---- crisis.js ----
 // The late-game crisis: the Wardens. Around turn 105–120, war machines the old empires left to guard the corridors
-// wake in the rifts. Six turns before, a signal gives warning. Then their Heart (it never moves) sends out a wave
+// wake in the rifts. Long before, the Signs: dormant Watchers appear by the rifts, and their transmissions grow. Awake,
+// they spread like an empire: every world they burn becomes a Node, a forge that sends out hunters of its own. Breaking
+// the Heart silences its waves, but while any Node stands a new, stronger Heart grows at one. It's over only when the
+// Heart and every Node are gone. Six turns before, a signal gives warning. Then their Heart (it never moves) sends out a wave
 // every few turns. The waves hunt the nearest worlds of every power and burn them while their orbits stand
 // unguarded. The Wardens are at war with everyone and talk to no one. Break the Heart and they go dark.
 // The player meets them in three scenes with choices (warning, waking, the Heart broken), shown like galactic events.
@@ -2566,12 +2599,82 @@ const crPlace = (s, hex) => (s.sysAt[hex] ? s.systems[s.sysAt[hex]].name : (() =
 
 /** Where things stand, for the panels: null before the warning. */
 function crisisState(s) {
-  const C = s.crisis; if (!C || C.stage === "quiet") return null;
+  const C = s.crisis; if (!C || (C.stage === "quiet" && !C.signs)) return null;
   const heart = heartShip(s);
-  return { stage: C.stage, at: C.at, heart: C.heart, place: C.heart ? crPlace(s, C.heart) : null, hull: heart ? heart.hull : 0, max: C.heartMax || SHIPS.heart.hull,
-    wave: C.wave || 0, nextWave: C.nextWave, ships: wardenFleets(s).reduce((t, f) => t + f.ships.length, 0), truce: !!C.truce, by: C.heartBy || null };
+  return { stage: C.stage === "quiet" ? "signs" : C.stage, at: C.at, heart: C.heart, place: C.heart ? crPlace(s, C.heart) : null, hull: heart ? heart.hull : 0, max: C.heartMax || SHIPS.heart.hull,
+    wave: C.wave || 0, nextWave: C.nextWave, ships: wardenFleets(s).reduce((t, f) => t + f.ships.length, 0), truce: !!C.truce, by: C.heartBy || null,
+    watchers: stationOf(s, "watcher").length, nodes: stationOf(s, "node").map((f) => ({ at: f.at, place: crPlace(s, f.at) })), regrowAt: C.regrowAt || null, returns: C.returns || 0 };
 }
 const wardenFleets = (s) => fleetsOf(s, WARDENS);
+/** The Wardens' machines that never move: Watchers (dormant) and Nodes (forges). */
+const stationOf = (s, type) => wardenFleets(s).filter((f) => f.ships.some((x) => x.type === type));
+/** Enemy warships on it: a Warden machine under siege doesn't mend. */
+const underSiege = (s, f) => !!f && fleetsAt(s, f.at).some((o) => o.owner !== WARDENS && o.ships.some((x) => SHIPS[x.type].skill > 0));
+const heartFleet = (s) => wardenFleets(s).find((f) => f.ships.some((x) => x.type === "heart"));
+const stationary = (f) => f.ships.some((x) => x.type === "watcher" || x.type === "node");
+/** How hard the Wardens come: a match for the whole galaxy together (its combined fleet strength, against
+ * CRISIS.perStrength a point), not just its strongest power. Difficulty scales it. */
+function wardenStrength(s) {
+  const all = crAlive(s).reduce((t, f) => t + militaryPower(s, f.id), 0);
+  const d = s.aiOpts ? Math.max(0.7, Math.min(1.25, s.aiOpts.strength)) : { easy: 0.7, hard: 1.25 }[s.difficulty] || 1;
+  return Math.max(1, Math.min(CRISIS.maxStrength, Math.round((all / CRISIS.perStrength) * d)));
+}
+/** The Wardens as a power (out of s.factions): made the first time they're needed, by the Signs or the waking. */
+function wardenPower(s) {
+  const C = s.crisis;
+  if (!C.F) C.F = { id: WARDENS, name: "The Wardens", color: CRISIS.color, ai: true, alive: true, crisis: true, capital: null, credits: 0, exotics: 0,
+    research: { current: null, progress: 0, done: [] }, explored: {}, visible: {}, relations: {}, met: {}, stats: { built: 0, lost: 0, won: 0 },
+    focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} };
+  return C.F;
+}
+const TRANSMISSIONS = [
+  "The rift-watch hears it again: a pulse, regular as a heartbeat, from somewhere under the rifts.",
+  "Your archivists match the pulse to the oldest records of the old empires. They won't say what they think it is.",
+  "A survey crew near the rifts reports a machine half-buried in the dust. Its eye was open. It hadn't been, the day before.",
+  "Every listening post on the rim now hears the same pattern. It is getting louder, and it is counting down.",
+  "Static on every band, then one word in a language dead a thousand years. The translators agree on it: \u201csoon\u201d.",
+];
+/** The Signs: Watchers wake one by one by the rifts, and the transmissions grow. */
+function signs(s, R) {
+  const C = s.crisis; wardenPower(s);
+  if (!C.signs) { C.signs = s.turn; C.nextWatcher = s.turn; }
+  // The Watchers' strength follows the galaxy's, as the Heart's will.
+  C.mSigns = wardenStrength(s);
+  if (s.turn >= C.nextWatcher && stationOf(s, "watcher").length < (CRISIS.watchers[s.size] || 3)) {
+    C.nextWatcher = s.turn + CRISIS.watcherEvery;
+    const cols = Object.values(s.systems).filter((x) => x.colony), taken = stationOf(s, "watcher").map((f) => f.at);
+    const open = (k, gap) => s.hexes[k].terrain === "space" && !s.sysAt[k] && !fleetsAt(s, k).length && Math.min(99, ...cols.map((c) => distance(c.at, k))) >= gap && taken.every((h) => distance(h, k) >= 4);
+    // By a rift if it can, away from the worlds; failing that, any open space a little way off.
+    let pool = Object.keys(s.hexes).filter((k) => open(k, 2) && neighbors(k).some((n) => s.hexes[n] && s.hexes[n].terrain === "rift")).sort();
+    if (!pool.length) pool = Object.keys(s.hexes).filter((k) => open(k, 2)).sort();
+    const k = pool[R.int(Math.max(1, pool.length))];
+    if (k) { const f = spawnFleet(s, WARDENS, k, ["watcher"]); f.born = s.turn;
+      const near = cols.filter((c) => distance(c.at, k) <= 6).map((c) => c.colony.owner);
+      for (const fid of new Set(near)) log(s, fid, `A Warden Watcher has surfaced by the rift near ${crPlace(s, k)}. It doesn't move, but it's armed, and it's watching. Destroy it now, or it wakes as a Node when the Wardens do.`, "war"); }
+  }
+  for (const f of stationOf(s, "watcher")) if (!underSiege(s, f)) for (const x of f.ships) x.hull = Math.min(shipStats(s, WARDENS, "watcher").hull, x.hull + C.mSigns);
+  const i = Math.floor((s.turn - C.signs) / 7);
+  if ((s.turn - C.signs) % 7 === 0 && TRANSMISSIONS[i]) log(s, null, TRANSMISSIONS[i], "war");
+}
+/** A world the Wardens burned to bare rock becomes a Node: a forge that holds the system and sends out hunters. */
+function newNode(s, hex) {
+  if (fleetsAt(s, hex).some((f) => f.owner === WARDENS && stationary(f))) return;
+  if (stationOf(s, "node").length >= (CRISIS.maxNodes[s.size] || 8)) return;   // there are only so many forges
+  const f = spawnFleet(s, WARDENS, hex, ["node"]); f.born = s.turn;
+  log(s, null, `The Wardens have raised a Node at ${crPlace(s, hex)}, on what's left of the world they burned. It will send out hunters of its own.`, "war");
+}
+/** Each Node sends out a pair of hunters (times the crisis's strength) every few turns, after the worlds near it. */
+function nodesTurn(s, R) {
+  const m = s.crisis.m || 1;
+  for (const f of [...stationOf(s, "node"), ...stationOf(s, "watcher")]) if (!underSiege(s, f)) for (const x of f.ships) x.hull = Math.min(shipStats(s, WARDENS, x.type).hull, x.hull + Math.ceil(m / 2));
+  const out = () => wardenFleets(s).filter((f) => !stationary(f) && !f.ships.some((x) => x.type === "heart")).reduce((t, f) => t + f.ships.length, 0);
+  for (const f of stationOf(s, "node")) {
+    if ((s.turn - (f.born || 0)) % CRISIS.nodeEvery !== CRISIS.nodeEvery - 1) continue;
+    if (out() >= CRISIS.huntersPerStrength * m) break;   // a limit to the hunters out at once
+    const h = spawnFleet(s, WARDENS, f.at, []); for (let i = 0; i < 2 * m; i++) h.ships.push({ type: "sentinel", hull: SHIPS.sentinel.hull });
+    hunt(s, h, R);
+  }
+}
 function heartShip(s) { for (const f of wardenFleets(s)) { const h = f.ships.find((x) => x.type === "heart"); if (h) return h; } return null; }
 
 /** Once a turn, after the turn resolves (and before galactic events): the warning, the waking, the waves, the burning. */
@@ -2579,6 +2682,7 @@ function crisisTurn(s) {
   if (s.crisisOff || s.winner) return;
   const C = s.crisis || (s.crisis = { stage: "quiet", at: Math.max(s.turn + CRISIS.warning + 2, CRISIS.earliest + makeRng("crisis:" + s.seed).int(CRISIS.spread)) });
   if (C.stage === "quiet") {
+    if (s.turn >= C.at - CRISIS.signsLead) { const R = rng(s); signs(s, R); R.save(); }
     if (s.turn >= C.at - CRISIS.warning && !s.galEvent) {
       C.stage = "stirring"; s.galEvent = { id: "stirring", ctx: {}, turn: s.turn };
       log(s, null, "A signal is coming out of the rifts: the same pattern, over and over, on every band.", "war");
@@ -2586,16 +2690,19 @@ function crisisTurn(s) {
     return;
   }
   if (C.stage === "stirring") { if (s.turn >= C.at && !s.galEvent) wake(s); return; }
+  if (C.stage === "dormant") { dormantTurn(s); return; }
   if (C.stage !== "awake") { if (C.queued && !s.galEvent) { s.galEvent = C.queued; C.queued = null; } return; }
   const heart = heartShip(s);
   if (!heart) { breakHeart(s); return; }
-  heart.hull = Math.min(C.heartMax, heart.hull + CRISIS.heartHeal * (C.m || 1));
+  // The Heart mends only when no one's at it: a siege wears it down, and breaking off lets it recover.
+  if (!underSiege(s, heartFleet(s))) heart.hull = Math.min(C.heartMax, heart.hull + Math.ceil(CRISIS.heartHeal * (C.m || 1) / 4));
   const R = rng(s);
   // A wave every few turns, unless the Wardens already have plenty out.
   if (s.turn >= C.nextWave) { if (wardenFleets(s).reduce((t, f) => t + f.ships.length, 0) < 12 * (C.m || 1)) sendWave(s, R); else C.nextWave = s.turn + 1; }
   // The waves: burn the world they hold, or find the next one.
+  nodesTurn(s, R);
   for (const f of wardenFleets(s)) {
-    if (f.ships.some((x) => x.type === "heart") || f.path.length) continue;
+    if (f.ships.some((x) => x.type === "heart") || stationary(f) || f.path.length) continue;
     const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
     if (sys && sys.colony) { if (!guarded(s, sys, WARDENS)) burn(s, sys, R); continue; }
     hunt(s, f, R);
@@ -2616,16 +2723,22 @@ function wake(s) {
   const far = (k) => Math.min(99, ...cols.map((c) => distance(c.at, k)));
   const pool = (byRift.length ? byRift : space).sort((a, b) => far(b) - far(a) || (a < b ? -1 : 1));
   C.heart = pool[0];
-  C.F = { id: WARDENS, name: "The Wardens", color: CRISIS.color, ai: true, alive: true, crisis: true, capital: null, credits: 0, exotics: 0,
-    research: { current: null, progress: 0, done: [] }, explored: {}, visible: {}, relations: {}, met: {}, stats: { built: 0, lost: 0, won: 0 },
-    focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} };
+  wardenPower(s);
+  // Every Watcher still standing wakes as a Node.
+  for (const f of stationOf(s, "watcher")) { f.ships = [{ type: "node", hull: shipStats(s, WARDENS, "node").hull }]; f.born = s.turn; }
   // How hard they come: with the strength of the strongest power they wake among.
   const P = Math.max(0, ...crAlive(s).map((f) => militaryPower(s, f.id)));
-  C.m = Math.max(1, Math.min(10, Math.round((P / 250) * (s.aiOpts ? Math.max(0.7, Math.min(1.25, s.aiOpts.strength)) : { easy: 0.7, hard: 1.25 }[s.difficulty] || 1))));
+  C.m = wardenStrength(s);
   C.heartMax = SHIPS.heart.hull * C.m - (C.studied ? CRISIS.studied * C.m : 0);
   const hf = spawnFleet(s, WARDENS, C.heart, []);
   hf.ships.push({ type: "heart", hull: C.heartMax });
-  for (let i = 0; i < C.m; i++) hf.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
+  // The Heart raises Nodes of its own around it: while any Node stands, nothing can harm it.
+  const ring = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain !== "rift" && distance(k, C.heart) >= 3 && distance(k, C.heart) <= 6 && !fleetsAt(s, k).length && !(s.sysAt[k] && s.systems[s.sysAt[k]].colony)).sort();
+  for (let i = 0, placed = []; i < (CRISIS.wakeNodes[s.size] || 2) && ring.length; i++) {
+    const pick = ring.filter((k) => placed.every((p) => distance(p, k) >= 3)); if (!pick.length) break;
+    const k = pick[R.int(pick.length)]; placed.push(k); const nf = spawnFleet(s, WARDENS, k, ["node"]); nf.born = s.turn;
+  }
+  for (let i = 0; i < Math.ceil(C.m / 2); i++) hf.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
   C.stage = "awake"; C.woke = s.turn; C.wave = 0; C.nextWave = s.turn;
   sendWave(s, R);
   // The rivals' own wars: most of them stop, for now.
@@ -2648,7 +2761,8 @@ function sendWave(s, R) {
   for (let i = 0; i < big; i++) f.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
   // The Heart keeps a guard of its own, growing to two (times the crisis's strength).
   const hf = wardenFleets(s).find((x) => x.ships.some((y) => y.type === "heart"));
-  if (hf && C.wave > 1) for (let i = 0; i < m && hf.ships.filter((x) => x.type === "colossus").length < 2 * m; i++) hf.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
+  // ...rebuilt a little each wave, to at most half the crisis's strength.
+  if (hf && C.wave > 1) for (let i = 0; i < Math.ceil(m / 4) && hf.ships.filter((x) => x.type === "colossus").length < Math.ceil(m / 2); i++) hf.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
   hunt(s, f, R);
   const target = f.dest && s.sysAt[f.dest] ? s.systems[s.sysAt[f.dest]] : null;
   const mine = target && target.colony && target.colony.owner === crMe(s).id;
@@ -2659,6 +2773,14 @@ function sendWave(s, R) {
 function hunt(s, f, R) {
   const near = Object.values(s.systems).filter((x) => x.colony).map((x) => ({ x, d: distance(f.at, x.at) - (x.colony.kind === "colony" ? x.colony.pop * 0.3 : 0) }))
     .sort((a, b) => a.d - b.d).slice(0, 3);
+  // They were left to guard the corridors: a power building the Corridor Engine draws them before anyone.
+  const builders = crAlive(s).map((F) => s.systems[F.capital]).filter((c) => c && c.colony && c.colony.queue.some((q) => q.id === "engine"));
+  const eb = builders.sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  if (eb && R.next() < CRISIS.engineHunt && setDestination(s, f.id, eb.at).ok) return;
+  // They come for the strongest, too: one in three waves goes after the leading power's nearest world.
+  const lead = crAlive(s).sort((a, b) => score(s, b.id) - score(s, a.id))[0];
+  const theirs = lead && coloniesOf(s, lead.id).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  if (theirs && R.next() < 1 / 3 && distance(theirs.at, f.at) <= 16 && setDestination(s, f.id, theirs.at).ok) return;
   for (const pick of [near[R.int(Math.max(1, near.length))], ...near]) if (pick && setDestination(s, f.id, pick.x.at).ok) return;
 }
 
@@ -2667,21 +2789,24 @@ function hunt(s, f, R) {
 function burn(s, sys, R) {
   const c = sys.colony, owner = faction(s, c.owner), me = crMe(s), seen = me.visible[sys.at];
   const tell = (text) => { log(s, owner.id, text, "war"); if (owner.id !== me.id && seen) log(s, me.id, text, "war"); };
-  if (c.kind === "outpost") { tell(`The Wardens burned ${owner.id === me.id ? "your" : `${owner.name}'s`} outpost at ${sys.name}.`); razeWorld(s, sys); return; }
+  if (c.kind === "outpost") { tell(`The Wardens burned ${owner.id === me.id ? "your" : `${owner.name}'s`} outpost at ${sys.name}.`); razeWorld(s, sys); newNode(s, sys.at); return; }
   c.pop -= 1;
   if (c.pop % 2 === 0) { const b = Object.keys(c.buildings).filter((k) => c.buildings[k] && k !== "engine"); if (b.length) c.buildings[b[R.int(b.length)]] = false; }
-  if (c.pop <= 0) { tell(`The Wardens burned ${sys.name} to bare rock. ${owner.id === me.id ? "Your" : `${owner.name}'s`} colony there is gone.`); razeWorld(s, sys); return; }
+  if (c.pop <= 0) { tell(`The Wardens burned ${sys.name} to bare rock. ${owner.id === me.id ? "Your" : `${owner.name}'s`} colony there is gone.`); razeWorld(s, sys); newNode(s, sys.at); return; }
   tell(`The Wardens are burning ${owner.id === me.id ? "your world " : `${owner.name}'s world `}${sys.name}: population down to ${c.pop}. Drive them off, or put guns or warships in its orbit.`);
 }
 
 function breakHeart(s) {
   const C = s.crisis, by = C.heartBy && faction(s, C.heartBy), me = crMe(s), with_ = C.heartWith || [];
-  C.stage = "over"; C.over = s.turn;
-  const left = wardenFleets(s).reduce((t, f) => t + f.ships.length, 0);
-  for (const f of wardenFleets(s)) delete s.fleets[f.id];
+  // Its hunters go dark; the Nodes don't. While one stands, the Heart will grow again.
+  const left = wardenFleets(s).filter((f) => !stationary(f)).reduce((t, f) => t + f.ships.length, 0);
+  for (const f of wardenFleets(s)) if (!stationary(f)) delete s.fleets[f.id];
+  for (const f of stationOf(s, "watcher")) delete s.fleets[f.id];
+  const nodes = stationOf(s, "node").length;
+  if (nodes) { C.stage = "dormant"; C.regrowAt = s.turn + CRISIS.regrow; } else { C.stage = "over"; C.over = s.turn; }
   if (by) { by.stats.heart = true; by.exotics += 6; if (by.ai) crResearch(s, by, 150); }
-  log(s, null, `The Heart of the Wardens is broken${by ? `, by ${by.name}` : ""}. ${left ? `The ${left} machine${left === 1 ? "" : "s"} still out there went dark at once.` : "Every machine went dark."}`, "victory");
-  const ev = { id: with_.includes(me.id) ? "broken" : "brokenBy", ctx: { by: C.heartBy || null }, turn: s.turn };
+  log(s, null, `The Heart of the Wardens is broken${by ? `, by ${by.name}` : ""}. ${left ? `The ${left} hunter${left === 1 ? "" : "s"} it sent out went dark at once.` : "Its hunters went dark."}${nodes ? ` But ${nodes} Node${nodes === 1 ? "" : "s"} still burn${nodes === 1 ? "s" : ""}: destroy ${nodes === 1 ? "it" : "them"} within ${CRISIS.regrow} turns, or a new Heart will grow.` : " Nothing of theirs is left: the Wardens are silent."}`, "victory");
+  const ev = { id: with_.includes(me.id) ? "broken" : "brokenBy", ctx: { by: C.heartBy || null, nodes }, turn: s.turn };
   if (s.galEvent) C.queued = ev; else s.galEvent = ev;
 }
 
@@ -2727,12 +2852,41 @@ const CRISIS_EVENTS = {
       { id: "memorial", label: "Raise a memorial for the fallen", does: "+12 standing with every rival you've met.", apply: (s) => { const met = crAlive(s).filter((f) => f.id !== crMe(s).id && crMe(s).met[f.id]); for (const f of met) remember(s, f.id, crMe(s).id, "raised a memorial to all who fell against the Wardens", 12); return "A beacon at the wreck names every ship that fell fighting the Wardens, whoever's it was. The other powers notice."; } },
     ],
   },
+  returning: {
+    title: "The Wardens return",
+    text: (s) => `The Node at ${crPlace(s, s.crisis.heart)} has been building something. Now it's done. A new Heart rises out of the forge, larger than the first, and the waves begin again. ${s.crisis.returns > 1 ? `This is the ${s.crisis.returns === 2 ? "third" : "next"} Heart; each is stronger. ` : ""}Break it, and burn out every Node, or they will keep coming back.`,
+    options: [
+      { id: "hold", label: "Hold the line", does: "Every world of yours with orbital guns has them repaired to full, now.", apply: (s) => { const me = crMe(s); let n = 0; for (const x of coloniesOf(s, me.id)) { const g = gunsMax(s, x.colony); if (g && x.colony.defense < g) { x.colony.defense = g; n++; } } return n ? `Gun crews work through the night: ${n} world${n === 1 ? "'s" : "s'"} guns are back to full.` : "Your guns are already at full strength."; } },
+      { id: "hunt", label: "Hunt the Nodes", does: "You learn where every Node is.", apply: (s) => { const me = crMe(s); for (const f of fleetsOf(s, WARDENS)) for (const k of within(f.at, 1)) if (s.hexes[k]) me.explored[k] = 1; return "Your analysts trace the signal back to every Node: they're on your map."; } },
+    ],
+  },
   brokenBy: {
     title: "The Heart is broken",
     text: (s) => `${s.crisis.heartBy ? `${crMe(s).met[s.crisis.heartBy] ? faction(s, s.crisis.heartBy).name : "A power you haven't met"} broke the Heart of the Wardens.` : "The Heart of the Wardens is dead."} Every hunter it sent out has gone silent where it stood. The galaxy breathes again, and the wars it put off are still waiting.`,
-    options: [{ id: "ok", label: "Back to the work of empire", does: "The crisis is over.", apply: () => "The Wardens are gone." }],
+    options: [{ id: "ok", label: "Back to the work of empire", does: "The Heart's waves are over, but any Node left can grow a new one.", apply: (s) => (s.crisis.stage === "dormant" ? "The Heart is gone, but its Nodes still burn." : "The Wardens are gone.") }],
   },
 };
+
+/** The Heart is broken but Nodes stand: they keep sending hunters, and after CRISIS.regrow turns a new, stronger Heart
+ * grows at the oldest. With no Node left, it's over. */
+function dormantTurn(s) {
+  const C = s.crisis, R = rng(s);
+  if (C.queued && !s.galEvent) { s.galEvent = C.queued; C.queued = null; }
+  const nodes = stationOf(s, "node");
+  if (!nodes.length) { C.stage = "over"; C.over = s.turn; log(s, null, "The last Warden Node is gone. The signal from the rifts has stopped: the Wardens are silent at last.", "victory"); R.save(); return; }
+  nodesTurn(s, R);
+  for (const f of wardenFleets(s)) { if (stationary(f) || f.path.length) continue; const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]]; if (sys && sys.colony) { if (!guarded(s, sys, WARDENS)) burn(s, sys, R); continue; } hunt(s, f, R); }
+  if (s.turn === C.regrowAt - 10) log(s, null, `The Warden Nodes are building something. In 10 turns, a new Heart.`, "war");
+  if (s.turn >= C.regrowAt) {
+    const seed = nodes.sort((a, b) => (a.born || 0) - (b.born || 0))[0];
+    C.returns = (C.returns || 0) + 1; C.heart = seed.at; C.heartMax = Math.round((C.heartMax || SHIPS.heart.hull) * CRISIS.regrowGain);
+    seed.ships = [{ type: "heart", hull: C.heartMax }]; for (let i = 0; i < (C.m || 1); i++) seed.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
+    C.stage = "awake"; C.heartBy = null; C.heartWith = null; C.nextWave = s.turn + 2; C.regrowAt = null;
+    log(s, null, `A new Heart of the Wardens has grown at ${crPlace(s, seed.at)}, stronger than the last. The waves will come again.`, "war");
+    const ev = { id: "returning", ctx: {}, turn: s.turn }; if (s.galEvent) C.queued = ev; else s.galEvent = ev;
+  }
+  R.save();
+}
 
 // ---- wilds.js ----
 // The wild things: threats that belong to no power. Pirate havens appear in empty systems and send out raiders, who
@@ -3712,13 +3866,16 @@ function huntWilds(s, F, f, reach) {
 /** While the Wardens are awake: go after a wave within `reach` hexes of one of this faction's worlds, if this fleet can
  * take it; a strong fleet goes for the Heart itself, once the powers have had time to see what they face. */
 function huntWardens(s, F, f, reach) {
-  if (!s.crisis || s.crisis.stage !== "awake") return false;
+  // Any Warden machine: the waves and the Heart once they're awake, the Watchers before, the Nodes until the last falls.
+  if (!s.crisis || !fleetsOf(s, "wardens").length) return false;
   const hullOf = (fl, fid) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, fid, x.type).hull * SHIPS[x.type].dmg : 0), 0);
   const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
   const waves = fleetsOf(s, "wardens").map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
   const heartAt = (waves.find((x) => x.heart) || {}).w;
   const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]
-    || (reach > 3 && s.turn >= s.crisis.woke + 12 ? waves.filter((x) => x.heart && x.d <= 14 && hullOf(x.w, "wardens") <= mine * 0.9)[0] : null);
+    // Once they've had time to see what they face, strong fleets lay siege to the Nodes that shield the Heart.
+    || (reach > 3 && s.turn >= s.crisis.woke + 8 && s.crisis.heart ? waves.filter((x) => x.w.ships.some((y) => y.type === "node") && distance(x.w.at, s.crisis.heart) <= 6 && x.d <= 16 && hullOf(x.w, "wardens") <= mine * 1.5).sort((a, b) => a.d - b.d)[0] : null)
+    || (reach > 3 && s.turn >= s.crisis.woke + 12 && !waves.some((x) => x.w.ships.some((y) => y.type === "node") && s.crisis.heart && distance(x.w.at, s.crisis.heart) <= 6) ? waves.filter((x) => x.heart && x.d <= 20 && hullOf(x.w, "wardens") <= mine * 2)[0] : null);   // the Heart is worn down over many battles: commit
   return !!(pick && pick.w.at !== f.at && setDestination(s, f.id, pick.w.at).ok);
 }
 
@@ -3998,6 +4155,7 @@ function draw() {
       if (sys.colony.capital) { ctx.fillStyle = colorOf(sys.colony.owner); ctx.beginPath(); ctx.moveTo(x, y - r - 13); ctx.lineTo(x + 5, y - r - 6); ctx.lineTo(x - 5, y - r - 6); ctx.closePath(); ctx.fill(); }
     }
     if (sys.exotics) { ctx.fillStyle = "#e9c7ff"; ctx.beginPath(); ctx.moveTo(x + r + 6, y - 4); ctx.lineTo(x + r + 9, y); ctx.lineTo(x + r + 6, y + 4); ctx.lineTo(x + r + 3, y); ctx.closePath(); ctx.fill(); }
+    if (Object.values(S.fleets).some((f) => f.owner === "wardens" && f.at === sys.at && f.ships.some((x) => x.type === "node"))) { ctx.strokeStyle = colorOf("wardens"); ctx.lineWidth = 2; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.arc(x, y, r + 12, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); if (view.zoom > 0.45) { ctx.fillStyle = colorOf("wardens"); ctx.font = "bold 9px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("NODE", x, y + r + 24); ctx.textAlign = "left"; } }
     if (engineHeld(S) && engineHeld(S).sys === sys.id) { ctx.strokeStyle = "#ffd36b"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 9, 0, Math.PI * 2); ctx.stroke(); if (view.zoom > 0.45) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ENGINE", x, y - r - 16); ctx.textAlign = "left"; } }
     if ((sys.relic && sys.relicLost && me.explored[sys.at]) || Object.values(S.relics || {}).some((r) => r.at === sys.id)) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 12px system-ui, sans-serif"; ctx.fillText("♦", x - r - 11, y - r - 2); }
     if (sys.anomaly) { ctx.fillStyle = "#9fd8ff"; ctx.font = "bold 12px system-ui, sans-serif"; ctx.fillText("✦", x + r + 2, y + r + 9); }
@@ -4313,15 +4471,24 @@ function engineOpenHTML(me) {
 function crisisHTML() {
   const c = crisisState(S); if (!c) return "";
   const me = player(S);
+  const nodeList = (c.nodes || []).map((n) => `<button class="linkish" data-center="${n.at}">${esc(n.place)}<\/button>`).join(", ");
+  if (c.stage === "signs") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">The Signs<\/span><\/h3>
+    <p class="small">Something under the rifts is waking. ${c.watchers ? `${c.watchers} Warden Watcher${c.watchers === 1 ? " has" : "s have"} surfaced by the rifts: dormant, armed, and watching.` : "Transmissions on every band, louder each week."} When the Wardens wake, every Watcher still standing becomes a Node, a forge that sends out hunters.<\/p>
+    <ol class="steps-list">${stepLi("now", "Destroy the Watchers while they're dormant: each is worth research, and one less Node later")}${stepLi("", "Put guns on your outer worlds, and build a fleet that can fight them")}<\/ol><\/div>`;
   if (c.stage === "stirring") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Stirring<\/span><\/h3>
     <p class="small">A signal is coming out of the rifts: the Wardens, war machines of the old empires, wake in about ${Math.max(1, c.at - S.turn)} turn${c.at - S.turn === 1 ? "" : "s"}. They'll burn any world they reach, whoever's it is. Build warships, and put guns on your outer worlds.<\/p><\/div>`;
   const fighters = [me, ...S.factions.filter((f) => f.id !== me.id && me.met[f.id])].map((f) => ({ f, n: f.stats.wardens || 0 })).sort((a, b) => b.n - a.n);
   const table = `<table class="tbl"><tr><th>Fighting them<\/th><th>Machines destroyed<\/th><\/tr>${fighters.map(({ f, n }) => `<tr><td><span class="dot" style="background:${f.color}"><\/span>${f.id === me.id ? "You" : esc(f.name)}${f.alive ? "" : " †"}<\/td><td>${n}<\/td><\/tr>`).join("")}<\/table>`;
+  if (c.stage === "dormant") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Not yet over<\/span><\/h3>
+    <p class="small">${c.by ? `${c.by === me.id ? "You" : me.met[c.by] ? esc(faction(S, c.by).name) : "A power you haven't met"} broke the Heart` : "The Heart is broken"}, and its waves have stopped. But <b>${c.nodes.length} Warden Node${c.nodes.length === 1 ? "" : "s"}<\/b> still stand${c.nodes.length === 1 ? "s" : ""}${nodeList ? `: ${nodeList}` : ""}. They keep sending hunters, and in <b>${Math.max(0, c.regrowAt - S.turn)} turn${c.regrowAt - S.turn === 1 ? "" : "s"}<\/b> a new, stronger Heart grows at one of them.<\/p>
+    <ol class="steps-list">${stepLi("now", "Destroy every Node before the new Heart grows: when the last one falls, the Wardens are silent for good")}<\/ol>${table}<\/div>`;
   if (c.stage === "over") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status good">Broken<\/span><\/h3>
     <p class="small">${c.by ? `${c.by === me.id ? "You" : me.met[c.by] ? esc(faction(S, c.by).name) : "A power you haven't met"} broke the Heart` : "The Heart is broken"}${S.crisis.over ? ` on turn ${S.crisis.over}` : ""}. Every machine went dark.<\/p>${table}<\/div>`;
   return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Awake<\/span><\/h3>
     <div class="kv small"><span>The Heart<\/span><span>${ibar(c.hull, c.max, "var(--bad)")} ${c.hull} of ${c.max} hull, at <button class="linkish" data-center="${c.heart}">${esc(c.place)}<\/button><\/span>
     <span>Waves<\/span><span>${c.wave} sent · the next in ${Math.max(0, c.nextWave - S.turn)} turn${c.nextWave - S.turn === 1 ? "" : "s"} · ${c.ships} machines out there<\/span>
+    <span>Nodes<\/span><span>${c.nodes.length ? `<b class="bad">${c.nodes.length}<\/b>: ${nodeList}. The ones within ${CRISIS.shieldRange} hexes of the Heart shield it: nothing can harm it while they stand. Each sends hunters every ${CRISIS.nodeEvery} turns, and any left when the Heart falls will grow a new one` : "None: every world they burn becomes one"}<\/span>
+    ${c.returns ? `<span>Returned<\/span><span class="bad">${c.returns} time${c.returns === 1 ? "" : "s"}: this Heart is stronger than the last<\/span>` : ""}
     <span>Truce<\/span><span>${c.truce ? "Holding: no power starts a new war while the Heart lives" : "None: wars go on"}<\/span><\/div>
     <ol class="steps-list">${stepLi("now", "Keep their waves off your worlds: a world with guns or warships in orbit can't be burned, only fought over")}${stepLi("", `Break the Heart: its guard must fall before it can be hit, it mends ${2 * (S.crisis.m || 1)} hull a turn, and it fires ${1 + (S.crisis.m || 1)} times a round`)}<\/ol>
     ${table}
@@ -4959,6 +5126,7 @@ function showHelp(back) {
       <li><b>Refits:<\/b> research that improves ships goes into new ones; ships already in service get it at a Drydock (a Shipyard fits the early systems: sensors, drives, shields). A fleet's panel says when its ships need a refit.<\/li>
       <li><b>Pirate ransom and tribute:<\/b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts<\/b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.<\/li>
       <li><b>Traders:<\/b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot<\/b> to fill its tanks and cut the depot's supply.<\/li>
+      <li><b>The Wardens:<\/b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out.<\/li>
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.<\/li>

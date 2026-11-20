@@ -67,6 +67,8 @@ export const SHIPS = {
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
+  watcher: { name: "Watcher", cost: 0, upkeep: 0, speed: 0, hull: 6, skill: 12, dmg: 2, sensors: 3, warden: true, text: "A Warden machine half-buried by a rift, dormant but watching. It fights whatever comes near. When the Wardens wake, it wakes as a Node." },
+  node: { name: "Warden Node", cost: 0, upkeep: 0, speed: 0, hull: 10, skill: 12, dmg: 2, shots: 2, sensors: 3, warden: true, text: "A Warden forge, built on a world they've burned. It sends out hunters and holds the system. While one stands, a new Heart can grow." },
   heart: { name: "Heart", cost: 0, upkeep: 0, speed: 0, hull: 20, skill: 14, dmg: 3, sensors: 3, warden: true, text: "The Wardens' mind and forge. It never moves, mends itself, and sends out the waves. Break it and they go dark." },
 };
 
@@ -86,6 +88,8 @@ export const SHIP_SHAPES = {
   haven: "M0 -11 L10 -4 L7 9 L-7 9 L-10 -4 Z M0 -5 L4 -2 L3 4 L-3 4 L-4 -2 Z M10 -4 L12.5 -6 M-10 -4 L-12.5 -6 M7 9 L9 11.5 M-7 9 L-9 11.5",
   swarm: "M0 -11 L3 -3 L11 -4 L5 2 L8 10 L0 5 L-8 10 L-5 2 L-11 -4 L-3 -3 Z",
   leviathan: "M12 0 Q8 -8 -2 -7 Q-8 -6 -12 -10 Q-10 -3 -10 0 Q-10 3 -12 10 Q-8 6 -2 7 Q8 8 12 0 Z M6 -2 L4 -2 M-2 -7 Q0 0 -2 7",
+  watcher: "M0 -10 L7 -4 L7 4 L0 10 L-7 4 L-7 -4 Z M0 -4 A4 4 0 1 0 0 4 A4 4 0 1 0 0 -4 M0 -1.5 A1.5 1.5 0 1 0 0 1.5 A1.5 1.5 0 1 0 0 -1.5",
+  node: "M0 -11 L4 -4 L11 -4 L6 1 L8 9 L0 5 L-8 9 L-6 1 L-11 -4 L-4 -4 Z M0 -3 L3 0 L0 3 L-3 0 Z",
   heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
 };
 
@@ -315,7 +319,21 @@ export const PATROL = { share: 0.5, regard: 0.3 };
 export const TRADERS = { every: 15, range: 10, maxPerExchange: 1, perPower: 2, base: 4, perHex: 1, hunt: 4, reach: 1, offer: 0.35, color: "#e6a8d7", name: "The Free Traders" };
 /** Raiders who lose ships at a world stay away from it this many turns. */
 export const RAID_AVOID = 15;
-export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
+/**
+ * The Wardens (crisis.js). The Signs: from `signsLead` turns before they wake, a dormant Watcher appears by a rift every
+ * `watcherEvery` turns, up to watchers[size]. Awake: the Heart sends waves; a burned world becomes a Node, and each
+ * Node sends hunters every `nodeEvery` turns. The Heart wakes with wakeNodes[size] Nodes of its own around it, and can't
+ * be harmed while one within `shieldRange` stands. Nodes and the Heart can only be worn down: a battle takes at most
+ * wear[type] of their full hull. Waves go for a power building the Corridor Engine (`engineHunt` of them) before anyone else.
+ * Breaking the Heart silences the waves, but while a Node stands, a new
+ * Heart grows at one after `regrow` turns, `regrowGain` times stronger. It's over only when the Heart and every Node
+ * are gone.
+ */
+export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0",
+  signsLead: 35, watcherEvery: 6, watchers: { small: 2, medium: 3, large: 4, vast: 5 }, nodeEvery: 8, regrow: 30, regrowGain: 1.25,
+  wakeNodes: { small: 2, medium: 3, large: 4, vast: 5 }, engineHunt: 0.5, perStrength: 300, maxStrength: 40,
+  wear: { node: 0.25, heart: 0.2 }, shieldRange: 6, maxNodes: { small: 5, medium: 8, large: 10, vast: 12 }, huntersPerStrength: 10,
+  bounty: { watcher: 40, node: 80 } };
 /**
  * The Corridor Engine in an open game: not a victory but the galaxy's great prize. Only one can stand. Its holder's
  * fleets travel corridors for nothing and can jump through the gate from the Engine world to any of its worlds (every

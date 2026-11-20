@@ -318,12 +318,15 @@ function huntWilds(s, F, f, reach) {
 /** While the Wardens are awake: go after a wave within `reach` hexes of one of this faction's worlds, if this fleet can
  * take it; a strong fleet goes for the Heart itself, once the powers have had time to see what they face. */
 function huntWardens(s, F, f, reach) {
-  if (!s.crisis || s.crisis.stage !== "awake") return false;
+  // Any Warden machine: the waves and the Heart once they're awake, the Watchers before, the Nodes until the last falls.
+  if (!s.crisis || !fleetsOf(s, "wardens").length) return false;
   const hullOf = (fl, fid) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, fid, x.type).hull * SHIPS[x.type].dmg : 0), 0);
   const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
   const waves = fleetsOf(s, "wardens").map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
   const heartAt = (waves.find((x) => x.heart) || {}).w;
   const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]
-    || (reach > 3 && s.turn >= s.crisis.woke + 12 ? waves.filter((x) => x.heart && x.d <= 14 && hullOf(x.w, "wardens") <= mine * 0.9)[0] : null);
+    // Once they've had time to see what they face, strong fleets lay siege to the Nodes that shield the Heart.
+    || (reach > 3 && s.turn >= s.crisis.woke + 8 && s.crisis.heart ? waves.filter((x) => x.w.ships.some((y) => y.type === "node") && distance(x.w.at, s.crisis.heart) <= 6 && x.d <= 16 && hullOf(x.w, "wardens") <= mine * 1.5).sort((a, b) => a.d - b.d)[0] : null)
+    || (reach > 3 && s.turn >= s.crisis.woke + 12 && !waves.some((x) => x.w.ships.some((y) => y.type === "node") && s.crisis.heart && distance(x.w.at, s.crisis.heart) <= 6) ? waves.filter((x) => x.heart && x.d <= 20 && hullOf(x.w, "wardens") <= mine * 2)[0] : null);   // the Heart is worn down over many battles: commit
   return !!(pick && pick.w.at !== f.at && setDestination(s, f.id, pick.w.at).ok);
 }

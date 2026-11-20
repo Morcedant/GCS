@@ -49,7 +49,7 @@ ${markers}
 ${common(TRADERS.name, TRADERS.color, [["merchant", 6]], "At peace with everyone but the pirates.")}
 ${common(WILDS.pirates.name, WILDS.pirates.color, [["raider", 7], ["haven", 2, "1.1in"]], "At war with every power.")}
 ${common(WILDS.beasts.name, WILDS.beasts.color, [["swarm", 4], ["leviathan", 2, "1.1in"]], "At war with every power.")}
-${common("The Wardens", CRISIS.color, [["sentinel", 7], ["colossus", 4], ["heart", 1, "1.3in"]], "The late-game crisis.")}
+${common("The Wardens", CRISIS.color, [["watcher", 3], ["node", 4, "1.1in"], ["sentinel", 7], ["colossus", 4], ["heart", 1, "1.3in"]], "The late-game crisis: the Signs, then the waking.")}
 ${FACTIONS.map(empire).join("\n")}
 <p style="margin-top:14px;font-size:10px;color:#555">Fracture Lines: Dominion, a strategy game in the Fracture Lines setting of the Legend Dynamics RPG.</p>
 </body></html>`;

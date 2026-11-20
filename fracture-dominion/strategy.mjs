@@ -84,7 +84,7 @@ const body = [
 
   sec("threats", "Threats from outside", ul([
     "<b>Pirates and creatures</b> belong to no one and trouble everyone. Deal with them when you're ready. They pay well when destroyed. Sometimes buying peace from pirates is the better use of your time. Neighbours can help each other against them.",
-    "<b>The Wardens</b> are the late-game crisis, and they come for every power. You'll get a warning. Use it.",
+    "<b>The Wardens</b> are the late-game crisis, and they come for every power, the strongest and anyone building the Corridor Engine first. The signs come long before they wake: deal with what you can while it's still asleep. Awake, they spread like an empire, and they come back unless every trace of them is gone.",
     "<b>Adjust the challenge</b> to your taste: the number of pirates and creatures, the difficulty and the computer players' options are all settings."])),
 
   sec("explore", "Exploration", ul([

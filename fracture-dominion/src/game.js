@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within, hexagon } from "./hex.js";
-import { shipLabel, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, YARDS, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, AI_PRESETS, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES } from "./data.js";
+import { shipLabel, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, YARDS, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, AI_PRESETS, REACH, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES, CRISIS } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -146,6 +146,8 @@ export function shipStats(s, fid, type, ship) {
   const base = SHIPS[type], warship = base.skill > 0;
   // The Heart of the Wardens grows with the galaxy it wakes in (crisis.js): more hull, more guns.
   if (type === "heart") { const m = (s.crisis && s.crisis.m) || 1; return { ...base, hull: s.crisis && s.crisis.heartMax || base.hull * m, shots: 1 + m }; }
+  // Watchers and Nodes grow with it too: their hull and guns by the crisis's strength (set by the Signs, then the waking).
+  if (type === "watcher" || type === "node") { const m = (s.crisis && (s.crisis.m || s.crisis.mSigns)) || 1; return { ...base, hull: base.hull * m, shots: (base.shots || 1) + Math.floor(m / 2) }; }
   // Research comes through the ship's own systems (fitOf); a people's traits and relics reach every ship at once.
   const k = fitOf(s, fid, ship);
   return { ...base,
@@ -800,8 +802,16 @@ function battles(s) {
     const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
     if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat || sys.colony.buildings.station ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : sys.colony.buildings.station ? "Orbital station" : "Orbital guns" } }); }
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
+    // The Nodes the Heart raised around itself shield it (CRISIS.shieldRange); Nodes on burned worlds far off don't.
+    const nodesUp = !!(s.crisis && s.crisis.heart) && Object.values(s.fleets).some((f) => f.owner === "wardens" && distance(f.at, s.crisis.heart) <= CRISIS.shieldRange && f.ships.some((x) => x.type === "node" && x.hull > 0));
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
-    const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
+    // Warden Nodes and the Heart can only be worn down: a battle takes at most a share of their full hull (CRISIS.wear).
+    const hit = (u, n) => {
+      if (u.world) { u.world.colony.defense = Math.max(0, u.world.colony.defense - n); return; }
+      const w = CRISIS.wear[u.ship.type];
+      if (w) { const cap = Math.ceil(u.st.hull * w) - (u.taken || 0); n = Math.max(0, Math.min(n, cap)); u.taken = (u.taken || 0) + n; }
+      u.ship.hull -= n;
+    };
     // A battle the player is in is recorded roll by roll, for the battle pop-up.
     const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
     const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
@@ -813,9 +823,9 @@ function battles(s) {
       for (const u of live) {
         for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
-        // The Heart of the Wardens can't be fired on while its guard still stands.
+        // The Heart of the Wardens can't be fired on while its guard still stands, nor while its own Nodes do.
         // Pirates and crystal swarms don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && u.ship.type === "swarm"))) && !(v.ship && v.ship.type === "heart" && live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0)));
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && u.ship.type === "swarm"))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
@@ -828,6 +838,8 @@ function battles(s) {
             // Score: by what the machine was worth, against how hard the Wardens came (a hunter is worth less in a swarm).
             K.stats.wardenPts = (K.stats.wardenPts || 0) + (SHIPS[t.ship.type].hull * SHIPS[t.ship.type].dmg / 3) / ((s.crisis && s.crisis.m) || 1) * (K.glory ? 2 : 1);
             if (t.ship.type === "heart" && s.crisis) { s.crisis.heartBy = u.fid; s.crisis.heartWith = list.filter((x) => x !== "wardens"); }
+            // A Watcher or a Node: what it was built from teaches something (CRISIS.bounty, in research).
+            if (CRISIS.bounty[t.ship.type]) { K.research.progress += CRISIS.bounty[t.ship.type]; log(s, u.fid, `${K.name} destroyed a Warden ${SHIPS[t.ship.type].name.replace(/^Warden /, "")} at ${where}: +${CRISIS.bounty[t.ship.type]} research.`, "war"); }
           }
           // A pirate or a creature destroyed: its bounty (credits), and what its wreck teaches (research), to whoever did it.
           if (was > 0 && hp(t) <= 0 && (t.fid === "pirates" || t.fid === "beasts") && !isWild(u.fid)) bounty(s, u.fid, t.ship.type, where);

@@ -122,12 +122,22 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Galactic events:** every nine turns or so, from turn 6, something happens that you decide about: a derelict of
   the old empires, refugees, a plague, a rich deposit, a defecting admiral, raiders, a trader, a golden age, a border
   incident. Surveying ruins is a scene with a choice too (rivals' surveys still give plain research).
-- **The late-game crisis (the Wardens):** around turn 105–120 the old empires' war machines wake beside a rift, after a
-  warning six turns before. Their Heart never moves; every 6 turns it sends a wave that hunts the nearest worlds of
-  every power and burns any whose orbit is unguarded. They grow with the strongest power in the galaxy. The player
-  chooses how to meet them (study the signal, warn the rivals, fortify; then a truce, an arms drive, or glory).
-  The Heart can't be hit while its guard stands, and breaking it makes every machine go dark. Destroyed machines
-  and the Heart count toward score. It can be switched off on the new-game screen. `src/crisis.js`.
+- **The late-game crisis (the Wardens):** the old empires' war machines, left to guard the corridors.
+  - **The Signs**, from about 35 turns before they wake: Warden **Watchers** surface by the rifts one by one (dormant,
+    armed, never moving), and transmissions on every band grow more urgent. Six turns before the waking, a warning
+    scene (study the signal, warn the rivals, fortify).
+  - **The waking**, around turn 105–120: the **Heart** rises beside a rift with Nodes of its own around it, and every
+    Watcher still standing wakes as a **Node**. Every 6 turns the Heart sends a wave; waves hunt the nearest worlds,
+    one in three goes for the strongest power, and half go for anyone building the Corridor Engine. A world whose
+    orbit they hold unguarded burns, and a world burned to rock becomes a new Node. Each Node sends hunters every 8
+    turns.
+  - **Hard to kill:** the Heart can't be harmed while its guard, or a Node within 6 hexes of it, stands; Nodes and the
+    Heart can only be worn down (a battle takes at most a quarter of a Node's hull, a sixth of the Heart's); they mend
+    each turn. Their strength follows the whole galaxy's combined fleets.
+  - **They come back:** breaking the Heart silences its waves, but while any Node stands, a new Heart a quarter
+    stronger grows at the oldest after 30 turns. It's over only when the Heart and every Node are gone.
+  - Watchers and Nodes destroyed give research; machines destroyed and the Heart count toward score. The crisis can be
+    switched off on the new-game screen. `src/crisis.js`.
 - **Rivals with personalities:** each people has a leader and a character (the Concord's idealists, the Tessan merchant
   princes, the patient Kel hive, the proud Hegemony legions, the Vael wanderers). They send messages in their own voice:
   a greeting at first contact, demands for tribute, warnings to move a fleet, offers of alliance, calls to join a war,

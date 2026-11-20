@@ -1082,3 +1082,44 @@ test("real provocation overrides the early-war turn: regard at −40 or a recent
   ({ s, F, me } = setup()); F.relations[me.id].score = -25; remember(s, F.id, me.id, "broke our alliance", AI_CALM.graveOffence - 5);
   F.relations[me.id].score = -25; aiTurn(s, F); assert.ok(atWar(s, F.id, me.id), "betrayed: war");
 });
+
+test("the Wardens persist: the Signs bring Watchers, Watchers wake as Nodes, Nodes shield the Heart, wear down slowly, and a broken Heart regrows while one stands", async () => {
+  const { crisisTurn, crisisState, WARDENS } = await import("../src/crisis.js");
+  const { CRISIS } = await import("../src/data.js");
+  const s = newGame({ seed: 42, size: "medium", player: "concord", rivals: 2 });
+  crisisTurn(s);
+  // The Signs: a Watcher surfaces some 35 turns before the waking.
+  s.turn = s.crisis.at - CRISIS.signsLead; crisisTurn(s);
+  assert.equal(crisisState(s).stage, "signs");
+  assert.ok(fleetsOf(s, WARDENS).some((f) => f.ships[0].type === "watcher"), "a Watcher");
+  // The waking: the Watcher becomes a Node, and the Heart raises Nodes of its own.
+  s.turn = s.crisis.at - CRISIS.warning; crisisTurn(s); s.galEvent = null;
+  s.turn = s.crisis.at; crisisTurn(s); s.galEvent = null;
+  const nodes = () => fleetsOf(s, WARDENS).filter((f) => f.ships.some((x) => x.type === "node"));
+  assert.ok(nodes().length >= CRISIS.wakeNodes.medium, "Nodes at the waking");
+  assert.ok(!fleetsOf(s, WARDENS).some((f) => f.ships[0].type === "watcher"), "no Watcher left asleep");
+  // Shielded: a fleet at the Heart can't harm it while its own Nodes stand.
+  const hf = fleetsOf(s, WARDENS).find((f) => f.ships.some((x) => x.type === "heart")), heart = hf.ships.find((x) => x.type === "heart");
+  hf.ships = [heart]; const h0 = heart.hull;
+  for (let i = 0; i < 20; i++) spawnFleet(s, "concord", hf.at, ["dreadnought"]);
+  endTurn(s, null); assert.equal(heart.hull, h0, "the Nodes shield it");
+  // Worn down: a battle takes at most a quarter of a Node's hull.
+  const n0 = nodes()[0], max = n0.ships[0].hull;
+  for (let i = 0; i < 20; i++) spawnFleet(s, "concord", n0.at, ["dreadnought"]);
+  endTurn(s, null); assert.ok(n0.ships[0].hull >= max - Math.ceil(max * CRISIS.wear.node), "no more than a quarter in one battle");
+  // Break the Heart with a far-off Node still standing: dormant, not over; then a new, stronger Heart grows.
+  for (const f of fleetsOf(s, "concord")) delete s.fleets[f.id];
+  const far = Object.keys(s.hexes).find((k) => distance(k, s.crisis.heart) > CRISIS.shieldRange + 2 && !s.sysAt[k] && s.hexes[k].terrain === "space" && !fleetsAt(s, k).length);
+  for (const f of nodes()) delete s.fleets[f.id];
+  spawnFleet(s, WARDENS, far, ["node"]).born = s.turn;
+  hf.ships = []; delete s.fleets[hf.id]; s.galEvent = null;
+  crisisTurn(s);
+  assert.equal(s.crisis.stage, "dormant", "a Node stands: not over");
+  const max0 = s.crisis.heartMax;
+  s.turn = s.crisis.regrowAt; s.galEvent = null; crisisTurn(s);
+  assert.equal(s.crisis.stage, "awake"); assert.equal(s.crisis.returns, 1); assert.ok(s.crisis.heartMax > max0, "stronger");
+  assert.equal(s.galEvent && s.galEvent.id, "returning");
+  // And with no Node at all when the Heart falls: over.
+  for (const f of fleetsOf(s, WARDENS)) delete s.fleets[f.id]; s.galEvent = null; crisisTurn(s);
+  assert.equal(s.crisis.stage, "over");
+});
