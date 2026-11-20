@@ -135,6 +135,34 @@ export function sendToDrydock(s, fleetId, onlyOld = false) {
   go.sentry = false; go.refitTrip = true;
   return { ok: true, fleet: go.id, dock: dock.name, turns: r.turns, ships: go.ships.length, split: go !== f };
 }
+/**
+ * Send a power's fleets to one place at once: its warship fleets (any with a warship in it; their transports and
+ * tankers go with them), or every fleet. Fleets already there stay; fleets told to hold position are sent too. What
+ * each fleet was doing is kept, so the order can be undone this turn (undoSendAll). Returns { fleets, ships, turns
+ * (the longest trip), unreachable }.
+ */
+export function sendAllTo(s, fid, hex, kind = "war") {
+  const out = { fleets: 0, ships: 0, turns: 0, unreachable: 0 }, before = [];
+  for (const f of fleetsOf(s, fid)) {
+    if (f.at === hex || (kind === "war" && !armed(f))) continue;
+    const prev = { id: f.id, path: f.path, dest: f.dest, sentry: f.sentry };
+    const r = setDestination(s, f.id, hex);
+    if (r.error) { out.unreachable++; continue; }
+    before.push(prev); f.sentry = false;
+    out.fleets++; out.ships += f.ships.length; out.turns = Math.max(out.turns, r.turns || 0);
+  }
+  faction(s, fid).lastSendAll = { turn: s.turn, hex, before };
+  return out;
+}
+/** Undo this turn's send-all: every fleet it sent goes back to what it was doing. */
+export function undoSendAll(s, fid) {
+  const L = faction(s, fid).lastSendAll;
+  if (!L || L.turn !== s.turn) return { error: "There's nothing to undo this turn." };
+  let n = 0;
+  for (const p of L.before) { const f = s.fleets[p.id]; if (!f) continue; f.path = p.path; f.dest = p.dest; f.sentry = p.sentry; n++; }
+  faction(s, fid).lastSendAll = null;
+  return { ok: true, fleets: n };
+}
 /** Every out-of-date ship of a power's, split off its fleet and sent to the nearest drydock. Returns how many ships. */
 export function sendAllToDrydock(s, fid) {
   let n = 0, fleets = 0;

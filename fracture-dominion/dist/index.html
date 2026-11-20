@@ -209,7 +209,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-20 12:48 UTC";
+const BUILD = "2026-11-20 12:51 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -985,6 +985,34 @@ function sendToDrydock(s, fleetId, onlyOld = false) {
   if (r.error) { if (go !== f) { f.ships.push(...go.ships); delete s.fleets[go.id]; } return { error: `No way to ${dock.name} from here.` }; }
   go.sentry = false; go.refitTrip = true;
   return { ok: true, fleet: go.id, dock: dock.name, turns: r.turns, ships: go.ships.length, split: go !== f };
+}
+/**
+ * Send a power's fleets to one place at once: its warship fleets (any with a warship in it; their transports and
+ * tankers go with them), or every fleet. Fleets already there stay; fleets told to hold position are sent too. What
+ * each fleet was doing is kept, so the order can be undone this turn (undoSendAll). Returns { fleets, ships, turns
+ * (the longest trip), unreachable }.
+ */
+function sendAllTo(s, fid, hex, kind = "war") {
+  const out = { fleets: 0, ships: 0, turns: 0, unreachable: 0 }, before = [];
+  for (const f of fleetsOf(s, fid)) {
+    if (f.at === hex || (kind === "war" && !armed(f))) continue;
+    const prev = { id: f.id, path: f.path, dest: f.dest, sentry: f.sentry };
+    const r = setDestination(s, f.id, hex);
+    if (r.error) { out.unreachable++; continue; }
+    before.push(prev); f.sentry = false;
+    out.fleets++; out.ships += f.ships.length; out.turns = Math.max(out.turns, r.turns || 0);
+  }
+  faction(s, fid).lastSendAll = { turn: s.turn, hex, before };
+  return out;
+}
+/** Undo this turn's send-all: every fleet it sent goes back to what it was doing. */
+function undoSendAll(s, fid) {
+  const L = faction(s, fid).lastSendAll;
+  if (!L || L.turn !== s.turn) return { error: "There's nothing to undo this turn." };
+  let n = 0;
+  for (const p of L.before) { const f = s.fleets[p.id]; if (!f) continue; f.path = p.path; f.dest = p.dest; f.sentry = p.sentry; n++; }
+  faction(s, fid).lastSendAll = null;
+  return { ok: true, fleets: n };
 }
 /** Every out-of-date ship of a power's, split off its fleet and sent to the nearest drydock. Returns how many ships. */
 function sendAllToDrydock(s, fid) {
@@ -4288,6 +4316,7 @@ function systemHTML() {
     h += `<h3>Add to the queue<\/h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18, player(S).id) + " " : ""}${esc(o.name)}<\/b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}<\/span><\/button>`).join("")}<\/div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.<\/p>`;
   }
+  if (me.explored[sys.at]) h += rallyHTML(sys);
   if (mine) h += musterHereHTML(sys);
   const fl = fleetsAt(S, sys.at).filter((f) => f.owner === me.id || seen);
   if (fl.length) h += `<h3>In orbit<\/h3>` + fl.map((f) => `<button class="row" data-selfleet="${f.id}"><span class="dot" style="background:${faction(S, f.owner).color}"><\/span>${esc(fleetName(f))}<\/button>`).join("");
@@ -4611,6 +4640,15 @@ function admiralsHTML() {
     ${fallen.length ? `<details class="small"><summary>The fallen (${fallen.length})<\/summary><ul>${fallen.map((x) => `<li>${esc(x.name)}, at ${esc(x.at)} on turn ${x.turn} (${x.wins} win${x.wins === 1 ? "" : "s"})<\/li>`).join("")}<\/ul><\/details>` : ""}`;
 }
 /** The empire's Focus: three points to share between industry, science, credits and defense. */
+/** Send every fleet here, at once: the warships, or everything; and undo it this turn. */
+function rallyHTML(sys) {
+  const me = player(S), all = fleetsOf(S, me.id), elsewhere = all.filter((f) => f.at !== sys.at), war = elsewhere.filter(armed);
+  const L = me.lastSendAll, undo = L && L.turn === S.turn && L.before.length;
+  if (!elsewhere.length && !undo) return "";
+  const n = (list) => list.reduce((t, f) => t + f.ships.length, 0);
+  return `<h3>Send your ships here<\/h3><p class="small muted" style="margin-top:-4px">Every fleet sets out for ${esc(sys.name)} now, by the quickest way. Each sails on its own, at its own speed.<\/p>
+    <div class="btn-row">${war.length ? `<button class="btn primary" data-sendall="war">Send all warships (${war.length} fleet${war.length === 1 ? "" : "s"}, ${n(war)} ships)<\/button>` : ""}${elsewhere.length > war.length || !war.length ? `<button class="btn" data-sendall="all">Send every ship (${elsewhere.length} fleet${elsewhere.length === 1 ? "" : "s"}, ${n(elsewhere)} ships)<\/button>` : ""}${undo ? `<button class="btn" data-sendundo>Undo the last send (${L.before.length} fleet${L.before.length === 1 ? "" : "s"})<\/button>` : ""}<\/div>`;
+}
 /** Muster points on a world or outpost of yours: which standing orders send new ships here, and buttons to set them. */
 function musterHereHTML(sys) {
   const me = player(S), M = me.muster || {}, here = ["all", ...Object.keys(MUSTER_KINDS)].filter((k) => M[k] === sys.id);
@@ -4748,6 +4786,9 @@ function bindChrome() {
     else if (d.alldock !== undefined) { const r = sendAllToDrydock(S, me.id); toast(r.ships ? `${r.ships} out-of-date ship${r.ships === 1 ? "" : "s"} from ${r.fleets} fleet${r.fleets === 1 ? "" : "s"} on the way to drydock.` : "Nothing to send: no drydock can take them, or they're already on the way.", !r.ships); }
     else if (d.autorefit !== undefined) { me.autoRefit = !me.autoRefit; toast(me.autoRefit ? "Standing order: idle fleets with out-of-date ships go to the nearest drydock." : "Standing order cancelled: fleets go for refits only when you send them."); }
     else if (d.deepstation !== undefined) { const r = foundStation(S, sel.id); if (r.error) toast(r.error, true); else { toast(`${r.name} is built.`); sel = { kind: "system", id: r.id }; } }
+    else if (d.sendall) { const sys = S.systems[sel.id], r = sendAllTo(S, me.id, sys.at, d.sendall);
+      toast(r.fleets ? `${r.fleets} fleet${r.fleets === 1 ? "" : "s"} (${r.ships} ships) on the way to ${sys.name}${r.turns ? `: the last arrives in ${r.turns} turn${r.turns === 1 ? "" : "s"}` : ""}.${r.unreachable ? ` ${r.unreachable} can't find a way there.` : ""}` : r.unreachable ? `None of your fleets can find a way to ${sys.name}.` : "They're all here already.", !r.fleets); }
+    else if (d.sendundo !== undefined) { const r = undoSendAll(S, me.id); toast(r.error || `Undone: ${r.fleets} fleet${r.fleets === 1 ? "" : "s"} back to what ${r.fleets === 1 ? "it was" : "they were"} doing.`, !!r.error); }
     else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }

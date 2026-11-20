@@ -1123,3 +1123,18 @@ test("the Wardens persist: the Signs bring Watchers, Watchers wake as Nodes, Nod
   for (const f of fleetsOf(s, WARDENS)) delete s.fleets[f.id]; s.galEvent = null; crisisTurn(s);
   assert.equal(s.crisis.stage, "over");
 });
+
+test("send all ships to one place with one order, and undo it this turn", async () => {
+  const { sendAllTo, undoSendAll } = await import("../src/game.js");
+  const s = newGame({ seed: 38, size: "small", player: "concord", rivals: 1 }), me = s.factions[0], cap = s.systems[me.capital];
+  const target = Object.values(s.systems).find((x) => x !== cap && findPath(s, "concord", cap.at, x.at));
+  const a = spawnFleet(s, "concord", cap.at, ["cruiser"]), b = spawnFleet(s, "concord", cap.at, ["frigate", "transport"]);
+  const c = spawnFleet(s, "concord", cap.at, ["colony"]); b.sentry = true;
+  const r = sendAllTo(s, "concord", target.at, "war");
+  assert.ok(r.fleets >= 2 && r.turns >= 1);
+  assert.equal(a.dest, target.at); assert.equal(b.dest, target.at, "holding position or not, it goes"); assert.ok(!b.sentry);
+  assert.notEqual(c.dest, target.at, "warships only: the colony ship stays");
+  assert.ok(undoSendAll(s, "concord").ok); assert.ok(!a.path.length && b.sentry, "undone");
+  assert.ok(sendAllTo(s, "concord", target.at, "all").fleets >= 3); assert.equal(c.dest, target.at, "every ship");
+  endTurn(s); assert.ok(undoSendAll(s, "concord").error, "only this turn");
+});

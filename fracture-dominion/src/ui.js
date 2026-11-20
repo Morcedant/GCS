@@ -1,7 +1,7 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
 import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE, CRISIS } from "./data.js";
-import { newGame, endTurn, difficultyLabel, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
@@ -408,6 +408,7 @@ function systemHTML() {
     h += `<h3>Add to the queue</h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18, player(S).id) + " " : ""}${esc(o.name)}</b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></button>`).join("")}</div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.</p>`;
   }
+  if (me.explored[sys.at]) h += rallyHTML(sys);
   if (mine) h += musterHereHTML(sys);
   const fl = fleetsAt(S, sys.at).filter((f) => f.owner === me.id || seen);
   if (fl.length) h += `<h3>In orbit</h3>` + fl.map((f) => `<button class="row" data-selfleet="${f.id}"><span class="dot" style="background:${faction(S, f.owner).color}"></span>${esc(fleetName(f))}</button>`).join("");
@@ -731,6 +732,15 @@ function admiralsHTML() {
     ${fallen.length ? `<details class="small"><summary>The fallen (${fallen.length})</summary><ul>${fallen.map((x) => `<li>${esc(x.name)}, at ${esc(x.at)} on turn ${x.turn} (${x.wins} win${x.wins === 1 ? "" : "s"})</li>`).join("")}</ul></details>` : ""}`;
 }
 /** The empire's Focus: three points to share between industry, science, credits and defense. */
+/** Send every fleet here, at once: the warships, or everything; and undo it this turn. */
+function rallyHTML(sys) {
+  const me = player(S), all = fleetsOf(S, me.id), elsewhere = all.filter((f) => f.at !== sys.at), war = elsewhere.filter(armed);
+  const L = me.lastSendAll, undo = L && L.turn === S.turn && L.before.length;
+  if (!elsewhere.length && !undo) return "";
+  const n = (list) => list.reduce((t, f) => t + f.ships.length, 0);
+  return `<h3>Send your ships here</h3><p class="small muted" style="margin-top:-4px">Every fleet sets out for ${esc(sys.name)} now, by the quickest way. Each sails on its own, at its own speed.</p>
+    <div class="btn-row">${war.length ? `<button class="btn primary" data-sendall="war">Send all warships (${war.length} fleet${war.length === 1 ? "" : "s"}, ${n(war)} ships)</button>` : ""}${elsewhere.length > war.length || !war.length ? `<button class="btn" data-sendall="all">Send every ship (${elsewhere.length} fleet${elsewhere.length === 1 ? "" : "s"}, ${n(elsewhere)} ships)</button>` : ""}${undo ? `<button class="btn" data-sendundo>Undo the last send (${L.before.length} fleet${L.before.length === 1 ? "" : "s"})</button>` : ""}</div>`;
+}
 /** Muster points on a world or outpost of yours: which standing orders send new ships here, and buttons to set them. */
 function musterHereHTML(sys) {
   const me = player(S), M = me.muster || {}, here = ["all", ...Object.keys(MUSTER_KINDS)].filter((k) => M[k] === sys.id);
@@ -868,6 +878,9 @@ function bindChrome() {
     else if (d.alldock !== undefined) { const r = sendAllToDrydock(S, me.id); toast(r.ships ? `${r.ships} out-of-date ship${r.ships === 1 ? "" : "s"} from ${r.fleets} fleet${r.fleets === 1 ? "" : "s"} on the way to drydock.` : "Nothing to send: no drydock can take them, or they're already on the way.", !r.ships); }
     else if (d.autorefit !== undefined) { me.autoRefit = !me.autoRefit; toast(me.autoRefit ? "Standing order: idle fleets with out-of-date ships go to the nearest drydock." : "Standing order cancelled: fleets go for refits only when you send them."); }
     else if (d.deepstation !== undefined) { const r = foundStation(S, sel.id); if (r.error) toast(r.error, true); else { toast(`${r.name} is built.`); sel = { kind: "system", id: r.id }; } }
+    else if (d.sendall) { const sys = S.systems[sel.id], r = sendAllTo(S, me.id, sys.at, d.sendall);
+      toast(r.fleets ? `${r.fleets} fleet${r.fleets === 1 ? "" : "s"} (${r.ships} ships) on the way to ${sys.name}${r.turns ? `: the last arrives in ${r.turns} turn${r.turns === 1 ? "" : "s"}` : ""}.${r.unreachable ? ` ${r.unreachable} can't find a way there.` : ""}` : r.unreachable ? `None of your fleets can find a way to ${sys.name}.` : "They're all here already.", !r.fleets); }
+    else if (d.sendundo !== undefined) { const r = undoSendAll(S, me.id); toast(r.error || `Undone: ${r.fleets} fleet${r.fleets === 1 ? "" : "s"} back to what ${r.fleets === 1 ? "it was" : "they were"} doing.`, !!r.error); }
     else if (d.depotraid !== undefined) { const r = raidDepot(S, sel.id); if (r.error) toast(r.error, true); else toast("Depot raided: your tanks are full, and theirs are dry."); }
     else if (d.gate) { const nm = S.systems[d.gate].name, r = engineGate(S, sel.id, d.gate); if (r.error) toast(r.error, true); else { toast(`Through the gate: the fleet is at ${nm}.`); centerOn(S.fleets[sel.id].at); } }
     else if (d.barrage) { const r = barrage(S, sel.id, d.barrage); if (r.error) toast(r.error, true); else toast(`Barrage: the ${BUILDINGS[d.barrage].name.toLowerCase()} is gone${r.wrecked ? `, with ${r.wrecked} ship${r.wrecked > 1 ? "s" : ""} in its yards` : ""}.`); }

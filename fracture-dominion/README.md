@@ -73,6 +73,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   off one, half or all of a type into a new fleet (the most damaged first; the admiral stays), or join every fleet in
   a system into one. The Empire tab groups war fleets apart from scouts, transports and colony ships, and folds a long
   list away.
+- **Send your ships here:** any explored system's panel sends every warship fleet there (with the transports and tankers
+  in them), or every fleet you have, in one click, by the quickest way; fleets holding position go too. An Undo puts
+  them all back to what they were doing, until the turn ends.
 - **Muster points:** standing orders for where new ships go: all of them, or warships, troop transports, colony and
   outpost ships or scouts on their own, to a world or outpost of yours (the Empire tab, or the world's own panel). They
   leave as soon as they're built and join their kind waiting there. A muster point that's lost is struck off.

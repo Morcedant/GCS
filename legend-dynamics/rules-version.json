@@ -6,6 +6,17 @@
     {
       "date": "2026-11-20",
       "kind": "site",
+      "title": "Dominion: send all your ships somewhere in one click",
+      "items": [
+        "Every explored system's panel now has a \"Send your ships here\" section. \"Send all warships\" sends every fleet with a warship in it, including the transports and tankers travelling with them. \"Send every ship\" sends everything you have.",
+        "Each fleet sets out by the quickest way, at its own speed. The message says how long the last one will take, and whether any can't find a way.",
+        "\"Undo the last send\" puts every fleet back to what it was doing, until you end the turn.",
+        "It works for your own worlds, empty systems, and an enemy's world you want to attack."
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "kind": "site",
       "title": "Dominion: the Wardens, a persistent threat",
       "items": [
         "The Signs: about 35 turns before the Wardens wake, dormant Warden Watchers surface by the rifts one by one, armed and watching, while transmissions on every band grow more urgent. Destroy them while they sleep, for research and one less Node later.",
