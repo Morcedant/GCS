@@ -1,10 +1,10 @@
 // The Peoples page: each empire's hex token and portrait, what its people look like, its trait, its leader and
 // character, and its ships. Writes dist/peoples.html.   node peoples.mjs
 // Painted art: put a picture named after the empire in art/ (art/mirrun.webp, .png or .jpg) and the page uses it in
-// place of the drawing, cropped to the hex. ART_PROMPTS (src/peoples.js) has a prompt for each, for an image generator.
+// place of the drawing, cropped to the hex.
 import { writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import { FACTIONS, PERSONALITIES, FLEET_STYLES, SHIPS } from "./src/data.js";
-import { peopleToken, LOOKS, ART_PROMPTS } from "./src/peoples.js";
+import { peopleToken, LOOKS } from "./src/peoples.js";
 
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "colony", "outpost", "transport", "tanker"];
@@ -54,9 +54,6 @@ details{margin-top:30px;background:var(--card);border:1px solid var(--line);bord
 <p><a href="index.html">Play the game</a> · <a href="strategy.html">Strategy guide</a> · <a href="tokens.html">Printable tokens</a></p>
 <div class="row">${FACTIONS.map((f) => `<a href="#${f.id}">${peopleToken(f.id, f.color, 72)}<br>${esc(f.people.replace(/ and .*/, ""))}</a>`).join("")}</div>
 ${FACTIONS.map(card).join("\n")}
-<details><summary><b>Painted portraits</b>: prompts for an image generator</summary>
-<p class="small">To replace a drawing with painted art, make a square picture from its prompt, name it after the empire (for example <code>mirrun.png</code>) and put it in the game's <code>art/</code> folder. The next build uses it here, cropped to the hex.</p>
-<ul>${FACTIONS.map((f) => `<li><b>${esc(f.people)}</b> (<code>${f.id}</code>): ${esc(ART_PROMPTS[f.id] || "")}</li>`).join("")}</ul></details>
 <p class="muted" style="margin-top:30px">Fracture Lines: Dominion, a strategy game in the Fracture Lines setting of the Legend Dynamics RPG. The peoples are described in the setting's guide.</p>
 </main></body></html>`;
 mkdirSync(new URL("dist/", import.meta.url), { recursive: true });
