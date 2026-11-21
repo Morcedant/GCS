@@ -211,7 +211,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-21 16:51 UTC";
+const BUILD = "2026-11-21 17:34 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -4749,6 +4749,31 @@ function startGame(state) {
   if (S.turn === 1 && !guideOn()) toast(`You lead ${player(S).name}. Explore, settle, and find out who else is out here.`);
 }
 function save() { if (S) store.set(JSON.stringify(S)); }
+// ---- the error log: what went wrong, kept in this browser, to download and send in ----
+const ERR_KEY = "dominion.errors.v1";
+const errLog = { list: (() => { try { return JSON.parse(localStorage.getItem(ERR_KEY)) || []; } catch { return []; } })(), told: false };
+/** Record an error (where: what the game was doing). Keeps the last 40. */
+function logError(where, e) {
+  const entry = { time: new Date().toISOString(), version: VERSION, where, message: String((e && e.message) || e || "unknown error"),
+    stack: String((e && e.stack) || "").split("\n").slice(0, 14).join("\n"), turn: S ? S.turn : null, player: S ? player(S).id : null };
+  errLog.list.push(entry); errLog.list = errLog.list.slice(-40);
+  try { localStorage.setItem(ERR_KEY, JSON.stringify(errLog.list)); } catch {}
+  return entry;
+}
+/** Everything needed to see what went wrong and play it again: the errors, the browser, the settings, and the save. */
+function bugReport(note) {
+  const g = S ? { seed: S.seed, size: S.size, turn: S.turn, player: player(S).id, rivals: S.factions.slice(1).map((f) => f.id), difficulty: S.difficulty, ai: S.aiOpts || null, mode: S.mode,
+    wilds: wildsLevel(S), crisis: !S.crisisOff, sectors: !S.sectorsOff, collapses: !S.collapsesOff, recentLog: S.log.slice(-40).map((l) => `T${l.turn} ${l.kind}: ${l.text}`) } : null;
+  return { report: "Fracture Lines: Dominion bug report", made: new Date().toISOString(), version: VERSION, note: note || "", browser: navigator.userAgent,
+    screen: `${window.innerWidth}×${window.innerHeight} @${window.devicePixelRatio || 1}x`, errors: errLog.list, game: g, save: S ? JSON.stringify(S) : store.get() };
+}
+function downloadBugReport(note) {
+  const blob = new Blob([JSON.stringify(bugReport(note), null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `dominion-bug-report-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}.json`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+window.addEventListener("error", (ev) => { logError("page", ev.error || ev.message); if (!errLog.told) { errLog.told = true; try { toast("Something went wrong. Menu → Download a bug report, and send it in.", true); } catch {} } });
+window.addEventListener("unhandledrejection", (ev) => { logError("background task", ev.reason); });
 
 // ---------- the map ----------
 const canvas = () => $("map");
@@ -4867,6 +4892,12 @@ function fade(a, to, ms, done) {
   const step = (now) => { const k = Math.min(1, (now - t0) / ms); a.volume = Math.max(0, Math.min(1, from + (to - from) * k)); if (k < 1) requestAnimationFrame(step); else if (done) done(); };
   requestAnimationFrame(step);
 }
+/** Start an audio element and fade it in. Only a browser's "needs a click first" refusal stops the music; a failed
+ * load is the error handler's to deal with, and an interrupted start (a quick change of track) is nothing. */
+function startAudio(a) {
+  a.play().then(() => { if (music.audio === a) { music.fails = 0; fade(a, music.prefs.volume, 2500); renderMusicNow(); } })
+    .catch((e) => { if (e && e.name === "NotAllowedError") music.started = false; });
+}
 function playTrack(t) {
   const old = music.audio, a = new Audio(t.src); a.volume = 0; a.preload = "auto";
   // Extended play: a track marked "loop" loops until the game's mood changes; "repeat": n plays it n times in a row;
@@ -4878,16 +4909,28 @@ function playTrack(t) {
     a.last = a.currentTime;
   });
   a.addEventListener("ended", () => { if (music.audio !== a) return; if (t.moodKey === "theme") { music.themeDone = true; music.mood = gameMood(); } playTrack(pickTrack(music.mood) || t); });
-  a.addEventListener("error", () => { if (music.audio === a && t.via && a.src !== t.via) { a.src = t.via; a.play().catch(() => {}); return; } if (music.audio === a) { music.played.push(t.file); const n = pickTrack(music.mood); if (n && n !== t) playTrack(n); } });
-  music.audio = a; music.current = t; music.played.push(t.file);
+  // A track that won't load: its copy on the music server, then the next track; after several in a row, stop and say so.
+  const failed = (why) => {
+    if (music.audio !== a || a.failedOnce === a.src) return; a.failedOnce = a.src;
+    logError("music", new Error(`${why}: ${t.title || t.file} (${a.src})${a.error ? `, media error ${a.error.code}` : ""}`));
+    if (t.via && a.src !== t.via) { a.src = t.via; a.load(); startAudio(a); return; }
+    music.played.push(t.file); music.fails = (music.fails || 0) + 1;
+    if (music.fails >= 4) { music.error = "The music couldn't be played (several tracks failed to load). Menu → Next track tries again."; music.audio = null; music.fails = 0; music.gaveUp = true; renderMusicNow(); return; }
+    const n = pickTrack(music.mood); if (n && n !== t) playTrack(n);
+  };
+  a.addEventListener("error", () => failed("didn't load"));
+  // Stalled: nothing played 20 seconds after starting (and not paused): treat it as a failed load.
+  setTimeout(() => { if (music.audio === a && !a.paused && a.currentTime === 0 && a.readyState < 3) failed("stalled"); }, 20000);
+  music.audio = a; music.current = t; music.played.push(t.file); music.error = null;
   if (document.getElementById("m-music-loop")) document.getElementById("m-music-loop").checked = false;
-  a.play().then(() => { fade(a, music.prefs.volume, 2500); renderMusicNow(); }).catch(() => { music.started = false; });
+  startAudio(a);
   if (old) fade(old, 0, 2000, () => { old.pause(); });
 }
 /** Keep the music in step with the game and the settings: call it on any change (after a turn, on a toggle). */
 function musicUpdate() {
   if (!music.prefs.on) { if (music.audio) { const a = music.audio; music.audio = null; fade(a, 0, 800, () => a.pause()); } renderMusicNow(); return; }
   if (!music.started) return;   // the browser plays sound only after the player has clicked something
+  if (music.gaveUp) { renderMusicNow(); return; }   // tracks kept failing: wait for Next track, or the ♪ button
   if (!music.tracks) { loadMusic(); return; }
   const mood = gameMood();
   // The main theme plays through to its end; the game's mood waits for it.
@@ -4920,7 +4963,7 @@ function bindMusicMenu() {
   $("m-music-on").onchange = () => { music.prefs.on = $("m-music-on").checked; savePrefs(); music.started = true; musicUpdate(); };
   $("m-music-loop").onchange = () => { music.loopNow = $("m-music-loop").checked; if (music.audio) music.audio.loop = music.loopNow || !!(music.current && (music.current.loop || (music.current.repeat > 1 && music.audio.plays < music.current.repeat))); renderMusicNow(); };
   $("m-music-vol").oninput = () => { music.prefs.volume = +$("m-music-vol").value; savePrefs(); if (music.audio) music.audio.volume = music.prefs.volume; };
-  $("m-music-skip").onclick = () => { music.started = true; if (!music.prefs.on) { music.prefs.on = true; savePrefs(); $("m-music-on").checked = true; } const t = pickTrack(gameMood()); if (t) { if (music.current && music.current.moodKey === "theme") music.themeDone = true; music.mood = gameMood(); playTrack(pickTrack(music.mood) || t); } else musicUpdate(); };
+  $("m-music-skip").onclick = () => { music.started = true; music.gaveUp = false; if (!music.prefs.on) { music.prefs.on = true; savePrefs(); $("m-music-on").checked = true; } const t = pickTrack(gameMood()); if (t) { if (music.current && music.current.moodKey === "theme") music.themeDone = true; music.mood = gameMood(); playTrack(pickTrack(music.mood) || t); } else musicUpdate(); };
 }
 
 // ---------- ship outlines ----------
@@ -5713,7 +5756,7 @@ function bindChrome() {
   $("zoom-out").addEventListener("click", () => zoomBy(0.8));
   $("home").addEventListener("click", () => { if (S) { centerOn(S.systems[player(S).capital].at); draw(); } });
   $("menu").addEventListener("click", () => showMenu());
-  if ($("music-btn")) $("music-btn").addEventListener("click", (e) => { e.stopPropagation(); music.prefs.on = !music.prefs.on; savePrefs(); music.started = true; musicUpdate(); });
+  if ($("music-btn")) $("music-btn").addEventListener("click", (e) => { e.stopPropagation(); music.prefs.on = !music.prefs.on; music.gaveUp = false; savePrefs(); music.started = true; musicUpdate(); });
   renderMusicNow();
   $("next").addEventListener("click", nextIdle);
   $("to-panel").addEventListener("click", () => document.querySelector(".side").scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -5741,17 +5784,32 @@ function doEndTurn() {
   if (!me.research.current && (availableTechs(S, me.id).length || availableAdvances(S, me.id).length)) { tab = "research"; renderTabs(); renderPanel(); toast("Choose what to research first.", true); return; }
   const before = { cols: coloniesOf(S, me.id).length, log: S.log.length };
   $("end-turn").disabled = true; $("end-turn").textContent = "Thinking…";
+  const snapshot = JSON.stringify(S);   // if the turn fails partway, the game goes back to this
   setTimeout(() => {
-    S.offers = S.offers.filter((o) => S.turn - o.turn < 3);
-    endTurn(S, aiTurn);
-    if (!S.winner) directivesTurn(S);
-    if (!S.winner) crisisTurn(S);
-    if (!S.winner) wildsTurn(S);
-    if (!S.winner) tradersTurn(S);
-    if (!S.winner) sectorsTurn(S);
-    if (!S.winner) corridorsTurn(S);
-    if (!S.winner) eventsTurn(S);
-    if (!S.winner) envoysTurn(S);
+    let step = "starting the turn";
+    try {
+      S.offers = S.offers.filter((o) => S.turn - o.turn < 3);
+      step = "moving, fighting and the computer players' turns"; endTurn(S, aiTurn);
+      step = "directives"; if (!S.winner) directivesTurn(S);
+      step = "the Wardens"; if (!S.winner) crisisTurn(S);
+      step = "pirates and creatures"; if (!S.winner) wildsTurn(S);
+      step = "traders"; if (!S.winner) tradersTurn(S);
+      step = "new sectors"; if (!S.winner) sectorsTurn(S);
+      step = "corridors"; if (!S.winner) corridorsTurn(S);
+      step = "galactic events"; if (!S.winner) eventsTurn(S);
+      step = "envoys"; if (!S.winner) envoysTurn(S);
+    } catch (e) {
+      const err = logError(`end turn: ${step}`, e);
+      S = JSON.parse(snapshot);   // back to before End turn: nothing half-done
+      $("end-turn").textContent = "End turn"; $("end-turn").disabled = false;
+      try { renderAll(); } catch (e2) { logError("redrawing after a failed turn", e2); }
+      modal(`<h1>Something went wrong<\/h1><p>The turn couldn't finish (it failed during <b>${esc(step)}<\/b>). Your game is back exactly where it was before you pressed End turn, so nothing is lost.<\/p>
+        <p class="small muted">${esc(err.message)}<\/p>
+        <p>Please download a bug report and send it in: it has the error and your save, so the problem can be played back and fixed. You can try End turn again, or change your orders first.<\/p>
+        <div class="btn-row"><button class="btn primary" id="err-dl">Download a bug report<\/button><button class="btn" id="err-close">Back to the game<\/button><\/div>`);
+      $("err-dl").onclick = () => downloadBugReport(`End turn failed during ${step}`); $("err-close").onclick = closeModal;
+      return;
+    }
     $("end-turn").textContent = "End turn";
     save(); musicUpdate();
     // News: what happened to you this turn.
@@ -6072,6 +6130,7 @@ function showHelp(back) {
       <li><b>New sectors:<\/b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.<\/li>
       <li><b>Corridor collapses:<\/b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). It's rare, and it's always one that matters. Ships then go the long way, until a scout rests ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).<\/li>
       <li><b>Fuel reserve:<\/b> the top bar's Fuel. Your colonies make a little and fuel depots and stations most, and each depot lets you store more. Fleets moving in supply, refuelling, filling tankers and burning hard spend it; run short and your fleets move slower and can't refuel. Burn hard (on a moving fleet's panel) for a hex a turn more. Fuel tankers still extend your reach: one travelling with a fleet tops its tank up beyond supply, and a parked one keeps your fleets nearby in supply. They fill up from the reserve.<\/li>
+      <li><b>Something wrong?<\/b> Menu → <b>Download a bug report<\/b>. It saves a file with any errors the game recorded, your browser, the game's settings and your save, so the problem can be played back and fixed. If a turn ever fails, the game goes back to before you pressed End turn and offers the report.<\/li>
       <li><b>Music:<\/b> the ♪ button (top right) turns it on or off. Menu → Music has the volume, Next track, and Loop this track. The main theme plays at the start; after that the music follows the galaxy (exploring, war, the Wardens).<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry. A power's <b>regard<\/b> for you decides whether it trades, allies, or attacks you. Their memory shows why they feel as they do.<\/li>
@@ -6102,6 +6161,17 @@ function bindGalaxyBox() {
   };
   $("seed-replay").onclick = () => showNewGame(true, g.preset);
 }
+/** The bug report: what's been recorded, a note to add, and the download. */
+function showBugReport() {
+  const L = errLog.list.slice(-8).reverse();
+  modal(`<h1>Bug report<\/h1><p>A bug report is a file with any errors the game recorded, your browser, the game's settings, its recent log and your save, so the problem can be played back exactly. Download it and send it in.<\/p>
+    ${L.length ? `<p class="small"><b>Errors recorded (${errLog.list.length}):<\/b><\/p><ul class="small mem">${L.map((x) => `<li class="bad">${esc(x.time.slice(0, 16).replace("T", " "))}${x.turn ? `, turn ${x.turn}` : ""}: ${esc(x.where)}: ${esc(x.message)}<\/li>`).join("")}<\/ul>` : `<p class="small muted">No errors recorded. If something looks wrong anyway, describe it below.<\/p>`}
+    <label class="small">What happened? <textarea id="bug-note" rows="3" style="width:100%;margin-top:4px" placeholder="What you did, and what you expected"><\/textarea><\/label>
+    <div class="btn-row"><button class="btn primary" id="bug-dl">Download the bug report<\/button>${errLog.list.length ? `<button class="btn" id="bug-clear">Clear the error log<\/button>` : ""}<button class="btn" id="bug-back">Back<\/button><\/div>`);
+  $("bug-dl").onclick = () => downloadBugReport($("bug-note").value.trim());
+  if ($("bug-clear")) $("bug-clear").onclick = () => { errLog.list = []; try { localStorage.removeItem(ERR_KEY); } catch {} showBugReport(); };
+  $("bug-back").onclick = showMenu;
+}
 function showMenu() {
   modal(`<h1>Menu<\/h1>${musicMenuHTML()}<div class="btn-row col">
     <button class="btn" id="m-resume">Back to the game<\/button>
@@ -6112,6 +6182,7 @@ function showMenu() {
     <a class="btn" href="strategy.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Strategy guide: how to win<\/a>
     <a class="btn" href="peoples.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">The peoples: who they are<\/a>
     <a class="btn" href="tokens.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Printable ship tokens<\/a>
+    <button class="btn" id="m-bug">Download a bug report${errLog.list.length ? ` (${errLog.list.length} error${errLog.list.length === 1 ? "" : "s"} recorded)` : ""}<\/button>
     <button class="btn" id="m-export">Save code (copy)<\/button>
     <button class="btn" id="m-load">Load a saved game<\/button>
     ${S && !S.winner ? `<label class="small" style="display:block;margin:4px 0">Pirates and creatures <select id="m-wilds">${Object.entries(WILD_LEVELS).map(([k, v]) => `<option value="${k}" ${k === wildsLevel(S) ? "selected" : ""}>${v.name}<\/option>`).join("")}<\/select><\/label><p class="small muted" id="m-wilds-text" style="margin-top:-2px">${esc(WILD_LEVELS[wildsLevel(S)].text)}<\/p>` : ""}
@@ -6124,6 +6195,7 @@ function showMenu() {
   $("m-resume").onclick = closeModal;
   bindMusicMenu();
   $("m-help").onclick = () => showHelp(showMenu);
+  $("m-bug").onclick = () => showBugReport();
   $("m-guide").onclick = () => showStarter(true);
   $("m-guide-go").onclick = () => { closeModal(); startGuide(); };
   $("m-steps").onclick = () => { S.tutorial = S.tutorial || {}; S.tutorial.on = !S.tutorial.on; save(); closeModal(); renderSteps(); };

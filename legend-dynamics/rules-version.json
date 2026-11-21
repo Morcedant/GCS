@@ -6,6 +6,16 @@
     {
       "date": "2026-11-21",
       "kind": "site",
+      "title": "Dominion: bug reports, crash recovery, and steadier music",
+      "items": [
+        "Menu → Download a bug report saves a file with any errors the game recorded, your browser, the game's settings, its recent log and your save, plus a note of what happened, so a problem can be played back and fixed. The game keeps a log of the last 40 errors in your browser.",
+        "If a turn fails partway, the game goes back to exactly where it was before End turn, explains what happened, and offers the bug report, instead of sticking on Thinking.",
+        "Music: a song that won't load now plays from the table server's copy at normal volume (before, it could play silently, or stop the music altogether). A song that stalls is skipped. If several fail in a row, the music stops and says so, and Next track tries again. Music problems are recorded in the bug report."
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "kind": "site",
       "title": "Dominion: fix for End turn sticking on Thinking",
       "items": [
         "Fixed End turn freezing on Thinking… partway through a game. The tribute a computer player demands from another empire shared its name with the pirates' tribute demand, and in the built game the pirates' version replaced it, so the turn crashed. Saved games are unaffected: reload the page and carry on.",
