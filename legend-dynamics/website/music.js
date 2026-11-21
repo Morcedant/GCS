@@ -26,7 +26,7 @@
   // ---- a setting's music page ----
   const root = document.querySelector("[data-music]"); if (!root) return;
   const list = root.querySelector(".ld-tracks"), empty = root.querySelector("[data-empty]"), status = root.querySelector("[data-status]");
-  const rowHTML = (t, k) => `<li class="ld-track" data-track data-src="${esc(t.src)}" data-title="${esc(t.title)}" data-sub="${esc(t.mood || "")}" data-credit="${esc(t.credit || "")}" data-loop="${t.loop ? 1 : 0}">`
+  const rowHTML = (t, k) => `<li class="ld-track" data-track data-src="${esc(t.src)}" data-via="${esc(t.via || "")}" data-title="${esc(t.title)}" data-sub="${esc(t.mood || "")}" data-credit="${esc(t.credit || "")}" data-loop="${t.loop ? 1 : 0}">`
     + `<button class="ld-track-go" type="button"><span class="ld-track-n">${k + 1}</span><span class="ld-track-name"><b>${esc(t.title)}</b>${t.mood ? `<small>${esc(t.mood)}</small>` : ""}</span></button>`
     + (t.use ? `<span class="ld-track-use">${esc(t.use)}</span>` : "") + ((t.credit || t.license) ? `<small class="ld-track-fine">${[t.credit, t.license].filter(Boolean).map(esc).join(" · ")}</small>` : "")
     + `<a class="ld-track-dl" href="${esc(t.download || t.src)}" download>Download <span class="ld-note">${t.bytes ? mb(t.bytes) : ""}</span></a></li>`;
@@ -86,7 +86,7 @@
     const paint = () => { const p = !audio.paused; play.textContent = p ? "Pause" : "Play"; play.setAttribute("aria-label", p ? "Pause" : "Play"); rows.forEach((x, k) => { x.querySelector(".ld-track-go").dataset.state = k === i && p ? "playing" : ""; }); };
     audio.addEventListener("play", paint); audio.addEventListener("pause", paint);
     audio.addEventListener("ended", () => { if (playOn) load(i + 1, true); else paint(); });
-    audio.addEventListener("error", () => { if (i >= 0) sub.textContent = "This track couldn't be played here. Try its download link."; });
+    audio.addEventListener("error", () => { const r = rows[i]; if (r && r.dataset.via && audio.src !== r.dataset.via) { audio.src = r.dataset.via; audio.play().catch(() => {}); return; } if (i >= 0) sub.textContent = "This track couldn't be played here. Try its download link."; });
     if ("mediaSession" in navigator) {
       const ms = navigator.mediaSession;
       ms.setActionHandler("play", () => toggle()); ms.setActionHandler("pause", () => audio.pause());

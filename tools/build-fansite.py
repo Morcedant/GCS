@@ -92,7 +92,7 @@ def music_page(slug, title):
     if (b.intro) document.getElementById("intro").textContent = b.intro;
     const ts = b.tracks || [];
     el.innerHTML = ts.length ? ts.map((t) => `<li><b>${{esc(t.title)}}</b>${{[t.mood, t.use].filter(Boolean).length ? `<small>${{esc([t.mood, t.use].filter(Boolean).join(" · "))}}</small>` : ""}}
-      <audio controls preload="none" src="${{esc(t.src)}}"${{t.loop ? " loop" : ""}}></audio><a href="${{esc(t.download)}}">Download (${{(t.bytes / 1048576).toFixed(1)}} MB)</a>${{t.credit ? `<small>${{esc(t.credit)}}</small>` : ""}}</li>`).join("")
+      <audio controls preload="none" src="${{esc(t.src)}}"${{t.via ? ` data-via="${{esc(t.via)}}" onerror="if(this.dataset.via&&this.src!==this.dataset.via)this.src=this.dataset.via"` : ""}}${{t.loop ? " loop" : ""}}></audio><a href="${{esc(t.download)}}">Download (${{(t.bytes / 1048576).toFixed(1)}} MB)</a>${{t.credit ? `<small>${{esc(t.credit)}}</small>` : ""}}</li>`).join("")
       : "<li><small>No tracks yet. Upload them into the music bucket's <b>{slug}/</b> folder, and they show here at once.</small></li>";
   }} catch (e) {{ el.innerHTML = "<li><small>The music server didn't answer. Try again in a moment.</small></li>"; }}
 }})();

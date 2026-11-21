@@ -60,3 +60,15 @@ test("a track's repeat count passes through, in range only", async () => {
   const list = buildList(objs, { tracks: [{ file: "war - a.mp3", repeat: 3 }, { file: "war - b.mp3", repeat: 99 }, { file: "war - c.mp3", loop: true }] }, "dominion", "https://x");
   assert.equal(list[0].repeat, 3); assert.equal(list[1].repeat, undefined, "out of range: ignored"); assert.equal(list[2].loop, true);
 });
+
+test("songs play from the bucket's public address, with this server as the fallback and for downloads", async () => {
+  const { buildList, MUSIC_PUBLIC_URL } = await import("../src/music.js");
+  const objs = [{ key: "dominion/war - a.mp3", size: 10 }];
+  const [t] = buildList(objs, null, "dominion", "https://srv.example", "https://music.example");
+  assert.equal(t.src, "https://music.example/dominion/war%20-%20a.mp3");
+  assert.equal(t.via, "https://srv.example/music/dominion/war%20-%20a.mp3");
+  assert.equal(t.download, t.via + "?download=1");
+  const [u] = buildList(objs, null, "dominion", "https://srv.example");
+  assert.equal(u.src, "https://srv.example/music/dominion/war%20-%20a.mp3"); assert.equal(u.via, undefined);
+  assert.ok(/^https:\/\//.test(MUSIC_PUBLIC_URL));
+});

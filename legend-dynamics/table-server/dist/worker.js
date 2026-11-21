@@ -618,18 +618,20 @@ function validKey2(key) {
   const parts = key.split("/");
   return parts.length === 2 && MUSIC_FOLDERS.includes(parts[0]) && !!parts[1] && !parts[1].startsWith(".") && !!audioType(parts[1]);
 }
-function buildList(objects, manifest, folder, base) {
+function buildList(objects, manifest, folder, base, publicBase = "") {
   const files = new Map(objects.filter((o) => validKey2(o.key) && o.key.startsWith(folder + "/")).map((o) => [o.key.slice(folder.length + 1), o]));
   const listed = Array.isArray(manifest && manifest.tracks) ? manifest.tracks.filter((t) => t && typeof t.file === "string" && files.has(t.file)) : [];
   const seen = new Set(listed.map((t) => t.file));
   const rest = [...files.keys()].filter((f) => !seen.has(f)).sort((a, b) => a.localeCompare(b, void 0, { numeric: true })).map((file) => ({ file }));
   const str = (v) => typeof v === "string" ? v.slice(0, 300) : void 0;
   return [...listed, ...rest].map((t) => {
-    const src = `${base}/music/${folder}/${encodeURIComponent(t.file)}`;
+    const via = `${base}/music/${folder}/${encodeURIComponent(t.file)}`;
+    const src = publicBase ? `${publicBase}/${folder}/${encodeURIComponent(t.file)}` : via;
     const out = { file: t.file, title: str(t.title) || titleFrom(t.file), bytes: (
       /** @type {any} */
       files.get(t.file).size
-    ), src, download: src + "?download=1" };
+    ), src, download: via + "?download=1" };
+    if (publicBase) out.via = via;
     for (const k of ["mood", "use", "credit", "license"]) {
       const v = str(t[k]);
       if (v) out[k] = v;
@@ -659,6 +661,11 @@ async function manifestOf(bucket, folder) {
     return null;
   }
 }
+var MUSIC_PUBLIC_URL = "https://music.legenddynamicsrpg.com";
+var publicMusic = (env) => {
+  const v = env && env.MUSIC_PUBLIC_URL || MUSIC_PUBLIC_URL;
+  return v === "off" ? "" : String(v).replace(/\/+$/, "");
+};
 async function musicFetch(req, env, h) {
   const url = new URL(req.url), path = url.pathname;
   if (path !== "/api/music" && !path.startsWith("/music/")) return null;
@@ -671,7 +678,7 @@ async function musicFetch(req, env, h) {
     if (folder) {
       if (!MUSIC_FOLDERS.includes(folder)) return json2({ error: "No such setting." }, 404);
       const [objects, manifest] = await Promise.all([listAll(bucket, folder + "/"), manifestOf(bucket, folder)]);
-      return json2({ folder, intro: typeof manifest?.intro === "string" ? manifest.intro.slice(0, 600) : "", tracks: buildList(objects, manifest, folder, url.origin) }, 200, { "Cache-Control": "public, max-age=60" });
+      return json2({ folder, intro: typeof manifest?.intro === "string" ? manifest.intro.slice(0, 600) : "", tracks: buildList(objects, manifest, folder, url.origin, publicMusic(env)) }, 200, { "Cache-Control": "public, max-age=60" });
     }
     const all = await listAll(bucket, "");
     const folders = Object.fromEntries(PUBLIC_FOLDERS.map((f) => [f, all.filter((o) => validKey2(o.key) && o.key.startsWith(f + "/")).length]));

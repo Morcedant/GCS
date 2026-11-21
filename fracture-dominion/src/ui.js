@@ -184,7 +184,7 @@ function playTrack(t) {
     a.last = a.currentTime;
   });
   a.addEventListener("ended", () => { if (music.audio !== a) return; if (t.moodKey === "theme") { music.themeDone = true; music.mood = gameMood(); } playTrack(pickTrack(music.mood) || t); });
-  a.addEventListener("error", () => { if (music.audio === a) { music.played.push(t.file); const n = pickTrack(music.mood); if (n && n !== t) playTrack(n); } });
+  a.addEventListener("error", () => { if (music.audio === a && t.via && a.src !== t.via) { a.src = t.via; a.play().catch(() => {}); return; } if (music.audio === a) { music.played.push(t.file); const n = pickTrack(music.mood); if (n && n !== t) playTrack(n); } });
   music.audio = a; music.current = t; music.played.push(t.file);
   if (document.getElementById("m-music-loop")) document.getElementById("m-music-loop").checked = false;
   a.play().then(() => { fade(a, music.prefs.volume, 2500); renderMusicNow(); }).catch(() => { music.started = false; });

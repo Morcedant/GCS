@@ -49,15 +49,19 @@ export function validKey(key) {
  * A folder's tracks, from the bucket's listing and its tracks.json (if any): listed tracks first, in its order, then the
  * rest by file name. @param {{ key: string, size: number }[]} objects @param {any} manifest @param {string} folder @param {string} base
  */
-export function buildList(objects, manifest, folder, base) {
+export function buildList(objects, manifest, folder, base, publicBase = "") {
   const files = new Map(objects.filter((o) => validKey(o.key) && o.key.startsWith(folder + "/")).map((o) => [o.key.slice(folder.length + 1), o]));
   const listed = Array.isArray(manifest && manifest.tracks) ? manifest.tracks.filter((/** @type {any} */ t) => t && typeof t.file === "string" && files.has(t.file)) : [];
   const seen = new Set(listed.map((/** @type {any} */ t) => t.file));
   const rest = [...files.keys()].filter((f) => !seen.has(f)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).map((file) => ({ file }));
   const str = (/** @type {any} */ v) => (typeof v === "string" ? v.slice(0, 300) : undefined);
   return [...listed, ...rest].map((/** @type {any} */ t) => {
-    const src = `${base}/music/${folder}/${encodeURIComponent(t.file)}`;
-    const out = { file: t.file, title: str(t.title) || titleFrom(t.file), bytes: /** @type {any} */ (files.get(t.file)).size, src, download: src + "?download=1" };
+    const via = `${base}/music/${folder}/${encodeURIComponent(t.file)}`;
+    // Played from the bucket's public, cached address when there is one (no Worker request per song); this server's
+    // own address stays as the fallback ("via") and for downloads, which need its download header.
+    const src = publicBase ? `${publicBase}/${folder}/${encodeURIComponent(t.file)}` : via;
+    const out = { file: t.file, title: str(t.title) || titleFrom(t.file), bytes: /** @type {any} */ (files.get(t.file)).size, src, download: via + "?download=1" };
+    if (publicBase) /** @type {any} */ (out).via = via;
     for (const k of ["mood", "use", "credit", "license"]) { const v = str(t[k]); if (v) /** @type {any} */ (out)[k] = v; }
     if (t.loop === true) /** @type {any} */ (out).loop = true;
     // How many times in a row to play it (the strategy game's player): a whole number from 2 to 20.
@@ -82,6 +86,10 @@ async function manifestOf(/** @type {any} */ bucket, /** @type {string} */ folde
   try { return JSON.parse(await m.text()); } catch { return null; }
 }
 
+/** The music bucket's public address (a custom domain on the R2 bucket, cached at Cloudflare's edge): songs are played
+ * from there. MUSIC_PUBLIC_URL overrides it; "off" serves every song through this Worker again. */
+export const MUSIC_PUBLIC_URL = "https://music.legenddynamicsrpg.com";
+const publicMusic = (/** @type {any} */ env) => { const v = (env && env.MUSIC_PUBLIC_URL) || MUSIC_PUBLIC_URL; return v === "off" ? "" : String(v).replace(/\/+$/, ""); };
 /**
  * The music routes. Returns a Response, or null if the path isn't music's.
  * @param {Request} req @param {any} env @param {Record<string, string>} h  CORS headers
@@ -98,7 +106,7 @@ export async function musicFetch(req, env, h) {
     if (folder) {
       if (!MUSIC_FOLDERS.includes(folder)) return json({ error: "No such setting." }, 404);
       const [objects, manifest] = await Promise.all([listAll(bucket, folder + "/"), manifestOf(bucket, folder)]);
-      return json({ folder, intro: typeof manifest?.intro === "string" ? manifest.intro.slice(0, 600) : "", tracks: buildList(objects, manifest, folder, url.origin) }, 200, { "Cache-Control": "public, max-age=60" });
+      return json({ folder, intro: typeof manifest?.intro === "string" ? manifest.intro.slice(0, 600) : "", tracks: buildList(objects, manifest, folder, url.origin, publicMusic(env)) }, 200, { "Cache-Control": "public, max-age=60" });
     }
     const all = await listAll(bucket, "");
     const folders = Object.fromEntries(PUBLIC_FOLDERS.map((f) => [f, all.filter((o) => validKey(o.key) && o.key.startsWith(f + "/")).length]));
