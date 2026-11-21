@@ -209,7 +209,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-21 14:42 UTC";
+const BUILD = "2026-11-21 14:50 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -1537,6 +1537,61 @@ function mergeFleets(s, intoId, fromId) {
  * Split ships of one type off into a new fleet at the same place: n of them (1 by default), "half", or "all". The most
  * damaged go first, so a fleet can send its wounded home. The admiral stays; at least one ship stays with them.
  */
+// ---- engagements: withdrawing, and detaching ships to send them on ----
+/** A fleet is engaged when it's armed and shares its hex with armed enemies at war, or an enemy world's working guns:
+ * the battle goes on each turn, and it can't simply sail away. It can withdraw (setWithdraw). */
+function engaged(s, f) {
+  if (!f || !armed(f) || isWild(f.owner) || f.owner === "traders") return false;
+  if (fleetsAt(s, f.at).some((o) => o.owner !== f.owner && armed(o) && atWar(s, f.owner, o.owner))) return true;
+  const sid = s.sysAt[f.at], sys = sid && s.systems[sid];
+  return !!(sys && sys.colony && atWar(s, f.owner, sys.colony.owner) && gunsUp(sys));
+}
+/** Withdraw from an engagement: the fleet fights the next battle's first exchange (defensively), then breaks off and
+ * pulls back toward the nearest world of its power's (or where it came from); the enemy gets no more shots at it. */
+function setWithdraw(s, fleetId, on = true) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  if (!on) { delete f.withdraw; return { ok: true }; }
+  if (!engaged(s, f)) return { error: "It isn't in an engagement: just move it." };
+  if (f.ships.some((x) => !shipStats(s, f.owner, x.type, x).speed)) return { error: "It can't move, so it can't withdraw." };
+  f.withdraw = s.turn; f.path = []; f.dest = null; f.sentry = false; return { ok: true };
+}
+/** After the battles: fleets that withdrew pull back, as far as a turn's move takes them. */
+function withdrawals(s) {
+  for (const f of Object.values(s.fleets)) {
+    if (!f.withdraw) continue;
+    delete f.withdraw;
+    if (!f.ships.length) continue;
+    const here = f.at, home = coloniesOf(s, f.owner).filter((x) => x.at !== here && !fleetsAt(s, x.at).some((o) => armed(o) && atWar(s, f.owner, o.owner)))
+      .map((x) => ({ x, p: findPath(s, f.owner, here, x.at) })).filter((o) => o.p).sort((a, b) => a.p.reduce((t, y) => t + y.cost, 0) - b.p.reduce((t, y) => t + y.cost, 0))[0];
+    const to = home ? home.x.at : f.from && f.from !== here ? f.from : null;
+    const path = to ? (home ? home.p : findPath(s, f.owner, here, to)) : null;
+    if (!path || !path.length) { log(s, f.owner, `Your fleet at ${nearestName(s, here)} tried to withdraw, but had nowhere to go.`, "war"); continue; }
+    let mp = fleetSpeed(s, f);
+    f.path = path; f.dest = to;
+    while (f.path.length && mp + 1e-9 >= f.path[0].cost) { const st = f.path.shift(); mp -= st.cost; f.from = f.at; f.at = st.hex; if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; } }
+    if (!f.path.length) f.dest = null;
+    log(s, f.owner, `Your fleet withdrew from ${nearestName(s, here)}${home ? ` toward ${home.x.name}` : ""}.`, "war");
+  }
+}
+/** Detach ships from a fleet into a fleet of their own, to send somewhere: counts by type ({ cruiser: 3, frigate: 2 }).
+ * The soundest ships go (they're going to fight); the admiral stays with the fleet. */
+function detachShips(s, fleetId, counts) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  const go = [];
+  for (const [type, n] of Object.entries(counts || {})) {
+    const k = Math.floor(+n) || 0; if (k <= 0) continue;
+    const max = shipStats(s, f.owner, type).hull;
+    go.push(...f.ships.filter((x) => x.type === type).sort((a, b) => b.hull / max - a.hull / max).slice(0, k));
+  }
+  if (!go.length) return { error: "Choose how many ships to detach." };
+  if (go.length >= f.ships.length) return { error: "That's the whole fleet: just move it." };
+  const fu = fuelOf(s, f);
+  f.ships = f.ships.filter((x) => !go.includes(x));
+  const nf = spawnFleet(s, f.owner, f.at, []); nf.ships.push(...go);
+  if (f.stance) nf.stance = f.stance;
+  nf.fuel = Math.min(fu, fuelMax(s, nf)); f.fuel = Math.min(fu, fuelMax(s, f));
+  return { ok: true, fleet: nf.id, ships: go.length };
+}
 function splitFleet(s, fleetId, type, n = 1) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   const of = f.ships.filter((x) => x.type === type);
@@ -1563,6 +1618,9 @@ function joinMustered(s) {
 }
 function moveFleets(s) {
   for (const f of Object.values(s.fleets)) {
+    if (f.withdraw) continue;   // it fights the first exchange, then pulls back (withdrawals)
+    // Engaged: it can't just sail away from the battle; withdrawing is the way out.
+    if (f.path.length && engaged(s, f)) { if (!faction(s, f.owner).ai && f.pinned !== s.turn) log(s, f.owner, `Your fleet at ${nearestName(s, f.at)} is engaged and can't just leave: fight on, or order it to withdraw.`, "war"); f.pinned = s.turn; continue; }
     let mp = fleetSpeed(s, f);
     // Fuel: a turn's travel beyond supply burns one; with none left the fleet crawls.
     const out = f.path.length && !inSupply(s, f) && fuelMax(s, f) !== Infinity;
@@ -1578,7 +1636,7 @@ function moveFleets(s) {
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) {
       const step = f.path[0];
       // A fleet stops where an enemy at war guards the hex.
-      mp -= step.cost; f.at = step.hex; f.path.shift();
+      mp -= step.cost; f.from = f.at; f.at = step.hex; f.path.shift();
       if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; }
     }
     if (!f.path.length) { f.dest = null; delete f.burn; }
@@ -1804,7 +1862,8 @@ function battles(s) {
     for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type, sh) });
     const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
     if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat || sys.colony.buildings.station ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : sys.colony.buildings.station ? "Orbital station" : "Orbital guns" } }); }
-    const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
+    const stance = (u) => (u.fleet && u.fleet.withdraw ? STANCES.defensive : (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced);
+    const leaving = (u) => !!(u.fleet && u.fleet.withdraw);
     // The Nodes the Heart raised around itself shield it (CRISIS.shieldRange); Nodes on burned worlds far off don't.
     const nodesUp = !!(s.crisis && s.crisis.heart) && Object.values(s.fleets).some((f) => f.owner === "wardens" && distance(f.at, s.crisis.heart) <= CRISIS.shieldRange && f.ships.some((x) => x.type === "node" && x.hull > 0));
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
@@ -1822,7 +1881,8 @@ function battles(s) {
       admirals: [...new Set(units.filter((u) => u.fleet && u.fleet.admiral).map((u) => u.fleet))].map((f) => ({ fid: f.owner, name: admTitle(f.admiral), traits: f.admiral.traits.map((t) => ADMIRAL_TRAITS[t].name) })) } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
-      const live = units.filter((u) => hp(u) > 0);
+      const live = units.filter((u) => hp(u) > 0 && !(round > 0 && leaving(u)));   // the withdrawing are gone after the first exchange
+      live.sort((a, b) => (b.world ? 1 : 0) - (a.world ? 1 : 0));   // dug-in guns fire first in each exchange
       for (const u of live) {
         for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
@@ -1830,7 +1890,10 @@ function battles(s) {
         // Pirates, crystal swarms and Warden husks don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
         const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && (u.ship.type === "swarm" || u.ship.type === "husk")))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
         if (!foes.length) continue;
-        const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
+        // A world's guns are laid by its gunnery officers: they finish off the most damaged ship in range. Ships pick at random.
+        let t = foes[R.int(foes.length)];
+        if (u.world) { const ships = foes.filter((v) => v.ship); if (ships.length) { const low = Math.min(...ships.map(hp)), weakest = ships.filter((v) => hp(v) === low); t = weakest[R.int(weakest.length)]; } }
+        const dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
         const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
         if (landed) {
@@ -1860,16 +1923,19 @@ function battles(s) {
     for (const u of units) if (u.ship && u.ship.hull <= 0) { lost[u.fid] = (lost[u.fid] || 0) + 1; u.fleet.ships = u.fleet.ships.filter((x) => x !== u.ship); }
     for (const f of fleetsAt(s, hex)) if (!f.ships.length) delete s.fleets[f.id];
     for (const [fid, n] of Object.entries(lost)) faction(s, fid).stats.lost += n;
+    // A world's guns knocked out count in the reckoning like ships lost (by their strength): the orbit is the attacker's now.
+    const gunUnit = units.find((u) => u.world), silenced = gunUnit && gunUnit.world.colony && gunUnit.world.colony.defense <= 0 ? gunUnit.fid : null;
+    const tally = { ...lost }; if (silenced) tally[silenced] = (tally[silenced] || 0) + Math.max(1, Math.round(gunsMax(s, gunUnit.world.colony) / 3));   // worth a ship for every 3 hull of guns
     const outcome = {};
-    for (const fid of list) { const theirs = Object.entries(lost).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0), mine = lost[fid] || 0; outcome[fid] = theirs > mine ? "won" : mine > theirs ? "lost" : "even"; }
+    for (const fid of list) { const theirs = Object.entries(tally).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0), mine = tally[fid] || 0; outcome[fid] = theirs > mine ? "won" : mine > theirs ? "lost" : "even"; }
     s.battleWith = list;
     const news = admiralsAfterBattle(s, inBattle, outcome, where, R);
     // A battle won: you destroyed ships of theirs, and lost fewer than they did.
-    for (const fid of list) { const theirs = Object.entries(lost).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0); if (theirs > (lost[fid] || 0)) faction(s, fid).stats.won = (faction(s, fid).stats.won || 0) + 1; }
+    for (const fid of list) if (outcome[fid] === "won") faction(s, fid).stats.won = (faction(s, fid).stats.won || 0) + 1;
     const names = list.map((x) => faction(s, x).name).join(" and ");
-    log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}.`, "war");
+    log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}${silenced ? `; ${faction(s, silenced).name}'s orbital guns at ${where} are knocked out` : ""}.`, "war");
     s.events.push({ turn: s.turn, kind: "battle", hex, sides: list });
-    if (rec) { rec.news = news.filter((x) => x.fid === me || x.text.includes("Your")).map((x) => x.text); rec.lost = lost; rec.won = (() => { const mine = lost[me] || 0, theirs = Object.entries(lost).filter(([o]) => atWar(s, me, o)).reduce((t, [, n]) => t + n, 0); return theirs > mine ? "won" : mine > theirs ? "lost" : "even"; })(); (s.battleReports = s.battleReports || []).push(rec); }
+    if (rec) { rec.news = news.filter((x) => x.fid === me || x.text.includes("Your")).map((x) => x.text); rec.lost = lost; rec.silenced = silenced; rec.won = outcome[me] || "even"; (s.battleReports = s.battleReports || []).push(rec); }
   }
   R.save();
 }
@@ -2034,6 +2100,7 @@ function endTurn(s, aiTurn) {
   moveFleets(s);
   joinMustered(s);
   battles(s);
+  withdrawals(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
   checkEngine(s);
   checkRelics(s);
@@ -4097,6 +4164,14 @@ function fleets(s, F) {
   for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
+    // Engaged and clearly losing: withdraw (it fights the first exchange, then pulls back), rather than die there.
+    if (engaged(s, f)) {
+      const pw = (fl) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? x.hull * SHIPS[x.type].dmg * (SHIPS[x.type].shots || 1) : 0), 0);
+      const sid = s.sysAt[f.at], sys = sid && s.systems[sid];
+      const foe = fleetsAt(s, f.at).filter((o) => armed(o) && atWar(s, F.id, o.owner)).reduce((t, o) => t + pw(o), 0) + (sys && sys.colony && atWar(s, F.id, sys.colony.owner) && sys.colony.defense > 0 ? sys.colony.defense * 2 : 0);
+      const mine = fleetsAt(s, f.at).filter((o) => o.owner === F.id).reduce((t, o) => t + pw(o), 0);
+      if (foe > 0 && mine < foe * 0.5 && !setWithdraw(s, f.id).error) continue;
+    }
     const types = new Set(f.ships.map((x) => x.type));
     // An outpost ship on a station mission: build it when it gets there.
     if (f.stationAt && types.has("outpost")) {
@@ -4706,6 +4781,9 @@ function fleetHTML() {
   }
   if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
     h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).<\/p>${mine && usesReserve(me.id) ? `<div class="btn-row"><button class="btn small ${f.burn ? "primary" : ""}" data-burn aria-pressed="${!!f.burn}" title="Burn hard: +${FUEL.burnSpeed} hex a turn until it arrives. In supply each turn costs ${burnCost(S, f)} fuel from your reserve; beyond it, an extra turn of the fleet's own fuel.">${f.burn ? "Burning hard ✓" : "Burn hard"}<\/button><span class="small muted">${f.burn ? `+${FUEL.burnSpeed} hex a turn; ${burnCost(S, f)} reserve fuel a turn in supply, an extra turn of its own beyond.` : `+${FUEL.burnSpeed} hex a turn for ${burnCost(S, f)} fuel a turn.`}<\/span><\/div>` : ""}${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.<\/p>` : ""}`; }
+  const eng = mine && engaged(S, f);
+  if (mine && f.withdraw) h += `<p class="small bad"><b>Withdrawing.<\/b> At the end of the turn it fights the first exchange (defensively), then breaks off and pulls back toward your nearest world.<\/p><div class="btn-row"><button class="btn small" data-withdraw="off">Stay and fight<\/button><\/div>`;
+  else if (eng) h += `<p class="small bad"><b>Engaged.<\/b> Enemy warships${S.sysAt[f.at] && S.systems[S.sysAt[f.at]].colony && atWar(S, me.id, S.systems[S.sysAt[f.at]].colony.owner) ? " or guns" : ""} share this hex: the battle goes on each turn, and the fleet can't simply sail away.<\/p><div class="btn-row"><button class="btn" data-withdraw title="It fights the first exchange of the next battle defensively, then breaks off and pulls back toward your nearest world. The enemy gets no more shots at it.">Withdraw<\/button><\/div>`;
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}<\/button>${f.path.length ? `<button class="btn" data-stop>Stop<\/button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}<\/button>`}<\/div>`;
   if (!sys && mine && f.ships.some((x) => x.type === "outpost") && S.hexes[f.at].terrain !== "rift") {
     const c = canFoundStation(S, f.id);
@@ -4753,6 +4831,11 @@ function fleetHTML() {
   if (f.ships.length > 1) h += `<h3>Split off by type<\/h3><p class="small muted" style="margin-top:-4px">Into a new fleet here. The most damaged go first; the admiral stays.<\/p>`
     + types.map((t) => { const n = f.ships.filter((x) => x.type === t).length, all = n === f.ships.length;
       return `<div class="split-row"><span>${shipSVG(t, me.color, 18, me.id)} ${esc(shipLabel(me.id, t))}${n > 1 ? ` ×${n}` : ""}<\/span><span class="opts">${[["1", "1"], ...(n >= 4 ? [["half", `Half (${Math.floor(n / 2)})`]] : []), ...(n > 1 ? [["all", all ? `All but 1 (${n - 1})` : `All ${n}`]] : [])].map(([k, label]) => `<button class="opt" data-split="${t}:${k}"><b>${label}<\/b><\/button>`).join("")}<\/span><\/div>`; }).join("");
+  // Detach a chosen number of ships and send them on: to a world, or at an enemy.
+  if (f.ships.length > 1) h += `<h3>Detach and send<\/h3><p class="small muted" style="margin-top:-4px">Choose how many of each to take (the soundest go), then click where to send them: a world, or an enemy fleet's hex. The admiral stays.<\/p>`
+    + types.map((t) => { const n = f.ships.filter((x) => x.type === t).length;
+      return `<div class="split-row"><label for="dt-${t}">${shipSVG(t, me.color, 18, me.id)} ${esc(shipLabel(me.id, t))} <span class="muted">of ${n}<\/span><\/label><input type="number" class="num" id="dt-${t}" data-detach-n="${t}" min="0" max="${n}" value="0" style="width:4.5em"><\/div>`; }).join("")
+    + `<div class="btn-row"><button class="btn" data-detach="send">Detach and send…<\/button>${eng ? `<button class="btn" data-detach="withdraw">Detach and withdraw them<\/button>` : ""}<\/div>`;
   return h;
 }
 // ---------- Objectives: the race to win, at a glance ----------
@@ -5115,6 +5198,14 @@ function bindChrome() {
     else if (d.move !== undefined) { moveMode = !moveMode; if (moveMode) toast("Click where to send this fleet. Esc cancels."); }
     else if (d.stop !== undefined) setDestination(S, sel.id, S.fleets[sel.id].at);
     else if (d.beacon !== undefined) { const r = buildBeacon(S, me.id, sel.id); if (r.error) toast(r.error, true); else toast("The Rift beacon is lit: the sector is open."); }
+    else if (d.withdraw !== undefined) { const r = setWithdraw(S, sel.id, d.withdraw !== "off"); if (r.error) toast(r.error, true); else toast(d.withdraw === "off" ? "It stays and fights." : "Withdrawing: it breaks off after the first exchange."); }
+    else if (d.detach !== undefined) {
+      const counts = {}; for (const el of document.querySelectorAll("[data-detach-n]")) counts[el.dataset.detachN] = Math.min(+el.max, Math.max(0, Math.floor(+el.value) || 0));
+      const r = detachShips(S, sel.id, counts);
+      if (r.error) toast(r.error, true);
+      else if (d.detach === "withdraw") { const w = setWithdraw(S, r.fleet); sel = { kind: "fleet", id: r.fleet }; toast(w.error ? w.error : `${r.ships} ship${r.ships === 1 ? "" : "s"} detached: they withdraw after the first exchange; the rest fight on.`, !!w.error); }
+      else { sel = { kind: "fleet", id: r.fleet }; moveMode = true; toast(`${r.ships} ship${r.ships === 1 ? "" : "s"} detached. Click where to send them: a world, or an enemy fleet.`); }
+    }
     else if (d.burn !== undefined) { const f = S.fleets[sel.id], r = setBurn(S, f.id, !f.burn); if (r.error) toast(r.error, true); else toast(f.burn ? "Burning hard: faster, at a cost in fuel." : "Cruising: back to normal speed."); }
     else if (d.sentry !== undefined) { const f = S.fleets[sel.id]; f.sentry = !f.sentry; if (f.sentry) nextIdle(); }
     else if (d.settle !== undefined) { const since = mark(), at = S.fleets[sel.id].at, nm = S.systems[S.sysAt[at]].name, r = settle(S, sel.id, { depot: d.settle === "depot" }); if (!r.error) reportSince(`${nm}`, since); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
@@ -5257,7 +5348,8 @@ function showBattle(then) {
       return `${head}<li class="${e.hit ? (a.fid === me ? "good" : "bad") : "muted"}${k === shown - 1 ? " now" : ""}">${esc(unitName(a))} fires on ${esc(unitName(t).replace(/^Your /, "your "))}: <span class="dice">${e.dice.map((d) => `<span class="die">${d}<\/span>`).join("")}<\/span> ${e.dice.reduce((x, y) => x + y, 0)} against ${e.need}: <b>${e.hit ? (killed ? "destroyed!" : `hit, −${e.dmg}`) : "miss"}<\/b><\/li>`;
     }).join("");
     const lostMine = (B.lost || {})[me] || 0, lostTheirs = Object.entries(B.lost || {}).filter(([f]) => f !== me).reduce((t, [, x]) => t + x, 0);
-    const result = B.won === "won" ? `<b class="good">Victory.<\/b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : B.won === "lost" ? `<b class="bad">Defeat.<\/b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : `<b>No clear winner.<\/b> You lost ${lostMine}; they lost ${lostTheirs}. The fight goes on next turn if both sides stay.`;
+    const gunsOut = B.silenced ? (B.silenced === me ? ` <b class="bad">Your orbital guns are knocked out:<\/b> they can't be repaired while enemy warships hold the orbit.` : ` <b class="good">Their orbital guns are knocked out:<\/b> the orbit is yours while you hold it. Bring troop transports to invade, or a barrage to bring down what they've built.`) : "";
+    const result = (B.won === "won" ? `<b class="good">Victory.<\/b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : B.won === "lost" ? `<b class="bad">Defeat.<\/b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : `<b>No clear winner.<\/b> You lost ${lostMine}; they lost ${lostTheirs}. The fight goes on next turn if both sides stay.`) + gunsOut;
     modal(`<h1>Battle at ${esc(B.at)}<\/h1><p class="small muted">Turn ${B.turn} · ${esc(B.sides.map((f) => f === me ? "you" : faction(S, f).name).join(" against "))} · each shot is 3d6 at or under the gunner's skill<\/p>
       <div class="battle">${sideHTML(mine, hull, "Your side")}${sideHTML(theirs, hull, esc(theirs.map((f) => faction(S, f).name).join(", ")))}<\/div>
       <ol class="blog-list">${lines || `<li class="muted">The fleets close. Three exchanges of fire.<\/li>`}<\/ol>
@@ -5462,7 +5554,7 @@ const GUIDE = [
   { id: "objectives", target: '[data-tab="objectives"]', tab: "objectives", title: "Three ways to win", text: "The Objectives tab: conquest (the last power standing), the Corridor Engine (research it, then build it at your capital), or the best score at turn 200. It shows how close everyone is.", done: () => S.tutorial.seen && S.tutorial.seen.objectives },
   { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "Directives and campaigns", text: "Your people send directives (the Mission tab): each pays credits, and each is a race against a rival. From turn 8, campaigns: three in a row, each against your nearest rival. Your research arm sends field tests that leave a prototype upgrade.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
   { id: "empire", target: '[data-tab="empire"]', tab: "empire", title: "Focus", text: "The Empire tab: share three Focus points between industry, science, credits and defense (2 at most to one). Change it whenever you like. Your prototypes are listed here too.", done: () => S.tutorial.seen && S.tutorial.seen.empire },
-  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels from your fuel reserve (top bar): your colonies make a little, fuel depots and stations make most of it and raise how much you can store. Fleets moving in supply, refuelling, filling tankers and burning hard (a fleet's button: a hex a turn faster) all draw on it; short of fuel, your fleets move slower. More depots, more fleets kept moving. A fuel tanker extends your lines: travelling with a fleet it tops up the tank; parked, it keeps your fleets within 2 hexes in supply. Enemy warships in a supply point's system cut it, so defend your tankers and depots." },
+  { id: "fleets", read: true, title: "Fleets: stance, supply and fuel", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Your colonies give supply within 3 hexes, and so does an outpost with a fuel depot (claim it with one, or build it later for credits). Beyond supply a fleet burns a turn of fuel each turn it moves (its panel shows the tank); run dry and it crawls a hex a turn, and its warships wear down. Back in supply it refuels from your fuel reserve (top bar): your colonies make a little, fuel depots and stations make most of it and raise how much you can store. Fleets moving in supply, refuelling, filling tankers and burning hard (a fleet's button: a hex a turn faster) all draw on it; short of fuel, your fleets move slower. More depots, more fleets kept moving. A fuel tanker extends your lines: travelling with a fleet it tops up the tank; parked, it keeps your fleets within 2 hexes in supply. Enemy warships in a supply point's system cut it, so defend your tankers and depots. In a battle a fleet is engaged and can't just leave: press Withdraw to pull it out after the first exchange. Detach and send sends part of a fleet somewhere else." },
   { id: "trade", read: true, title: "Trade and sieges", text: "Your colonies trade with each other and with treaty partners' worlds within 4 hexes, for credits (an Exchange doubles it; the Empire tab's market buys and sells exotics). Warships in an enemy's orbit besiege it: half its industry and credits, no trade, no growth, it starves, its garrison weakens, and an ordinary colony starved low enough surrenders. Your own worlds can be besieged too: break the siege with a fleet." },
   { id: "done", read: true, title: "The galaxy is yours", text: "That's the turn: research, build, move, end the turn. Next: a Factory and a Research lab at your capital, two or three frigates at home, and meet your neighbours (Diplomacy). Menu → Restart the guide brings this back any time." },
 ];
@@ -5512,7 +5604,9 @@ function showHelp(back) {
       <li><b>Corridors<\/b> (the dashed lines) link systems: a jump along one costs 1 move, however far. Nebulae cost 2 and hide ships; red rifts block.<\/li>
       <li><b>Colony ships<\/b> settle worlds you can live on; <b>outpost ships<\/b> claim any system, for its exotics ◆ and territory. Xenology and Habitat domes open harsher worlds.<\/li>
       <li><b>Exotics<\/b> ◆ come from deposits. Cruisers, dreadnoughts and the Corridor Engine need them.<\/li>
-      <li><b>Battles<\/b> happen when fleets of factions at war share a hex. Each armed ship rolls 3d6 under its skill to hit (3–4 always hits, 17–18 always misses), three exchanges a turn. Worlds with guns fire back.<\/li>
+      <li><b>Battles<\/b> happen when fleets of factions at war share a hex. Each armed ship rolls 3d6 under its skill to hit (3–4 always hits, 17–18 always misses), three exchanges a turn. Worlds with guns fire back: they fire first in each exchange and finish off the most damaged ship. Knocking a world's guns out counts toward winning the battle, and they can't be repaired while you hold the orbit.<\/li>
+      <li><b>Engaged:<\/b> a fleet sharing a hex with enemy warships (or an enemy world's guns) is engaged. It can't simply sail away. Press <b>Withdraw<\/b>: it fights the next battle's first exchange defensively, then pulls back toward your nearest world.<\/li>
+      <li><b>Detach and send:<\/b> on a fleet's panel, choose how many of each ship to take, then click where to send them (a world, or an enemy fleet). The soundest ships go and the admiral stays. In a battle you can detach some ships and withdraw just those. <b>Split off by type<\/b> does the same for one type at a time, most damaged first.<\/li>
       <li><b>Advances:<\/b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.<\/li>
       <li><b>Anomalies<\/b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.<\/li>
       <li><b>Relics<\/b> (♦): eleven artifacts of the old empires, hidden in ruins and anomalies. End a fleet's turn at one to recover it; take a world to take its relics. The Founders' Star Chart opens the Outer Reach beyond the rim. See them on the Empire tab.<\/li>
@@ -5523,7 +5617,8 @@ function showHelp(back) {
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
       <li><b>New sectors:<\/b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.<\/li>
       <li><b>Corridor collapses:<\/b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). It's rare, and it's always one that matters. Ships then go the long way, until a scout rests ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).<\/li>
-      <li><b>Fuel reserve:<\/b> the top bar's Fuel. Your colonies make a little and fuel depots and stations most, and each depot lets you store more. Fleets moving in supply, refuelling, filling tankers and burning hard spend it; run short and your fleets move slower and can't refuel. Burn hard (on a moving fleet's panel) for a hex a turn more.<\/li>
+      <li><b>Fuel reserve:<\/b> the top bar's Fuel. Your colonies make a little and fuel depots and stations most, and each depot lets you store more. Fleets moving in supply, refuelling, filling tankers and burning hard spend it; run short and your fleets move slower and can't refuel. Burn hard (on a moving fleet's panel) for a hex a turn more. Fuel tankers still extend your reach: one travelling with a fleet tops its tank up beyond supply, and a parked one keeps your fleets nearby in supply. They fill up from the reserve.<\/li>
+      <li><b>Music:<\/b> the ♪ button (top right) turns it on or off. Menu → Music has the volume, Next track, and Loop this track. The main theme plays at the start; after that the music follows the galaxy (exploring, war, the Wardens).<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.<\/li>
       <li><b>Win<\/b> by conquest (the last people standing), by building the <b>Corridor Engine<\/b> (research it, then build it at your capital), or with the highest score at turn ${RULES.maxTurns}.<\/li>

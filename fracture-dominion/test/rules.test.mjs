@@ -1271,3 +1271,50 @@ test("corridor collapses: announced, never a world's last corridor, and a scout 
   assert.equal(me.research.progress, r0 + COLLAPSE.research);
   const off = newGame({ seed: 33, size: "small", player: "concord", rivals: 1, collapses: false }); off.turn = COLLAPSE.first; corridorsTurn(off); assert.equal(off.collapse, undefined);
 });
+
+test("engagements: an engaged fleet can't just sail off; it withdraws after the first exchange; ships can be detached", async () => {
+  const { engaged, setWithdraw, detachShips, gunsMax } = await import("../src/game.js");
+  const s = newGame({ seed: 34, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const me = s.factions[0], R = s.factions[1]; me.relations[R.id].status = "war"; R.relations[me.id].status = "war";
+  const cap = s.systems[me.capital];
+  const spot = Object.keys(s.hexes).find((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && distance(k, cap.at) === 3);
+  const f = spawnFleet(s, me.id, spot, ["cruiser", "cruiser", "frigate", "frigate", "frigate"]);
+  const e = spawnFleet(s, R.id, spot, ["dreadnought", "dreadnought"]);
+  assert.ok(engaged(s, f) && engaged(s, e));
+  // Detach: exact counts, never the whole fleet.
+  assert.ok(detachShips(s, f.id, { cruiser: 5, frigate: 3 }).error, "not the whole fleet");
+  const d = detachShips(s, f.id, { frigate: 2 }); assert.ok(d.ok && d.ships === 2);
+  assert.equal(s.fleets[d.fleet].ships.length, 2); assert.equal(f.ships.length, 3);
+  // Pinned: a move order doesn't take it out of the fight.
+  const away = Object.keys(s.hexes).find((k) => s.hexes[k].terrain === "space" && distance(k, spot) === 2);
+  assert.ok(setDestination(s, d.fleet, away).ok);
+  endTurn(s, null);
+  if (s.fleets[d.fleet]) assert.equal(s.fleets[d.fleet].at, spot, "engaged: it stayed");
+  // Withdraw: it leaves after the battle.
+  assert.ok(setWithdraw(s, f.id).ok || !s.fleets[f.id]);
+  if (s.fleets[f.id]) { endTurn(s, null); if (s.fleets[f.id]) { assert.notEqual(s.fleets[f.id].at, spot, "it pulled back"); assert.ok(!s.fleets[f.id].withdraw); } }
+  // Not engaged: nothing to withdraw from.
+  const g = spawnFleet(s, me.id, cap.at, ["frigate"]); assert.ok(setWithdraw(s, g.id).error);
+});
+
+test("orbital guns: they fire first and finish off the weakest ship; knocking them out counts as winning the battle", async () => {
+  const { gunsMax } = await import("../src/game.js");
+  const s = newGame({ seed: 5, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const me = s.factions[0], R = s.factions[1]; me.relations[R.id].status = "war"; R.relations[me.id].status = "war";
+  const w = s.systems[R.capital]; w.colony.buildings.battery = true; w.colony.defense = gunsMax(s, w.colony);
+  for (const f of Object.values(s.fleets)) if (f.at === w.at) delete s.fleets[f.id];
+  spawnFleet(s, me.id, w.at, ["frigate", "frigate"]);
+  s.battleReports = []; endTurn(s, null);
+  const r = s.battleReports[0]; assert.ok(r);
+  assert.ok(r.units[r.events[0].a].type === "guns", "the guns fire first");
+  assert.ok((r.lost[me.id] || 0) >= 1, "they sink ships, not just scratch them");
+  // A big fleet knocks them out: a win, though no ship of theirs was lost.
+  const s2 = newGame({ seed: 5, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const m2 = s2.factions[0], R2 = s2.factions[1]; m2.relations[R2.id].status = "war"; R2.relations[m2.id].status = "war";
+  const w2 = s2.systems[R2.capital]; w2.colony.buildings.battery = true; w2.colony.defense = gunsMax(s2, w2.colony);
+  for (const f of Object.values(s2.fleets)) if (f.at === w2.at) delete s2.fleets[f.id];
+  spawnFleet(s2, m2.id, w2.at, Array(6).fill("cruiser"));
+  s2.battleReports = []; endTurn(s2, null);
+  const r2 = s2.battleReports[0];
+  assert.equal(w2.colony.defense, 0); assert.equal(r2.silenced, R2.id); assert.equal(r2.won, "won");
+});

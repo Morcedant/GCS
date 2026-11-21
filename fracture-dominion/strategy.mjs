@@ -17,7 +17,7 @@ const peoples = {
   vael: "Your living ships go farther, heal anywhere and need no fuel. Reach is your strength: you can act where others can't follow.",
 };
 
-const toc = [["win", "Know how the game is won"], ["principles", "Principles"], ["early", "The early game"], ["middle", "The middle game"], ["late", "The late game"], ["paths", "Choosing a path to victory"], ["peoples", "Playing to your people's strengths"], ["war", "War"], ["defense", "Defense"], ["threats", "Threats from outside"], ["explore", "Exploration"], ["diplomacy", "Diplomacy"], ["mistakes", "Common mistakes"]];
+const toc = [["win", "Know how the game is won"], ["principles", "Principles"], ["early", "The early game"], ["middle", "The middle game"], ["late", "The late game"], ["paths", "Choosing a path to victory"], ["peoples", "Playing to your people's strengths"], ["war", "War"], ["logistics", "Fuel and supply"], ["defense", "Defense"], ["threats", "Threats from outside"], ["explore", "Exploration"], ["diplomacy", "Diplomacy"], ["mistakes", "Common mistakes"], ["settings", "Settings and music"]];
 
 const body = [
   sec("win", "Know how the game is won", `
@@ -74,12 +74,25 @@ const body = [
     "<b>Quality matters.</b> Better technology and refitted ships often matter more than numbers.",
     "<b>Mind your supply.</b> Fleets far from home run short. Plan how you'll keep them fuelled before you go.",
     "<b>Finish what you start.</b> Taking a world means winning its orbit, holding it, and bringing enough troops. Leave halfway and you'll start again.",
+    "<b>Once you're in a battle, you're committed.</b> A fleet that shares a hex with the enemy can't just sail off. Pulling back is an order of its own, and it costs a last exchange of fire. Decide before you engage whether you can win.",
+    "<b>Withdraw while you still have a fleet.</b> A beaten fleet that survives can be repaired, refitted and sent back. One that fights to the last can't.",
+    "<b>Use your fleet in pieces when it pays.</b> Detaching part of a fleet lets you screen a world, chase a weaker enemy or pull damaged ships out, without giving up your main force.",
+    "<b>Respect orbital guns.</b> Dug-in batteries fire first and finish off damaged ships. Bring enough to silence them quickly, or they'll grind a fleet down. Once they're out, they stay out while you hold the orbit.",
     "<b>Know when to make peace.</b> A war that costs more than it gains is worth ending."])),
+
+  sec("logistics", "Fuel and supply", ul([
+    "<b>Fuel is a budget.</b> Your empire keeps a reserve. Moving, refuelling and pushing ships harder all draw on it, and running short slows everything down.",
+    "<b>Depots are what keep you moving.</b> They make most of the fuel and let you store more. An empire with few depots can't keep many fleets in motion for long.",
+    "<b>Stock up in peacetime.</b> A full reserve is what lets you fight a long war, or answer a surprise.",
+    "<b>Tankers carry your reach.</b> Fuel tankers travelling with a fleet keep it going beyond supply, and parked ones extend your lines. Plan any deep strike around them.",
+    "<b>Burn hard when speed decides it.</b> Arriving a turn sooner can save a world or win a race, but it costs fuel you may want later.",
+    "<b>Your rivals have the same limits.</b> Raiding their depots, or catching them far from supply, can stop a war before it reaches you."])),
 
   sec("defense", "Defense", ul([
     "<b>Defend where it matters.</b> Your capital, your best worlds and your borders come first.",
     "<b>Fixed defenses buy time.</b> Guns in orbit hold off small attacks and give your fleets time to arrive.",
     "<b>Respond quickly.</b> A world under siege loses output every turn. Break sieges early.",
+    "<b>Batteries punish small attacks.</b> Orbital guns make raids and probing attacks costly. Pair them with a fleet that can arrive before a big attack silences them.",
     "<b>Don't leave your heart empty.</b> A rival who finds your capital unguarded can undo a whole game."])),
 
   sec("threats", "Threats from outside", ul([
@@ -93,7 +106,9 @@ const body = [
     "<b>Keep a scout or two all game.</b> When a corridor collapses, whoever charts the new route first gets research, and the route back.",
     "<b>Plan for new sectors.</b> In a long game the map grows, and you hear what kind of sector is coming before it opens. Have scouts and settlers ready, and be ready to defend what you claim: a new sector is a fresh race.",
     "<b>Relics are powerful</b>, and they stay with the world that keeps them. Guard yours; a rival's can be taken.",
-    "<b>The galaxy may be bigger than it looks.</b> Be ready to move if new space opens."])),
+    "<b>The galaxy may be bigger than it looks.</b> Be ready to move if new space opens.",
+    "<b>Some space is sealed.</b> Getting into a sealed sector takes the right technology, or a beacon that opens it for everyone. Being first in is worth a lot; opening it for your rivals is a choice to make on purpose.",
+    "<b>The network can change.</b> Corridors rarely collapse, but when one does it can cut an empire in two. Don't depend on a single route to your most important worlds."])),
 
   sec("diplomacy", "Diplomacy", ul([
     "<b>Friends are an economy.</b> Trade and good relations pay steadily and keep wars away from you.",
@@ -109,7 +124,13 @@ const body = [
     "Fighting with an outdated fleet.",
     "Letting the treasury fall into debt.",
     "Leaving the capital undefended.",
-    "Ignoring threats from outside until they're at your door."])),
+    "Ignoring threats from outside until they're at your door.",
+    "Running the fuel reserve dry in the middle of a war.",
+    "Fighting a lost battle to the end instead of withdrawing."])),
+
+  sec("settings", "Settings and music", `
+<p>You can shape each game on the new-game form: the galaxy's size, your rivals and how hard they play (with the computer players' options), standard or open play, pirates and creatures, the Wardens, new sectors, and corridor collapses. Choose a harder or longer game once you know how the pieces fit together.</p>
+<p><b>Music.</b> Dominion has a soundtrack. The main theme opens the game, and after that the music follows the state of the galaxy: exploring, at war, or facing the Wardens. Some tracks play for a long stretch before the next one. The <b>♪</b> button turns music on or off. <b>Menu → Music</b> has the volume, <b>Next track</b>, and <b>Loop this track</b> to keep one playing. Your choices are remembered on this device.</p>`),
 ].join("\n");
 
 const page = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Dominion strategy guide</title>

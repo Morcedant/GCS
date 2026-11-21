@@ -3,7 +3,7 @@
 import { distance, neighbors, hexLine } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS } from "./data.js";
 import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw } from "./game.js";
 
 const PRIORITY = {
   // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
@@ -237,6 +237,14 @@ function fleets(s, F) {
   for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
+    // Engaged and clearly losing: withdraw (it fights the first exchange, then pulls back), rather than die there.
+    if (engaged(s, f)) {
+      const pw = (fl) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? x.hull * SHIPS[x.type].dmg * (SHIPS[x.type].shots || 1) : 0), 0);
+      const sid = s.sysAt[f.at], sys = sid && s.systems[sid];
+      const foe = fleetsAt(s, f.at).filter((o) => armed(o) && atWar(s, F.id, o.owner)).reduce((t, o) => t + pw(o), 0) + (sys && sys.colony && atWar(s, F.id, sys.colony.owner) && sys.colony.defense > 0 ? sys.colony.defense * 2 : 0);
+      const mine = fleetsAt(s, f.at).filter((o) => o.owner === F.id).reduce((t, o) => t + pw(o), 0);
+      if (foe > 0 && mine < foe * 0.5 && !setWithdraw(s, f.id).error) continue;
+    }
     const types = new Set(f.ships.map((x) => x.type));
     // An outpost ship on a station mission: build it when it gets there.
     if (f.stationAt && types.has("outpost")) {

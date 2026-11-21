@@ -4,6 +4,18 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-21",
+      "kind": "site",
+      "title": "Dominion: withdrawing, detaching ships, decisive orbital guns, updated guides",
+      "items": [
+        "Engaged fleets: a fleet sharing a hex with enemy warships, or with an enemy world's guns, can't simply sail away. Withdraw pulls it out: it fights the next battle's first exchange defensively, then falls back toward its nearest world. Computer players withdraw from battles they're clearly losing.",
+        "Detach and send: choose exactly how many ships of each type to take from a fleet, then send them to a world or at an enemy. In a battle you can detach some ships and withdraw just those.",
+        "Orbital guns no longer stalemate: they fire first in each exchange and finish off the most damaged ship. Knocking out a world's guns now counts toward winning the battle, and the battle report says so.",
+        "The strategy guide has new sections on fuel and supply, battles and withdrawing, sealed sectors and collapses, and settings and music. The in-game How to play and the tutorial cover the same.",
+        "Music on the website, the fan sites and in Dominion now plays from the music bucket's public, cached address, falling back to the table server if needed."
+      ]
+    },
+    {
       "date": "2026-11-20",
       "kind": "site",
       "title": "Dominion: corridor collapses are rarer, and hit harder",
