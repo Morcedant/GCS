@@ -6,6 +6,14 @@
     {
       "date": "2026-11-21",
       "kind": "site",
+      "title": "Dominion: painted portraits from the music bucket",
+      "items": [
+        "Painted portraits now come from the music bucket's peoples/ folder instead of the game's files. Upload a square image named after an empire (for example peoples/mirrun.png, or .webp or .jpg) and it shows at once on the Peoples page, in the people picker and on the Diplomacy tab, with no rebuild. Empires without one keep their drawing."
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "kind": "site",
       "title": "Dominion: three new empires, and the peoples' portraits",
       "items": [
         "Three new empires from the Fracture Lines setting. The Mirrun Commonwealth (Pelagic scholars): +20% science, Ocean worlds hold 3 more population, and they start on an ocean world. The Ylith Aeries (Far sight): ships and worlds see 2 hexes farther, and scouts and colony ships move 1 faster. The Zhaq Free Republics (Never again): garrisons half again as strong that never weaken under siege, and besieged worlds starve half as fast.",

@@ -1,31 +1,17 @@
 // The Peoples page: each empire's hex token and portrait, what its people look like, its trait, its leader and
 // character, and its ships. Writes dist/peoples.html.   node peoples.mjs
-// Painted art: put a picture named after the empire in art/ (art/mirrun.webp, .png or .jpg) and the page uses it in
-// place of the drawing, cropped to the hex.
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
+// Painted portraits come from the music bucket's peoples/ folder (src/peoples.js, peopleArt), when there are any.
+import { writeFileSync, mkdirSync } from "node:fs";
 import { FACTIONS, PERSONALITIES, FLEET_STYLES, SHIPS } from "./src/data.js";
-import { peopleToken, LOOKS } from "./src/peoples.js";
+import { peopleToken, peopleArt, LOOKS } from "./src/peoples.js";
 
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "colony", "outpost", "transport", "tanker"];
 const HEX = "50,2 92,26 92,74 50,98 8,74 8,26";
-// Painted art, if there is any: inlined, so the page stays one file.
-const art = (id) => {
-  for (const [ext, mime] of [["webp", "image/webp"], ["png", "image/png"], ["jpg", "image/jpeg"]]) {
-    const f = new URL(`art/${id}.${ext}`, import.meta.url);
-    if (existsSync(f)) return `data:${mime};base64,${readFileSync(f).toString("base64")}`;
-  }
-  return null;
-};
-const token = (f, size) => {
-  const a = art(f.id); if (!a) return peopleToken(f.id, f.color, size);
-  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" role="img" aria-label="${esc(f.people)}"><defs><clipPath id="pa-${f.id}"><polygon points="${HEX}"/></clipPath></defs>
-    <image href="${a}" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice" clip-path="url(#pa-${f.id})"/><polygon points="${HEX}" fill="none" stroke="${f.color}" stroke-width="4"/></svg>`;
-};
 const card = (f) => {
   const P = PERSONALITIES[f.id] || {}, St = FLEET_STYLES[f.id];
   return `<article class="people" id="${f.id}" style="--c:${f.color}">
-  <div class="pic">${token(f, 180)}</div>
+  <div class="pic">${peopleArt(f.id, f.color, 180)}</div>
   <div class="txt">
     <h2>${esc(f.name)}</h2>
     <p class="sub">${esc(f.people)} · homeworld ${esc(f.homeworld)}</p>
@@ -52,7 +38,7 @@ details{margin-top:30px;background:var(--card);border:1px solid var(--line);bord
 <h1>The peoples of Dominion</h1>
 <p class="lede">The empires of the Fracture Lines, what their peoples look like, and what each brings to the game. Their hex tokens are on the <a href="tokens.html">token sheet</a> too.</p>
 <p><a href="index.html">Play the game</a> · <a href="strategy.html">Strategy guide</a> · <a href="tokens.html">Printable tokens</a></p>
-<div class="row">${FACTIONS.map((f) => `<a href="#${f.id}">${peopleToken(f.id, f.color, 72)}<br>${esc(f.people.replace(/ and .*/, ""))}</a>`).join("")}</div>
+<div class="row">${FACTIONS.map((f) => `<a href="#${f.id}">${peopleArt(f.id, f.color, 72)}<br>${esc(f.people.replace(/ and .*/, ""))}</a>`).join("")}</div>
 ${FACTIONS.map(card).join("\n")}
 <p class="muted" style="margin-top:30px">Fracture Lines: Dominion, a strategy game in the Fracture Lines setting of the Legend Dynamics RPG. The peoples are described in the setting's guide.</p>
 </main></body></html>`;

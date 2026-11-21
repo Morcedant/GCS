@@ -103,6 +103,21 @@ export function peopleToken(id, color, size = 96, label = "") {
     ${label ? `<text x="50" y="114" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="currentColor">${label}</text>` : ""}
   </svg>`;
 }
+// Painted portraits, if any: square images in the music bucket's peoples/ folder (R2, served cached from the public
+// music address), named after the empire: peoples/mirrun.webp, .png or .jpg. A token shows its drawing, and the
+// painting over it once it loads; with no painting it stays a drawing (each empire is tried once per page).
+export const ART_BASE = "https://music.legenddynamicsrpg.com/peoples";
+const ART_EXT = ["webp", "png", "jpg"];
+const HEX_CLIP = "polygon(50% 6%, 88% 28%, 88% 72%, 50% 94%, 12% 72%, 12% 28%)";
+/** A token with the painted portrait layered on (in a page's HTML): the drawing until a painting loads. */
+export function peopleArt(id, color, size = 96) {
+  const tok = peopleToken(id, color, size);
+  if (!tok) return "";
+  const missing = typeof window !== "undefined" && window.__ldArtMissing && window.__ldArtMissing[id];
+  if (missing) return tok;
+  const onerr = "var x=this.dataset.ext.split(',');if(x.length&&x[0]){this.dataset.ext=x.slice(1).join(',');this.src=this.dataset.base+'.'+x[0];}else{(window.__ldArtMissing=window.__ldArtMissing||{})[this.dataset.id]=1;this.remove();}";
+  return `<span class="ld-art" style="position:relative;display:inline-block;line-height:0;width:${size}px;height:${size}px">${tok}<img alt="" loading="lazy" decoding="async" data-id="${id}" data-base="${ART_BASE}/${id}" data-ext="${ART_EXT.slice(1).join(",")}" src="${ART_BASE}/${id}.${ART_EXT[0]}" onerror="${onerr}" style="position:absolute;inset:0;width:${size}px;height:${size}px;object-fit:cover;clip-path:${HEX_CLIP}"></span>`;
+}
 /** What each people looks like, in words (from the RPG), for the Peoples page and the picker. */
 export const LOOKS = {
   concord: "Humans: adaptable and restless. Three centuries in the corridors have scattered them across dozens of colonies and competing governments.",

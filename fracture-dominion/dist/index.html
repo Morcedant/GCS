@@ -211,7 +211,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-21 16:42 UTC";
+const BUILD = "2026-11-21 16:45 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -1026,6 +1026,21 @@ function peopleToken(id, color, size = 96, label = "") {
     <polygon points="${HEX}" fill="none" stroke="${color}" stroke-width="4"/><polygon points="${HEX}" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1" transform="translate(50 50) scale(.9) translate(-50 -50)"/>
     ${label ? `<text x="50" y="114" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="currentColor">${label}<\/text>` : ""}
   <\/svg>`;
+}
+// Painted portraits, if any: square images in the music bucket's peoples/ folder (R2, served cached from the public
+// music address), named after the empire: peoples/mirrun.webp, .png or .jpg. A token shows its drawing, and the
+// painting over it once it loads; with no painting it stays a drawing (each empire is tried once per page).
+const ART_BASE = "https://music.legenddynamicsrpg.com/peoples";
+const ART_EXT = ["webp", "png", "jpg"];
+const HEX_CLIP = "polygon(50% 6%, 88% 28%, 88% 72%, 50% 94%, 12% 72%, 12% 28%)";
+/** A token with the painted portrait layered on (in a page's HTML): the drawing until a painting loads. */
+function peopleArt(id, color, size = 96) {
+  const tok = peopleToken(id, color, size);
+  if (!tok) return "";
+  const missing = typeof window !== "undefined" && window.__ldArtMissing && window.__ldArtMissing[id];
+  if (missing) return tok;
+  const onerr = "var x=this.dataset.ext.split(',');if(x.length&&x[0]){this.dataset.ext=x.slice(1).join(',');this.src=this.dataset.base+'.'+x[0];}else{(window.__ldArtMissing=window.__ldArtMissing||{})[this.dataset.id]=1;this.remove();}";
+  return `<span class="ld-art" style="position:relative;display:inline-block;line-height:0;width:${size}px;height:${size}px">${tok}<img alt="" loading="lazy" decoding="async" data-id="${id}" data-base="${ART_BASE}/${id}" data-ext="${ART_EXT.slice(1).join(",")}" src="${ART_BASE}/${id}.${ART_EXT[0]}" onerror="${onerr}" style="position:absolute;inset:0;width:${size}px;height:${size}px;object-fit:cover;clip-path:${HEX_CLIP}"><\/span>`;
 }
 /** What each people looks like, in words (from the RPG), for the Peoples page and the picker. */
 const LOOKS = {
@@ -5568,7 +5583,7 @@ function diplomacyHTML() {
   for (const F of met) {
     const r = me.relations[F.id], them = F.relations[me.id];
     const mood = !F.alive ? "gone" : attitude(S, F.id), P = PERSONALITIES[F.id] || {}, mem = (them.memory || []).slice(-5).reverse();
-    h += `<div class="dip"><h3 class="dip-h">${peopleToken(F.id, F.color, 40)}<span>${esc(F.name)}${F.alive ? "" : " †"}<\/span><\/h3>
+    h += `<div class="dip"><h3 class="dip-h">${peopleArt(F.id, F.color, 40)}<span>${esc(F.name)}${F.alive ? "" : " †"}<\/span><\/h3>
       <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}<\/b> · ${esc(P.title || "")}: ${esc(P.text || "")}<\/p>
       <p class="small">${r.status === "war" ? `<b class="bad">At war<\/b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied<\/b>" : "<b>At peace<\/b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}<\/b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.<\/p>
       ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:<\/p><ul class="small mem">${mem.map((m) => { const i = (them.memory || []).indexOf(m), cost = F.alive ? amendsCost(S, me.id, F.id, i) : null;
@@ -5844,7 +5859,7 @@ function showNewGame(canContinue, preset) {
   modal(`<h1>Fracture Lines: Dominion<\/h1>
     <p class="lede">The old empires are breaking along the corridors. Lead a people of the Fracture Lines from one world to an empire: explore, settle, trade, research and fight, turn by turn.<\/p>
     ${canContinue ? `<div class="btn-row"><button class="btn primary" id="ng-continue">Continue your game<\/button><\/div>` : ""}
-    <h3>Choose your people<\/h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span class="fac-tok">${peopleToken(f.id, f.color, 46)}<\/span><span><b>${esc(f.name)}<\/b><small><b>${esc(f.trait)}:<\/b> ${esc(f.traitText)}<\/small><small class="muted">${esc(LOOKS[f.id] || "")}<\/small><\/span><\/label>`).join("")}<\/div>
+    <h3>Choose your people<\/h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span class="fac-tok">${peopleArt(f.id, f.color, 46)}<\/span><span><b>${esc(f.name)}<\/b><small><b>${esc(f.trait)}:<\/b> ${esc(f.traitText)}<\/small><small class="muted">${esc(LOOKS[f.id] || "")}<\/small><\/span><\/label>`).join("")}<\/div>
     <div class="ng-row">
       <label>Galaxy <select id="ng-size"><option value="small">Small<\/option><option value="medium" selected>Medium<\/option><option value="large">Large<\/option><option value="vast">Vast<\/option><\/select><\/label>
       <label>Game <select id="ng-mode"><option value="standard" selected>Standard: 200 turns<\/option><option value="open">Open: no end<\/option><\/select><\/label>

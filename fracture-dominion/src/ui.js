@@ -10,7 +10,7 @@ import { crisisTurn, crisisState } from "./crisis.js";
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
 import { sectorsTurn, sectorsState, corridorsTurn, collapseState } from "./sectors.js";
-import { peopleToken, LOOKS } from "./peoples.js";
+import { peopleToken, peopleArt, LOOKS } from "./peoples.js";
 import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
@@ -890,7 +890,7 @@ function diplomacyHTML() {
   for (const F of met) {
     const r = me.relations[F.id], them = F.relations[me.id];
     const mood = !F.alive ? "gone" : attitude(S, F.id), P = PERSONALITIES[F.id] || {}, mem = (them.memory || []).slice(-5).reverse();
-    h += `<div class="dip"><h3 class="dip-h">${peopleToken(F.id, F.color, 40)}<span>${esc(F.name)}${F.alive ? "" : " †"}</span></h3>
+    h += `<div class="dip"><h3 class="dip-h">${peopleArt(F.id, F.color, 40)}<span>${esc(F.name)}${F.alive ? "" : " †"}</span></h3>
       <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}</b> · ${esc(P.title || "")}: ${esc(P.text || "")}</p>
       <p class="small">${r.status === "war" ? `<b class="bad">At war</b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied</b>" : "<b>At peace</b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}</b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.</p>
       ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:</p><ul class="small mem">${mem.map((m) => { const i = (them.memory || []).indexOf(m), cost = F.alive ? amendsCost(S, me.id, F.id, i) : null;
@@ -1166,7 +1166,7 @@ function showNewGame(canContinue, preset) {
   modal(`<h1>Fracture Lines: Dominion</h1>
     <p class="lede">The old empires are breaking along the corridors. Lead a people of the Fracture Lines from one world to an empire: explore, settle, trade, research and fight, turn by turn.</p>
     ${canContinue ? `<div class="btn-row"><button class="btn primary" id="ng-continue">Continue your game</button></div>` : ""}
-    <h3>Choose your people</h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span class="fac-tok">${peopleToken(f.id, f.color, 46)}</span><span><b>${esc(f.name)}</b><small><b>${esc(f.trait)}:</b> ${esc(f.traitText)}</small><small class="muted">${esc(LOOKS[f.id] || "")}</small></span></label>`).join("")}</div>
+    <h3>Choose your people</h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span class="fac-tok">${peopleArt(f.id, f.color, 46)}</span><span><b>${esc(f.name)}</b><small><b>${esc(f.trait)}:</b> ${esc(f.traitText)}</small><small class="muted">${esc(LOOKS[f.id] || "")}</small></span></label>`).join("")}</div>
     <div class="ng-row">
       <label>Galaxy <select id="ng-size"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option><option value="vast">Vast</option></select></label>
       <label>Game <select id="ng-mode"><option value="standard" selected>Standard: 200 turns</option><option value="open">Open: no end</option></select></label>
