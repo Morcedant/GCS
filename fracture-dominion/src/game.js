@@ -629,13 +629,25 @@ export function musterFor(s, fid, type) {
   const M = faction(s, fid).muster || {}, id = M[musterKind(type)] || M.all;
   return musterOk(s, fid, id) ? s.systems[id] : null;
 }
+/** Where a fleet ends each turn along a path, moving step by step as moveFleets does (a step it can't afford waits
+ * for the next turn): the index of the last step reached each turn. Its length is the turns the trip takes. */
+export function turnStops(s, f, path = f.path, speed = fleetSpeed(s, f) + (f.burn ? FUEL.burnSpeed : 0)) {
+  const stops = []; let i = 0;
+  while (i < path.length && stops.length < 200) {
+    let mp = speed, moved = false;
+    while (i < path.length && mp + 1e-9 >= path[i].cost) { mp -= path[i].cost; i++; moved = true; }
+    if (!moved) { mp = speed; if (path[i].cost > speed) i++; }   // a step that costs more than a whole turn's move still takes a turn
+    stops.push(i - 1);
+  }
+  return stops;
+}
 export function setDestination(s, fleetId, hex) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   if (hex === f.at) { f.path = []; f.dest = null; return { ok: true }; }
   const path = findPath(s, f.owner, f.at, hex);
   if (!path && s.hexes[hex] && s.hexes[hex].sealed && !canCrossSealed(s, f.owner)) return { error: "That sector is sealed: it takes Rift drives, or a Rift beacon on a world near it, to get in." };
   if (!path) return { error: "No way there." };
-  f.path = path; f.dest = hex; return { ok: true, turns: Math.ceil(path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(s, f)) };
+  f.path = path; f.dest = hex; return { ok: true, turns: turnStops(s, f).length };
 }
 export function mergeFleets(s, intoId, fromId) {
   const a = s.fleets[intoId], b = s.fleets[fromId];

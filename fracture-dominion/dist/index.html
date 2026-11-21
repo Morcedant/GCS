@@ -211,7 +211,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-21 17:34 UTC";
+const BUILD = "2026-11-21 18:01 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -1774,13 +1774,25 @@ function musterFor(s, fid, type) {
   const M = faction(s, fid).muster || {}, id = M[musterKind(type)] || M.all;
   return musterOk(s, fid, id) ? s.systems[id] : null;
 }
+/** Where a fleet ends each turn along a path, moving step by step as moveFleets does (a step it can't afford waits
+ * for the next turn): the index of the last step reached each turn. Its length is the turns the trip takes. */
+function turnStops(s, f, path = f.path, speed = fleetSpeed(s, f) + (f.burn ? FUEL.burnSpeed : 0)) {
+  const stops = []; let i = 0;
+  while (i < path.length && stops.length < 200) {
+    let mp = speed, moved = false;
+    while (i < path.length && mp + 1e-9 >= path[i].cost) { mp -= path[i].cost; i++; moved = true; }
+    if (!moved) { mp = speed; if (path[i].cost > speed) i++; }   // a step that costs more than a whole turn's move still takes a turn
+    stops.push(i - 1);
+  }
+  return stops;
+}
 function setDestination(s, fleetId, hex) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   if (hex === f.at) { f.path = []; f.dest = null; return { ok: true }; }
   const path = findPath(s, f.owner, f.at, hex);
   if (!path && s.hexes[hex] && s.hexes[hex].sealed && !canCrossSealed(s, f.owner)) return { error: "That sector is sealed: it takes Rift drives, or a Rift beacon on a world near it, to get in." };
   if (!path) return { error: "No way there." };
-  f.path = path; f.dest = hex; return { ok: true, turns: Math.ceil(path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(s, f)) };
+  f.path = path; f.dest = hex; return { ok: true, turns: turnStops(s, f).length };
 }
 function mergeFleets(s, intoId, fromId) {
   const a = s.fleets[intoId], b = s.fleets[fromId];
@@ -5061,18 +5073,19 @@ function draw() {
     let path = sf.path;
     if (moveMode && hoverHex && S.hexes[hoverHex]) path = findPath(S, sf.owner, sf.at, hoverHex) || [];
     if (path.length) {
-      const sp = fleetSpeed(S, sf);
+      const stops = turnStops(S, sf, path);
       ctx.strokeStyle = moveMode ? "rgba(255,230,140,.85)" : "rgba(140,230,255,.85)"; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
       ctx.beginPath(); let p = toPixel(sf.at, size); ctx.moveTo(p.x, p.y);
-      let used = 0, turn = 1;
-      for (const st of path) {
-        p = toPixel(st.hex, size); ctx.lineTo(p.x, p.y);
-        used += st.cost;
-        if (used > sp * turn + 1e-9) turn++;
-      }
+      for (const st of path) { p = toPixel(st.hex, size); ctx.lineTo(p.x, p.y); }
       ctx.stroke(); ctx.setLineDash([]);
+      // Where it will be at the end of each turn: a numbered dot (the last is the arrival).
+      ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      stops.forEach((idx, n) => { if (idx < 0) return; const q = toPixel(path[idx].hex, size), last = n === stops.length - 1;
+        ctx.beginPath(); ctx.arc(q.x, q.y, last ? 8 : 6.5, 0, Math.PI * 2); ctx.fillStyle = last ? ctx.strokeStyle : "rgba(10,14,24,.85)"; ctx.fill(); ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = last ? "#0a0e18" : ctx.strokeStyle; ctx.fillText(String(n + 1), q.x, q.y + 0.5); });
+      ctx.textAlign = "start"; ctx.textBaseline = "alphabetic"; ctx.lineWidth = 2;
       ctx.fillStyle = ctx.strokeStyle; ctx.font = "bold 11px system-ui, sans-serif";
-      ctx.fillText(`${Math.ceil(used / sp)}t`, p.x + 8, p.y - 8);
+      ctx.fillText(`${stops.length} turn${stops.length === 1 ? "" : "s"}`, p.x + 11, p.y - 10);
     }
   }
   // Fleets you can see.
@@ -5234,7 +5247,7 @@ function fleetHTML() {
     h += `<p class="small ${ok ? "" : "bad"}"><b>Supply:<\/b> ${ok ? `in supply (within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours)` : `out of supply${f.out ? ` for ${f.out} turn${f.out === 1 ? "" : "s"}` : ""}: from the second turn its warships wear down a hull point a turn. Bring it within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours.`}<\/p>`;
     h += `<h3>Battle stance<\/h3><div class="opts">${Object.entries(STANCES).map(([k, x]) => `<button class="opt ${(f.stance || "balanced") === k ? "on" : ""}" data-stance="${k}" aria-pressed="${(f.stance || "balanced") === k}"><b>${esc(x.name)}<\/b><small>${esc(x.text)}<\/small><\/button>`).join("")}<\/div>`;
   }
-  if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
+  if (f.path.length) { const turns = turnStops(S, f).length, dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
     h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).<\/p>${mine && usesReserve(me.id) ? `<div class="btn-row"><button class="btn small ${f.burn ? "primary" : ""}" data-burn aria-pressed="${!!f.burn}" title="Burn hard: +${FUEL.burnSpeed} hex a turn until it arrives. In supply each turn costs ${burnCost(S, f)} fuel from your reserve; beyond it, an extra turn of the fleet's own fuel.">${f.burn ? "Burning hard ✓" : "Burn hard"}<\/button><span class="small muted">${f.burn ? `+${FUEL.burnSpeed} hex a turn; ${burnCost(S, f)} reserve fuel a turn in supply, an extra turn of its own beyond.` : `+${FUEL.burnSpeed} hex a turn for ${burnCost(S, f)} fuel a turn.`}<\/span><\/div>` : ""}${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.<\/p>` : ""}`; }
   const eng = mine && engaged(S, f);
   if (mine && f.withdraw) h += `<p class="small bad"><b>Withdrawing.<\/b> At the end of the turn it fights the first exchange (defensively), then breaks off and pulls back toward your nearest world.<\/p><div class="btn-row"><button class="btn small" data-withdraw="off">Stay and fight<\/button><\/div>`;

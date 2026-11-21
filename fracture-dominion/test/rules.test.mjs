@@ -1386,3 +1386,24 @@ test("the new empires' traits: Mirrun science and seas, Ylith far sight and fast
   zh.colony.siege = 9; assert.equal(garrisonFactor(zh), 1);
   zh.colony.owner = "concord"; assert.ok(garrisonFactor(zh) < 1); zh.colony.owner = "zhaq";
 });
+
+test("travel time: the turns a fleet is told it will take are the turns it takes", async () => {
+  const { turnStops, fleetSpeed } = await import("../src/game.js");
+  // The Vael need no fuel, so nothing but the route sets the pace; no relics to pick up on the way.
+  const s = newGame({ seed: 2, size: "medium", player: "vael", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  for (const x of Object.values(s.systems)) { delete x.relic; delete x.anomaly; }
+  const me = s.factions[0]; for (const k of Object.keys(s.hexes)) me.explored[k] = 1;
+  // Some nebula along the way, where steps cost 2.
+  Object.keys(s.hexes).filter((k, i) => i % 5 === 0 && !s.sysAt[k] && s.hexes[k].terrain === "space").forEach((k) => (s.hexes[k].terrain = "nebula"));
+  for (const f of Object.values(s.fleets)) delete s.fleets[f.id];
+  const sys = Object.values(s.systems); let checked = 0;
+  for (let i = 0; i < 25; i++) {
+    const a = sys[(i * 7 + 1) % sys.length], b = sys[(i * 11 + 4) % sys.length]; if (a === b) continue;
+    const f = spawnFleet(s, me.id, a.at, ["dreadnought"]); const r = setDestination(s, f.id, b.at); if (!r.ok) { delete s.fleets[f.id]; continue; }
+    assert.equal(r.turns, turnStops(s, f).length);
+    let n = 0; while (f.at !== b.at && n < 40) { endTurn(s, null); n++; }
+    assert.equal(n, r.turns, `route ${a.name} → ${b.name}: told ${r.turns}, took ${n}`); checked++;
+    delete s.fleets[f.id];
+  }
+  assert.ok(checked >= 15);
+});

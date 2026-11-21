@@ -2,7 +2,7 @@
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
 import { SECTORS, COLLAPSE, INFLUENCE, SUPPLY, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE, CRISIS } from "./data.js";
 import { newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
-  buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, giftRegard, giveGift, amendsCost, makeAmends, acceptHint, proposeSweetened, exactTribute, denounce, joinWarPrice, askJoinWar, engaged, setWithdraw, detachShips, canCrossSealed, beaconSites, buildBeacon, usesReserve, fuelStock, fuelCap, fuelIncome, burnCost, setBurn, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
+  buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, turnStops, giftRegard, giveGift, amendsCost, makeAmends, acceptHint, proposeSweetened, exactTribute, denounce, joinWarPrice, askJoinWar, engaged, setWithdraw, detachShips, canCrossSealed, beaconSites, buildBeacon, usesReserve, fuelStock, fuelCap, fuelIncome, burnCost, setBurn, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
@@ -368,18 +368,19 @@ function draw() {
     let path = sf.path;
     if (moveMode && hoverHex && S.hexes[hoverHex]) path = findPath(S, sf.owner, sf.at, hoverHex) || [];
     if (path.length) {
-      const sp = fleetSpeed(S, sf);
+      const stops = turnStops(S, sf, path);
       ctx.strokeStyle = moveMode ? "rgba(255,230,140,.85)" : "rgba(140,230,255,.85)"; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
       ctx.beginPath(); let p = toPixel(sf.at, size); ctx.moveTo(p.x, p.y);
-      let used = 0, turn = 1;
-      for (const st of path) {
-        p = toPixel(st.hex, size); ctx.lineTo(p.x, p.y);
-        used += st.cost;
-        if (used > sp * turn + 1e-9) turn++;
-      }
+      for (const st of path) { p = toPixel(st.hex, size); ctx.lineTo(p.x, p.y); }
       ctx.stroke(); ctx.setLineDash([]);
+      // Where it will be at the end of each turn: a numbered dot (the last is the arrival).
+      ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      stops.forEach((idx, n) => { if (idx < 0) return; const q = toPixel(path[idx].hex, size), last = n === stops.length - 1;
+        ctx.beginPath(); ctx.arc(q.x, q.y, last ? 8 : 6.5, 0, Math.PI * 2); ctx.fillStyle = last ? ctx.strokeStyle : "rgba(10,14,24,.85)"; ctx.fill(); ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = last ? "#0a0e18" : ctx.strokeStyle; ctx.fillText(String(n + 1), q.x, q.y + 0.5); });
+      ctx.textAlign = "start"; ctx.textBaseline = "alphabetic"; ctx.lineWidth = 2;
       ctx.fillStyle = ctx.strokeStyle; ctx.font = "bold 11px system-ui, sans-serif";
-      ctx.fillText(`${Math.ceil(used / sp)}t`, p.x + 8, p.y - 8);
+      ctx.fillText(`${stops.length} turn${stops.length === 1 ? "" : "s"}`, p.x + 11, p.y - 10);
     }
   }
   // Fleets you can see.
@@ -541,7 +542,7 @@ function fleetHTML() {
     h += `<p class="small ${ok ? "" : "bad"}"><b>Supply:</b> ${ok ? `in supply (within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours)` : `out of supply${f.out ? ` for ${f.out} turn${f.out === 1 ? "" : "s"}` : ""}: from the second turn its warships wear down a hull point a turn. Bring it within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours.`}</p>`;
     h += `<h3>Battle stance</h3><div class="opts">${Object.entries(STANCES).map(([k, x]) => `<button class="opt ${(f.stance || "balanced") === k ? "on" : ""}" data-stance="${k}" aria-pressed="${(f.stance || "balanced") === k}"><b>${esc(x.name)}</b><small>${esc(x.text)}</small></button>`).join("")}</div>`;
   }
-  if (f.path.length) { const turns = Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f)), dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
+  if (f.path.length) { const turns = turnStops(S, f).length, dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
     h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).</p>${mine && usesReserve(me.id) ? `<div class="btn-row"><button class="btn small ${f.burn ? "primary" : ""}" data-burn aria-pressed="${!!f.burn}" title="Burn hard: +${FUEL.burnSpeed} hex a turn until it arrives. In supply each turn costs ${burnCost(S, f)} fuel from your reserve; beyond it, an extra turn of the fleet's own fuel.">${f.burn ? "Burning hard ✓" : "Burn hard"}</button><span class="small muted">${f.burn ? `+${FUEL.burnSpeed} hex a turn; ${burnCost(S, f)} reserve fuel a turn in supply, an extra turn of its own beyond.` : `+${FUEL.burnSpeed} hex a turn for ${burnCost(S, f)} fuel a turn.`}</span></div>` : ""}${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.</p>` : ""}`; }
   const eng = mine && engaged(S, f);
   if (mine && f.withdraw) h += `<p class="small bad"><b>Withdrawing.</b> At the end of the turn it fights the first exchange (defensively), then breaks off and pulls back toward your nearest world.</p><div class="btn-row"><button class="btn small" data-withdraw="off">Stay and fight</button></div>`;
