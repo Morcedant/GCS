@@ -212,7 +212,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-21 16:45 UTC";
+const BUILD = "2026-11-21 16:51 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -2334,7 +2334,7 @@ function proposeSweetened(s, from, to, what) {
   return propose(s, from, to, what);
 }
 /** Demand tribute from a much weaker power. */
-function demandTribute(s, from, to) {
+function exactTribute(s, from, to) {
   const A = faction(s, from), B = faction(s, to), r = B.relations[from], T = INFLUENCE.tribute;
   if (!A.met[to] || !B.alive) return { error: "You haven't met them." };
   if (r.status === "war") return { error: "You're at war: take it instead." };
@@ -4441,7 +4441,7 @@ function influence(s, F) {
   }
   // The weak: tribute (from another computer power; the player is asked by message instead).
   const prey = met.filter((O) => O.ai && !atWar(s, F.id, O.id) && !allied(s, F.id, O.id) && militaryPower(s, O.id) < mine * INFLUENCE.tribute.weaker && O.credits >= INFLUENCE.tribute.min).sort((a, b) => b.credits - a.credits)[0];
-  if (prey && go("tribute") && demandTribute(s, F.id, prey.id).ok) return done();
+  if (prey && go("tribute") && exactTribute(s, F.id, prey.id).ok) return done();
 }
 function diplomacy(s, F, diff) {
   for (const [oid, r] of Object.entries(F.relations)) {
@@ -5677,7 +5677,7 @@ function bindChrome() {
     else if (d.gift) { const [fid, c, x] = d.gift.split(":"); const r = giveGift(S, me.id, fid, { credits: +c, exotics: +x }); if (r.error) toast(r.error, true); else toast(`Gift sent: their regard rises ${r.regard}.`); }
     else if (d.amends) { const [fid, i] = d.amends.split(":"); const r = makeAmends(S, me.id, fid, +i); if (r.error) toast(r.error, true); else toast(`Amends made: +${r.regard} regard.`); }
     else if (d.sweet) { const [fid, what] = d.sweet.split(":"); const r = proposeSweetened(S, me.id, fid, what); if (r.error) toast(r.error, true); else toast(r.accepted ? "They accepted." : "They took the gift, but still said no.", !r.accepted); }
-    else if (d.tribute) { const r = demandTribute(S, me.id, d.tribute); if (r.error) toast(r.error, true); else toast(r.accepted ? `They paid ${r.credits} credits in tribute.` : "They refused.", !r.accepted); }
+    else if (d.tribute) { const r = exactTribute(S, me.id, d.tribute); if (r.error) toast(r.error, true); else toast(r.accepted ? `They paid ${r.credits} credits in tribute.` : "They refused.", !r.accepted); }
     else if (d.denounce) { const about = document.getElementById("dn-" + d.denounce).value, r = denounce(S, me.id, about, d.denounce); if (r.error) toast(r.error, true); else toast(`You denounced ${faction(S, about).name}.`); }
     else if (d.joinwar) { const [fid, enemy] = d.joinwar.split(":"); const r = askJoinWar(S, me.id, fid, enemy); if (r.error) toast(r.error, true); else toast(`${faction(S, fid).name} declared war on ${faction(S, enemy).name}${r.price ? `, for ${r.price} credits` : ""}.`); }
     else if (d.dip) {

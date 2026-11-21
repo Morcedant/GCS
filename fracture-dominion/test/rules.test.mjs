@@ -1320,7 +1320,7 @@ test("orbital guns: they fire first and finish off the weakest ship; knocking th
 });
 
 test("influence: gifts raise regard (less when piled up), amends forgive, sweeteners win proposals, tribute and denouncing", async () => {
-  const { giftRegard, giveGift, makeAmends, amendsCost, acceptHint, proposeSweetened, demandTribute, denounce, askJoinWar, joinWarPrice, remember } = await import("../src/game.js");
+  const { giftRegard, giveGift, makeAmends, amendsCost, acceptHint, proposeSweetened, exactTribute, denounce, askJoinWar, joinWarPrice, remember } = await import("../src/game.js");
   const s = newGame({ seed: 36, size: "small", player: "concord", rivals: 3, wilds: "none" });
   const me = s.factions[0], [A, B, C] = s.factions.slice(1);
   for (const X of [A, B, C]) { me.met[X.id] = true; X.met[me.id] = true; }
@@ -1343,8 +1343,8 @@ test("influence: gifts raise regard (less when piled up), amends forgive, sweete
   // Tribute: only from the much weaker, and they resent it.
   spawnFleet(s, me.id, s.systems[me.capital].at, Array(10).fill("cruiser"));
   for (const f of fleetsOf(s, B.id)) delete s.fleets[f.id];
-  const bs = B.relations[me.id].score, t = demandTribute(s, me.id, B.id);
-  assert.ok(t.ok); assert.ok(B.relations[me.id].score < bs); assert.ok(demandTribute(s, me.id, B.id).error, "not again so soon");
+  const bs = B.relations[me.id].score, t = exactTribute(s, me.id, B.id);
+  assert.ok(t.ok); assert.ok(B.relations[me.id].score < bs); assert.ok(exactTribute(s, me.id, B.id).error, "not again so soon");
   // Denounce: the third power thinks less of the rival.
   const ab = C.relations[A.id].score; assert.ok(denounce(s, me.id, A.id, C.id).ok); assert.ok(C.relations[A.id].score < ab);
   // Ask an ally to join a war.

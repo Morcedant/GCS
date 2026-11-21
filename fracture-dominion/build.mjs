@@ -10,6 +10,15 @@ const strip = (src) => src
   .replace(/^export (?=(async )?function|const|let|class)/gm, "");
 // A build stamp, shown on the new-game screen and in the menu, so it's plain which version a browser has.
 const BUILD_STAMP = new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC";
+// The modules share one scope once inlined: two top-level functions or constants with one name would silently replace
+// each other (the later wins), so a clash stops the build.
+{
+  const seen = {}, clash = [];
+  for (const m of ORDER) for (const x of readFileSync(new URL(`src/${m}.js`, here), "utf8").matchAll(/^(?:export )?(?:async )?(?:function\s+|const\s+|let\s+|class\s+)([A-Za-z_$][\w$]*)/gm)) {
+    if (seen[x[1]] && seen[x[1]] !== m) clash.push(`${x[1]} (${seen[x[1]]}.js and ${m}.js)`); else seen[x[1]] = m;
+  }
+  if (clash.length) { console.error("Name clash between modules: " + clash.join(", ")); process.exit(1); }
+}
 const body = `const BUILD = ${JSON.stringify(BUILD_STAMP)};\n` + ORDER.map((m) => `// ---- ${m}.js ----\n` + strip(readFileSync(new URL(`src/${m}.js`, here), "utf8"))).join("\n");
 // The music comes from the shared table server, if one is deployed (its address in table-server/server-url.txt).
 let musicServer = ""; try { musicServer = readFileSync(new URL("../legend-dynamics/table-server/server-url.txt", here), "utf8").trim(); } catch {}

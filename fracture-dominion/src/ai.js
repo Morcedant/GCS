@@ -3,7 +3,7 @@
 import { distance, neighbors, hexLine, makeRng } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE } from "./data.js";
 import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, demandTribute, score } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
 
 const PRIORITY = {
   // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
@@ -145,7 +145,7 @@ function influence(s, F) {
   }
   // The weak: tribute (from another computer power; the player is asked by message instead).
   const prey = met.filter((O) => O.ai && !atWar(s, F.id, O.id) && !allied(s, F.id, O.id) && militaryPower(s, O.id) < mine * INFLUENCE.tribute.weaker && O.credits >= INFLUENCE.tribute.min).sort((a, b) => b.credits - a.credits)[0];
-  if (prey && go("tribute") && demandTribute(s, F.id, prey.id).ok) return done();
+  if (prey && go("tribute") && exactTribute(s, F.id, prey.id).ok) return done();
 }
 function diplomacy(s, F, diff) {
   for (const [oid, r] of Object.entries(F.relations)) {

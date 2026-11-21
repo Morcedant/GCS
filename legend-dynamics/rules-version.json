@@ -6,6 +6,15 @@
     {
       "date": "2026-11-21",
       "kind": "site",
+      "title": "Dominion: fix for End turn sticking on Thinking",
+      "items": [
+        "Fixed End turn freezing on Thinking… partway through a game. The tribute a computer player demands from another empire shared its name with the pirates' tribute demand, and in the built game the pirates' version replaced it, so the turn crashed. Saved games are unaffected: reload the page and carry on.",
+        "The build now stops if two parts of the game use the same name, so this kind of clash can't slip through again."
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "kind": "site",
       "title": "Dominion: painted portraits from the music bucket",
       "items": [
         "Painted portraits now come from the music bucket's peoples/ folder instead of the game's files. Upload a square image named after an empire (for example peoples/mirrun.png, or .webp or .jpg) and it shows at once on the Peoples page, in the people picker and on the Diplomacy tab, with no rebuild. Empires without one keep their drawing."

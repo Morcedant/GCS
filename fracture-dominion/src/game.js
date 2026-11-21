@@ -1188,7 +1188,7 @@ export function proposeSweetened(s, from, to, what) {
   return propose(s, from, to, what);
 }
 /** Demand tribute from a much weaker power. */
-export function demandTribute(s, from, to) {
+export function exactTribute(s, from, to) {
   const A = faction(s, from), B = faction(s, to), r = B.relations[from], T = INFLUENCE.tribute;
   if (!A.met[to] || !B.alive) return { error: "You haven't met them." };
   if (r.status === "war") return { error: "You're at war: take it instead." };
