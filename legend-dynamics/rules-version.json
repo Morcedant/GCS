@@ -6,6 +6,16 @@
     {
       "date": "2026-11-21",
       "kind": "site",
+      "title": "Dominion: influence in diplomacy, and a space travel guide",
+      "items": [
+        "Influence, on each power's card on the Diplomacy tab. Gifts of credits or exotics raise their regard, though gifts close together count for less. You can make amends for a grievance they remember. Each proposal shows whether they'd accept, and you can sweeten it with credits.",
+        "Pressure: demand tribute from a power whose fleet is far weaker than yours (they pay or refuse, and resent it either way), denounce a rival to a third power, or ask a power to join your war, free if they like you, for credits if they're only lukewarm.",
+        "How to play has a new Space travel section: ship speeds, open space, corridors, nebulae, rifts, sealed sectors, collapses, the Gate Shard and Engine gate, fuel and supply, and engagements. The strategy guide covers influence in general terms."
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "kind": "site",
       "title": "Dominion: withdrawing, detaching ships, decisive orbital guns, updated guides",
       "items": [
         "Engaged fleets: a fleet sharing a hex with enemy warships, or with an enemy world's guns, can't simply sail away. Withdraw pulls it out: it fights the next battle's first exchange defensively, then falls back toward its nearest world. Computer players withdraw from battles they're clearly losing.",

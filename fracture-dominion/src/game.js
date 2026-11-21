@@ -2,7 +2,7 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within, hexagon } from "./hex.js";
-import { shipLabel, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, YARDS, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, AI_PRESETS, REACH, SECTORS, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES, CRISIS } from "./data.js";
+import { shipLabel, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY, TRADE, SIEGE, BATTERY, MARKET, INFLUENCE, FUEL, OUTPOST_BUY, YARDS, OUTPOST_TRADE, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, RELIC_SCORE, AI_PRESETS, REACH, SECTORS, STAR_NAMES, RAID_AVOID, DEPOT_RAID, PATROL, ADMIRAL_RANKS, ADMIRAL_STEPS, ADMIRAL_TRAITS, ADMIRAL_NAMES, CRISIS } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
@@ -1082,7 +1082,7 @@ export function declareWar(s, a, b, joining) {
   A.relations[b].patrol = B.relations[a].patrol = false;
   A.relations[b].turnsAtWar = B.relations[a].turnsAtWar = 0;
   remember(s, b, a, betrayal ? "broke our alliance and declared war on us" : joining ? `joined the war against us, for ${faction(s, joining).name}` : "declared war on us", betrayal ? -50 : -30);
-  log(s, a, `${A.name} declared war on ${B.name}${betrayal ? ", breaking their alliance" : joining ? `, honouring its alliance with ${faction(s, joining).name}` : ""}.`, "war");
+  log(s, a, `${A.name} declared war on ${B.name}${betrayal ? ", breaking their alliance" : joining ? (allied(s, a, joining) ? `, honouring its alliance with ${faction(s, joining).name}` : `, on behalf of ${faction(s, joining).name}`) : ""}.`, "war");
   if (B.id === player(s).id && A.ai) sendEnvoy(s, a, "war", { joining: joining || null });
   if (!joining) for (const X of s.factions) {
     if (!X.alive || X.id === a || X.id === b || !allied(s, X.id, b) || atWar(s, X.id, a) || allied(s, X.id, a)) continue;
@@ -1127,6 +1127,111 @@ export function propose(s, from, to, what) {
     log(s, from, `${A.name} ended its alliance with ${B.name}.`, "diplo");
   }
   return { ok: true, accepted: !!yes };
+}
+// ---- influence: moving a rival's regard on demand ----
+/** What a gift of credits is worth in regard now (less the more you've given them lately). */
+export function giftRegard(s, from, to, credits) {
+  const r = faction(s, to).relations[from], G = INFLUENCE.gift;
+  const recent = (r.gifts || []).filter((g) => s.turn - g.turn < G.window).reduce((t, g) => t + g.value, 0);
+  return Math.round((credits / G.perRegard) / (1 + recent / G.fade) * 10) / 10;
+}
+/** Give credits and/or exotics. Returns { ok, regard }. */
+export function giveGift(s, from, to, { credits = 0, exotics = 0 } = {}) {
+  const A = faction(s, from), B = faction(s, to), r = B && B.relations[from];
+  if (!B || !B.alive || !r || !A.met[to]) return { error: "You haven't met them." };
+  credits = Math.max(0, Math.floor(credits)); exotics = Math.max(0, Math.floor(exotics));
+  if (!credits && !exotics) return { error: "Choose a gift." };
+  if (A.credits < credits) return { error: "You don't have the credits." };
+  if (A.exotics < exotics) return { error: "You don't have the exotics." };
+  const value = credits + exotics * marketPrice(s), gain = giftRegard(s, from, to, value);
+  A.credits = round1(A.credits - credits); A.exotics -= exotics; B.credits = round1(B.credits + credits); B.exotics += exotics;
+  (r.gifts = r.gifts || []).push({ turn: s.turn, value }); r.gifts = r.gifts.filter((g) => s.turn - g.turn < INFLUENCE.gift.window);
+  remember(s, to, from, `sent us a gift (${[credits && `${credits} credits`, exotics && `${exotics} exotics`].filter(Boolean).join(", ")})`, gain);
+  log(s, from, `You sent ${B.name} a gift: their regard for you rises ${gain}.`, "diplo");
+  return { ok: true, regard: gain };
+}
+/** The price of making amends for one grievance they remember (index into their memory of you). */
+export function amendsCost(s, from, to, i) {
+  const m = ((faction(s, to).relations[from] || {}).memory || [])[i];
+  return m && m.d < 0 && !m.forgiven ? Math.round(-m.d * INFLUENCE.amends.perPoint * (1 + s.turn * INFLUENCE.amends.perTurn)) : null;
+}
+export function makeAmends(s, from, to, i) {
+  const A = faction(s, from), r = faction(s, to).relations[from], m = r && (r.memory || [])[i], cost = amendsCost(s, from, to, i);
+  if (cost === null) return { error: "Nothing to make amends for there." };
+  if (A.credits < cost) return { error: `Making amends costs ${cost} credits.` };
+  A.credits = round1(A.credits - cost); faction(s, to).credits = round1(faction(s, to).credits + cost);
+  const back = Math.round(-m.d * INFLUENCE.amends.back); m.forgiven = s.turn;
+  r.score = Math.min(40, r.score + back);
+  log(s, from, `You made amends to ${faction(s, to).name} for what they held against you (that you ${m.text}): ${cost} credits, and +${back} regard.`, "diplo");
+  return { ok: true, regard: back, cost };
+}
+/** Would they accept this proposal now? { yes, short (regard missing, if any), sweeten (credits to make up for it) }. */
+export function acceptHint(s, from, to, what) {
+  const B = faction(s, to), rel = B.relations[from]; if (!B.ai) return { yes: true };
+  const need = what === "alliance" ? 20 : what === "peace" ? -9 : what === "trade" || what === "patrol" ? -5 : null;
+  if (need === null) return { yes: true };
+  if (what === "peace" && (rel.turnsAtWar >= 8 || militaryPower(s, to) < militaryPower(s, from) * 0.8)) return { yes: true };
+  const short = Math.max(0, Math.ceil(need - rel.score));
+  if (!short) return { yes: true };
+  // What a gift big enough to close the gap would cost now (gifts lose value as they pile up: search for it).
+  let c = short * INFLUENCE.gift.perRegard; for (let k = 0; k < 40 && giftRegard(s, from, to, c) < short; k++) c = Math.ceil(c * 1.15);
+  return { yes: false, short, sweeten: c };
+}
+/** Propose, with a gift first that makes up what they'd want. */
+export function proposeSweetened(s, from, to, what) {
+  const h = acceptHint(s, from, to, what);
+  if (!h.yes) { const g = giveGift(s, from, to, { credits: h.sweeten }); if (g.error) return g; }
+  return propose(s, from, to, what);
+}
+/** Demand tribute from a much weaker power. */
+export function demandTribute(s, from, to) {
+  const A = faction(s, from), B = faction(s, to), r = B.relations[from], T = INFLUENCE.tribute;
+  if (!A.met[to] || !B.alive) return { error: "You haven't met them." };
+  if (r.status === "war") return { error: "You're at war: take it instead." };
+  if (r.lastTribute && s.turn - r.lastTribute < T.every) return { error: `You asked them on turn ${r.lastTribute}: wait until turn ${r.lastTribute + T.every}.` };
+  const mine = militaryPower(s, from), theirs = militaryPower(s, to);
+  if (theirs >= mine * T.weaker) return { error: "They're not afraid of you: your fleet needs to be far stronger than theirs." };
+  r.lastTribute = s.turn;
+  const pay = Math.min(Math.round(B.credits), Math.max(T.min, Math.round(B.credits * T.share)));
+  const yes = pay > 0 && (theirs < mine * T.weaker / 2 || r.score > -20 || allied(s, to, from));
+  remember(s, to, from, yes ? "forced tribute out of us" : "demanded tribute from us", T.regard);
+  if (yes) { B.credits = round1(B.credits - pay); A.credits = round1(A.credits + pay); log(s, from, `${B.name} paid you ${pay} credits in tribute, and resent it.`, "diplo"); }
+  else log(s, from, `${B.name} refused your demand for tribute.`, "diplo");
+  return { ok: true, accepted: yes, credits: yes ? pay : 0 };
+}
+/** Denounce `about` to `to`: turn a third power against a rival. */
+export function denounce(s, from, about, to) {
+  const A = faction(s, from), T = faction(s, to), X = faction(s, about), D = INFLUENCE.denounce;
+  if (!A.met[to] || !A.met[about] || to === about || to === from || about === from) return { error: "Choose two powers you've met." };
+  const r = T.relations[from], rx = T.relations[about];
+  if (!rx) return { error: `${T.name} hasn't met ${X.name}.` };
+  const last = (A.denounced || {})[about];
+  if (last && s.turn - last < D.every) return { error: `You denounced ${X.name} on turn ${last}: wait until turn ${last + D.every}.` };
+  (A.denounced = A.denounced || {})[about] = s.turn;
+  remember(s, to, about, `was denounced to us by ${A.name}`, D.them);
+  remember(s, about, from, `denounced us to ${T.name}`, D.target);
+  if (rx.score < 0) remember(s, to, from, `warned us about ${X.name}`, D.ally);
+  log(s, from, `You denounced ${X.name} to ${T.name}. ${T.name} thinks less of them; ${X.name} won't forget it.`, "diplo");
+  return { ok: true };
+}
+/** The price for `ally` to declare war on `enemy` for you (null: they won't, at any price). */
+export function joinWarPrice(s, from, ally, enemy) {
+  const r = faction(s, ally).relations[from], J = INFLUENCE.joinWar;
+  if (!r || r.score < 0) return null;
+  return r.score >= J.regard || allied(s, ally, from) ? 0 : Math.round(J.cost * (1 - r.score / J.regard * 0.5));
+}
+export function askJoinWar(s, from, ally, enemy) {
+  const A = faction(s, from), Y = faction(s, ally), E = faction(s, enemy);
+  if (!atWar(s, from, enemy)) return { error: `You're not at war with ${E.name}.` };
+  if (!Y.relations[enemy] || atWar(s, ally, enemy)) return { error: `${Y.name} can't join that war.` };
+  if (allied(s, ally, enemy)) return { error: `${Y.name} is allied with ${E.name}.` };
+  const price = joinWarPrice(s, from, ally, enemy);
+  if (price === null) return { error: `${Y.name} won't fight for you: they don't like you enough.` };
+  if (A.credits < price) return { error: `${Y.name} wants ${price} credits to join the war.` };
+  A.credits = round1(A.credits - price); Y.credits = round1(Y.credits + price);
+  declareWar(s, ally, enemy, from);
+  remember(s, ally, from, price ? "paid us to join their war" : "asked us to stand with them", price ? 1 : 3);
+  return { ok: true, price };
 }
 export function militaryPower(s, fid) {
   return fleetsOf(s, fid).reduce((t, f) => t + f.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? shipStats(s, fid, x.type, x).hull * SHIPS[x.type].dmg * 2 : 0), 0), 0);

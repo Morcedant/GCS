@@ -319,6 +319,22 @@ export const DEPOT_RAID = { cut: 5, steal: 15 };
  * the bounty when the other destroys a pirate ship. */
 export const PATROL = { share: 0.5, regard: 0.3 };
 /**
+ * Influence: ways to move a rival's regard when you need to (the Diplomacy tab).
+ *   gift: `perRegard` credits buy a point of regard (exotics at the market price), worth less the more you've given them
+ *     in the last `window` turns (halved after `fade` credits' worth).
+ *   amends: pay `perPoint` credits a point (plus `perTurn` a turn of game) to make up for one grievance they remember;
+ *     `back` of what it cost you in regard comes back, and the grievance is forgiven.
+ *   tribute: from a power with under `weaker` of your fleet strength: `share` of their treasury (at least `min`). They
+ *     pay or refuse; either way they resent it (`regard`), and they can't be asked again for `every` turns.
+ *   denounce: tell a third power what a rival is: the third power's regard for the rival falls `them`; the rival's for
+ *     you falls `target`; the third power likes you `ally` more if it already disliked the rival. Every `every` turns.
+ *   joinWar: ask a power at peace with your enemy to declare war on it: yes at `regard` or better, or for `cost` credits
+ *     (less the better they like you) when they're at least neutral.
+ */
+export const INFLUENCE = { gift: { perRegard: 8, window: 20, fade: 120 }, amends: { perPoint: 5, perTurn: 0.05, back: 0.75 },
+  tribute: { weaker: 0.6, share: 0.15, min: 20, regard: -12, every: 15 }, denounce: { them: -8, target: -12, ally: 3, every: 10 },
+  joinWar: { regard: 15, cost: 150 } };
+/**
  * Traders: a convoy leaves a colony with an Exchange every `every` turns or so for another colony with an Exchange
  * within `range` hexes whose owner isn't at war with the sender (perPower convoys on the lanes per living power at most),
  * and pays both ends base + perHex × distance when it arrives. Raiders within `hunt` hexes go after convoys with no

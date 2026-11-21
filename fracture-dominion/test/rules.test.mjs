@@ -1318,3 +1318,36 @@ test("orbital guns: they fire first and finish off the weakest ship; knocking th
   const r2 = s2.battleReports[0];
   assert.equal(w2.colony.defense, 0); assert.equal(r2.silenced, R2.id); assert.equal(r2.won, "won");
 });
+
+test("influence: gifts raise regard (less when piled up), amends forgive, sweeteners win proposals, tribute and denouncing", async () => {
+  const { giftRegard, giveGift, makeAmends, amendsCost, acceptHint, proposeSweetened, demandTribute, denounce, askJoinWar, joinWarPrice, remember } = await import("../src/game.js");
+  const s = newGame({ seed: 36, size: "small", player: "concord", rivals: 3, wilds: "none" });
+  const me = s.factions[0], [A, B, C] = s.factions.slice(1);
+  for (const X of [A, B, C]) { me.met[X.id] = true; X.met[me.id] = true; }
+  for (const X of [A, B, C]) for (const Y of [A, B, C]) if (X !== Y) X.met[Y.id] = true;
+  me.credits = 1000; me.exotics = 10;
+  // Gifts: regard goes up, and the next gift counts for less.
+  const r = A.relations[me.id], s0 = r.score, g1 = giftRegard(s, me.id, A.id, 100);
+  assert.ok(giveGift(s, me.id, A.id, { credits: 100 }).ok); assert.ok(r.score > s0);
+  assert.ok(giftRegard(s, me.id, A.id, 100) < g1, "diminishing");
+  assert.ok(giveGift(s, me.id, A.id, { credits: 99999 }).error);
+  // Amends: a grievance forgiven for credits.
+  remember(s, B.id, me.id, "raided our fuel depot at X", -10);
+  const i = B.relations[me.id].memory.length - 1, cost = amendsCost(s, me.id, B.id, i), b0 = B.relations[me.id].score;
+  assert.ok(cost > 0 && makeAmends(s, me.id, B.id, i).ok);
+  assert.ok(B.relations[me.id].score > b0 && amendsCost(s, me.id, B.id, i) === null, "once");
+  // An alliance they'd refuse, sweetened until they accept.
+  C.relations[me.id].score = 5;
+  const h = acceptHint(s, me.id, C.id, "alliance"); assert.ok(!h.yes && h.sweeten > 0);
+  const p = proposeSweetened(s, me.id, C.id, "alliance"); assert.ok(p.ok && p.accepted, "sweetened alliance accepted");
+  // Tribute: only from the much weaker, and they resent it.
+  spawnFleet(s, me.id, s.systems[me.capital].at, Array(10).fill("cruiser"));
+  for (const f of fleetsOf(s, B.id)) delete s.fleets[f.id];
+  const bs = B.relations[me.id].score, t = demandTribute(s, me.id, B.id);
+  assert.ok(t.ok); assert.ok(B.relations[me.id].score < bs); assert.ok(demandTribute(s, me.id, B.id).error, "not again so soon");
+  // Denounce: the third power thinks less of the rival.
+  const ab = C.relations[A.id].score; assert.ok(denounce(s, me.id, A.id, C.id).ok); assert.ok(C.relations[A.id].score < ab);
+  // Ask an ally to join a war.
+  declareWar(s, me.id, A.id);
+  if (C.relations[A.id].status !== "war") { assert.equal(joinWarPrice(s, me.id, C.id, A.id), 0); assert.ok(askJoinWar(s, me.id, C.id, A.id).ok); assert.equal(C.relations[A.id].status, "war"); }
+});

@@ -209,7 +209,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-21 14:50 UTC";
+const BUILD = "2026-11-21 16:18 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -612,6 +612,22 @@ const DEPOT_RAID = { cut: 5, steal: 15 };
 /** A pirate patrol pact: partners' warships guard each other's worlds against raiders, and each partner gets `share` of
  * the bounty when the other destroys a pirate ship. */
 const PATROL = { share: 0.5, regard: 0.3 };
+/**
+ * Influence: ways to move a rival's regard when you need to (the Diplomacy tab).
+ *   gift: `perRegard` credits buy a point of regard (exotics at the market price), worth less the more you've given them
+ *     in the last `window` turns (halved after `fade` credits' worth).
+ *   amends: pay `perPoint` credits a point (plus `perTurn` a turn of game) to make up for one grievance they remember;
+ *     `back` of what it cost you in regard comes back, and the grievance is forgiven.
+ *   tribute: from a power with under `weaker` of your fleet strength: `share` of their treasury (at least `min`). They
+ *     pay or refuse; either way they resent it (`regard`), and they can't be asked again for `every` turns.
+ *   denounce: tell a third power what a rival is: the third power's regard for the rival falls `them`; the rival's for
+ *     you falls `target`; the third power likes you `ally` more if it already disliked the rival. Every `every` turns.
+ *   joinWar: ask a power at peace with your enemy to declare war on it: yes at `regard` or better, or for `cost` credits
+ *     (less the better they like you) when they're at least neutral.
+ */
+const INFLUENCE = { gift: { perRegard: 8, window: 20, fade: 120 }, amends: { perPoint: 5, perTurn: 0.05, back: 0.75 },
+  tribute: { weaker: 0.6, share: 0.15, min: 20, regard: -12, every: 15 }, denounce: { them: -8, target: -12, ally: 3, every: 10 },
+  joinWar: { regard: 15, cost: 150 } };
 /**
  * Traders: a convoy leaves a colony with an Exchange every `every` turns or so for another colony with an Exchange
  * within `range` hexes whose owner isn't at war with the sender (perPower convoys on the lanes per living power at most),
@@ -1975,7 +1991,7 @@ function declareWar(s, a, b, joining) {
   A.relations[b].patrol = B.relations[a].patrol = false;
   A.relations[b].turnsAtWar = B.relations[a].turnsAtWar = 0;
   remember(s, b, a, betrayal ? "broke our alliance and declared war on us" : joining ? `joined the war against us, for ${faction(s, joining).name}` : "declared war on us", betrayal ? -50 : -30);
-  log(s, a, `${A.name} declared war on ${B.name}${betrayal ? ", breaking their alliance" : joining ? `, honouring its alliance with ${faction(s, joining).name}` : ""}.`, "war");
+  log(s, a, `${A.name} declared war on ${B.name}${betrayal ? ", breaking their alliance" : joining ? (allied(s, a, joining) ? `, honouring its alliance with ${faction(s, joining).name}` : `, on behalf of ${faction(s, joining).name}`) : ""}.`, "war");
   if (B.id === player(s).id && A.ai) sendEnvoy(s, a, "war", { joining: joining || null });
   if (!joining) for (const X of s.factions) {
     if (!X.alive || X.id === a || X.id === b || !allied(s, X.id, b) || atWar(s, X.id, a) || allied(s, X.id, a)) continue;
@@ -2020,6 +2036,111 @@ function propose(s, from, to, what) {
     log(s, from, `${A.name} ended its alliance with ${B.name}.`, "diplo");
   }
   return { ok: true, accepted: !!yes };
+}
+// ---- influence: moving a rival's regard on demand ----
+/** What a gift of credits is worth in regard now (less the more you've given them lately). */
+function giftRegard(s, from, to, credits) {
+  const r = faction(s, to).relations[from], G = INFLUENCE.gift;
+  const recent = (r.gifts || []).filter((g) => s.turn - g.turn < G.window).reduce((t, g) => t + g.value, 0);
+  return Math.round((credits / G.perRegard) / (1 + recent / G.fade) * 10) / 10;
+}
+/** Give credits and/or exotics. Returns { ok, regard }. */
+function giveGift(s, from, to, { credits = 0, exotics = 0 } = {}) {
+  const A = faction(s, from), B = faction(s, to), r = B && B.relations[from];
+  if (!B || !B.alive || !r || !A.met[to]) return { error: "You haven't met them." };
+  credits = Math.max(0, Math.floor(credits)); exotics = Math.max(0, Math.floor(exotics));
+  if (!credits && !exotics) return { error: "Choose a gift." };
+  if (A.credits < credits) return { error: "You don't have the credits." };
+  if (A.exotics < exotics) return { error: "You don't have the exotics." };
+  const value = credits + exotics * marketPrice(s), gain = giftRegard(s, from, to, value);
+  A.credits = round1(A.credits - credits); A.exotics -= exotics; B.credits = round1(B.credits + credits); B.exotics += exotics;
+  (r.gifts = r.gifts || []).push({ turn: s.turn, value }); r.gifts = r.gifts.filter((g) => s.turn - g.turn < INFLUENCE.gift.window);
+  remember(s, to, from, `sent us a gift (${[credits && `${credits} credits`, exotics && `${exotics} exotics`].filter(Boolean).join(", ")})`, gain);
+  log(s, from, `You sent ${B.name} a gift: their regard for you rises ${gain}.`, "diplo");
+  return { ok: true, regard: gain };
+}
+/** The price of making amends for one grievance they remember (index into their memory of you). */
+function amendsCost(s, from, to, i) {
+  const m = ((faction(s, to).relations[from] || {}).memory || [])[i];
+  return m && m.d < 0 && !m.forgiven ? Math.round(-m.d * INFLUENCE.amends.perPoint * (1 + s.turn * INFLUENCE.amends.perTurn)) : null;
+}
+function makeAmends(s, from, to, i) {
+  const A = faction(s, from), r = faction(s, to).relations[from], m = r && (r.memory || [])[i], cost = amendsCost(s, from, to, i);
+  if (cost === null) return { error: "Nothing to make amends for there." };
+  if (A.credits < cost) return { error: `Making amends costs ${cost} credits.` };
+  A.credits = round1(A.credits - cost); faction(s, to).credits = round1(faction(s, to).credits + cost);
+  const back = Math.round(-m.d * INFLUENCE.amends.back); m.forgiven = s.turn;
+  r.score = Math.min(40, r.score + back);
+  log(s, from, `You made amends to ${faction(s, to).name} for what they held against you (that you ${m.text}): ${cost} credits, and +${back} regard.`, "diplo");
+  return { ok: true, regard: back, cost };
+}
+/** Would they accept this proposal now? { yes, short (regard missing, if any), sweeten (credits to make up for it) }. */
+function acceptHint(s, from, to, what) {
+  const B = faction(s, to), rel = B.relations[from]; if (!B.ai) return { yes: true };
+  const need = what === "alliance" ? 20 : what === "peace" ? -9 : what === "trade" || what === "patrol" ? -5 : null;
+  if (need === null) return { yes: true };
+  if (what === "peace" && (rel.turnsAtWar >= 8 || militaryPower(s, to) < militaryPower(s, from) * 0.8)) return { yes: true };
+  const short = Math.max(0, Math.ceil(need - rel.score));
+  if (!short) return { yes: true };
+  // What a gift big enough to close the gap would cost now (gifts lose value as they pile up: search for it).
+  let c = short * INFLUENCE.gift.perRegard; for (let k = 0; k < 40 && giftRegard(s, from, to, c) < short; k++) c = Math.ceil(c * 1.15);
+  return { yes: false, short, sweeten: c };
+}
+/** Propose, with a gift first that makes up what they'd want. */
+function proposeSweetened(s, from, to, what) {
+  const h = acceptHint(s, from, to, what);
+  if (!h.yes) { const g = giveGift(s, from, to, { credits: h.sweeten }); if (g.error) return g; }
+  return propose(s, from, to, what);
+}
+/** Demand tribute from a much weaker power. */
+function demandTribute(s, from, to) {
+  const A = faction(s, from), B = faction(s, to), r = B.relations[from], T = INFLUENCE.tribute;
+  if (!A.met[to] || !B.alive) return { error: "You haven't met them." };
+  if (r.status === "war") return { error: "You're at war: take it instead." };
+  if (r.lastTribute && s.turn - r.lastTribute < T.every) return { error: `You asked them on turn ${r.lastTribute}: wait until turn ${r.lastTribute + T.every}.` };
+  const mine = militaryPower(s, from), theirs = militaryPower(s, to);
+  if (theirs >= mine * T.weaker) return { error: "They're not afraid of you: your fleet needs to be far stronger than theirs." };
+  r.lastTribute = s.turn;
+  const pay = Math.min(Math.round(B.credits), Math.max(T.min, Math.round(B.credits * T.share)));
+  const yes = pay > 0 && (theirs < mine * T.weaker / 2 || r.score > -20 || allied(s, to, from));
+  remember(s, to, from, yes ? "forced tribute out of us" : "demanded tribute from us", T.regard);
+  if (yes) { B.credits = round1(B.credits - pay); A.credits = round1(A.credits + pay); log(s, from, `${B.name} paid you ${pay} credits in tribute, and resent it.`, "diplo"); }
+  else log(s, from, `${B.name} refused your demand for tribute.`, "diplo");
+  return { ok: true, accepted: yes, credits: yes ? pay : 0 };
+}
+/** Denounce `about` to `to`: turn a third power against a rival. */
+function denounce(s, from, about, to) {
+  const A = faction(s, from), T = faction(s, to), X = faction(s, about), D = INFLUENCE.denounce;
+  if (!A.met[to] || !A.met[about] || to === about || to === from || about === from) return { error: "Choose two powers you've met." };
+  const r = T.relations[from], rx = T.relations[about];
+  if (!rx) return { error: `${T.name} hasn't met ${X.name}.` };
+  const last = (A.denounced || {})[about];
+  if (last && s.turn - last < D.every) return { error: `You denounced ${X.name} on turn ${last}: wait until turn ${last + D.every}.` };
+  (A.denounced = A.denounced || {})[about] = s.turn;
+  remember(s, to, about, `was denounced to us by ${A.name}`, D.them);
+  remember(s, about, from, `denounced us to ${T.name}`, D.target);
+  if (rx.score < 0) remember(s, to, from, `warned us about ${X.name}`, D.ally);
+  log(s, from, `You denounced ${X.name} to ${T.name}. ${T.name} thinks less of them; ${X.name} won't forget it.`, "diplo");
+  return { ok: true };
+}
+/** The price for `ally` to declare war on `enemy` for you (null: they won't, at any price). */
+function joinWarPrice(s, from, ally, enemy) {
+  const r = faction(s, ally).relations[from], J = INFLUENCE.joinWar;
+  if (!r || r.score < 0) return null;
+  return r.score >= J.regard || allied(s, ally, from) ? 0 : Math.round(J.cost * (1 - r.score / J.regard * 0.5));
+}
+function askJoinWar(s, from, ally, enemy) {
+  const A = faction(s, from), Y = faction(s, ally), E = faction(s, enemy);
+  if (!atWar(s, from, enemy)) return { error: `You're not at war with ${E.name}.` };
+  if (!Y.relations[enemy] || atWar(s, ally, enemy)) return { error: `${Y.name} can't join that war.` };
+  if (allied(s, ally, enemy)) return { error: `${Y.name} is allied with ${E.name}.` };
+  const price = joinWarPrice(s, from, ally, enemy);
+  if (price === null) return { error: `${Y.name} won't fight for you: they don't like you enough.` };
+  if (A.credits < price) return { error: `${Y.name} wants ${price} credits to join the war.` };
+  A.credits = round1(A.credits - price); Y.credits = round1(Y.credits + price);
+  declareWar(s, ally, enemy, from);
+  remember(s, ally, from, price ? "paid us to join their war" : "asked us to stand with them", price ? 1 : 3);
+  return { ok: true, price };
 }
 function militaryPower(s, fid) {
   return fleetsOf(s, fid).reduce((t, f) => t + f.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? shipStats(s, fid, x.type, x).hull * SHIPS[x.type].dmg * 2 : 0), 0), 0);
@@ -5134,6 +5255,30 @@ function researchHTML() {
     <li><b>Ruins<\/b>, and the wrecks of pirates and creatures you destroy (a crystal swarm ${WILDS.bounty.swarm.research}, a void leviathan ${WILDS.bounty.leviathan.research}, a pirate haven ${WILDS.bounty.haven.research}).<\/li><\/ul>`;
   return h;
 }
+/** Influence on demand: gifts, sweetened proposals, tribute, denouncing, and asking a power to join your war. */
+function influenceHTML(F) {
+  const me = player(S), r = me.relations[F.id], price = marketPrice(S);
+  const gifts = [25, 50, 100, 200].filter((c) => me.credits >= c).map((c) => `<button class="opt" data-gift="${F.id}:${c}:0"><b>${c} credits<\/b><span>+${giftRegard(S, me.id, F.id, c)}<\/span><\/button>`)
+    .concat([1, 3].filter((x) => me.exotics >= x).map((x) => `<button class="opt" data-gift="${F.id}:0:${x}"><b>${x} exotic${x === 1 ? "" : "s"}<\/b><span>+${giftRegard(S, me.id, F.id, x * price)}<\/span><\/button>`));
+  let h = `<details class="small influence"><summary><b>Influence<\/b>: gifts, terms, pressure<\/summary>`;
+  h += `<p class="muted" style="margin:6px 0 2px">A gift raises their regard (the number shown). Gifts given close together count for less.<\/p>${gifts.length ? `<div class="opts">${gifts.join("")}<\/div>` : `<p class="muted">Nothing to give right now.<\/p>`}`;
+  // Proposals they'd turn down now, and what would change their mind.
+  const props = r.status === "war" ? ["peace"] : [r.treaty ? null : "trade", r.allied ? null : "alliance", r.patrol ? null : "patrol"].filter(Boolean);
+  const names = { peace: "peace", trade: "a trade treaty", alliance: "an alliance", patrol: "a patrol pact" };
+  const hints = props.map((w) => [w, acceptHint(S, me.id, F.id, w)]);
+  h += `<p style="margin:8px 0 2px"><b>Would they accept?<\/b><\/p><ul class="mem">${hints.map(([w, k]) => `<li>${names[w][0].toUpperCase() + names[w].slice(1)}: ${k.yes ? `<span class="good">likely yes<\/span>` : `<span class="bad">not yet<\/span> (they'd want ${k.short} more regard) <button class="linkish" data-sweet="${F.id}:${w}" ${me.credits < k.sweeten ? "disabled" : ""}>Sweeten it with ${k.sweeten} credits and propose<\/button>`}<\/li>`).join("")}<\/ul>`;
+  // Pressure.
+  const T = INFLUENCE.tribute, weak = militaryPower(S, F.id) < militaryPower(S, me.id) * T.weaker, wait = F.relations[me.id].lastTribute && S.turn - F.relations[me.id].lastTribute < T.every;
+  if (r.status !== "war") h += `<div class="btn-row"><button class="btn small" data-tribute="${F.id}" ${!weak || wait ? "disabled" : ""} title="${weak ? `They pay ${Math.round(T.share * 100)}% of their treasury, or refuse. Either way they resent it (${T.regard}).` : "Only from a power whose fleet is far weaker than yours"}">Demand tribute<\/button>${wait ? `<span class="muted">asked on turn ${F.relations[me.id].lastTribute}<\/span>` : weak ? "" : `<span class="muted">needs a far stronger fleet than theirs<\/span>`}<\/div>`;
+  const others = S.factions.filter((X) => X.alive && X.id !== me.id && X.id !== F.id && me.met[X.id] && F.relations[X.id]);
+  if (others.length) {
+    const D = INFLUENCE.denounce;
+    h += `<div class="btn-row"><label>Denounce <select id="dn-${F.id}" aria-label="Rival to denounce to ${esc(F.name)}">${others.map((X) => `<option value="${X.id}">${esc(X.name)}<\/option>`).join("")}<\/select> to them<\/label><button class="btn small" data-denounce="${F.id}" title="${esc(F.name)} thinks less of that rival (${D.them}); the rival thinks less of you (${D.target}).">Denounce<\/button><\/div>`;
+    const wars = others.filter((X) => atWar(S, me.id, X.id) && !atWar(S, F.id, X.id) && !allied(S, F.id, X.id));
+    h += wars.map((X) => { const p = joinWarPrice(S, me.id, F.id, X.id); return `<div class="btn-row"><button class="btn small" data-joinwar="${F.id}:${X.id}" ${p === null || me.credits < (p || 0) ? "disabled" : ""}>Ask them to join the war on ${esc(X.name)}${p ? ` (${p} credits)` : ""}<\/button>${p === null ? `<span class="muted">they don't like you enough<\/span>` : ""}<\/div>`; }).join("");
+  }
+  return h + `<\/details>`;
+}
 function diplomacyHTML() {
   const me = player(S);
   let h = `<h2>Diplomacy<\/h2>`;
@@ -5150,7 +5295,9 @@ function diplomacyHTML() {
     h += `<div class="dip"><h3><span class="dot" style="background:${F.color}"><\/span>${esc(F.name)}${F.alive ? "" : " †"}<\/h3>
       <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}<\/b> · ${esc(P.title || "")}: ${esc(P.text || "")}<\/p>
       <p class="small">${r.status === "war" ? `<b class="bad">At war<\/b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied<\/b>" : "<b>At peace<\/b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}<\/b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.<\/p>
-      ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:<\/p><ul class="small mem">${mem.map((m) => `<li class="${m.d >= 0 ? "good" : "bad"}">${esc(m.text)} <span class="muted">(turn ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})<\/span><\/li>`).join("")}<\/ul>` : ""}
+      ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:<\/p><ul class="small mem">${mem.map((m) => { const i = (them.memory || []).indexOf(m), cost = F.alive ? amendsCost(S, me.id, F.id, i) : null;
+        return `<li class="${m.d >= 0 ? "good" : "bad"}">${esc(m.text)} <span class="muted">(turn ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})<\/span>${m.forgiven ? ` <span class="good">· forgiven<\/span>` : cost !== null ? ` <button class="linkish" data-amends="${F.id}:${i}" ${me.credits < cost ? "disabled" : ""} title="Pay ${cost} credits to make up for it: +${Math.round(-m.d * INFLUENCE.amends.back)} regard">Make amends (${cost} credits)<\/button>` : ""}<\/li>`; }).join("")}<\/ul>` : ""}
+      ${F.alive ? influenceHTML(F) : ""}
       ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace<\/button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}<\/button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}<\/button><button class="btn" data-dip="${F.id}:${r.patrol ? "endPatrol" : "patrol"}" title="Your warships guard each other's worlds from raiders, and you share pirate bounties">${r.patrol ? "End the pirate patrol pact" : "Propose a pirate patrol pact"}<\/button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}<\/button>`}<\/div>` : ""}<\/div>`;
   }
   return h;
@@ -5235,6 +5382,12 @@ function bindChrome() {
     else if (d.mergeall !== undefined) { const f = S.fleets[sel.id]; let n = 0; for (const o of fleetsAt(S, f.at).filter((o) => o.owner === me.id && o.id !== f.id)) if (!mergeFleets(S, f.id, o.id).error) n++; toast(`${n} fleet${n === 1 ? "" : "s"} joined this one.`); }
     else if (d.split) { const [t, n] = d.split.split(":"); const r = splitFleet(S, sel.id, t, n || 1); if (r.error) toast(r.error, true); else { toast(`${r.moved} ${SHIPS[t].name.toLowerCase()}${r.moved === 1 ? "" : "s"} split off into a new fleet.`); sel = { kind: "fleet", id: r.fleet }; } }
     else if (d.tech) setResearch(S, me.id, d.tech);
+    else if (d.gift) { const [fid, c, x] = d.gift.split(":"); const r = giveGift(S, me.id, fid, { credits: +c, exotics: +x }); if (r.error) toast(r.error, true); else toast(`Gift sent: their regard rises ${r.regard}.`); }
+    else if (d.amends) { const [fid, i] = d.amends.split(":"); const r = makeAmends(S, me.id, fid, +i); if (r.error) toast(r.error, true); else toast(`Amends made: +${r.regard} regard.`); }
+    else if (d.sweet) { const [fid, what] = d.sweet.split(":"); const r = proposeSweetened(S, me.id, fid, what); if (r.error) toast(r.error, true); else toast(r.accepted ? "They accepted." : "They took the gift, but still said no.", !r.accepted); }
+    else if (d.tribute) { const r = demandTribute(S, me.id, d.tribute); if (r.error) toast(r.error, true); else toast(r.accepted ? `They paid ${r.credits} credits in tribute.` : "They refused.", !r.accepted); }
+    else if (d.denounce) { const about = document.getElementById("dn-" + d.denounce).value, r = denounce(S, me.id, about, d.denounce); if (r.error) toast(r.error, true); else toast(`You denounced ${faction(S, about).name}.`); }
+    else if (d.joinwar) { const [fid, enemy] = d.joinwar.split(":"); const r = askJoinWar(S, me.id, fid, enemy); if (r.error) toast(r.error, true); else toast(`${faction(S, fid).name} declared war on ${faction(S, enemy).name}${r.price ? `, for ${r.price} credits` : ""}.`); }
     else if (d.dip) {
       const [fid, what] = d.dip.split(":");
       const since = mark(), F = faction(S, fid);
@@ -5601,7 +5754,17 @@ function showHelp(back) {
     <ul class="help">
       <li><b>Each turn<\/b>, give orders, then press <b>End turn<\/b> (or Enter). Everyone moves at once.<\/li>
       <li><b>Worlds<\/b> grow population, which makes <b>industry<\/b> (to build), <b>science<\/b> (to research) and <b>credits<\/b> (to pay upkeep). Pick what each world builds in its queue; rush the first item with credits.<\/li>
-      <li><b>Corridors<\/b> (the dashed lines) link systems: a jump along one costs 1 move, however far. Nebulae cost 2 and hide ships; red rifts block.<\/li>
+      <li><b>Space travel.<\/b> Each ship has a speed: the moves it gets each turn (a scout 4, frigates and cruisers 3, colony ships and dreadnoughts 2; Fold drives add 1). A fleet moves at its slowest ship's speed. Right-click where it should go; the route and the turns it takes show on the map.
+        <ul>
+          <li><b>Open space:<\/b> a move a hex. You can fly anywhere this way, just slowly.<\/li>
+          <li><b>Corridors<\/b> (the dashed lines) are the fast way: folds in space between two systems. A jump along one costs 1 move however long it is, so a corridor can cross half the map in a single move. <b>Corridor theory<\/b> makes corridor jumps cost almost nothing (a quarter of a move), and the holder of the Corridor Engine travels them free. The route-finder uses corridors by itself whenever they're faster.<\/li>
+          <li><b>Nebulae<\/b> (purple): 2 moves a hex, and ships inside are hidden from anyone not in the same nebula.<\/li>
+          <li><b>Rifts<\/b> (red, jagged): tears in space that nothing of ours can cross; routes go round them. The Wardens' machines come out of the rifts late in the game, so worlds near them are on the front line.<\/li>
+          <li><b>Sealed sectors<\/b> (a teal tint): new space that only Rift drives can enter, until someone lights a Rift beacon beside it.<\/li>
+          <li><b>Corridors can change:<\/b> a rare collapse (red, dashed, with warning) cuts one, and a scout can chart a new one. The Gate Shard relic opens a new corridor; the Corridor Engine's gate jumps a fleet to any of its holder's worlds.<\/li>
+          <li><b>Fuel and supply:<\/b> within ${SUPPLY.range} hexes of your colonies, depots and stations, fleets are in supply. Beyond it, each turn a fleet moves uses a turn of its own fuel; out of fuel it crawls a hex a turn. Moving in supply draws on your fuel reserve. A fleet that <b>burns hard<\/b> moves a hex a turn farther, for more fuel.<\/li>
+          <li><b>Stopping:<\/b> a fleet stops in a hex where armed enemies at war wait for it. Once engaged in a battle it can't just leave: it has to withdraw.<\/li>
+        <\/ul><\/li>
       <li><b>Colony ships<\/b> settle worlds you can live on; <b>outpost ships<\/b> claim any system, for its exotics ◆ and territory. Xenology and Habitat domes open harsher worlds.<\/li>
       <li><b>Exotics<\/b> ◆ come from deposits. Cruisers, dreadnoughts and the Corridor Engine need them.<\/li>
       <li><b>Battles<\/b> happen when fleets of factions at war share a hex. Each armed ship rolls 3d6 under its skill to hit (3–4 always hits, 17–18 always misses), three exchanges a turn. Worlds with guns fire back: they fire first in each exchange and finish off the most damaged ship. Knocking a world's guns out counts toward winning the battle, and they can't be repaired while you hold the orbit.<\/li>
@@ -5620,7 +5783,8 @@ function showHelp(back) {
       <li><b>Fuel reserve:<\/b> the top bar's Fuel. Your colonies make a little and fuel depots and stations most, and each depot lets you store more. Fleets moving in supply, refuelling, filling tankers and burning hard spend it; run short and your fleets move slower and can't refuel. Burn hard (on a moving fleet's panel) for a hex a turn more. Fuel tankers still extend your reach: one travelling with a fleet tops its tank up beyond supply, and a parked one keeps your fleets nearby in supply. They fill up from the reserve.<\/li>
       <li><b>Music:<\/b> the ♪ button (top right) turns it on or off. Menu → Music has the volume, Next track, and Loop this track. The main theme plays at the start; after that the music follows the galaxy (exploring, war, the Wardens).<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
-      <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry.<\/li>
+      <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry. A power's <b>regard<\/b> for you decides whether it trades, allies, or attacks you. Their memory shows why they feel as they do.<\/li>
+      <li><b>Influence<\/b> (each power's card on the Diplomacy tab): send <b>gifts<\/b> of credits or exotics (gifts close together count for less); <b>make amends<\/b> for a grievance they remember; see whether they'd accept a proposal, and <b>sweeten<\/b> it with credits; <b>demand tribute<\/b> from a power whose fleet is far weaker than yours (they resent it); <b>denounce<\/b> a rival to them; or ask them to <b>join your war<\/b> (free if they like you, for credits if they're only lukewarm).<\/li>
       <li><b>Win<\/b> by conquest (the last people standing), by building the <b>Corridor Engine<\/b> (research it, then build it at your capital), or with the highest score at turn ${RULES.maxTurns}.<\/li>
       <li><b>Map:<\/b> drag to pan, scroll to zoom, click to select, right-click to move the selected fleet. <b>M<\/b> toggles move, <b>Esc<\/b> cancels.<\/li>
     <\/ul><div class="btn-row"><button class="btn primary" id="help-back">Back<\/button><\/div>`);

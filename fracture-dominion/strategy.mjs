@@ -114,7 +114,10 @@ const body = [
     "<b>Friends are an economy.</b> Trade and good relations pay steadily and keep wars away from you.",
     "<b>Choose your enemies.</b> You can't fight everyone. Keep the peace where you can, so you can focus where you must.",
     "<b>Remember they remember.</b> Rivals recall how you've treated them, and it shapes how they'll treat you.",
-    "<b>Alliances cut both ways.</b> An ally brings help, and their wars."])),
+    "<b>Alliances cut both ways.</b> An ally brings help, and their wars.",
+    "<b>Regard can be bought, and repaired.</b> A timely gift or amends for an old grievance can head off a war, or open a treaty they'd otherwise refuse. Spend it where it changes something.",
+    "<b>Pressure has a price.</b> Demanding tribute or denouncing a rival works, but it's remembered. Use it against those you don't need as friends.",
+    "<b>Wars can be shared.</b> A friendly power will often join a war against your enemy, and a lukewarm one may for a price."])),
 
   sec("mistakes", "Common mistakes", ul([
     "Stopping expansion too early.",
