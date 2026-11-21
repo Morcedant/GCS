@@ -6,6 +6,16 @@
     {
       "date": "2026-11-21",
       "kind": "site",
+      "title": "Dominion: computer players use influence",
+      "items": [
+        "Computer players now use influence on each other and on you, at most once every 12 turns each, in keeping with their character. A weak power facing a much stronger neighbour sends gifts or makes amends. One losing a war pays a friend to join it. One that resents the leader or the Corridor Engine's holder denounces them to others. Strong powers squeeze tribute from weak ones.",
+        "You're told when a rival sends you a gift, makes amends to you, or denounces you.",
+        "Two new computer-player options on the new-game form: Use influence (on at every difficulty) and Demand tribute from you (off on Easy)."
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "kind": "site",
       "title": "Dominion: influence in diplomacy, and a space travel guide",
       "items": [
         "Influence, on each power's card on the Diplomacy tab. Gifts of credits or exotics raise their regard, though gifts close together count for less. You can make amends for a grievance they remember. Each proposal shows whether they'd accept, and you can sweeten it with credits.",

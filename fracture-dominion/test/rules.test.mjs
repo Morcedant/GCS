@@ -1351,3 +1351,21 @@ test("influence: gifts raise regard (less when piled up), amends forgive, sweete
   declareWar(s, me.id, A.id);
   if (C.relations[A.id].status !== "war") { assert.equal(joinWarPrice(s, me.id, C.id, A.id), 0); assert.ok(askJoinWar(s, me.id, C.id, A.id).ok); assert.equal(C.relations[A.id].status, "war"); }
 });
+
+test("computer players use influence: a weak power appeases a strong neighbour, and tribute from you needs its option", async () => {
+  const { aiTurn } = await import("../src/ai.js");
+  const s = newGame({ seed: 37, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const me = s.factions[0], T = s.factions[1];
+  me.met[T.id] = T.met[me.id] = true; s.turn = 40;
+  T.credits = 400; T.relations[me.id].score = -15;
+  spawnFleet(s, me.id, s.systems[me.capital].at, Array(12).fill("cruiser"));
+  for (const f of fleetsOf(s, T.id)) if (f.ships.some((x) => SHIPS[x.type].skill)) delete s.fleets[f.id];
+  const c0 = me.credits;
+  for (let i = 0; i < 30 && me.credits === c0; i++) { s.turn += 13; aiTurn(s, T); }
+  assert.ok(me.credits > c0, "they sent something to buy peace");
+  assert.ok(s.log.some((l) => l.fid === me.id && /sent you a gift|made amends/.test(l.text)), "and you were told");
+  // Easy: no tribute demands on you.
+  const { aiOpt } = await import("../src/game.js");
+  const e = newGame({ seed: 37, size: "small", player: "concord", rivals: 1, difficulty: "easy" });
+  assert.equal(aiOpt(e, "tribute"), false); assert.equal(aiOpt(e, "influence"), true);
+});

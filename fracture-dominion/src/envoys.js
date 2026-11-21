@@ -4,7 +4,7 @@
 // an answer, and every answer is remembered (game.js remember()): it moves their standing with you, and the Diplomacy
 // tab lists what they remember.
 import { PERSONALITIES, TECHS, PROTECTION } from "./data.js";
-import { player, faction, coloniesOf, fleetsOf, armed, atWar, allied, militaryPower, declareWar, remember, log, rng, admiralsOf, admTitle, setDestination, researchItem, spawnFleet } from "./game.js";
+import { player, faction, coloniesOf, fleetsOf, armed, atWar, allied, militaryPower, declareWar, remember, log, rng, admiralsOf, admTitle, setDestination, researchItem, spawnFleet, aiOpt } from "./game.js";
 import { payPirates } from "./wilds.js";
 import { distance } from "./hex.js";
 
@@ -27,6 +27,7 @@ export function attitude(s, fid) { const r = faction(s, fid).relations[enMe(s).i
 const CANDIDATES = {
   demand: (s, F) => {
     const me = enMe(s), n = Math.min(120, Math.round(30 + s.turn * 0.4));
+    if (!aiOpt(s, "tribute")) return null;   // the "Demand tribute from you" option
     if (atWar(s, F.id, me.id) || allied(s, F.id, me.id) || me.credits < n || enScore(s, F.id) > 10 || s.turn - (F.lastDemand || -99) < 20) return null;
     return militaryPower(s, F.id) >= militaryPower(s, me.id) * 1.2 || enP(F.id).weights.demand >= 1.4 ? { n } : null;
   },

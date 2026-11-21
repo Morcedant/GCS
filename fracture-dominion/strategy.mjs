@@ -117,7 +117,8 @@ const body = [
     "<b>Alliances cut both ways.</b> An ally brings help, and their wars.",
     "<b>Regard can be bought, and repaired.</b> A timely gift or amends for an old grievance can head off a war, or open a treaty they'd otherwise refuse. Spend it where it changes something.",
     "<b>Pressure has a price.</b> Demanding tribute or denouncing a rival works, but it's remembered. Use it against those you don't need as friends.",
-    "<b>Wars can be shared.</b> A friendly power will often join a war against your enemy, and a lukewarm one may for a price."])),
+    "<b>Wars can be shared.</b> A friendly power will often join a war against your enemy, and a lukewarm one may for a price.",
+    "<b>Your rivals play this game too.</b> They court the strong, turn others against the leader, and squeeze the weak. A gift from a neighbour tells you they're afraid; a denunciation tells you you're the one to beat."])),
 
   sec("mistakes", "Common mistakes", ul([
     "Stopping expansion too early.",

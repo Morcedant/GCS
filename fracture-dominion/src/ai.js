@@ -1,9 +1,9 @@
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
-import { distance, neighbors, hexLine } from "./hex.js";
-import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS } from "./data.js";
+import { distance, neighbors, hexLine, makeRng } from "./hex.js";
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE } from "./data.js";
 import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, demandTribute, score } from "./game.js";
 
 const PRIORITY = {
   // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
@@ -23,6 +23,7 @@ export function aiTurn(s, F) {
   beacons(s, F);
   outposts(s, F);
   diplomacy(s, F, diff);
+  influence(s, F);
   production(s, F, diff);
   fleets(s, F);
 }
@@ -103,6 +104,45 @@ function relics(s, F) {
   const mineIds = new Set(coloniesOf(s, F.id).map((x) => x.id));
   const t = shardTargets(s, F.id, cap.id).filter((x) => mineIds.has(x.id)).sort((a, b) => distance(b.at, cap.at) - distance(a.at, cap.at))[0];
   if (t) useRelic(s, F.id, "shard", { from: cap.id, to: t.id });
+}
+/**
+ * Influence (the "influence" option): at most one move every INFLUENCE.ai.every turns, by its people's leanings. A power
+ * that fears a stronger neighbour who dislikes it sends a gift, or makes amends for what it did to them; one losing a
+ * war pays a friend to join it; one that resents the leader (or the Engine's holder) denounces it to others; a strong
+ * one demands tribute from the weak (from the player only with the "tribute" option, through a message: envoys.js).
+ */
+function influence(s, F) {
+  if (!aiOpt(s, "influence") || s.turn < 20 || s.turn - (F.lastInfluence || -99) < INFLUENCE.ai.every) return;
+  const L = INFLUENCE.ai.leanings[F.id] || INFLUENCE.ai.leanings.concord, R = makeRng("influence:" + s.seed + ":" + s.turn + ":" + F.id);
+  const go = (k) => R.next() < 0.5 * L[k];
+  const mine = militaryPower(s, F.id), met = s.factions.filter((O) => O.alive && O.id !== F.id && F.met[O.id] && O.relations[F.id]);
+  const done = () => { F.lastInfluence = s.turn; return true; };
+  // Fear: a much stronger power, at peace with us, that doesn't like us.
+  // (The player keeps no regard of its own: for the player, it's tension: we dislike them, or their worlds crowd ours.)
+  const near = (O) => coloniesOf(s, O.id).some((x) => coloniesOf(s, F.id).some((y) => distance(x.at, y.at) <= 4));
+  const uneasy = (O) => (O.ai ? O.relations[F.id].score < -8 : F.relations[O.id].score < 0 || near(O));
+  for (const O of met.filter((O) => !atWar(s, F.id, O.id) && militaryPower(s, O.id) >= mine * 1.5 && uneasy(O)).sort((a, b) => militaryPower(s, b.id) - militaryPower(s, a.id))) {
+    const mem = O.relations[F.id].memory || [], worst = mem.map((m, i) => ({ m, i, c: amendsCost(s, F.id, O.id, i) })).filter((x) => x.c !== null && x.m.d <= -8 && x.c <= F.credits * 0.5).sort((a, b) => a.m.d - b.m.d)[0];
+    if (worst && go("amends") && makeAmends(s, F.id, O.id, worst.i).ok) return done();
+    const c = Math.min(150, Math.round(F.credits * 0.25 / 25) * 25);
+    if (c >= 25 && go("gift") && giveGift(s, F.id, O.id, { credits: c }).ok) return done();
+  }
+  // A war going badly: pay a friend to join it.
+  for (const E of met.filter((E) => atWar(s, F.id, E.id) && militaryPower(s, E.id) > mine * 0.9)) {
+    const Y = met.filter((Y) => Y.ai && Y.id !== E.id && Y.relations[E.id] && !atWar(s, Y.id, E.id) && !allied(s, Y.id, E.id)).map((Y) => ({ Y, p: joinWarPrice(s, F.id, Y.id, E.id) }))
+      .filter((x) => x.p !== null && x.p <= F.credits * 0.5).sort((a, b) => a.p - b.p || militaryPower(s, b.Y.id) - militaryPower(s, a.Y.id))[0];
+    if (Y && go("joinWar") && askJoinWar(s, F.id, Y.Y.id, E.id).ok) return done();
+  }
+  // The leader: whoever holds the Corridor Engine, or a clear front-runner on score, if we don't like them.
+  const E = engineHeld(s), ranked = s.factions.filter((X) => X.alive).sort((a, b) => score(s, b.id) - score(s, a.id));
+  const lead = E && E.owner !== F.id ? faction(s, E.owner) : ranked[0] && ranked[0].id !== F.id && ranked[1] && score(s, ranked[0].id) >= score(s, ranked[1].id) * 1.3 ? ranked[0] : null;
+  if (lead && F.relations[lead.id] && F.relations[lead.id].score < 5 && go("denounce")) {
+    const T = met.filter((T) => T.id !== lead.id && T.relations[lead.id] && !allied(s, T.id, lead.id)).sort((a, b) => militaryPower(s, b.id) - militaryPower(s, a.id))[0];
+    if (T && denounce(s, F.id, lead.id, T.id).ok) return done();
+  }
+  // The weak: tribute (from another computer power; the player is asked by message instead).
+  const prey = met.filter((O) => O.ai && !atWar(s, F.id, O.id) && !allied(s, F.id, O.id) && militaryPower(s, O.id) < mine * INFLUENCE.tribute.weaker && O.credits >= INFLUENCE.tribute.min).sort((a, b) => b.credits - a.credits)[0];
+  if (prey && go("tribute") && demandTribute(s, F.id, prey.id).ok) return done();
 }
 function diplomacy(s, F, diff) {
   for (const [oid, r] of Object.entries(F.relations)) {

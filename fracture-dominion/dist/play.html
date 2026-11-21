@@ -210,7 +210,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-21 16:18 UTC";
+const BUILD = "2026-11-21 16:27 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -628,7 +628,14 @@ const PATROL = { share: 0.5, regard: 0.3 };
  */
 const INFLUENCE = { gift: { perRegard: 8, window: 20, fade: 120 }, amends: { perPoint: 5, perTurn: 0.05, back: 0.75 },
   tribute: { weaker: 0.6, share: 0.15, min: 20, regard: -12, every: 15 }, denounce: { them: -8, target: -12, ally: 3, every: 10 },
-  joinWar: { regard: 15, cost: 150 } };
+  joinWar: { regard: 15, cost: 150 },
+  // The computer players: one move of influence every `every` turns at most, each people with its own leanings.
+  ai: { every: 12, leanings: {
+    concord: { gift: 1.2, amends: 1.2, denounce: 0.8, tribute: 0.4, joinWar: 1 },
+    tessan: { gift: 1.6, amends: 1.3, denounce: 1, tribute: 0.6, joinWar: 1.2 },
+    kel: { gift: 0.7, amends: 0.8, denounce: 0.8, tribute: 1.3, joinWar: 1 },
+    hegemony: { gift: 0.3, amends: 0.4, denounce: 1.2, tribute: 1.6, joinWar: 1.1 },
+    vael: { gift: 0.9, amends: 0.9, denounce: 1, tribute: 0.9, joinWar: 0.9 } } } };
 /**
  * Traders: a convoy leaves a colony with an Exchange every `every` turns or so for another colony with an Exchange
  * within `range` hexes whose owner isn't at war with the sender (perPower convoys on the lanes per living power at most),
@@ -725,11 +732,13 @@ const AI_OPTIONS = {
   coalitions: { name: "Form coalitions against the Engine holder", text: "In an open game, they band together against whoever holds the Corridor Engine." },
   raidDepots: { name: "Raid your fuel depots", text: "At war, their fleets loot unguarded fuel depots." },
   payPirates: { name: "Pay pirates instead of fighting", text: "When they're rich, they pay ransom and tribute (off: they always fight)." },
+  influence: { name: "Use influence", text: "They send gifts to powers they fear, make amends, denounce the leader, and pay friends to join their wars, with each other and with you." },
+  tribute: { name: "Demand tribute from you", text: "A power whose fleet is far stronger than yours may demand credits, and resent a refusal." },
 };
 const AI_PRESETS = {
-  easy: { strength: 0.7, stations: false, fortify: false, coalitions: true, raidDepots: false, payPirates: true },
-  normal: { strength: 1, stations: false, fortify: true, coalitions: true, raidDepots: true, payPirates: true },
-  hard: { strength: 1.35, stations: true, fortify: true, coalitions: true, raidDepots: true, payPirates: false },
+  easy: { strength: 0.7, stations: false, fortify: false, coalitions: true, raidDepots: false, payPirates: true, influence: true, tribute: false },
+  normal: { strength: 1, stations: false, fortify: true, coalitions: true, raidDepots: true, payPirates: true, influence: true, tribute: true },
+  hard: { strength: 1.35, stations: true, fortify: true, coalitions: true, raidDepots: true, payPirates: false, influence: true, tribute: true },
 };
 /**
  * The early game: before turn `until`, a computer power at war with no one keeps a defensive fleet (`perColony` fleet
@@ -2057,7 +2066,8 @@ function giveGift(s, from, to, { credits = 0, exotics = 0 } = {}) {
   A.credits = round1(A.credits - credits); A.exotics -= exotics; B.credits = round1(B.credits + credits); B.exotics += exotics;
   (r.gifts = r.gifts || []).push({ turn: s.turn, value }); r.gifts = r.gifts.filter((g) => s.turn - g.turn < INFLUENCE.gift.window);
   remember(s, to, from, `sent us a gift (${[credits && `${credits} credits`, exotics && `${exotics} exotics`].filter(Boolean).join(", ")})`, gain);
-  log(s, from, `You sent ${B.name} a gift: their regard for you rises ${gain}.`, "diplo");
+  if (!A.ai) log(s, from, `You sent ${B.name} a gift: their regard for you rises ${gain}.`, "diplo");
+  if (!B.ai) log(s, to, `${A.name} sent you a gift: ${[credits && `${credits} credits`, exotics && `${exotics} exotics`].filter(Boolean).join(" and ")}.`, "diplo");
   return { ok: true, regard: gain };
 }
 /** The price of making amends for one grievance they remember (index into their memory of you). */
@@ -2072,7 +2082,8 @@ function makeAmends(s, from, to, i) {
   A.credits = round1(A.credits - cost); faction(s, to).credits = round1(faction(s, to).credits + cost);
   const back = Math.round(-m.d * INFLUENCE.amends.back); m.forgiven = s.turn;
   r.score = Math.min(40, r.score + back);
-  log(s, from, `You made amends to ${faction(s, to).name} for what they held against you (that you ${m.text}): ${cost} credits, and +${back} regard.`, "diplo");
+  if (!A.ai) log(s, from, `You made amends to ${faction(s, to).name} for what they held against you (that you ${m.text}): ${cost} credits, and +${back} regard.`, "diplo");
+  if (!faction(s, to).ai) log(s, to, `${A.name} made amends for having ${m.text.replace(/^(\w+) us/, "$1 you").replace(/ our /g, " your ").replace(/ us\b/g, " you")}: they paid you ${cost} credits.`, "diplo");
   return { ok: true, regard: back, cost };
 }
 /** Would they accept this proposal now? { yes, short (regard missing, if any), sweeten (credits to make up for it) }. */
@@ -2105,8 +2116,9 @@ function demandTribute(s, from, to) {
   const pay = Math.min(Math.round(B.credits), Math.max(T.min, Math.round(B.credits * T.share)));
   const yes = pay > 0 && (theirs < mine * T.weaker / 2 || r.score > -20 || allied(s, to, from));
   remember(s, to, from, yes ? "forced tribute out of us" : "demanded tribute from us", T.regard);
-  if (yes) { B.credits = round1(B.credits - pay); A.credits = round1(A.credits + pay); log(s, from, `${B.name} paid you ${pay} credits in tribute, and resent it.`, "diplo"); }
-  else log(s, from, `${B.name} refused your demand for tribute.`, "diplo");
+  if (yes) { B.credits = round1(B.credits - pay); A.credits = round1(A.credits + pay); }
+  if (!A.ai) log(s, from, yes ? `${B.name} paid you ${pay} credits in tribute, and resent it.` : `${B.name} refused your demand for tribute.`, "diplo");
+  else if (player(s).met[from] && player(s).met[to]) log(s, null, yes ? `${A.name} forced ${pay} credits of tribute out of ${B.name}.` : `${B.name} refused ${A.name}'s demand for tribute.`, "diplo");
   return { ok: true, accepted: yes, credits: yes ? pay : 0 };
 }
 /** Denounce `about` to `to`: turn a third power against a rival. */
@@ -2121,7 +2133,9 @@ function denounce(s, from, about, to) {
   remember(s, to, about, `was denounced to us by ${A.name}`, D.them);
   remember(s, about, from, `denounced us to ${T.name}`, D.target);
   if (rx.score < 0) remember(s, to, from, `warned us about ${X.name}`, D.ally);
-  log(s, from, `You denounced ${X.name} to ${T.name}. ${T.name} thinks less of them; ${X.name} won't forget it.`, "diplo");
+  if (!A.ai) log(s, from, `You denounced ${X.name} to ${T.name}. ${T.name} thinks less of them; ${X.name} won't forget it.`, "diplo");
+  if (!X.ai) log(s, about, `${A.name} denounced you to ${T.name}: ${T.name} thinks less of you now.`, "diplo");
+  if (!T.ai) log(s, to, `${A.name} warned you about ${X.name}.`, "diplo");
   return { ok: true };
 }
 /** The price for `ally` to declare war on `enemy` for you (null: they won't, at any price). */
@@ -3876,6 +3890,7 @@ function attitude(s, fid) { const r = faction(s, fid).relations[enMe(s).id]; if 
 const CANDIDATES = {
   demand: (s, F) => {
     const me = enMe(s), n = Math.min(120, Math.round(30 + s.turn * 0.4));
+    if (!aiOpt(s, "tribute")) return null;   // the "Demand tribute from you" option
     if (atWar(s, F.id, me.id) || allied(s, F.id, me.id) || me.credits < n || enScore(s, F.id) > 10 || s.turn - (F.lastDemand || -99) < 20) return null;
     return militaryPower(s, F.id) >= militaryPower(s, me.id) * 1.2 || enP(F.id).weights.demand >= 1.4 ? { n } : null;
   },
@@ -4072,6 +4087,7 @@ function aiTurn(s, F) {
   beacons(s, F);
   outposts(s, F);
   diplomacy(s, F, diff);
+  influence(s, F);
   production(s, F, diff);
   fleets(s, F);
 }
@@ -4152,6 +4168,45 @@ function relics(s, F) {
   const mineIds = new Set(coloniesOf(s, F.id).map((x) => x.id));
   const t = shardTargets(s, F.id, cap.id).filter((x) => mineIds.has(x.id)).sort((a, b) => distance(b.at, cap.at) - distance(a.at, cap.at))[0];
   if (t) useRelic(s, F.id, "shard", { from: cap.id, to: t.id });
+}
+/**
+ * Influence (the "influence" option): at most one move every INFLUENCE.ai.every turns, by its people's leanings. A power
+ * that fears a stronger neighbour who dislikes it sends a gift, or makes amends for what it did to them; one losing a
+ * war pays a friend to join it; one that resents the leader (or the Engine's holder) denounces it to others; a strong
+ * one demands tribute from the weak (from the player only with the "tribute" option, through a message: envoys.js).
+ */
+function influence(s, F) {
+  if (!aiOpt(s, "influence") || s.turn < 20 || s.turn - (F.lastInfluence || -99) < INFLUENCE.ai.every) return;
+  const L = INFLUENCE.ai.leanings[F.id] || INFLUENCE.ai.leanings.concord, R = makeRng("influence:" + s.seed + ":" + s.turn + ":" + F.id);
+  const go = (k) => R.next() < 0.5 * L[k];
+  const mine = militaryPower(s, F.id), met = s.factions.filter((O) => O.alive && O.id !== F.id && F.met[O.id] && O.relations[F.id]);
+  const done = () => { F.lastInfluence = s.turn; return true; };
+  // Fear: a much stronger power, at peace with us, that doesn't like us.
+  // (The player keeps no regard of its own: for the player, it's tension: we dislike them, or their worlds crowd ours.)
+  const near = (O) => coloniesOf(s, O.id).some((x) => coloniesOf(s, F.id).some((y) => distance(x.at, y.at) <= 4));
+  const uneasy = (O) => (O.ai ? O.relations[F.id].score < -8 : F.relations[O.id].score < 0 || near(O));
+  for (const O of met.filter((O) => !atWar(s, F.id, O.id) && militaryPower(s, O.id) >= mine * 1.5 && uneasy(O)).sort((a, b) => militaryPower(s, b.id) - militaryPower(s, a.id))) {
+    const mem = O.relations[F.id].memory || [], worst = mem.map((m, i) => ({ m, i, c: amendsCost(s, F.id, O.id, i) })).filter((x) => x.c !== null && x.m.d <= -8 && x.c <= F.credits * 0.5).sort((a, b) => a.m.d - b.m.d)[0];
+    if (worst && go("amends") && makeAmends(s, F.id, O.id, worst.i).ok) return done();
+    const c = Math.min(150, Math.round(F.credits * 0.25 / 25) * 25);
+    if (c >= 25 && go("gift") && giveGift(s, F.id, O.id, { credits: c }).ok) return done();
+  }
+  // A war going badly: pay a friend to join it.
+  for (const E of met.filter((E) => atWar(s, F.id, E.id) && militaryPower(s, E.id) > mine * 0.9)) {
+    const Y = met.filter((Y) => Y.ai && Y.id !== E.id && Y.relations[E.id] && !atWar(s, Y.id, E.id) && !allied(s, Y.id, E.id)).map((Y) => ({ Y, p: joinWarPrice(s, F.id, Y.id, E.id) }))
+      .filter((x) => x.p !== null && x.p <= F.credits * 0.5).sort((a, b) => a.p - b.p || militaryPower(s, b.Y.id) - militaryPower(s, a.Y.id))[0];
+    if (Y && go("joinWar") && askJoinWar(s, F.id, Y.Y.id, E.id).ok) return done();
+  }
+  // The leader: whoever holds the Corridor Engine, or a clear front-runner on score, if we don't like them.
+  const E = engineHeld(s), ranked = s.factions.filter((X) => X.alive).sort((a, b) => score(s, b.id) - score(s, a.id));
+  const lead = E && E.owner !== F.id ? faction(s, E.owner) : ranked[0] && ranked[0].id !== F.id && ranked[1] && score(s, ranked[0].id) >= score(s, ranked[1].id) * 1.3 ? ranked[0] : null;
+  if (lead && F.relations[lead.id] && F.relations[lead.id].score < 5 && go("denounce")) {
+    const T = met.filter((T) => T.id !== lead.id && T.relations[lead.id] && !allied(s, T.id, lead.id)).sort((a, b) => militaryPower(s, b.id) - militaryPower(s, a.id))[0];
+    if (T && denounce(s, F.id, lead.id, T.id).ok) return done();
+  }
+  // The weak: tribute (from another computer power; the player is asked by message instead).
+  const prey = met.filter((O) => O.ai && !atWar(s, F.id, O.id) && !allied(s, F.id, O.id) && militaryPower(s, O.id) < mine * INFLUENCE.tribute.weaker && O.credits >= INFLUENCE.tribute.min).sort((a, b) => b.credits - a.credits)[0];
+  if (prey && go("tribute") && demandTribute(s, F.id, prey.id).ok) return done();
 }
 function diplomacy(s, F, diff) {
   for (const [oid, r] of Object.entries(F.relations)) {
@@ -5785,7 +5840,7 @@ function showHelp(back) {
       <li><b>Music:<\/b> the ♪ button (top right) turns it on or off. Menu → Music has the volume, Next track, and Loop this track. The main theme plays at the start; after that the music follows the galaxy (exploring, war, the Wardens).<\/li>
       <li><b>Invading:<\/b> clear the orbit (warships and guns), then land troop transports whose troops match the defense.<\/li>
       <li><b>Diplomacy:<\/b> meet rivals by seeing them. Trade for credits; settling next to them makes them angry. A power's <b>regard<\/b> for you decides whether it trades, allies, or attacks you. Their memory shows why they feel as they do.<\/li>
-      <li><b>Influence<\/b> (each power's card on the Diplomacy tab): send <b>gifts<\/b> of credits or exotics (gifts close together count for less); <b>make amends<\/b> for a grievance they remember; see whether they'd accept a proposal, and <b>sweeten<\/b> it with credits; <b>demand tribute<\/b> from a power whose fleet is far weaker than yours (they resent it); <b>denounce<\/b> a rival to them; or ask them to <b>join your war<\/b> (free if they like you, for credits if they're only lukewarm).<\/li>
+      <li><b>Influence<\/b> (each power's card on the Diplomacy tab): send <b>gifts<\/b> of credits or exotics (gifts close together count for less); <b>make amends<\/b> for a grievance they remember; see whether they'd accept a proposal, and <b>sweeten<\/b> it with credits; <b>demand tribute<\/b> from a power whose fleet is far weaker than yours (they resent it); <b>denounce<\/b> a rival to them; or ask them to <b>join your war<\/b> (free if they like you, for credits if they're only lukewarm). The computer players do all of this too, with each other and with you: a weak neighbour may send you gifts, a rival may denounce you to others, and a far stronger one may demand tribute (both are options on the new-game form).<\/li>
       <li><b>Win<\/b> by conquest (the last people standing), by building the <b>Corridor Engine<\/b> (research it, then build it at your capital), or with the highest score at turn ${RULES.maxTurns}.<\/li>
       <li><b>Map:<\/b> drag to pan, scroll to zoom, click to select, right-click to move the selected fleet. <b>M<\/b> toggles move, <b>Esc<\/b> cancels.<\/li>
     <\/ul><div class="btn-row"><button class="btn primary" id="help-back">Back<\/button><\/div>`);

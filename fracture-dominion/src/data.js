@@ -333,7 +333,14 @@ export const PATROL = { share: 0.5, regard: 0.3 };
  */
 export const INFLUENCE = { gift: { perRegard: 8, window: 20, fade: 120 }, amends: { perPoint: 5, perTurn: 0.05, back: 0.75 },
   tribute: { weaker: 0.6, share: 0.15, min: 20, regard: -12, every: 15 }, denounce: { them: -8, target: -12, ally: 3, every: 10 },
-  joinWar: { regard: 15, cost: 150 } };
+  joinWar: { regard: 15, cost: 150 },
+  // The computer players: one move of influence every `every` turns at most, each people with its own leanings.
+  ai: { every: 12, leanings: {
+    concord: { gift: 1.2, amends: 1.2, denounce: 0.8, tribute: 0.4, joinWar: 1 },
+    tessan: { gift: 1.6, amends: 1.3, denounce: 1, tribute: 0.6, joinWar: 1.2 },
+    kel: { gift: 0.7, amends: 0.8, denounce: 0.8, tribute: 1.3, joinWar: 1 },
+    hegemony: { gift: 0.3, amends: 0.4, denounce: 1.2, tribute: 1.6, joinWar: 1.1 },
+    vael: { gift: 0.9, amends: 0.9, denounce: 1, tribute: 0.9, joinWar: 0.9 } } } };
 /**
  * Traders: a convoy leaves a colony with an Exchange every `every` turns or so for another colony with an Exchange
  * within `range` hexes whose owner isn't at war with the sender (perPower convoys on the lanes per living power at most),
@@ -430,11 +437,13 @@ export const AI_OPTIONS = {
   coalitions: { name: "Form coalitions against the Engine holder", text: "In an open game, they band together against whoever holds the Corridor Engine." },
   raidDepots: { name: "Raid your fuel depots", text: "At war, their fleets loot unguarded fuel depots." },
   payPirates: { name: "Pay pirates instead of fighting", text: "When they're rich, they pay ransom and tribute (off: they always fight)." },
+  influence: { name: "Use influence", text: "They send gifts to powers they fear, make amends, denounce the leader, and pay friends to join their wars, with each other and with you." },
+  tribute: { name: "Demand tribute from you", text: "A power whose fleet is far stronger than yours may demand credits, and resent a refusal." },
 };
 export const AI_PRESETS = {
-  easy: { strength: 0.7, stations: false, fortify: false, coalitions: true, raidDepots: false, payPirates: true },
-  normal: { strength: 1, stations: false, fortify: true, coalitions: true, raidDepots: true, payPirates: true },
-  hard: { strength: 1.35, stations: true, fortify: true, coalitions: true, raidDepots: true, payPirates: false },
+  easy: { strength: 0.7, stations: false, fortify: false, coalitions: true, raidDepots: false, payPirates: true, influence: true, tribute: false },
+  normal: { strength: 1, stations: false, fortify: true, coalitions: true, raidDepots: true, payPirates: true, influence: true, tribute: true },
+  hard: { strength: 1.35, stations: true, fortify: true, coalitions: true, raidDepots: true, payPirates: false, influence: true, tribute: true },
 };
 /**
  * The early game: before turn `until`, a computer power at war with no one keeps a defensive fleet (`perColony` fleet

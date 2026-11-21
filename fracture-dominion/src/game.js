@@ -1147,7 +1147,8 @@ export function giveGift(s, from, to, { credits = 0, exotics = 0 } = {}) {
   A.credits = round1(A.credits - credits); A.exotics -= exotics; B.credits = round1(B.credits + credits); B.exotics += exotics;
   (r.gifts = r.gifts || []).push({ turn: s.turn, value }); r.gifts = r.gifts.filter((g) => s.turn - g.turn < INFLUENCE.gift.window);
   remember(s, to, from, `sent us a gift (${[credits && `${credits} credits`, exotics && `${exotics} exotics`].filter(Boolean).join(", ")})`, gain);
-  log(s, from, `You sent ${B.name} a gift: their regard for you rises ${gain}.`, "diplo");
+  if (!A.ai) log(s, from, `You sent ${B.name} a gift: their regard for you rises ${gain}.`, "diplo");
+  if (!B.ai) log(s, to, `${A.name} sent you a gift: ${[credits && `${credits} credits`, exotics && `${exotics} exotics`].filter(Boolean).join(" and ")}.`, "diplo");
   return { ok: true, regard: gain };
 }
 /** The price of making amends for one grievance they remember (index into their memory of you). */
@@ -1162,7 +1163,8 @@ export function makeAmends(s, from, to, i) {
   A.credits = round1(A.credits - cost); faction(s, to).credits = round1(faction(s, to).credits + cost);
   const back = Math.round(-m.d * INFLUENCE.amends.back); m.forgiven = s.turn;
   r.score = Math.min(40, r.score + back);
-  log(s, from, `You made amends to ${faction(s, to).name} for what they held against you (that you ${m.text}): ${cost} credits, and +${back} regard.`, "diplo");
+  if (!A.ai) log(s, from, `You made amends to ${faction(s, to).name} for what they held against you (that you ${m.text}): ${cost} credits, and +${back} regard.`, "diplo");
+  if (!faction(s, to).ai) log(s, to, `${A.name} made amends for having ${m.text.replace(/^(\w+) us/, "$1 you").replace(/ our /g, " your ").replace(/ us\b/g, " you")}: they paid you ${cost} credits.`, "diplo");
   return { ok: true, regard: back, cost };
 }
 /** Would they accept this proposal now? { yes, short (regard missing, if any), sweeten (credits to make up for it) }. */
@@ -1195,8 +1197,9 @@ export function demandTribute(s, from, to) {
   const pay = Math.min(Math.round(B.credits), Math.max(T.min, Math.round(B.credits * T.share)));
   const yes = pay > 0 && (theirs < mine * T.weaker / 2 || r.score > -20 || allied(s, to, from));
   remember(s, to, from, yes ? "forced tribute out of us" : "demanded tribute from us", T.regard);
-  if (yes) { B.credits = round1(B.credits - pay); A.credits = round1(A.credits + pay); log(s, from, `${B.name} paid you ${pay} credits in tribute, and resent it.`, "diplo"); }
-  else log(s, from, `${B.name} refused your demand for tribute.`, "diplo");
+  if (yes) { B.credits = round1(B.credits - pay); A.credits = round1(A.credits + pay); }
+  if (!A.ai) log(s, from, yes ? `${B.name} paid you ${pay} credits in tribute, and resent it.` : `${B.name} refused your demand for tribute.`, "diplo");
+  else if (player(s).met[from] && player(s).met[to]) log(s, null, yes ? `${A.name} forced ${pay} credits of tribute out of ${B.name}.` : `${B.name} refused ${A.name}'s demand for tribute.`, "diplo");
   return { ok: true, accepted: yes, credits: yes ? pay : 0 };
 }
 /** Denounce `about` to `to`: turn a third power against a rival. */
@@ -1211,7 +1214,9 @@ export function denounce(s, from, about, to) {
   remember(s, to, about, `was denounced to us by ${A.name}`, D.them);
   remember(s, about, from, `denounced us to ${T.name}`, D.target);
   if (rx.score < 0) remember(s, to, from, `warned us about ${X.name}`, D.ally);
-  log(s, from, `You denounced ${X.name} to ${T.name}. ${T.name} thinks less of them; ${X.name} won't forget it.`, "diplo");
+  if (!A.ai) log(s, from, `You denounced ${X.name} to ${T.name}. ${T.name} thinks less of them; ${X.name} won't forget it.`, "diplo");
+  if (!X.ai) log(s, about, `${A.name} denounced you to ${T.name}: ${T.name} thinks less of you now.`, "diplo");
+  if (!T.ai) log(s, to, `${A.name} warned you about ${X.name}.`, "diplo");
   return { ok: true };
 }
 /** The price for `ally` to declare war on `enemy` for you (null: they won't, at any price). */
