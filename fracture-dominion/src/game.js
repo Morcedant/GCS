@@ -28,6 +28,7 @@ export function newGame(opts) {
     state.systems[home].colony = { owner: f.id, kind: "colony", pop: f.id === "concord" ? 4 : 4, growth: 0, buildings: { shipyard: true, factory: false, lab: false, market: false },
       queue: [], stock: 0, defense: 2, capital: true };
     state.systems[home].name = f.homeworld;
+    if (f.id === "mirrun") state.systems[home].world = "ocean";   // the Mirrun come from a deep-ocean world
     for (const t of ["scout", "frigate", "colony"]) spawnFleet(state, f.id, state.systems[home].at, [t]);
   });
   // Every power starts with one admiral, on its frigate.
@@ -179,10 +180,10 @@ export function shipStats(s, fid, type, ship) {
   // Research comes through the ship's own systems (fitOf); a people's traits and relics reach every ship at once.
   const k = fitOf(s, fid, ship);
   return { ...base,
-    speed: base.speed + (k.foldDrives ? 1 : 0) + (fid === "vael" ? 1 : 0) + (base.speed > 0 && relicHeld(s, fid, "anchor") ? 1 : 0),
+    speed: base.speed + (k.foldDrives ? 1 : 0) + (fid === "vael" ? 1 : 0) + (fid === "ylith" && (type === "scout" || type === "colony") ? 1 : 0) + (base.speed > 0 && relicHeld(s, fid, "anchor") ? 1 : 0),
     hull: base.hull + (warship && k.shields ? 1 : 0) + (warship && k.plating ? 1 : 0) + (warship ? k.armor || 0 : 0),
     skill: warship ? base.skill + (k.targeting ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (k.lances ? 1 : 0) + (k.fireControl || 0) : 0,
-    sensors: base.sensors + (k.sensors ? 1 : 0) + (k.scanners ? 1 : 0) + (relicHeld(s, fid, "oracle") ? 2 : 0),
+    sensors: base.sensors + (k.sensors ? 1 : 0) + (k.scanners ? 1 : 0) + (relicHeld(s, fid, "oracle") ? 2 : 0) + (fid === "ylith" ? 2 : 0),
     troops: (base.troops || 0) * (fid === "hegemony" ? 2 : 1),
     cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * (proto(s, fid, "drones") ? 0.9 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1)) };
 }
@@ -455,7 +456,7 @@ export function canSettle(s, fid, sys, kind) {
 }
 export function maxPop(s, sys) {
   const c = sys.colony; if (!c || c.kind !== "colony") return 0;
-  return WORLDS[sys.world].pop + sys.size * 2 + (has(s, c.owner, "terraforming") ? 2 : 0) + (c.owner === "kel" ? 2 : 0) + (proto(s, c.owner, "arcologies") ? 1 : 0)
+  return WORLDS[sys.world].pop + sys.size * 2 + (has(s, c.owner, "terraforming") ? 2 : 0) + (c.owner === "kel" ? 2 : 0) + (c.owner === "mirrun" && sys.world === "ocean" ? 3 : 0) + (proto(s, c.owner, "arcologies") ? 1 : 0)
     + (c.buildings.habitat ? 2 : 0) + advLevel(s, c.owner, "habitats") + (relicHeld(s, c.owner, "seeds") ? 2 : 0);
 }
 /** What a world gives each turn: { ind, sci, cr, exo, upkeep }. */
@@ -470,6 +471,7 @@ export function yields(s, sys) {
     if (B.factory) ind *= 1.5;
     if (B.lab) sci *= 1.5;
     if (fid === "tessan") cr *= 1.25;
+    if (fid === "mirrun") sci *= 1.2;
     const fo = focusOf(s, fid);   // the empire's Focus
     ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
     if (relicHeld(s, fid, "forge")) ind *= s.relics.forge.at === sys.id ? 1.5 : 1.1;
@@ -817,7 +819,7 @@ export function tradeExotics(s, fid, n) {
 }
 // ---- sieges ----
 /** How far a long siege has worn down a world's garrison: 1 at the start, down to SIEGE.garrisonMin. */
-export const garrisonFactor = (sys) => Math.max(sys.colony && sys.colony.buildings.barracks ? 0.8 : SIEGE.garrisonMin, 1 - SIEGE.garrisonPerTurn * ((sys.colony && sys.colony.siege) || 0));
+export const garrisonFactor = (sys) => sys.colony && sys.colony.owner === "zhaq" ? 1 : Math.max(sys.colony && sys.colony.buildings.barracks ? 0.8 : SIEGE.garrisonMin, 1 - SIEGE.garrisonPerTurn * ((sys.colony && sys.colony.siege) || 0));
 /** The besieger who would take a world's surrender: the power with the most warships in its orbit. */
 function besiegerOf(s, sys) {
   const n = {};
@@ -828,7 +830,7 @@ export function invasionOdds(s, fleetId) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
   if (!sys || !sys.colony || sys.colony.owner === f.owner) return null;
   const troops = f.ships.filter((x) => x.type === "transport").reduce((t, x) => t + shipStats(s, f.owner, "transport").troops, 0);
-  const defense = (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0) + (sys.colony.buildings.battery ? BATTERY.garrison : 0) + (sys.colony.buildings.barracks ? 3 : 0)) * garrisonFactor(sys);
+  const defense = (sys.colony.owner === "zhaq" ? 1.5 : 1) * (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0) + (sys.colony.buildings.battery ? BATTERY.garrison : 0) + (sys.colony.buildings.barracks ? 3 : 0)) * garrisonFactor(sys);
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
@@ -1267,7 +1269,7 @@ export function updateVision(s, F) {
   const vis = {};
   const charted = [];
   const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; if (!F.explored[k] && !F.ai && s.sysAt[k]) charted.push(s.systems[s.sysAt[k]]); F.explored[k] = 1; } };
-  const bonus = has(s, F.id, "sensors") ? 1 : 0;
+  const bonus = (has(s, F.id, "sensors") ? 1 : 0) + (F.id === "ylith" ? 2 : 0);
   for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus + (sys.colony.buildings.station ? 2 : 0));
   for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type, x).sensors)));
   // Allies share what their worlds see.
@@ -1436,7 +1438,7 @@ function economy(s, F) {
     if (blockaded(s, sys) && besiegerOf(s, sys)) {   // pirates and creatures blockade, but don't besiege a world into hunger
       c.siege = (c.siege || 0) + 1;
       const by = besiegerOf(s, sys);
-      if (c.kind === "colony" && c.siege % SIEGE.starveEvery === 0 && c.pop > 1) {
+      if (c.kind === "colony" && c.siege % (SIEGE.starveEvery * (c.owner === "zhaq" ? 2 : 1)) === 0 && c.pop > 1) {
         c.pop--; log(s, F.id, `${sys.name} is starving under the siege: its population falls to ${c.pop}.`, "war");
         if (by) log(s, by, `${sys.name} is starving under your siege: its population falls to ${c.pop}.`, "war");
       }

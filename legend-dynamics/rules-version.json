@@ -6,6 +6,17 @@
     {
       "date": "2026-11-21",
       "kind": "site",
+      "title": "Dominion: three new empires, and the peoples' portraits",
+      "items": [
+        "Three new empires from the Fracture Lines setting. The Mirrun Commonwealth (Pelagic scholars): +20% science, Ocean worlds hold 3 more population, and they start on an ocean world. The Ylith Aeries (Far sight): ships and worlds see 2 hexes farther, and scouts and colony ships move 1 faster. The Zhaq Free Republics (Never again): garrisons half again as strong that never weaken under siege, and besieged worlds starve half as fast.",
+        "Each new empire has its own leader and voice, ship classes and outlines, admirals, directives and computer-player character. Up to 4 rivals are drawn from all eight.",
+        "Every people now has a portrait on a hex token, drawn from the setting's descriptions. They appear in the people picker, on the Diplomacy tab, on the token sheet (hex tokens to mark whose a world is), and on a new Peoples page with each people's looks, trait, leader and ships.",
+        "Painted art can replace the drawings: the Peoples page has an image-generator prompt for each people, and a square picture named after the empire in the game's art folder is used on the Peoples page."
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "kind": "site",
       "title": "Dominion: computer players use influence",
       "items": [
         "Computer players now use influence on each other and on you, at most once every 12 turns each, in keeping with their character. A weak power facing a much stronger neighbour sends gifts or makes amends. One losing a war pays a friend to join it. One that resents the leader or the Corridor Engine's holder denounces them to others. Strong powers squeeze tribute from weak ones.",

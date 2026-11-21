@@ -2,7 +2,7 @@
 //   node build.mjs
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 
-const ORDER = ["hex", "data", "galaxy", "game", "orders", "crisis", "wilds", "traders", "sectors", "events", "envoys", "ai", "ui"];
+const ORDER = ["hex", "data", "peoples", "galaxy", "game", "orders", "crisis", "wilds", "traders", "sectors", "events", "envoys", "ai", "ui"];
 const here = new URL(".", import.meta.url);
 const strip = (src) => src
   .replace(/^import [^;]+;\s*$/gm, "")        // the modules share one scope once inlined
@@ -22,3 +22,4 @@ writeFileSync(new URL("dist/play.html", here), `<!doctype html><html lang="en"><
 console.log(`wrote dist/index.html (${Math.round(page.length / 1024)} KB)`);
 await import("./tokens.mjs");     // the printable ship tokens, from the same outlines
 await import("./strategy.mjs");   // the strategy guide, from the same data
+await import("./peoples.mjs");    // the peoples: tokens, portraits and traits

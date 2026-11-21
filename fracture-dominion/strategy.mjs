@@ -15,6 +15,9 @@ const peoples = {
   kel: "Your worlds hold more people and grow faster. Big, well-developed worlds are your strength, and a large population serves every path to victory.",
   hegemony: "Your warships hit harder and your troops land in greater force. War is your strength: every world you take is one your rivals no longer have.",
   vael: "Your living ships go farther, heal anywhere and need no fuel. Reach is your strength: you can act where others can't follow.",
+  mirrun: "Science is your strength, and ocean worlds are your home. Settle the seas, out-research your rivals, and let your knowledge do the fighting.",
+  ylith: "You see farther and spread faster than anyone. Information and early expansion are your strengths: find the best worlds first, and never be surprised.",
+  zhaq: "Your worlds are very hard to take. Defense is your strength: hold what you claim, let attackers break on your walls, and strike when they're spent.",
 };
 
 const toc = [["win", "Know how the game is won"], ["principles", "Principles"], ["early", "The early game"], ["middle", "The middle game"], ["late", "The late game"], ["paths", "Choosing a path to victory"], ["peoples", "Playing to your people's strengths"], ["war", "War"], ["logistics", "Fuel and supply"], ["defense", "Defense"], ["threats", "Threats from outside"], ["explore", "Exploration"], ["diplomacy", "Diplomacy"], ["mistakes", "Common mistakes"], ["settings", "Settings and music"]];

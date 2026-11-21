@@ -17,6 +17,15 @@ export const FACTIONS = [
   { id: "vael", name: "The Vael Living Fleets", people: "Vael", color: "#8a5bb8",
     trait: "Living hulls", traitText: "Ships move 1 hex farther and repair a point of hull every turn, anywhere.",
     homeworld: "The Long Flotilla" },
+  { id: "mirrun", name: "The Mirrun Commonwealth", people: "Mirrun", color: "#2aa198",
+    trait: "Pelagic scholars", traitText: "+20% science on every world, and Ocean worlds hold 3 more population.",
+    homeworld: "Oluun" },
+  { id: "ylith", name: "The Ylith Aeries", people: "Ylith", color: "#c9a0dc",
+    trait: "Far sight", traitText: "Ships and worlds see 2 hexes farther, and scouts and colony ships move 1 faster.",
+    homeworld: "Skyrrin" },
+  { id: "zhaq", name: "The Zhaq Free Republics", people: "Zhaq", color: "#d07434",
+    trait: "Never again", traitText: "Their worlds' garrisons are half again as strong and never weaken under siege, and a besieged world starves half as fast.",
+    homeworld: "Zhaqar" },
 ];
 
 // Worlds: what can live there, and what it gives. maxPop is per size point; rich worlds give more industry.
@@ -160,6 +169,39 @@ export const FLEET_STYLES = {
       tanker: "M11 0 Q9 -8 -1 -7 Q-11 -6 -11 0 Q-11 6 -1 7 Q9 8 11 0 Z M-11 0 L-13 -3 M-11 0 L-13 3",
       cruiser: "M12 0 Q8 -4 2 -4 Q-2 -12 -10 -11 Q-6 -5 -8 0 Q-6 5 -10 11 Q-2 12 2 4 Q8 4 12 0 Z M-8 0 L-13 0",
       dreadnought: "M12 0 Q10 -6 4 -7 Q-2 -13 -12 -12 Q-7 -6 -9 0 Q-7 6 -12 12 Q-2 13 4 7 Q10 6 12 0 Z M-9 0 L-13 -2 M-9 0 L-13 2 M1 -3 L1 3" } },
+  mirrun: { style: "Smooth teardrop hulls with fins and gill-vents: built to slip through pressure, in water or in the fold.",
+    classes: { scout: "Ripple", colony: "Tidepool", outpost: "Buoy", frigate: "Barracuda", transport: "Current", tanker: "Reservoir", cruiser: "Leviathan", dreadnought: "Trench" },
+    shapes: {
+      scout: "M12 0 Q6 -4 -6 -3 L-11 -6 L-9 0 L-11 6 L-6 3 Q6 4 12 0 Z",
+      colony: "M11 0 Q9 -7 -3 -6 Q-11 -5 -11 0 Q-11 5 -3 6 Q9 7 11 0 Z M-2 -3 Q2 0 -2 3",
+      outpost: "M0 -9 Q7 -7 7 0 Q7 7 0 9 Q-7 7 -7 0 Q-7 -7 0 -9 Z M0 9 L0 12 M-3 12 L3 12",
+      frigate: "M12 0 Q6 -4 -5 -3 L-10 -8 L-8 -2 L-12 0 L-8 2 L-10 8 L-5 3 Q6 4 12 0 Z",
+      transport: "M11 0 Q8 -7 -4 -6 Q-11 -4 -11 0 Q-11 4 -4 6 Q8 7 11 0 Z M-4 -6 Q-1 0 -4 6 M3 -6 Q6 0 3 6",
+      tanker: "M10 0 Q10 -7 0 -7 Q-11 -7 -11 0 Q-11 7 0 7 Q10 7 10 0 Z M10 0 L13 0 M-5 -7 L-5 7",
+      cruiser: "M12 0 Q8 -5 0 -5 L-4 -11 L-7 -5 Q-12 -4 -12 0 Q-12 4 -7 5 L-4 11 L0 5 Q8 5 12 0 Z M2 -2 Q4 0 2 2",
+      dreadnought: "M12 0 Q10 -7 1 -7 L-3 -12 L-7 -7 Q-12 -6 -12 0 Q-12 6 -7 7 L-3 12 L1 7 Q10 7 12 0 Z M-12 0 L-9 0 M3 -3 Q6 0 3 3 M-3 -3 Q0 0 -3 3" } },
+  ylith: { style: "Swept wings and feathered vanes: the Ylith build ships that look ready to glide.",
+    classes: { scout: "Kestrel", colony: "Nestling", outpost: "Eyrie", frigate: "Harrier", transport: "Flock", tanker: "Updraft", cruiser: "Condor", dreadnought: "Skylord" },
+    shapes: {
+      scout: "M12 0 L-6 -8 L-3 -2 L-10 0 L-3 2 L-6 8 Z",
+      colony: "M11 0 L2 -4 L-6 -10 L-5 -4 L-10 -3 L-10 3 L-5 4 L-6 10 L2 4 Z",
+      outpost: "M0 -10 L4 -3 L10 0 L4 3 L0 10 L-4 3 L-10 0 L-4 -3 Z M0 -3 L3 0 L0 3 L-3 0 Z",
+      frigate: "M12 0 L0 -3 L-8 -11 L-6 -3 L-11 -2 L-11 2 L-6 3 L-8 11 L0 3 Z",
+      transport: "M11 0 L3 -5 L-4 -11 L-4 -5 L-10 -4 L-10 4 L-4 5 L-4 11 L3 5 Z M-1 -5 L-1 5",
+      tanker: "M11 0 Q7 -5 0 -5 L-5 -10 L-5 -5 Q-10 -4 -10 0 Q-10 4 -5 5 L-5 10 L0 5 Q7 5 11 0 Z",
+      cruiser: "M12 0 L3 -3 L-6 -12 L-6 -5 L-12 -6 L-9 0 L-12 6 L-6 5 L-6 12 L3 3 Z M-2 -6 L-2 6",
+      dreadnought: "M12 0 L4 -4 L-4 -12 L-6 -6 L-12 -9 L-10 0 L-12 9 L-6 6 L-4 12 L4 4 Z M-1 -7 L-1 7 M-6 -6 L-6 6" } },
+  zhaq: { style: "Three-pronged, segmented hulls: Zhaq ships stand on three struts, like their builders on three legs.",
+    classes: { scout: "Watcher", colony: "Seedvault", outpost: "Tripod", frigate: "Sentinel", transport: "Cohort", tanker: "Cache", cruiser: "Bastion", dreadnought: "Republic" },
+    shapes: {
+      scout: "M12 0 L0 -3 L-10 -6 L-6 0 L-10 6 L0 3 Z M-6 0 L-12 0",
+      colony: "M11 0 L5 -5 L-5 -5 L-11 -9 L-9 0 L-11 9 L-5 5 L5 5 Z M-1 -5 L-1 5",
+      outpost: "M0 -9 L8 5 L-8 5 Z M0 -9 L0 -12 M8 5 L11 7 M-8 5 L-11 7 M0 -2 L0 2",
+      frigate: "M12 0 L4 -4 L-6 -4 L-12 -10 L-9 0 L-12 10 L-6 4 L4 4 Z M-2 -4 L-2 4 M-6 0 L-12 0",
+      transport: "M11 0 L6 -6 L-6 -6 L-11 -10 L-9 0 L-11 10 L-6 6 L6 6 Z M-2 -6 L-2 6 M2 -6 L2 6",
+      tanker: "M10 0 L5 -6 L-6 -6 L-6 6 L5 6 Z M-6 -6 L-11 -10 M-6 6 L-11 10 M-6 0 L-12 0 M-1 -6 L-1 6",
+      cruiser: "M12 0 L6 -5 L-4 -5 L-8 -12 L-9 -5 L-12 -4 L-10 0 L-12 4 L-9 5 L-8 12 L-4 5 L6 5 Z M0 -5 L0 5 M-10 0 L-13 0",
+      dreadnought: "M12 -3 L12 3 L6 7 L-4 7 L-6 13 L-10 7 L-12 0 L-10 -7 L-6 -13 L-4 -7 L6 -7 Z M2 -7 L2 7 M-4 -7 L-4 7 M-12 0 L-14 0" } },
 };
 /** A ship's outline for its owner: the people's own, or the common one (the Wardens, pirates, creatures, traders). */
 export const shipShape = (fid, type) => (FLEET_STYLES[fid] && FLEET_STYLES[fid].shapes[type]) || SHIP_SHAPES[type] || SHIP_SHAPES.frigate;
@@ -340,7 +382,10 @@ export const INFLUENCE = { gift: { perRegard: 8, window: 20, fade: 120 }, amends
     tessan: { gift: 1.6, amends: 1.3, denounce: 1, tribute: 0.6, joinWar: 1.2 },
     kel: { gift: 0.7, amends: 0.8, denounce: 0.8, tribute: 1.3, joinWar: 1 },
     hegemony: { gift: 0.3, amends: 0.4, denounce: 1.2, tribute: 1.6, joinWar: 1.1 },
-    vael: { gift: 0.9, amends: 0.9, denounce: 1, tribute: 0.9, joinWar: 0.9 } } } };
+    vael: { gift: 0.9, amends: 0.9, denounce: 1, tribute: 0.9, joinWar: 0.9 },
+    mirrun: { gift: 1.4, amends: 1.3, denounce: 0.9, tribute: 0.4, joinWar: 0.9 },
+    ylith: { gift: 1.0, amends: 0.9, denounce: 1.1, tribute: 0.8, joinWar: 1.0 },
+    zhaq: { gift: 0.8, amends: 0.8, denounce: 1.3, tribute: 0.6, joinWar: 1.3 } } } };
 /**
  * Traders: a convoy leaves a colony with an Exchange every `every` turns or so for another colony with an Exchange
  * within `range` hexes whose owner isn't at war with the sender (perPower convoys on the lanes per living power at most),
@@ -522,6 +567,39 @@ export const PERSONALITIES = {
       gift: "The Flotilla found this in the dark between stars. We think you'll know what to do with it.",
       war: "The Flotilla turns against {you}. We are at war. {admiral} leads the hunt.",
     } },
+  mirrun: { title: "The deliberators", leader: "Tidecaller Veshu", text: "Witty, patient and hard to rush; they defend ocean worlds fiercely and despise strip-miners.",
+    weights: { demand: 0.4, warn: 1.1, alliance: 1.2, joint: 0.7, gift: 1.4 },
+    voice: {
+      hello: "Tidecaller Veshu, for the Commonwealth. We felt your ships in the fold before we saw them. You hum a little off-key, {you}, but we can work with that.",
+      demand: "The Commonwealth's reef-cities need rebuilding, and {you} have done well lately. {n} credits would buy a great deal of goodwill. And a great deal of patience.",
+      warn: "Your warships off {world} are making the whole sea nervous. We'd take it kindly if you moved them before we stop being kind.",
+      alliance: "We've talked it over for a long time, which is how we do things. The Commonwealth would like to stand with {you}.",
+      joint: "{them} have been poisoning seas that aren't theirs. The Commonwealth is at war with them. Swim with us.",
+      gift: "Our resonance labs found something you'll like. Consider it a joke between friends: the punchline is free research.",
+      war: "We deliberated. We decided. The Commonwealth is at war with {you}. {admiral} speaks for us now.",
+    } },
+  ylith: { title: "The high watchers", leader: "Windmarshal Kirrae", text: "Proud, far-seeing and restless; they love open space and hate being boxed in.",
+    weights: { demand: 0.6, warn: 1.4, alliance: 1.0, joint: 0.9, gift: 1.0 },
+    voice: {
+      hello: "Windmarshal Kirrae of the Aeries. We saw {you} coming from a long way off. We see most things from a long way off.",
+      demand: "The Aeries charted half the corridors you fly. {n} credits seems a small fee for the view.",
+      warn: "We can see your fleet near {world} very clearly. Everyone in the Aeries can. Move it.",
+      alliance: "From up here, {you} look like the kind of power worth flying beside. Join the Aeries' wing.",
+      joint: "{them} have crowded our skies. The Aeries are at war with them. Fly with us.",
+      gift: "Star charts from our navigators, the best there are. Don't get lost.",
+      war: "The Aeries take to the wind against {you}. We are at war. {admiral} leads the flight.",
+    } },
+  zhaq: { title: "The defiant", leader: "First Citizen Thrix-Ammol", text: "Free, stubborn and suspicious of empires; they never forgive anyone who tries to rule them.",
+    weights: { demand: 0.5, warn: 1.3, alliance: 1.1, joint: 1.2, gift: 0.9 },
+    voice: {
+      hello: "First Citizen Thrix-Ammol, of the Free Republics. We slept six hundred years and woke up free. We intend to stay that way. What do {you} intend?",
+      demand: "The Republics defend a long border, and {you} sit safely behind it. {n} credits toward its upkeep would be fair.",
+      warn: "Three eyes are watching your fleet at {world}, and all of them are unhappy. Take it home.",
+      alliance: "{you} haven't tried to rule us. That's rare. The Republics would stand with you.",
+      joint: "{them} think they can make us bow. The Republics are at war with them. Join us, and they'll learn otherwise.",
+      gift: "From the Republics' archives: what we learned while the galaxy forgot us.",
+      war: "Never again. The Free Republics are at war with {you}. {admiral} commands.",
+    } },
 };
 
 /** Admirals: named commanders who learn from every battle they win, and can be lost. */
@@ -542,4 +620,7 @@ export const ADMIRAL_NAMES = {
   kel: { first: ["Brood-Marshal", "Swarm-Leader", "Hive-Warden", "Brood-Mother"], last: ["Vekk'a", "Th'rii", "Ossk", "Kaa'vel", "Zhirr", "Ul'tek", "Mmor", "Ix'ka"] },
   hegemony: { first: ["Ozhan", "Drezh", "Vorak", "Ishka", "Tal", "Kurro", "Zhenna", "Ruvek"], last: ["Dresh", "Ozhvar", "Kael", "Morrud", "Vash", "Torr", "Ixhal", "Brannoc"] },
   vael: { first: ["Ilae", "Senn", "Oruë", "Tavi", "Wren", "Lio", "Maë", "Fael"], last: ["of the Long Wake", "Drift-born", "of the Seventh Hull", "Star-sung", "of the Quiet Reach", "Tide-runner"] },
+  mirrun: { first: ["Veshu", "Olla", "Pim", "Sarrow", "Tull", "Mee", "Quoll", "Nai"], last: ["of the Deep Reef", "Tidewise", "of the Trench", "Brightgill", "of the Long Current", "Saltsong"] },
+  ylith: { first: ["Kirrae", "Shree", "Talon", "Vyx", "Aeri", "Sko", "Liri", "Hesk"], last: ["of the High Aerie", "Farsight", "of the Updraft", "Stormwing", "of the Ninth Spire", "Skycut"] },
+  zhaq: { first: ["Thrix", "Ammol", "Kesh", "Vura", "Tolq", "Zhenn", "Irra", "Qaz"], last: ["of the Long Sleep", "Thrice-sworn", "of Free Zhaqar", "Unbowed", "of the Waking", "Ironstride"] },
 };

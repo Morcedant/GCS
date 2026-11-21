@@ -10,6 +10,7 @@ import { crisisTurn, crisisState } from "./crisis.js";
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
 import { sectorsTurn, sectorsState, corridorsTurn, collapseState } from "./sectors.js";
+import { peopleToken, LOOKS } from "./peoples.js";
 import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
@@ -889,7 +890,7 @@ function diplomacyHTML() {
   for (const F of met) {
     const r = me.relations[F.id], them = F.relations[me.id];
     const mood = !F.alive ? "gone" : attitude(S, F.id), P = PERSONALITIES[F.id] || {}, mem = (them.memory || []).slice(-5).reverse();
-    h += `<div class="dip"><h3><span class="dot" style="background:${F.color}"></span>${esc(F.name)}${F.alive ? "" : " †"}</h3>
+    h += `<div class="dip"><h3 class="dip-h">${peopleToken(F.id, F.color, 40)}<span>${esc(F.name)}${F.alive ? "" : " †"}</span></h3>
       <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}</b> · ${esc(P.title || "")}: ${esc(P.text || "")}</p>
       <p class="small">${r.status === "war" ? `<b class="bad">At war</b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied</b>" : "<b>At peace</b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}</b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.</p>
       ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:</p><ul class="small mem">${mem.map((m) => { const i = (them.memory || []).indexOf(m), cost = F.alive ? amendsCost(S, me.id, F.id, i) : null;
@@ -1165,7 +1166,7 @@ function showNewGame(canContinue, preset) {
   modal(`<h1>Fracture Lines: Dominion</h1>
     <p class="lede">The old empires are breaking along the corridors. Lead a people of the Fracture Lines from one world to an empire: explore, settle, trade, research and fight, turn by turn.</p>
     ${canContinue ? `<div class="btn-row"><button class="btn primary" id="ng-continue">Continue your game</button></div>` : ""}
-    <h3>Choose your people</h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span><b><span class="dot" style="background:${f.color}"></span>${esc(f.name)}</b><small><b>${esc(f.trait)}:</b> ${esc(f.traitText)}</small></span></label>`).join("")}</div>
+    <h3>Choose your people</h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span class="fac-tok">${peopleToken(f.id, f.color, 46)}</span><span><b>${esc(f.name)}</b><small><b>${esc(f.trait)}:</b> ${esc(f.traitText)}</small><small class="muted">${esc(LOOKS[f.id] || "")}</small></span></label>`).join("")}</div>
     <div class="ng-row">
       <label>Galaxy <select id="ng-size"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option><option value="vast">Vast</option></select></label>
       <label>Game <select id="ng-mode"><option value="standard" selected>Standard: 200 turns</option><option value="open">Open: no end</option></select></label>
@@ -1183,7 +1184,7 @@ function showNewGame(canContinue, preset) {
     <label class="small check-line"><input type="checkbox" id="ng-sectors" checked> New sectors: from turn ${SECTORS.first}, new space opens beyond the rim, each sector with its own character (an open game keeps growing, every ${SECTORS.every} turns)</label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step</label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>
-    <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win</a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens</a></p>
+    <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win</a> · <a href="peoples.html" target="_blank" rel="noopener">The peoples</a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens</a></p>
     <p class="small muted">Version: ${esc(VERSION)}</p>`);
   // The difficulty sets the computer players' options; change any and it's Custom.
   const setAi = (o) => { $("ng-ai-strength").value = String(o.strength); document.querySelectorAll("[data-aiopt]").forEach((b) => { b.checked = !!o[b.dataset.aiopt]; }); };
@@ -1232,7 +1233,7 @@ function showStarter(canContinue) {
     <div class="sg-keys"><span><kbd>Drag</kbd> pan</span><span><kbd>Scroll</kbd> zoom</span><span><kbd>Click</kbd> select</span><span><kbd>Right-click</kbd> move</span><span><kbd>N</kbd> next idle</span><span><kbd>Enter</kbd> end turn</span></div>
     <div class="btn-row"><button class="btn primary big" id="sg-first">Start my first game</button><button class="btn" id="sg-choose">Choose my own settings</button>${canContinue ? `<button class="btn" id="sg-continue">Continue your game</button>` : ""}</div>
     <p class="small muted">The first game is set up to learn on: the Concord, a small galaxy, two easy rivals, and the First steps checklist.</p>
-    <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win</a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens</a></p></div>`);
+    <p class="small sg-links"><a href="strategy.html" target="_blank" rel="noopener">Strategy guide: how to win</a> · <a href="peoples.html" target="_blank" rel="noopener">The peoples</a> · <a href="tokens.html" target="_blank" rel="noopener">Printable ship tokens</a></p></div>`);
   $("sg-first").onclick = () => { const st = newGame({ player: "concord", size: "small", rivals: 2, difficulty: "easy" }); st.tutorial = { on: true, guide: true, ack: {}, seen: {} }; startGame(st); save(); };
   $("sg-choose").onclick = () => showNewGame(canContinue);
   if ($("sg-continue")) $("sg-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
@@ -1416,6 +1417,7 @@ function showMenu() {
     <button class="btn" id="m-guide-go">${guideOn() ? "Restart" : "Start"} the guide</button>
     <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist</button>
     <a class="btn" href="strategy.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Strategy guide: how to win</a>
+    <a class="btn" href="peoples.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">The peoples: who they are</a>
     <a class="btn" href="tokens.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Printable ship tokens</a>
     <button class="btn" id="m-export">Save code (copy)</button>
     <button class="btn" id="m-load">Load a saved game</button>

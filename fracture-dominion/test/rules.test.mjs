@@ -544,7 +544,7 @@ test("an Orbital battery: a fortress that holds off small fleets, keeps the worl
   w.colony.buildings.battery = true; w.colony.defense = gunsMax(s, w.colony);
   assert.equal(w.colony.defense, BATTERY.hull);
   for (const f of fleetsAt(s, w.at)) delete s.fleets[f.id];
-  assert.equal(invasionOdds(s, spawnFleet(s, "concord", w.at, ["transport"]).id).defense, bare + BATTERY.garrison, "its troops add to the garrison");
+  assert.equal(invasionOdds(s, spawnFleet(s, "concord", w.at, ["transport"]).id).defense, bare + BATTERY.garrison * (foe === "zhaq" ? 1.5 : 1), "its troops add to the garrison");
   for (const f of fleetsAt(s, w.at)) delete s.fleets[f.id];
   declareWar(s, "concord", foe);
   // Two frigates against it: over many seeds, the battery wins nearly always.
@@ -1368,4 +1368,21 @@ test("computer players use influence: a weak power appeases a strong neighbour, 
   const { aiOpt } = await import("../src/game.js");
   const e = newGame({ seed: 37, size: "small", player: "concord", rivals: 1, difficulty: "easy" });
   assert.equal(aiOpt(e, "tribute"), false); assert.equal(aiOpt(e, "influence"), true);
+});
+
+test("the new empires' traits: Mirrun science and seas, Ylith far sight and fast scouts, Zhaq garrisons that never break", async () => {
+  const { yields, garrisonFactor, FACTIONS: _f } = await import("../src/game.js").then((G) => ({ ...G, FACTIONS: null }));
+  const { FACTIONS } = await import("../src/data.js");
+  assert.ok(["mirrun", "ylith", "zhaq"].every((id) => FACTIONS.some((f) => f.id === id)));
+  const m = newGame({ seed: 40, size: "small", player: "mirrun", rivals: 1 }), mh = m.systems[m.factions[0].capital];
+  assert.equal(mh.world, "ocean", "a Mirrun homeworld is an ocean");
+  const mp = maxPop(m, mh); mh.colony.owner = "concord"; const cp = maxPop(m, mh); mh.colony.owner = "mirrun";
+  assert.equal(mp - cp, 3);
+  const y = newGame({ seed: 40, size: "small", player: "ylith", rivals: 1 });
+  assert.equal(shipStats(y, "ylith", "scout").sensors, shipStats(y, "concord", "scout").sensors + 2);
+  assert.equal(shipStats(y, "ylith", "scout").speed, shipStats(y, "concord", "scout").speed + 1);
+  assert.equal(shipStats(y, "ylith", "frigate").speed, shipStats(y, "concord", "frigate").speed, "only scouts and colony ships");
+  const z = newGame({ seed: 40, size: "small", player: "zhaq", rivals: 1 }), zh = z.systems[z.factions[0].capital];
+  zh.colony.siege = 9; assert.equal(garrisonFactor(zh), 1);
+  zh.colony.owner = "concord"; assert.ok(garrisonFactor(zh) < 1); zh.colony.owner = "zhaq";
 });

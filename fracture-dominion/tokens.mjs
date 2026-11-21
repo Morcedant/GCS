@@ -3,6 +3,7 @@
 // creatures of the deep and the Wardens), and markers for stations, batteries and depots.
 // Writes dist/tokens.html.   node tokens.mjs
 import { writeFileSync, mkdirSync } from "node:fs";
+import { peopleToken } from "./src/peoples.js";
 import { SHIP_SHAPES, SHIPS, FACTIONS, CRISIS, FLEET_STYLES, WILDS, TRADERS, BUILDINGS, BATTERY, shipShape, shipLabel } from "./src/data.js";
 
 const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "transport", "tanker", "colony", "outpost"];
@@ -32,6 +33,9 @@ const MARKERS = {
 const markers = `<section class="others"><h2>Markers <span>Set one under a world's token, or (a station) on an empty hex for a deep-space station.</span></h2>
   ${Object.values(MARKERS).map((m) => `<div class="ship"><h3>${esc(m.name)} <span>${esc(m.text)}</span></h3><div class="row">${FACTIONS.map((F) => token(m.d, F.color, "0.7in")).join("")}${token(m.d, null, "0.7in")}${token(m.d, null, "0.7in")}</div></div>`).join("")}</section>`;
 
+// Each people's hex token, to mark the worlds they hold: four each, and one large for the empire's card.
+const peoples = `<section class="others"><h2>Peoples <span>Hex tokens to mark whose a world is: set one on the world's hex. Portraits and traits are on the <a href="peoples.html">Peoples page</a>.</span></h2>
+  ${FACTIONS.map((F) => `<div class="ship"><h3>${esc(F.name)} <span>${esc(F.people)} · ${esc(F.trait)}: ${esc(F.traitText)}</span></h3><div class="row">${peopleToken(F.id, F.color, 120)}${[1, 2, 3, 4].map(() => peopleToken(F.id, F.color, 82)).join("")}</div></div>`).join("")}</section>`;
 const page = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Fracture Lines: Dominion · ship tokens</title>
 <style>@page{size:letter;margin:.45in}body{font:11px/1.35 system-ui,sans-serif;color:#000;background:#fff;margin:0 auto;max-width:7.6in;padding:0 8px}
 h1{font-size:18px;margin:12px 0 4px}p{margin:0 0 10px}h2{font-size:14px;margin:14px 0 4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}h2 span,h3 span{font-weight:400;color:#555}
@@ -45,6 +49,7 @@ table.classes{border-collapse:collapse;margin:6px 0 10px;font-size:10px}table.cl
 <div class="key">${FACTIONS.map((f) => `<span><i style="background:${f.color}"></i>${esc(f.name)}</span>`).join("")}</div>
 <table class="classes"><tr><th>Ship</th>${FACTIONS.map((f) => `<th>${esc(f.name.replace(/^The /, ""))}</th>`).join("")}</tr>
 ${ORDER.map((t) => `<tr><td>${esc(SHIPS[t].name)}</td>${FACTIONS.map((f) => `<td>${esc(FLEET_STYLES[f.id].classes[t])}</td>`).join("")}</tr>`).join("")}</table>
+${peoples}
 ${markers}
 ${common(TRADERS.name, TRADERS.color, [["merchant", 6]], "At peace with everyone but the pirates.")}
 ${common(WILDS.pirates.name, WILDS.pirates.color, [["raider", 7], ["haven", 2, "1.1in"]], "At war with every power.")}

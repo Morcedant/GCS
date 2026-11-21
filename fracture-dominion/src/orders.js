@@ -102,6 +102,9 @@ export const AUTHORITY = {
   kel: { name: "the Hive Overmind", kinds: ["growth", "growth", "colony", "building", "ships", "outpost"] },
   hegemony: { name: "Legion Command", kinds: ["fleet", "fleet", "ships", "conquest", "outpost", "research"] },
   vael: { name: "the Flotilla Choir", kinds: ["explore", "explore", "contact", "ships", "research", "outpost"] },
+  mirrun: { name: "the Tidal Moot", kinds: ["research", "research", "colony", "growth", "trade", "building"] },
+  ylith: { name: "the Council of Spires", kinds: ["explore", "explore", "outpost", "colony", "contact", "research"] },
+  zhaq: { name: "the Assembly of Republics", kinds: ["building", "fleet", "growth", "outpost", "colony", "research"] },
 };
 export const authorityOf = (s) => AUTHORITY[player(s).id] || { name: "your council", kinds: Object.keys(KINDS) };
 /** How far along a faction (the player, unless named) is on a directive's measure, right now. */

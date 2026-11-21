@@ -12,8 +12,11 @@ const PRIORITY = {
   kel: ["automation", "xenology", "commerce", "orbitalYards", "domes", "terraforming", "sensors", "batteries", "heavyHulls"],
   hegemony: ["automation", "heavyHulls", "orbitalYards", "shields", "targeting", "xenology", "batteries", "refining", "capitalShips"],
   vael: ["sensors", "automation", "orbitalYards", "foldDrives", "xenology", "shields", "heavyHulls", "corridorTheory", "refining"],
+  mirrun: ["automation", "sensors", "orbitalYards", "xenology", "domes", "commerce", "terraforming", "refining", "corridorTheory"],
+  ylith: ["sensors", "foldDrives", "automation", "orbitalYards", "xenology", "commerce", "shields", "corridorTheory", "refining"],
+  zhaq: ["automation", "batteries", "orbitalYards", "sensors", "shields", "heavyHulls", "xenology", "targeting", "refining"],
 };
-const AGGRESSION = { concord: 0.9, tessan: 0.7, kel: 0.9, hegemony: 1.4, vael: 1.0 };
+const AGGRESSION = { concord: 0.9, tessan: 0.7, kel: 0.9, hegemony: 1.4, vael: 1.0, mirrun: 0.7, ylith: 1.0, zhaq: 1.1 };
 const DIFF = { easy: 0.7, normal: 1, hard: 1.35 };
 
 export function aiTurn(s, F) {
