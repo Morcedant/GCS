@@ -112,6 +112,7 @@ const body = [
     "<b>Relics are powerful</b>, and they stay with the world that keeps them. Guard yours; a rival's can be taken.",
     "<b>The galaxy may be bigger than it looks.</b> Be ready to move if new space opens.",
     "<b>Some space is sealed.</b> Getting into a sealed sector takes the right technology, or a beacon that opens it for everyone. Being first in is worth a lot; opening it for your rivals is a choice to make on purpose.",
+    "<b>Mind the voids.</b> Empires start in different star clusters, with open space between them. The long corridors across a void are the roads to your neighbours, and a station in the void is how you watch and hold them.",
     "<b>The network can change.</b> Corridors rarely collapse, but when one does it can cut an empire in two. Don't depend on a single route to your most important worlds."])),
 
   sec("diplomacy", "Diplomacy", ul([

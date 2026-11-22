@@ -3,7 +3,11 @@
 import { makeRng, hexagon, distance, neighbors, within, key } from "./hex.js";
 import { WORLDS, STAR_NAMES } from "./data.js";
 
-export const SIZES = { small: { radius: 9, systems: 34 }, medium: { radius: 12, systems: 58 }, large: { radius: 15, systems: 88 }, vast: { radius: 19, systems: 136 } };
+// Each size: the map's radius, its systems, and how many star clusters they gather into (open voids between them).
+export const SIZES = { small: { radius: 13, systems: 34, clusters: 5 }, medium: { radius: 16, systems: 58, clusters: 7 }, large: { radius: 20, systems: 88, clusters: 11 }, vast: { radius: 25, systems: 136, clusters: 16 } };
+/** How tightly a cluster gathers its systems (hexes from its centre), the least distance between cluster centres, and
+ * between two systems in a cluster. Systems that don't fit fall back to anywhere on the map, 3+ hexes apart. */
+const CLUSTER = { spread: 3, apart: 10, gap: 2 };   // tight clusters (systems 2+ hexes apart), their centres 10+ apart: voids between
 
 /** @returns {{ radius, hexes, systems, sysAt, corridors, adj, homes }} */
 export function makeGalaxy(seed, sizeName, factionCount) {
@@ -24,14 +28,19 @@ export function makeGalaxy(seed, sizeName, factionCount) {
   blob("nebula", Math.round(R * 0.9), 7);
   blob("rift", Math.round(R * 0.45), 4);
 
-  // Systems: spread out, never on a rift, at least 2 hexes apart.
+  // Star clusters: centres spread across the map, with open space between them.
+  const inner = all.filter((k) => distance(k, "0,0") <= R - 3), centres = [];
+  for (let i = 0; i < 4000 && centres.length < (size.clusters || 1); i++) { const k = rng.pick(inner); if (centres.every((c) => distance(c, k) >= CLUSTER.apart)) centres.push(k); }
+  const nearCentre = (k) => !centres.length || centres.some((c) => distance(c, k) <= CLUSTER.spread);
+  // Systems: in the clusters, never on a rift, at least 2 hexes apart.
   const systems = {}, sysAt = {};
   const names = [...STAR_NAMES];
   let tries = 0;
-  while (Object.keys(systems).length < size.systems && tries++ < 20000) {
-    const k = rng.pick(all);
-    if (hexes[k].terrain === "rift" || distance(k, "0,0") > R - 1) continue;
-    if (Object.keys(sysAt).some((h) => distance(h, k) < 3)) continue;
+  while (Object.keys(systems).length < size.systems && tries++ < 40000) {
+    const k = tries < 30000 ? (centres.length ? rng.pick(within(rng.pick(centres), CLUSTER.spread).filter((x) => hexes[x])) : rng.pick(all)) : rng.pick(all);
+    if (!k || hexes[k].terrain === "rift" || distance(k, "0,0") > R - 1) continue;
+    if (tries < 30000 && !nearCentre(k)) continue;
+    if (Object.keys(sysAt).some((h) => distance(h, k) < (tries < 30000 ? CLUSTER.gap : 3))) continue;
     const id = "s" + Object.keys(systems).length;
     const nm = names.length ? names.splice(rng.int(names.length), 1)[0] : "System " + id;
     const roll = rng.next();
@@ -48,6 +57,16 @@ export function makeGalaxy(seed, sizeName, factionCount) {
   for (const a of ids) {
     const near = ids.filter((b) => b !== a).map((b) => [b, distance(systems[a].at, systems[b].at)]).sort((x, y) => x[1] - y[1]);
     near.filter(([, d]) => d <= 6).slice(0, 2).forEach(([b]) => link(a, b));
+  }
+  // Between clusters: each linked to its two nearest by the closest pair of their systems (the long corridors across
+  // the voids), so no cluster hangs by a single thread.
+  if (centres.length > 1) {
+    const of = (id) => centres.reduce((bi, c, i) => (distance(c, systems[id].at) < distance(centres[bi], systems[id].at) ? i : bi), 0);
+    const group = centres.map((_, i) => ids.filter((id) => of(id) === i));
+    for (let i = 0; i < centres.length; i++) {
+      const others = centres.map((c, j) => [j, distance(c, centres[i])]).filter(([j]) => j !== i && group[j].length).sort((x, y) => x[1] - y[1]).slice(0, 2);
+      for (const [j] of others) { let best = null; for (const a of group[i]) for (const b of group[j]) { const d = distance(systems[a].at, systems[b].at); if (!best || d < best[2]) best = [a, b, d]; } if (best) link(best[0], best[1]); }
+    }
   }
   // Join the islands: repeatedly link the closest pair of systems in different components.
   const comp = () => { const c = {}; let n = 0; for (const s of ids) if (c[s] === undefined) { const st = [s]; c[s] = n; while (st.length) { const x = st.pop(); for (const y of adj[x]) if (c[y] === undefined) { c[y] = n; st.push(y); } } n++; } return [c, n]; };

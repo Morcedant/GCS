@@ -70,7 +70,7 @@ export function stationTarget(s, F) {
     const theirs = coloniesOf(s, o.id); if (!theirs.length) continue;
     const near = (x) => Math.min(...cols.map((c) => distance(c.at, x.at)));
     const targets = [...new Set([s.systems[o.capital], ...theirs.sort((a, b) => near(a) - near(b)).slice(0, 3)])].filter((e) => e && e.colony && e.colony.owner === o.id);
-    for (const e of targets) { const c = cols.slice().sort((a, b) => distance(a.at, e.at) - distance(b.at, e.at))[0]; if (c && distance(c.at, e.at) <= 18) lines.push({ c, e, theirs, d: distance(c.at, e.at) }); }
+    for (const e of targets) { const c = cols.slice().sort((a, b) => distance(a.at, e.at) - distance(b.at, e.at))[0]; if (c && distance(c.at, e.at) <= Math.max(18, Math.round(s.radius * 1.75))) lines.push({ c, e, theirs, d: distance(c.at, e.at) }); }
   }
   lines.sort((a, b) => a.d - b.d);
   // On each: open space 2–4 hexes out from our worlds (or just past the edge of our supply), 2 or more from theirs, not
