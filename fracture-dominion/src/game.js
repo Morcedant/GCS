@@ -682,7 +682,7 @@ function withdrawals(s) {
     if (!f.withdraw) continue;
     delete f.withdraw;
     if (!f.ships.length) continue;
-    const here = f.at, home = coloniesOf(s, f.owner).filter((x) => x.at !== here && !fleetsAt(s, x.at).some((o) => armed(o) && atWar(s, f.owner, o.owner)))
+    const here = f.at, home = (f.repairAt && s.systems[f.repairAt] && s.systems[f.repairAt].colony && s.systems[f.repairAt].colony.owner === f.owner ? [s.systems[f.repairAt]] : coloniesOf(s, f.owner)).filter((x) => x.at !== here && !fleetsAt(s, x.at).some((o) => armed(o) && atWar(s, f.owner, o.owner)))
       .map((x) => ({ x, p: findPath(s, f.owner, here, x.at) })).filter((o) => o.p).sort((a, b) => a.p.reduce((t, y) => t + y.cost, 0) - b.p.reduce((t, y) => t + y.cost, 0))[0];
     const to = home ? home.x.at : f.from && f.from !== here ? f.from : null;
     const path = to ? (home ? home.p : findPath(s, f.owner, here, to)) : null;
@@ -692,6 +692,57 @@ function withdrawals(s) {
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) { const st = f.path.shift(); mp -= st.cost; f.from = f.at; f.at = st.hex; if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; } }
     if (!f.path.length) f.dest = null;
     log(s, f.owner, `Your fleet withdrew from ${nearestName(s, here)}${home ? ` toward ${home.x.name}` : ""}.`, "war");
+  }
+}
+// ---- repairs: damaged ships to the yards ----
+export const damagedShips = (s, f) => f.ships.filter((x) => x.hull < shipStats(s, f.owner, x.type, x).hull);
+/** The best place to repair these ships from here: the soonest done, counting the trip and the repair (a drydock
+ * mends everything at once, a station 2 hull a turn, any other world of the power's 1). { sys, turns, how } or null. */
+export function repairPlace(s, fid, hex, ships, speedOf) {
+  const worst = Math.max(0, ...ships.map((x) => shipStats(s, fid, x.type, x).hull - x.hull));
+  let best = null;
+  for (const x of coloniesOf(s, fid)) {
+    if (besieged(s, x)) continue;
+    const path = x.at === hex ? [] : findPath(s, fid, hex, x.at); if (!path) continue;
+    const trip = path.length ? turnStops(s, { ships, owner: fid, burn: false }, path, speedOf).length : 0;
+    const B = x.colony.buildings, how = B.drydock ? "drydock" : B.station ? "station" : "world";
+    const turns = trip + (how === "drydock" ? 1 : how === "station" ? Math.ceil(worst / YARDS.station) : worst);
+    if (!best || turns < best.turns) best = { sys: x, turns, how };
+  }
+  return best;
+}
+/** Send a fleet's damaged ships for repairs: split off (the soundest stay, with the admiral), to the best place to
+ * repair, withdrawing first if the fleet is engaged; with rejoin, they come back to the fleet once mended. */
+export function sendForRepairs(s, fleetId, rejoin = false) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  const hurt = damagedShips(s, f); if (!hurt.length) return { error: "No ship in this fleet is damaged." };
+  if (hurt.some((x) => !shipStats(s, f.owner, x.type, x).speed)) return { error: "These can't move." };
+  const speed = Math.min(...hurt.map((x) => shipStats(s, f.owner, x.type, x).speed)) + (admTrait(f, "swift") ? 1 : 0);
+  const place = repairPlace(s, f.owner, f.at, hurt, speed); if (!place) return { error: "There's nowhere of yours to repair them that they can reach." };
+  let go = f;
+  if (hurt.length < f.ships.length) {
+    const fu = fuelOf(s, f); f.ships = f.ships.filter((x) => !hurt.includes(x));
+    go = spawnFleet(s, f.owner, f.at, []); go.ships.push(...hurt); if (f.stance) go.stance = f.stance;
+    go.fuel = Math.min(fu, fuelMax(s, go)); f.fuel = Math.min(fu, fuelMax(s, f));
+  }
+  go.repairAt = place.sys.id; go.rejoin = rejoin && go !== f ? f.id : null; go.sentry = false;
+  const engagedNow = engaged(s, go);
+  if (engagedNow) { const w = setWithdraw(s, go.id); if (w.error) return w; }
+  else if (go.at !== place.sys.at && setDestination(s, go.id, place.sys.at).error) return { error: `No way to ${place.sys.name} from here.` };
+  return { ok: true, fleet: go.id, ships: hurt.length, to: place.sys.name, how: place.how, turns: place.turns, withdrawing: engagedNow, split: go !== f };
+}
+/** Each turn: ships sent for repairs that are mended go back to their fleet (if asked), following it if it moved. */
+function repairsTurn(s) {
+  for (const f of Object.values(s.fleets)) {
+    if (!f.repairAt || f.withdraw) continue;
+    const place = s.systems[f.repairAt], mended = !damagedShips(s, f).length;
+    if (!mended) { if (place && place.colony && place.colony.owner === f.owner && f.at !== place.at && !f.path.length) setDestination(s, f.id, place.at); continue; }
+    const back = f.rejoin && s.fleets[f.rejoin];
+    if (!f.rejoined && !faction(s, f.owner).ai) log(s, f.owner, `Your ships at ${place ? place.name : "the yards"} are repaired${back ? ", and heading back to their fleet" : ""}.`, "build");
+    f.rejoined = true;
+    if (!back) { delete f.repairAt; delete f.rejoin; delete f.rejoined; continue; }
+    if (back.at === f.at && !back.path.length) { back.ships.push(...f.ships); joinAdmirals(s, back, f); delete s.fleets[f.id]; continue; }
+    if (f.dest !== back.at) setDestination(s, f.id, back.at);
   }
 }
 /** Detach ships from a fleet into a fleet of their own, to send somewhere: counts by type ({ cruiser: 3, frigate: 2 }).
@@ -767,7 +818,8 @@ function moveFleets(s) {
   const byHex = {};
   // Warships only: colony ships, outposts, scouts and transports keep their own fleets until the player joins them.
   const warOnly = (f) => f.ships.every((x) => SHIPS[x.type].skill > 0);
-  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f) || f.owner === "pirates" || f.owner === "beasts") continue; const k = f.owner + "|" + f.at; if (byHex[k]) { const g = byHex[k], fu = Math.min(fuelOf(s, g), fuelOf(s, f)); g.ships.push(...f.ships); g.fuel = Math.min(fu, fuelMax(s, g)); joinAdmirals(s, g, f); delete s.fleets[f.id]; } else byHex[k] = f; }
+  // (Ships away for repairs keep to themselves, to go back to their own fleet.)
+  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f) || f.owner === "pirates" || f.owner === "beasts" || f.repairAt) continue; const k = f.owner + "|" + f.at; if (byHex[k]) { const g = byHex[k], fu = Math.min(fuelOf(s, g), fuelOf(s, f)); g.ships.push(...f.ships); g.fuel = Math.min(fu, fuelMax(s, g)); joinAdmirals(s, g, f); delete s.fleets[f.id]; } else byHex[k] = f; }
 }
 
 // ---- settling and invading ----
@@ -1332,6 +1384,7 @@ export function endTurn(s, aiTurn) {
   joinMustered(s);
   battles(s);
   withdrawals(s);
+  repairsTurn(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
   checkEngine(s);
   checkRelics(s);

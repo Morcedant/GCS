@@ -211,7 +211,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-22 14:36 UTC";
+const BUILD = "2026-11-22 15:26 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -1855,7 +1855,7 @@ function withdrawals(s) {
     if (!f.withdraw) continue;
     delete f.withdraw;
     if (!f.ships.length) continue;
-    const here = f.at, home = coloniesOf(s, f.owner).filter((x) => x.at !== here && !fleetsAt(s, x.at).some((o) => armed(o) && atWar(s, f.owner, o.owner)))
+    const here = f.at, home = (f.repairAt && s.systems[f.repairAt] && s.systems[f.repairAt].colony && s.systems[f.repairAt].colony.owner === f.owner ? [s.systems[f.repairAt]] : coloniesOf(s, f.owner)).filter((x) => x.at !== here && !fleetsAt(s, x.at).some((o) => armed(o) && atWar(s, f.owner, o.owner)))
       .map((x) => ({ x, p: findPath(s, f.owner, here, x.at) })).filter((o) => o.p).sort((a, b) => a.p.reduce((t, y) => t + y.cost, 0) - b.p.reduce((t, y) => t + y.cost, 0))[0];
     const to = home ? home.x.at : f.from && f.from !== here ? f.from : null;
     const path = to ? (home ? home.p : findPath(s, f.owner, here, to)) : null;
@@ -1865,6 +1865,57 @@ function withdrawals(s) {
     while (f.path.length && mp + 1e-9 >= f.path[0].cost) { const st = f.path.shift(); mp -= st.cost; f.from = f.at; f.at = st.hex; if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; } }
     if (!f.path.length) f.dest = null;
     log(s, f.owner, `Your fleet withdrew from ${nearestName(s, here)}${home ? ` toward ${home.x.name}` : ""}.`, "war");
+  }
+}
+// ---- repairs: damaged ships to the yards ----
+const damagedShips = (s, f) => f.ships.filter((x) => x.hull < shipStats(s, f.owner, x.type, x).hull);
+/** The best place to repair these ships from here: the soonest done, counting the trip and the repair (a drydock
+ * mends everything at once, a station 2 hull a turn, any other world of the power's 1). { sys, turns, how } or null. */
+function repairPlace(s, fid, hex, ships, speedOf) {
+  const worst = Math.max(0, ...ships.map((x) => shipStats(s, fid, x.type, x).hull - x.hull));
+  let best = null;
+  for (const x of coloniesOf(s, fid)) {
+    if (besieged(s, x)) continue;
+    const path = x.at === hex ? [] : findPath(s, fid, hex, x.at); if (!path) continue;
+    const trip = path.length ? turnStops(s, { ships, owner: fid, burn: false }, path, speedOf).length : 0;
+    const B = x.colony.buildings, how = B.drydock ? "drydock" : B.station ? "station" : "world";
+    const turns = trip + (how === "drydock" ? 1 : how === "station" ? Math.ceil(worst / YARDS.station) : worst);
+    if (!best || turns < best.turns) best = { sys: x, turns, how };
+  }
+  return best;
+}
+/** Send a fleet's damaged ships for repairs: split off (the soundest stay, with the admiral), to the best place to
+ * repair, withdrawing first if the fleet is engaged; with rejoin, they come back to the fleet once mended. */
+function sendForRepairs(s, fleetId, rejoin = false) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  const hurt = damagedShips(s, f); if (!hurt.length) return { error: "No ship in this fleet is damaged." };
+  if (hurt.some((x) => !shipStats(s, f.owner, x.type, x).speed)) return { error: "These can't move." };
+  const speed = Math.min(...hurt.map((x) => shipStats(s, f.owner, x.type, x).speed)) + (admTrait(f, "swift") ? 1 : 0);
+  const place = repairPlace(s, f.owner, f.at, hurt, speed); if (!place) return { error: "There's nowhere of yours to repair them that they can reach." };
+  let go = f;
+  if (hurt.length < f.ships.length) {
+    const fu = fuelOf(s, f); f.ships = f.ships.filter((x) => !hurt.includes(x));
+    go = spawnFleet(s, f.owner, f.at, []); go.ships.push(...hurt); if (f.stance) go.stance = f.stance;
+    go.fuel = Math.min(fu, fuelMax(s, go)); f.fuel = Math.min(fu, fuelMax(s, f));
+  }
+  go.repairAt = place.sys.id; go.rejoin = rejoin && go !== f ? f.id : null; go.sentry = false;
+  const engagedNow = engaged(s, go);
+  if (engagedNow) { const w = setWithdraw(s, go.id); if (w.error) return w; }
+  else if (go.at !== place.sys.at && setDestination(s, go.id, place.sys.at).error) return { error: `No way to ${place.sys.name} from here.` };
+  return { ok: true, fleet: go.id, ships: hurt.length, to: place.sys.name, how: place.how, turns: place.turns, withdrawing: engagedNow, split: go !== f };
+}
+/** Each turn: ships sent for repairs that are mended go back to their fleet (if asked), following it if it moved. */
+function repairsTurn(s) {
+  for (const f of Object.values(s.fleets)) {
+    if (!f.repairAt || f.withdraw) continue;
+    const place = s.systems[f.repairAt], mended = !damagedShips(s, f).length;
+    if (!mended) { if (place && place.colony && place.colony.owner === f.owner && f.at !== place.at && !f.path.length) setDestination(s, f.id, place.at); continue; }
+    const back = f.rejoin && s.fleets[f.rejoin];
+    if (!f.rejoined && !faction(s, f.owner).ai) log(s, f.owner, `Your ships at ${place ? place.name : "the yards"} are repaired${back ? ", and heading back to their fleet" : ""}.`, "build");
+    f.rejoined = true;
+    if (!back) { delete f.repairAt; delete f.rejoin; delete f.rejoined; continue; }
+    if (back.at === f.at && !back.path.length) { back.ships.push(...f.ships); joinAdmirals(s, back, f); delete s.fleets[f.id]; continue; }
+    if (f.dest !== back.at) setDestination(s, f.id, back.at);
   }
 }
 /** Detach ships from a fleet into a fleet of their own, to send somewhere: counts by type ({ cruiser: 3, frigate: 2 }).
@@ -1940,7 +1991,8 @@ function moveFleets(s) {
   const byHex = {};
   // Warships only: colony ships, outposts, scouts and transports keep their own fleets until the player joins them.
   const warOnly = (f) => f.ships.every((x) => SHIPS[x.type].skill > 0);
-  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f) || f.owner === "pirates" || f.owner === "beasts") continue; const k = f.owner + "|" + f.at; if (byHex[k]) { const g = byHex[k], fu = Math.min(fuelOf(s, g), fuelOf(s, f)); g.ships.push(...f.ships); g.fuel = Math.min(fu, fuelMax(s, g)); joinAdmirals(s, g, f); delete s.fleets[f.id]; } else byHex[k] = f; }
+  // (Ships away for repairs keep to themselves, to go back to their own fleet.)
+  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f) || f.owner === "pirates" || f.owner === "beasts" || f.repairAt) continue; const k = f.owner + "|" + f.at; if (byHex[k]) { const g = byHex[k], fu = Math.min(fuelOf(s, g), fuelOf(s, f)); g.ships.push(...f.ships); g.fuel = Math.min(fu, fuelMax(s, g)); joinAdmirals(s, g, f); delete s.fleets[f.id]; } else byHex[k] = f; }
 }
 
 // ---- settling and invading ----
@@ -2505,6 +2557,7 @@ function endTurn(s, aiTurn) {
   joinMustered(s);
   battles(s);
   withdrawals(s);
+  repairsTurn(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
   checkEngine(s);
   checkRelics(s);
@@ -5351,6 +5404,15 @@ function fleetHTML() {
   if (f.path.length) { const turns = turnStops(S, f).length, dry = mine && fuelMax(S, f) !== Infinity && !inSupplyAt(S, f.owner, f.dest) && turns > fuelOf(S, f);
     h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${turns} turn(s).<\/p>${mine && usesReserve(me.id) ? `<div class="btn-row"><button class="btn small ${f.burn ? "primary" : ""}" data-burn aria-pressed="${!!f.burn}" title="Burn hard: +${FUEL.burnSpeed} hex a turn until it arrives. In supply each turn costs ${burnCost(S, f)} fuel from your reserve; beyond it, an extra turn of the fleet's own fuel.">${f.burn ? "Burning hard ✓" : "Burn hard"}<\/button><span class="small muted">${f.burn ? `+${FUEL.burnSpeed} hex a turn; ${burnCost(S, f)} reserve fuel a turn in supply, an extra turn of its own beyond.` : `+${FUEL.burnSpeed} hex a turn for ${burnCost(S, f)} fuel a turn.`}<\/span><\/div>` : ""}${dry ? `<p class="small bad">It ends beyond supply, and it has fuel for ${fuelOf(S, f)} turn${fuelOf(S, f) === 1 ? "" : "s"} of travel: it may run dry on the way, and crawl.<\/p>` : ""}`; }
   const eng = mine && engaged(S, f);
+  // Damaged ships: off to the yards, and (if asked) back again once mended.
+  const hurt = mine ? damagedShips(S, f) : [];
+  if (f.repairAt && mine) { const rp = S.systems[f.repairAt]; h += `<p class="small"><b>For repairs<\/b> at ${esc(rp ? rp.name : "the yards")}${f.rejoin && S.fleets[f.rejoin] ? "; it rejoins its fleet once mended" : ""}.<\/p>`; }
+  else if (hurt.length && hurt.every((x) => shipStats(S, f.owner, x.type, x).speed)) {
+    const sp = Math.min(...hurt.map((x) => shipStats(S, f.owner, x.type, x).speed)), rp = repairPlace(S, f.owner, f.at, hurt, sp);
+    if (rp) h += `<h3>Damaged ships (${hurt.length})<\/h3><p class="small muted" style="margin-top:-4px">Best place to mend them: <b>${esc(rp.sys.name)}<\/b> (${rp.how === "drydock" ? "a drydock: fully repaired at once" : rp.how === "station" ? `a station: ${YARDS.station} hull a turn` : "a world of yours: 1 hull a turn"}), about ${rp.turns} turn${rp.turns === 1 ? "" : "s"} there and mended.${eng ? " They withdraw from the battle first." : ""}${hurt.length < f.ships.length ? " The rest of the fleet stays." : ""}<\/p>
+      <div class="btn-row"><button class="btn small" data-repair="0">Send for repairs<\/button>${hurt.length < f.ships.length ? `<button class="btn small" data-repair="1">Repair, then rejoin this fleet<\/button>` : ""}<\/div>`;
+    else h += `<p class="small muted"><b>${hurt.length} damaged ship${hurt.length === 1 ? "" : "s"}.<\/b> No world of yours can repair them right now: every one in reach is under siege.<\/p>`;
+  }
   if (mine && f.withdraw) h += `<p class="small bad"><b>Withdrawing.<\/b> At the end of the turn it fights the first exchange (defensively), then breaks off and pulls back toward your nearest world.<\/p><div class="btn-row"><button class="btn small" data-withdraw="off">Stay and fight<\/button><\/div>`;
   else if (eng) h += `<p class="small bad"><b>Engaged.<\/b> Enemy warships${S.sysAt[f.at] && S.systems[S.sysAt[f.at]].colony && atWar(S, me.id, S.systems[S.sysAt[f.at]].colony.owner) ? " or guns" : ""} share this hex: the battle goes on each turn, and the fleet can't simply sail away.<\/p><div class="btn-row"><button class="btn" data-withdraw title="It fights the first exchange of the next battle defensively, then breaks off and pulls back toward your nearest world. The enemy gets no more shots at it.">Withdraw<\/button><\/div>`;
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}<\/button>${f.path.length ? `<button class="btn" data-stop>Stop<\/button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}<\/button>`}<\/div>`;
@@ -5814,6 +5876,7 @@ function bindChrome() {
     else if (d.stop !== undefined) setDestination(S, sel.id, S.fleets[sel.id].at);
     else if (d.coalition !== undefined) { const hex = ($("co-target") || {}).value; const r = callCoalition(S, me.id, hex, d.coalition === "pay"); if (r.error) toast(r.error, true); else toast(`The coalition is called: ${r.members} power${r.members === 1 ? "" : "s"} send ${r.ships} ships${r.cost ? `, for ${r.cost} credits` : ""}.`); }
     else if (d.beacon !== undefined) { const r = buildBeacon(S, me.id, sel.id); if (r.error) toast(r.error, true); else toast("The Rift beacon is lit: the sector is open."); }
+    else if (d.repair !== undefined) { const r = sendForRepairs(S, sel.id, d.repair === "1"); if (r.error) toast(r.error, true); else { toast(`${r.ships} damaged ship${r.ships === 1 ? "" : "s"} ${r.withdrawing ? "withdraw, then head" : "head"} for repairs at ${r.to}${d.repair === "1" ? ", and will rejoin the fleet" : ""}.`); if (r.split) sel = { kind: "fleet", id: r.fleet }; } }
     else if (d.withdraw !== undefined) { const r = setWithdraw(S, sel.id, d.withdraw !== "off"); if (r.error) toast(r.error, true); else toast(d.withdraw === "off" ? "It stays and fights." : "Withdrawing: it breaks off after the first exchange."); }
     else if (d.detach !== undefined) {
       const counts = {}; for (const el of document.querySelectorAll("[data-detach-n]")) counts[el.dataset.detachN] = Math.min(+el.max, Math.max(0, Math.floor(+el.value) || 0));
@@ -6253,6 +6316,7 @@ function showHelp(back) {
       <li><b>Exotics<\/b> ◆ come from deposits. Cruisers, dreadnoughts and the Corridor Engine need them.<\/li>
       <li><b>Battles<\/b> happen when fleets of factions at war share a hex. Each armed ship rolls 3d6 under its skill to hit (3–4 always hits, 17–18 always misses), three exchanges a turn. Worlds with guns fire back: they fire first in each exchange and finish off the most damaged ship. Knocking a world's guns out counts toward winning the battle, and they can't be repaired while you hold the orbit.<\/li>
       <li><b>Engaged:<\/b> a fleet sharing a hex with enemy warships (or an enemy world's guns) is engaged. It can't simply sail away. Press <b>Withdraw<\/b>: it fights the next battle's first exchange defensively, then pulls back toward your nearest world.<\/li>
+      <li><b>Repairs:<\/b> a fleet with damaged ships shows where best to mend them (a drydock repairs everything at once, a station ${YARDS.station} hull a turn, any other world of yours 1) and how long it takes. <b>Send for repairs<\/b> splits off the damaged ships and sends them, withdrawing them from a battle first. <b>Repair, then rejoin this fleet<\/b> brings them back once they're whole.<\/li>
       <li><b>Detach and send:<\/b> on a fleet's panel, choose how many of each ship to take, then click where to send them (a world, or an enemy fleet). The soundest ships go and the admiral stays. In a battle you can detach some ships and withdraw just those. <b>Split off by type<\/b> does the same for one type at a time, most damaged first.<\/li>
       <li><b>Advances:<\/b> once a technology is done, the Research tab offers advances built on it: take them again and again, a level at a time.<\/li>
       <li><b>Anomalies<\/b> (✦): send a scout to end its turn at one for research. A Deep-space observatory studies nearby ones by itself.<\/li>

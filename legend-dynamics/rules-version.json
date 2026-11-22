@@ -6,6 +6,15 @@
     {
       "date": "2026-11-22",
       "kind": "site",
+      "title": "Dominion: send damaged ships for repairs",
+      "items": [
+        "A fleet with damaged ships shows where best to mend them, counting the trip and the repair: a drydock fixes everything at once, a station 2 hull a turn, any other world of yours 1. It also shows how many turns that takes.",
+        "Send for repairs splits off the damaged ships (the sound ones and the admiral stay) and sends them there. In a battle, they withdraw first. Repair, then rejoin this fleet brings them back to the fleet once they're whole, following it if it has moved."
+      ]
+    },
+    {
+      "date": "2026-11-22",
+      "kind": "site",
       "title": "Dominion: call a coalition against the Wardens",
       "items": [
         "While the Wardens are awake, the Wardens card on the Objectives tab can call a coalition. Pick the Heart or one of its Nodes, and see which powers will come: free if they like you, for credits if they're lukewarm, or not at all, with the reason.",

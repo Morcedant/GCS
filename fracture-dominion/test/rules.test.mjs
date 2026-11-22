@@ -1444,3 +1444,26 @@ test("a coalition against the Wardens: friends come free, the lukewarm for credi
   assert.ok(committed.length && committed.every((f) => f.dest === tg[0].at || f.at === tg[0].at));
   aiTurn(s, A); assert.ok(Object.values(s.fleets).filter((f) => f.coalition && f.owner === A.id).every((f) => f.dest === tg[0].at || f.at === tg[0].at));
 });
+
+test("repairs: damaged ships split off to the best yard, mend, and rejoin their fleet; in a battle they withdraw first", async () => {
+  const { sendForRepairs, damagedShips, repairPlace } = await import("../src/game.js");
+  const s = newGame({ seed: 52, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const me = s.factions[0], cap = s.systems[me.capital]; me.research.current = "sensors";
+  cap.colony.buildings.drydock = true;
+  const spot = Object.keys(s.hexes).find((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && distance(k, cap.at) === 2);
+  const f = spawnFleet(s, me.id, spot, ["cruiser", "cruiser", "cruiser"]); f.ships[0].hull = 1; f.ships[1].hull = 2;
+  assert.equal(damagedShips(s, f).length, 2);
+  const rp = repairPlace(s, me.id, f.at, damagedShips(s, f), 3); assert.equal(rp.sys.id, cap.id); assert.equal(rp.how, "drydock");
+  const r = sendForRepairs(s, f.id, true); assert.ok(r.ok && r.split && r.ships === 2 && r.to === cap.name);
+  assert.equal(f.ships.length, 1, "the sound one stays");
+  const g = s.fleets[r.fleet];
+  for (let i = 0; i < 6 && s.fleets[g.id]; i++) endTurn(s, null);
+  assert.ok(!s.fleets[g.id], "mended and merged back");
+  assert.equal(f.ships.length, 3); assert.ok(!damagedShips(s, f).length, "all whole again");
+  assert.ok(sendForRepairs(s, f.id).error, "nothing to repair");
+  // In a battle: they withdraw first.
+  const R = s.factions[1]; me.relations[R.id].status = "war"; R.relations[me.id].status = "war";
+  f.ships[0].hull = 1; spawnFleet(s, R.id, f.at, ["frigate"]);
+  const w = sendForRepairs(s, f.id); assert.ok(w.ok && w.withdrawing);
+  assert.ok(s.fleets[w.fleet].withdraw);
+});
