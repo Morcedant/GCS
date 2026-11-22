@@ -1422,3 +1422,25 @@ test("a world finishes one thing a turn: rushing the first doesn't empty the que
   endTurn(s, null);
   assert.equal(count(), 2, "the next finishes next turn");
 });
+
+test("a coalition against the Wardens: friends come free, the lukewarm for credits, and they hold the target", async () => {
+  const { crisisTurn, coalitionTargets, coalitionAnswers, callCoalition } = await import("../src/crisis.js");
+  const { aiTurn } = await import("../src/ai.js");
+  const s = newGame({ seed: 41, size: "medium", player: "concord", rivals: 3, wilds: "none" });
+  const me = s.factions[0], [A, B, C] = s.factions.slice(1);
+  for (const X of [A, B, C]) { me.met[X.id] = X.met[me.id] = true; for (let i = 0; i < 2; i++) spawnFleet(s, X.id, s.systems[X.capital].at, ["cruiser", "cruiser", "cruiser"]); }
+  crisisTurn(s); s.turn = s.crisis.at - 6; crisisTurn(s); s.galEvent = null; s.turn = s.crisis.at; crisisTurn(s); s.galEvent = null;
+  for (const k of Object.keys(s.hexes)) me.explored[k] = 1;
+  const tg = coalitionTargets(s, me.id); assert.ok(tg.length && tg[0].kind === "heart");
+  A.relations[me.id].score = 20; B.relations[me.id].score = 0; C.relations[me.id].score = -30;
+  const ans = Object.fromEntries(coalitionAnswers(s, me.id).map((a) => [a.id, a]));
+  assert.equal(ans[A.id].answer, "free"); assert.equal(ans[B.id].answer, "paid"); assert.equal(ans[C.id].answer, "no");
+  me.credits = 1000; const c0 = me.credits;
+  const r = callCoalition(s, me.id, tg[0].at, true); assert.ok(r.ok && r.members === 2 && r.ships > 0);
+  assert.equal(me.credits, c0 - ans[B.id].price);
+  assert.ok(callCoalition(s, me.id, tg[0].at, true).error, "one at a time");
+  // Their fleets head for the Heart and keep going there.
+  const committed = Object.values(s.fleets).filter((f) => f.coalition);
+  assert.ok(committed.length && committed.every((f) => f.dest === tg[0].at || f.at === tg[0].at));
+  aiTurn(s, A); assert.ok(Object.values(s.fleets).filter((f) => f.coalition && f.owner === A.id).every((f) => f.dest === tg[0].at || f.at === tg[0].at));
+});

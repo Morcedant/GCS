@@ -280,6 +280,9 @@ function fleets(s, F) {
   for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
+    // Answering a coalition against the Wardens: to the target, and hold there (no withdrawing) until it falls.
+    const A = s.crisis && s.crisis.coalition;
+    if (f.coalition && A && !A.done && A.from === f.coalition) { if (f.at !== A.at && (!f.path.length || f.dest !== A.at)) setDestination(s, f.id, A.at); continue; }
     // Engaged and clearly losing: withdraw (it fights the first exchange, then pulls back), rather than die there.
     if (engaged(s, f)) {
       const pw = (fl) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? x.hull * SHIPS[x.type].dmg * (SHIPS[x.type].shots || 1) : 0), 0);

@@ -410,7 +410,12 @@ export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, hea
   signsLead: 35, watcherEvery: 6, watchers: { small: 2, medium: 3, large: 4, vast: 5 }, nodeEvery: 8, regrow: 30, regrowGain: 1.25,
   wakeNodes: { small: 2, medium: 3, large: 4, vast: 5 }, engineHunt: 0.5, perStrength: 300, maxStrength: 40,
   wear: { node: 0.25, heart: 0.2 }, shieldRange: 6, maxNodes: { small: 5, medium: 8, large: 10, vast: 12 }, huntersPerStrength: 10,
-  bounty: { watcher: 40, node: 80 } };
+  bounty: { watcher: 40, node: 80 },
+  // A coalition against the Wardens (a power calls it on a Node or the Heart): powers that like the caller at least
+  // `free` come for nothing; those at `paid` or better for `price` credits (plus `perM` for each point of Warden
+  // strength). Each member sends its strongest war fleets, up to `share` of its warships, and holds them on the target
+  // for `turns` turns or until it falls. One call every `every` turns. Fighting together: `regard` each way.
+  coalition: { free: 10, paid: -10, price: 60, perM: 5, share: 0.6, turns: 20, every: 10, regard: 6 } };
 /**
  * The Corridor Engine in an open game: not a victory but the galaxy's great prize. Only one can stand. Its holder's
  * fleets travel corridors for nothing and can jump through the gate from the Engine world to any of its worlds (every

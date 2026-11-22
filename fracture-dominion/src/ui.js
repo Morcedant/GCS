@@ -6,7 +6,7 @@ import { newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gun
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
-import { crisisTurn, crisisState } from "./crisis.js";
+import { crisisTurn, crisisState, coalitionTargets, coalitionAnswers, callCoalition } from "./crisis.js";
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
 import { sectorsTurn, sectorsState, corridorsTurn, collapseState } from "./sectors.js";
@@ -689,6 +689,26 @@ function sectorsHTML() {
     ${c.opened.map((o) => `<p class="small"><b>${esc(o.name[0].toUpperCase() + o.name.slice(1))}</b>, opened on turn ${o.turn}: ${near(o.kind)}. ${o.sealed ? `<b class="${canCrossSealed(S, player(S).id) ? "good" : "bad"}">Sealed${canCrossSealed(S, player(S).id) ? ": your Rift drives get you in" : `: research Rift drives, or light a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes`}.</b> ` : o.unsealed ? `<span class="good">Opened by a Rift beacon on turn ${o.unsealed.turn}.</span> ` : ""}<span class="muted">${esc(o.text)}</span></p>`).join("")}
     ${!c.coming && c.next !== null ? `<p class="small muted">The map grows as the game goes on: the ${c.opened.length ? "next" : "first"} new sector opens around turn ${c.next}, and every power hears what kind ${SECTORS.warn} turns ahead.</p>` : ""}</div>`;
 }
+/** Call a coalition against the Wardens: the target, who would come (free, for credits, or not), and the call. */
+function coalitionHTML() {
+  const me = player(S), K = S.crisis, A = K && K.coalition, CO = CRISIS.coalition;
+  if (A && !A.done && A.until > S.turn) {
+    const ships = Object.values(S.fleets).filter((f) => f.coalition === A.from && f.owner !== me.id).reduce((t, f) => t + f.ships.length, 0);
+    return `<div class="card-sub"><p class="small good"><b>Coalition under way</b> against ${esc(A.name)}${A.by === me.id ? "" : `, called by ${esc(faction(S, A.by).name)}`}: ${A.members.map((x) => esc(faction(S, x).name)).join(", ")}, with ${ships} ship${ships === 1 ? "" : "s"} of theirs, until turn ${A.until}. <button class="linkish" data-center="${A.at}">Show it</button></p></div>`;
+  }
+  const tg = coalitionTargets(S, me.id); if (!tg.length) return "";
+  const pick = tg.find((t) => t.at === coalitionPick) || tg[0], ans = coalitionAnswers(S, me.id);
+  const free = ans.filter((a) => a.answer === "free"), paid = ans.filter((a) => a.answer === "paid"), cost = paid.reduce((t, a) => t + a.price, 0);
+  const wait = K.lastCall && K.lastCall[me.id] && S.turn - K.lastCall[me.id] < CO.every;
+  return `<div class="card-sub"><h4 style="margin:10px 0 4px">Call a coalition</h4>
+    <p class="small muted" style="margin-top:0">Ask the other powers to send their fleets against one machine, and hold it with you for ${CO.turns} turns or until it falls. Nothing can harm the Heart while Nodes within ${CRISIS.shieldRange} hexes of it stand, so call them on those first.</p>
+    <label class="small">Target <select id="co-target">${tg.map((t) => `<option value="${t.at}" ${t.at === pick.at ? "selected" : ""}>${esc(t.name[0].toUpperCase() + t.name.slice(1))}</option>`).join("")}</select></label>
+    <ul class="small mem">${ans.map((a) => `<li class="${a.answer === "no" ? "bad" : "good"}">${esc(a.name)}: ${a.answer === "free" ? "will come" : a.answer === "paid" ? `will come for ${a.price} credits` : `won't come (${esc(a.why)})`}</li>`).join("") || `<li class="muted">You haven't met anyone.</li>`}</ul>
+    <div class="btn-row"><button class="btn small" data-coalition="free" ${!free.length || wait ? "disabled" : ""}>Call those who'll come free (${free.length})</button>${paid.length ? `<button class="btn small" data-coalition="pay" ${me.credits < cost || wait ? "disabled" : ""}>Call everyone, paying ${cost} credits (${free.length + paid.length})</button>` : ""}</div>
+    ${wait ? `<p class="small muted">You can call another on turn ${K.lastCall[me.id] + CO.every}.</p>` : ""}</div>`;
+}
+let coalitionPick = null;
+document.addEventListener("change", (e) => { if (e.target && e.target.id === "co-target") coalitionPick = e.target.value; });
 /** The late-game crisis, on the Objectives tab: the warning, then the Heart, its waves and who is fighting them. */
 function crisisHTML() {
   const c = crisisState(S); if (!c) return "";
@@ -703,7 +723,7 @@ function crisisHTML() {
   const table = `<table class="tbl"><tr><th>Fighting them</th><th>Machines destroyed</th></tr>${fighters.map(({ f, n }) => `<tr><td><span class="dot" style="background:${f.color}"></span>${f.id === me.id ? "You" : esc(f.name)}${f.alive ? "" : " †"}</td><td>${n}</td></tr>`).join("")}</table>`;
   if (c.stage === "dormant") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Not yet over</span></h3>
     <p class="small">${c.by ? `${c.by === me.id ? "You" : me.met[c.by] ? esc(faction(S, c.by).name) : "A power you haven't met"} broke the Heart` : "The Heart is broken"}, and its waves have stopped. But <b>${c.nodes.length} Warden Node${c.nodes.length === 1 ? "" : "s"}</b> still stand${c.nodes.length === 1 ? "s" : ""}${nodeList ? `: ${nodeList}` : ""}. They keep sending hunters, and in <b>${Math.max(0, c.regrowAt - S.turn)} turn${c.regrowAt - S.turn === 1 ? "" : "s"}</b> a new, stronger Heart grows at one of them.</p>
-    <ol class="steps-list">${stepLi("now", "Destroy every Node before the new Heart grows: when the last one falls, the Wardens are silent for good")}</ol>${table}</div>`;
+    <ol class="steps-list">${stepLi("now", "Destroy every Node before the new Heart grows: when the last one falls, the Wardens are silent for good")}</ol>${coalitionHTML()}${table}</div>`;
   if (c.stage === "over") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status good">Broken</span></h3>
     <p class="small">${c.by ? `${c.by === me.id ? "You" : me.met[c.by] ? esc(faction(S, c.by).name) : "A power you haven't met"} broke the Heart` : "The Heart is broken"}${S.crisis.over ? ` on turn ${S.crisis.over}` : ""}. Every machine went dark.</p>${table}</div>`;
   return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Awake</span></h3>
@@ -713,7 +733,7 @@ function crisisHTML() {
     ${c.returns ? `<span>Returned</span><span class="bad">${c.returns} time${c.returns === 1 ? "" : "s"}: this Heart is stronger than the last</span>` : ""}
     <span>Truce</span><span>${c.truce ? "Holding: no power starts a new war while the Heart lives" : "None: wars go on"}</span></div>
     <ol class="steps-list">${stepLi("now", "Keep their waves off your worlds: a world with guns or warships in orbit can't be burned, only fought over")}${stepLi("", `Break the Heart: its guard must fall before it can be hit, it mends ${2 * (S.crisis.m || 1)} hull a turn, and it fires ${1 + (S.crisis.m || 1)} times a round`)}</ol>
-    ${table}
+    ${coalitionHTML()}${table}
     <p class="small" style="margin-top:6px"><b class="good">Reward:</b> score for every machine destroyed; breaking the Heart is worth 30 more, and its wreck.</p></div>`;
 }
 /** The Mission tab: the directives under way (progress, deadline, reward), the backlog, and past directives. */
@@ -987,6 +1007,7 @@ function bindChrome() {
     else if (d.rush !== undefined) { const r = rush(S, sel.id); if (r.error) toast(r.error, true); }
     else if (d.move !== undefined) { moveMode = !moveMode; if (moveMode) toast("Click where to send this fleet. Esc cancels."); }
     else if (d.stop !== undefined) setDestination(S, sel.id, S.fleets[sel.id].at);
+    else if (d.coalition !== undefined) { const hex = ($("co-target") || {}).value; const r = callCoalition(S, me.id, hex, d.coalition === "pay"); if (r.error) toast(r.error, true); else toast(`The coalition is called: ${r.members} power${r.members === 1 ? "" : "s"} send ${r.ships} ships${r.cost ? `, for ${r.cost} credits` : ""}.`); }
     else if (d.beacon !== undefined) { const r = buildBeacon(S, me.id, sel.id); if (r.error) toast(r.error, true); else toast("The Rift beacon is lit: the sector is open."); }
     else if (d.withdraw !== undefined) { const r = setWithdraw(S, sel.id, d.withdraw !== "off"); if (r.error) toast(r.error, true); else toast(d.withdraw === "off" ? "It stays and fights." : "Withdrawing: it breaks off after the first exchange."); }
     else if (d.detach !== undefined) {
@@ -1434,7 +1455,7 @@ function showHelp(back) {
       <li><b>Refits:</b> research that improves ships goes into new ones; ships already in service get it at a Drydock (a Shipyard fits the early systems: sensors, drives, shields). A fleet's panel says when its ships need a refit.</li>
       <li><b>Pirate ransom and tribute:</b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts</b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.</li>
       <li><b>Traders:</b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot</b> to fill its tanks and cut the depot's supply.</li>
-      <li><b>The Wardens:</b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out.</li>
+      <li><b>The Wardens:</b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out. To rally the others, <b>call a coalition</b> from the Wardens card on the Objectives tab: pick the Heart or a Node, and every power that likes you sends its fleets to hold it with you (the lukewarm for credits).</li>
       <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>
       <li><b>New sectors:</b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.</li>
       <li><b>Corridor collapses:</b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). It's rare, and it's always one that matters. Ships then go the long way, until a scout rests ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).</li>

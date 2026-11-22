@@ -100,6 +100,7 @@ function heartShip(s) { for (const f of wardenFleets(s)) { const h = f.ships.fin
 export function crisisTurn(s) {
   if (s.crisisOff || s.winner) return;
   const C = s.crisis || (s.crisis = { stage: "quiet", at: Math.max(s.turn + CRISIS.warning + 2, CRISIS.earliest + makeRng("crisis:" + s.seed).int(CRISIS.spread)) });
+  coalitionTurn(s);
   if (C.stage === "quiet") {
     if (s.turn >= C.at - CRISIS.signsLead) { const R = rng(s); signs(s, R); R.save(); }
     if (s.turn >= C.at - CRISIS.warning && !s.galEvent) {
@@ -305,4 +306,69 @@ function dormantTurn(s) {
     const ev = { id: "returning", ctx: {}, turn: s.turn }; if (s.galEvent) C.queued = ev; else s.galEvent = ev;
   }
   R.save();
+}
+
+// ---- a coalition against the Wardens ----
+const CO = () => CRISIS.coalition;
+/** The Warden machines a coalition can be called against: the Heart and the Nodes, where the caller can see them. */
+export function coalitionTargets(s, fid) {
+  const F = faction(s, fid), out = [];
+  for (const f of wardenFleets(s)) {
+    const t = f.ships.some((x) => x.type === "heart") ? "heart" : f.ships.some((x) => x.type === "node") ? "node" : null;
+    if (t && F.explored[f.at]) out.push({ at: f.at, kind: t, place: crPlace(s, f.at), name: t === "heart" ? "the Heart" : `the Node at ${crPlace(s, f.at)}` });
+  }
+  return out.sort((a, b) => (a.kind === "heart" ? -1 : 1) - (b.kind === "heart" ? -1 : 1));
+}
+/** Who would answer a call from `fid`: [{ id, name, answer: "free" | "paid" | "no", price, why }]. */
+export function coalitionAnswers(s, fid) {
+  const C = CO(), m = (s.crisis && s.crisis.m) || 1, F = faction(s, fid);
+  return s.factions.filter((X) => X.alive && X.id !== fid && F.met[X.id]).map((X) => {
+    const r = X.relations[fid], war = militaryPower(s, X.id);
+    if (atWar(s, X.id, fid)) return { id: X.id, name: X.name, answer: "no", why: "at war with you" };
+    if (!war) return { id: X.id, name: X.name, answer: "no", why: "no warships to send" };
+    if (!X.ai) return { id: X.id, name: X.name, answer: "no", why: "not a computer power" };
+    if (r.score >= C.free || r.allied) return { id: X.id, name: X.name, answer: "free" };
+    if (r.score >= C.paid) return { id: X.id, name: X.name, answer: "paid", price: Math.round(C.price + C.perM * m) };
+    return { id: X.id, name: X.name, answer: "no", why: "they don't like you enough" };
+  });
+}
+/** Call a coalition against a Warden machine at `hex`. With pay, the lukewarm are paid to come too. */
+export function callCoalition(s, fid, hex, pay = false) {
+  const K = s.crisis, F = faction(s, fid), C = CO();
+  if (!K || !["awake", "dormant"].includes(K.stage)) return { error: "There's nothing to fight: the Wardens aren't awake." };
+  const target = coalitionTargets(s, fid).find((t) => t.at === hex); if (!target) return { error: "Choose the Heart or one of its Nodes that you've seen." };
+  if (K.coalition && K.coalition.until > s.turn) return { error: `A coalition is already under way, until turn ${K.coalition.until}.` };
+  if (K.lastCall && K.lastCall[fid] && s.turn - K.lastCall[fid] < C.every) return { error: `You called one on turn ${K.lastCall[fid]}: wait until turn ${K.lastCall[fid] + C.every}.` };
+  const ans = coalitionAnswers(s, fid), cost = pay ? ans.filter((a) => a.answer === "paid").reduce((t, a) => t + a.price, 0) : 0;
+  if (F.credits < cost) return { error: `Paying them all needs ${cost} credits.` };
+  const members = ans.filter((a) => a.answer === "free" || (pay && a.answer === "paid"));
+  if (!members.length) return { error: "No one would answer the call." };
+  F.credits -= cost;
+  (K.lastCall = K.lastCall || {})[fid] = s.turn;
+  K.coalition = { by: fid, at: hex, kind: target.kind, name: target.name, until: s.turn + C.turns, members: members.map((a) => a.id), from: s.turn };
+  let ships = 0;
+  for (const a of members) {
+    const X = faction(s, a.id); if (a.answer === "paid") X.credits += a.price;
+    // Its strongest war fleets, up to its share of its warships; the rest stay home.
+    const fleets = fleetsOf(s, X.id).filter((f) => f.ships.some((x) => SHIPS[x.type].skill > 0)).sort((p, q) => q.ships.length - p.ships.length);
+    const total = fleets.reduce((t, f) => t + f.ships.length, 0); let sent = 0;
+    for (const f of fleets) { if (sent >= total * C.share && sent > 0) break; if (setDestination(s, f.id, hex).ok || f.at === hex) { f.coalition = K.coalition.from; sent += f.ships.length; } }
+    ships += sent;
+    remember(s, X.id, fid, a.answer === "paid" ? "paid us to fight the Wardens with them" : "called us to fight the Wardens together", 2);
+  }
+  log(s, null, `${F.name} called a coalition against ${target.name}: ${members.map((a) => faction(s, a.id).name).join(", ")} answered, with ${ships} ships, for the next ${C.turns} turns.`, "war");
+  return { ok: true, members: members.length, ships, cost };
+}
+/** Once a turn: the coalition holds its target until it falls or the time runs out; members who fought earn regard. */
+export function coalitionTurn(s) {
+  const K = s.crisis, A = K && K.coalition; if (!A || A.done) return;
+  const there = wardenFleets(s).some((f) => f.at === A.at && f.ships.some((x) => x.type === A.kind));
+  if (there && s.turn < A.until) return;
+  A.done = true; A.until = s.turn;
+  for (const f of Object.values(s.fleets)) if (f.coalition === A.from) delete f.coalition;
+  if (!there) {
+    const side = [A.by, ...A.members];
+    for (const a of side) for (const b of side) if (a !== b && faction(s, a) && faction(s, a).ai) remember(s, a, b, `fought beside us against ${A.name}`, CO().regard);
+    log(s, null, `The coalition's target has fallen: ${A.name}. ${side.map((x) => faction(s, x).name).join(", ")} fought it together.`, "war");
+  } else log(s, null, `The coalition against ${A.name} has broken up: its time ran out with the machine still standing.`, "war");
 }
