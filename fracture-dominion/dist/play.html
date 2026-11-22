@@ -212,7 +212,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-22 00:37 UTC";
+const BUILD = "2026-11-22 00:38 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -1056,7 +1056,11 @@ function installPeopleArt(server, clip) {
     }
   };
   fetch(server + "/api/peoples").then((r) => r.json()).then((b) => {
-    for (const [name, src] of Object.entries((b && b.images) || {})) { const id = ALIAS[name.toLowerCase().replace(/^the/, "").replace(/[^a-z]/g, "")]; if (id && !art[id]) art[id] = src; }
+    // By name: exactly ("mirrun", "human"), or a name that contains one ("Ozhvek and Dresh", "the Kel Hives").
+    for (const [name, src] of Object.entries((b && b.images) || {})) {
+      const n = name.toLowerCase().replace(/[^a-z]/g, ""), key = ALIAS[n] ? n : Object.keys(ALIAS).filter((k) => k.length >= 3 && n.includes(k)).sort((x, y) => y.length - x.length)[0];
+      const id = key && ALIAS[key]; if (id && !art[id]) art[id] = src;
+    }
     fill();
     if (Object.keys(art).length && "MutationObserver" in window) new MutationObserver(fill).observe(document.body, { childList: true, subtree: true });
   }).catch(() => {});
