@@ -2,7 +2,7 @@
 //   node build.mjs
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 
-const ORDER = ["hex", "data", "peoples", "galaxy", "game", "orders", "crisis", "wilds", "traders", "sectors", "events", "envoys", "ai", "ui"];
+const ORDER = ["hex", "data", "peoples", "galaxy", "game", "orders", "crisis", "wilds", "traders", "sectors", "events", "envoys", "ai", "intro", "ui"];
 const here = new URL(".", import.meta.url);
 const strip = (src) => src
   .replace(/^import [^;]+;\s*$/gm, "")        // the modules share one scope once inlined

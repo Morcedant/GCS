@@ -6,6 +6,15 @@
     {
       "date": "2026-11-22",
       "kind": "site",
+      "title": "Dominion: an introduction",
+      "items": [
+        "A 40-second animated intro over the main theme, on a first visit: the corridors light up across the star clusters, some fail, the eight peoples appear, something wakes beneath the rifts, and the title. It opens with a Play button (browsers only play sound after a click) and can be skipped at any moment. Menu → Watch the intro plays it again.",
+        "An intro video can replace it: upload an MP4 to the music bucket as video/intro.mp4 and the game plays that instead, with its own sound. It shows up within a day of uploading."
+      ]
+    },
+    {
+      "date": "2026-11-22",
+      "kind": "site",
       "title": "Dominion: music that goes further",
       "items": [
         "A quiet pause of about half a minute to a minute between tracks, so the soundtrack breathes and repeats less. The Menu's Music section has a switch for it (on by default).",

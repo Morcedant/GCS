@@ -10,6 +10,7 @@ import { crisisTurn, crisisState, coalitionTargets, coalitionAnswers, callCoalit
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
 import { sectorsTurn, sectorsState, corridorsTurn, collapseState } from "./sectors.js";
+import { showIntro } from "./intro.js";
 import { peopleToken, peopleArt, installPeopleArt, PEOPLE_CLIP, LOOKS } from "./peoples.js";
 import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
@@ -37,12 +38,25 @@ function debugHook() {
   try { if (!/[?&]debug\b/.test(location.search)) return; } catch { return; }
   window.__dominion = { state: () => S, screenOf: (hex) => { const c = canvas(), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
 }
+/** The intro (intro.js): the theme with the prologue, or the uploaded video with the game's music held back. */
+function playIntro() {
+  try { const ip = JSON.parse(localStorage.getItem("dominion.intro.v1")) || {}; ip.seen = true; localStorage.setItem("dominion.intro.v1", JSON.stringify(ip)); } catch {}
+  showIntro({
+    peoples: FACTIONS.map((f) => ({ name: esc(f.people.replace(/ and .*/, "")), token: peopleArt(f.id, f.color, 84) })),
+    onStart: () => { music.themeDone = false; musicStart(); musicUpdate(); },
+    onVideo: () => { music.hold = true; if (music.audio) { const a = music.audio; fade(a, 0, 600, () => a.pause()); } },
+    onDone: () => { if (music.hold) { music.hold = false; music.audio = null; music.themeDone = true; } musicUpdate(); },
+  });
+}
 function boot() {
   bindMap();
   bindChrome();
   debugHook();
   const saved = store.get();
-  if (saved) showNewGame(true); else showStarter(false);
+  const start = () => { if (saved) showNewGame(true); else showStarter(false); };
+  // The intro on a first visit (and each time, if the player asks for it in the Menu).
+  let ip = {}; try { ip = JSON.parse(localStorage.getItem("dominion.intro.v1")) || {}; } catch {}
+  if (!ip.seen || ip.always) { start(); playIntro(); } else start();
 }
 function startGame(state) {
   S = state; sel = null; moveMode = false; tab = "selected"; music.mood = null; setTimeout(musicUpdate, 0);
@@ -252,7 +266,7 @@ function playTrack(t) {
 function musicUpdate() {
   if (!music.prefs.on) { if (music.audio) { const a = music.audio; music.audio = null; fade(a, 0, 800, () => a.pause()); } renderMusicNow(); return; }
   if (!music.started) return;   // the browser plays sound only after the player has clicked something
-  if (music.gaveUp) { renderMusicNow(); return; }   // tracks kept failing: wait for Next track, or the ♪ button
+  if (music.gaveUp || music.hold) { renderMusicNow(); return; }   // (hold: the intro video has the sound)   // tracks kept failing: wait for Next track, or the ♪ button
   if (!music.tracks) { loadMusic(); return; }
   const mood = gameMood();
   // The main theme plays through to its end; the game's mood waits for it.
@@ -1536,6 +1550,7 @@ function showMenu() {
   modal(`<h1>Menu</h1>${musicMenuHTML()}<div class="btn-row col">
     <button class="btn" id="m-resume">Back to the game</button>
     <button class="btn" id="m-help">How to play</button>
+    <button class="btn" id="m-intro">Watch the intro</button>
     <button class="btn" id="m-guide">The starter guide</button>
     <button class="btn" id="m-guide-go">${guideOn() ? "Restart" : "Start"} the guide</button>
     <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist</button>
@@ -1555,6 +1570,7 @@ function showMenu() {
   $("m-resume").onclick = closeModal;
   bindMusicMenu();
   $("m-help").onclick = () => showHelp(showMenu);
+  $("m-intro").onclick = () => { closeModal(); playIntro(); };
   $("m-bug").onclick = () => showBugReport();
   $("m-guide").onclick = () => showStarter(true);
   $("m-guide-go").onclick = () => { closeModal(); startGuide(); };
