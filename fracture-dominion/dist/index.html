@@ -211,7 +211,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-22 00:38 UTC";
+const BUILD = "2026-11-22 03:35 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -2568,8 +2568,11 @@ function economy(s, F) {
       c.stock += y.ind * strike;
       // While another Engine stands, one in the queue waits (its progress kept) at the back, and the rest goes ahead.
       if (engineHeld(s) && c.queue[0] && c.queue[0].id === "engine" && c.queue.length > 1) c.queue.push(c.queue.shift());
+      // One thing finished a turn: what's left over goes into the next in line, ready to finish next turn.
+      let finished = false;
       while (c.queue.length) {
         const q = c.queue[0];
+        if (finished) { const put = Math.min(q.cost - q.progress, c.stock); if (put > 0) { q.progress += put; c.stock -= put; } break; }
         if (q.id === "engine" && engineHeld(s)) { if (!q.held) log(s, F.id, `Work on the Corridor Engine at ${sys.name} stops: another stands. What's built is kept, ready for when it falls.`, "build"); q.held = true; break; }
         q.held = false;
         const need = q.cost - q.progress, put = Math.min(need, c.stock);
@@ -2580,7 +2583,7 @@ function economy(s, F) {
         if ((q.kind === "ship" || q.id === "battery" || q.id === "station") && besieged(s, sys)) { if (!q.blockaded) log(s, F.id, `${q.name} at ${sys.name} is ready, but the siege holds it in the yards.`, "build"); q.blockaded = true; break; }
         q.blockaded = false;
         F.exotics -= q.exotics || 0;
-        c.queue.shift();
+        c.queue.shift(); finished = true;
         if (q.kind === "ship") {
           const warship = SHIPS[q.id].skill > 0, dest = musterFor(s, F.id, q.id);
           if (dest && dest !== sys) {   // a standing order: it leaves for the muster point as soon as it's built
@@ -6139,7 +6142,7 @@ function showHelp(back) {
   modal(`<h1>How to play<\/h1>
     <ul class="help">
       <li><b>Each turn<\/b>, give orders, then press <b>End turn<\/b> (or Enter). Everyone moves at once.<\/li>
-      <li><b>Worlds<\/b> grow population, which makes <b>industry<\/b> (to build), <b>science<\/b> (to research) and <b>credits<\/b> (to pay upkeep). Pick what each world builds in its queue; rush the first item with credits.<\/li>
+      <li><b>Worlds<\/b> grow population, which makes <b>industry<\/b> (to build), <b>science<\/b> (to research) and <b>credits<\/b> (to pay upkeep). Pick what each world builds in its queue; rush the first item with credits. A world finishes one item a turn: industry left over goes into the next, which finishes the turn after.<\/li>
       <li><b>Space travel.<\/b> Each ship has a speed: the moves it gets each turn (a scout 4, frigates and cruisers 3, colony ships and dreadnoughts 2; Fold drives add 1). A fleet moves at its slowest ship's speed. Right-click where it should go; the route and the turns it takes show on the map.
         <ul>
           <li><b>Open space:<\/b> a move a hex. You can fly anywhere this way, just slowly.<\/li>

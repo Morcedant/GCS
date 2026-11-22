@@ -1407,3 +1407,18 @@ test("travel time: the turns a fleet is told it will take are the turns it takes
   }
   assert.ok(checked >= 15);
 });
+
+test("a world finishes one thing a turn: rushing the first doesn't empty the queue at once", () => {
+  const s = newGame({ seed: 51, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const me = s.factions[0], cap = s.systems[me.capital];
+  me.research.current = "sensors"; me.credits = 1000; cap.colony.stock = 40;
+  for (let i = 0; i < 4; i++) assert.ok(enqueue(s, cap.id, "ship", "outpost").ok);
+  assert.ok(rush(s, cap.id).ok);
+  const count = () => fleetsOf(s, me.id).reduce((t, f) => t + f.ships.filter((x) => x.type === "outpost").length, 0);
+  endTurn(s, null);
+  assert.equal(count(), 1, "the rushed one, and only it");
+  assert.equal(cap.colony.queue.length, 3);
+  assert.ok(cap.colony.queue[0].progress > 0, "the rest of the turn's industry went into the next");
+  endTurn(s, null);
+  assert.equal(count(), 2, "the next finishes next turn");
+});

@@ -1400,8 +1400,11 @@ function economy(s, F) {
       c.stock += y.ind * strike;
       // While another Engine stands, one in the queue waits (its progress kept) at the back, and the rest goes ahead.
       if (engineHeld(s) && c.queue[0] && c.queue[0].id === "engine" && c.queue.length > 1) c.queue.push(c.queue.shift());
+      // One thing finished a turn: what's left over goes into the next in line, ready to finish next turn.
+      let finished = false;
       while (c.queue.length) {
         const q = c.queue[0];
+        if (finished) { const put = Math.min(q.cost - q.progress, c.stock); if (put > 0) { q.progress += put; c.stock -= put; } break; }
         if (q.id === "engine" && engineHeld(s)) { if (!q.held) log(s, F.id, `Work on the Corridor Engine at ${sys.name} stops: another stands. What's built is kept, ready for when it falls.`, "build"); q.held = true; break; }
         q.held = false;
         const need = q.cost - q.progress, put = Math.min(need, c.stock);
@@ -1412,7 +1415,7 @@ function economy(s, F) {
         if ((q.kind === "ship" || q.id === "battery" || q.id === "station") && besieged(s, sys)) { if (!q.blockaded) log(s, F.id, `${q.name} at ${sys.name} is ready, but the siege holds it in the yards.`, "build"); q.blockaded = true; break; }
         q.blockaded = false;
         F.exotics -= q.exotics || 0;
-        c.queue.shift();
+        c.queue.shift(); finished = true;
         if (q.kind === "ship") {
           const warship = SHIPS[q.id].skill > 0, dest = musterFor(s, F.id, q.id);
           if (dest && dest !== sys) {   // a standing order: it leaves for the muster point as soon as it's built

@@ -1411,7 +1411,7 @@ function showHelp(back) {
   modal(`<h1>How to play</h1>
     <ul class="help">
       <li><b>Each turn</b>, give orders, then press <b>End turn</b> (or Enter). Everyone moves at once.</li>
-      <li><b>Worlds</b> grow population, which makes <b>industry</b> (to build), <b>science</b> (to research) and <b>credits</b> (to pay upkeep). Pick what each world builds in its queue; rush the first item with credits.</li>
+      <li><b>Worlds</b> grow population, which makes <b>industry</b> (to build), <b>science</b> (to research) and <b>credits</b> (to pay upkeep). Pick what each world builds in its queue; rush the first item with credits. A world finishes one item a turn: industry left over goes into the next, which finishes the turn after.</li>
       <li><b>Space travel.</b> Each ship has a speed: the moves it gets each turn (a scout 4, frigates and cruisers 3, colony ships and dreadnoughts 2; Fold drives add 1). A fleet moves at its slowest ship's speed. Right-click where it should go; the route and the turns it takes show on the map.
         <ul>
           <li><b>Open space:</b> a move a hex. You can fly anywhere this way, just slowly.</li>
