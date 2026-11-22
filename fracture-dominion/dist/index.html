@@ -211,7 +211,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-22 18:34 UTC";
+const BUILD = "2026-11-22 19:38 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -5067,7 +5067,9 @@ function territory() {
 const MUSIC_SERVER = "https://legend-table.des0906.workers.dev";
 const MUSIC_MOODS = { theme: "Main theme", exploration: "Exploration", war: "War", crisis: "Crisis" };
 const music = { tracks: null, loading: false, audio: null, mood: null, current: null, played: [], error: null, started: false,
-  prefs: (() => { try { return { on: true, volume: 0.4, ...(JSON.parse(localStorage.getItem("dominion.music.v1")) || {}) }; } catch { return { on: true, volume: 0.4 }; } })() };
+  prefs: (() => { try { return { on: true, volume: 0.4, pauses: true, ...(JSON.parse(localStorage.getItem("dominion.music.v1")) || {}) }; } catch { return { on: true, volume: 0.4, pauses: true }; } })() };
+/** Pauses between tracks (the Menu's "Pauses between tracks"): a quiet stretch of this many seconds, at random. */
+const MUSIC_PAUSE = [25, 70];
 const savePrefs = () => { try { localStorage.setItem("dominion.music.v1", JSON.stringify(music.prefs)); } catch {} };
 const moodOf = (t) => { const m = String(t.mood || "").toLowerCase(), w = t.file.toLowerCase().split(/[\s._-]+/)[0]; return MUSIC_MOODS[m] ? m : MUSIC_MOODS[w] ? w : null; };
 /** What the game calls for now. */
@@ -5093,7 +5095,8 @@ async function loadMusic() {
 /** A track for this mood: ones of that mood (or with none), not the one just played, least recently played first. */
 function pickTrack(mood) {
   const all = music.tracks || []; if (!all.length) return null;
-  let pool = all.filter((t) => t.moodKey === mood); if (!pool.length) pool = all.filter((t) => !t.moodKey); if (!pool.length) pool = all.filter((t) => t.moodKey !== "theme"); if (!pool.length) pool = all;
+  // A mood's own tracks, and the interludes (tracks with no mood), which suit any of them.
+  let pool = all.filter((t) => t.moodKey === mood || (!t.moodKey && mood !== "theme")); if (!pool.length) pool = all.filter((t) => !t.moodKey); if (!pool.length) pool = all.filter((t) => t.moodKey !== "theme"); if (!pool.length) pool = all;
   const fresh = pool.filter((t) => !music.played.includes(t.file)); const from = fresh.length ? fresh : pool.filter((t) => t !== music.current) .length ? pool.filter((t) => t !== music.current) : pool;
   if (!fresh.length) music.played = music.played.filter((f) => !pool.some((t) => t.file === f));
   return from[Math.floor(Math.random() * from.length)];
@@ -5110,6 +5113,7 @@ function startAudio(a) {
     .catch((e) => { if (e && e.name === "NotAllowedError") music.started = false; });
 }
 function playTrack(t) {
+  if (music.resting) { clearTimeout(music.resting); music.resting = null; music.restUntil = 0; }
   const old = music.audio, a = new Audio(t.src); a.volume = 0; a.preload = "auto";
   // Extended play: a track marked "loop" loops until the game's mood changes; "repeat": n plays it n times in a row;
   // and the Menu's Loop this track keeps the current one going. The browser loops it seamlessly.
@@ -5119,7 +5123,18 @@ function playTrack(t) {
     if (a.currentTime + 1 < a.last) { a.plays++; renderMusicNow(); if (!(t.loop && t.moodKey !== "theme") && !music.loopNow && t.repeat && a.plays >= t.repeat) a.loop = false; }
     a.last = a.currentTime;
   });
-  a.addEventListener("ended", () => { if (music.audio !== a) return; if (t.moodKey === "theme") { music.themeDone = true; music.mood = gameMood(); } playTrack(pickTrack(music.mood) || t); });
+  a.addEventListener("ended", () => {
+    if (music.audio !== a) return;
+    if (t.moodKey === "theme") { music.themeDone = true; music.mood = gameMood(); }
+    // A quiet stretch before the next track (not after the theme): the soundtrack breathes, and goes further.
+    if (music.prefs.pauses && t.moodKey !== "theme") {
+      const secs = MUSIC_PAUSE[0] + Math.random() * (MUSIC_PAUSE[1] - MUSIC_PAUSE[0]);
+      music.restUntil = Date.now() + secs * 1000; renderMusicNow();
+      music.resting = setTimeout(() => { music.resting = null; music.restUntil = 0; if (music.audio === a && music.prefs.on) playTrack(pickTrack(music.mood) || t); }, secs * 1000);
+      return;
+    }
+    playTrack(pickTrack(music.mood) || t);
+  });
   // A track that won't load: its copy on the music server, then the next track; after several in a row, stop and say so.
   const failed = (why) => {
     if (music.audio !== a || a.failedOnce === a.src) return; a.failedOnce = a.src;
@@ -5160,6 +5175,7 @@ function renderMusicNow() {
 const musicStatus = () => {
   if (!music.prefs.on) return "Music is off."; if (music.error) return music.error;
   const t = music.current, a = music.audio; if (!t) return music.loading ? "Loading the music…" : "The music starts when you click.";
+  if (music.restUntil > Date.now()) return `A pause between tracks: the next in about ${Math.max(1, Math.round((music.restUntil - Date.now()) / 1000))} seconds.`;
   const ext = music.loopNow || t.loop ? " · looping" : t.repeat > 1 && a ? ` · play ${Math.min(a.plays, t.repeat)} of ${t.repeat}` : "";
   return `Now playing: ${t.title}${t.moodKey ? ` (${MUSIC_MOODS[t.moodKey]})` : ""}${ext}.`;
 };
@@ -5167,6 +5183,7 @@ function musicMenuHTML() {
   return `<div class="music-box"><h3>Music<\/h3><label class="small check-line"><input type="checkbox" id="m-music-on" ${music.prefs.on ? "checked" : ""}> Play music<\/label>
     <label class="small">Volume <input type="range" id="m-music-vol" min="0" max="1" step="0.05" value="${music.prefs.volume}"><\/label>
     <div class="btn-row"><button class="btn small" id="m-music-skip">Next track<\/button><label class="small check-line" style="margin:0"><input type="checkbox" id="m-music-loop" ${music.loopNow ? "checked" : ""}> Loop this track<\/label><\/div>
+    <label class="small check-line"><input type="checkbox" id="m-music-pauses" ${music.prefs.pauses ? "checked" : ""}> Pauses between tracks (a quiet half-minute or so)<\/label>
     <p class="small muted" id="m-music-now">${esc(musicStatus())}<\/p>
     <p class="small muted">The mood follows the game: the main theme at the start, exploration in peacetime, war while you're at war, the crisis when the Wardens wake.<\/p><\/div>`;
 }
@@ -5174,6 +5191,7 @@ function bindMusicMenu() {
   if (!$("m-music-on")) return;
   $("m-music-on").onchange = () => { music.prefs.on = $("m-music-on").checked; savePrefs(); music.started = true; musicUpdate(); };
   $("m-music-loop").onchange = () => { music.loopNow = $("m-music-loop").checked; if (music.audio) music.audio.loop = music.loopNow || !!(music.current && (music.current.loop || (music.current.repeat > 1 && music.audio.plays < music.current.repeat))); renderMusicNow(); };
+  $("m-music-pauses").onchange = () => { music.prefs.pauses = $("m-music-pauses").checked; savePrefs(); };
   $("m-music-vol").oninput = () => { music.prefs.volume = +$("m-music-vol").value; savePrefs(); if (music.audio) music.audio.volume = music.prefs.volume; };
   $("m-music-skip").onclick = () => { music.started = true; music.gaveUp = false; if (!music.prefs.on) { music.prefs.on = true; savePrefs(); $("m-music-on").checked = true; } const t = pickTrack(gameMood()); if (t) { if (music.current && music.current.moodKey === "theme") music.themeDone = true; music.mood = gameMood(); playTrack(pickTrack(music.mood) || t); } else musicUpdate(); };
 }
