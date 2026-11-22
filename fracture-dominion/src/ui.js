@@ -10,7 +10,7 @@ import { crisisTurn, crisisState } from "./crisis.js";
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
 import { sectorsTurn, sectorsState, corridorsTurn, collapseState } from "./sectors.js";
-import { peopleToken, peopleArt, LOOKS } from "./peoples.js";
+import { peopleToken, peopleArt, installPeopleArt, PEOPLE_CLIP, LOOKS } from "./peoples.js";
 import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
@@ -245,6 +245,7 @@ function musicUpdate() {
   if (!themePlaying && (mood !== music.mood || !music.audio)) { music.mood = mood; const t = pickTrack(mood); if (t) playTrack(t); }
   renderMusicNow();
 }
+installPeopleArt(MUSIC_SERVER, PEOPLE_CLIP);   // painted portraits, if any are in the bucket
 function musicStart() { if (music.started) return; music.started = true; musicUpdate(); }
 document.addEventListener("pointerdown", musicStart, { once: false });
 document.addEventListener("keydown", musicStart, { once: false });

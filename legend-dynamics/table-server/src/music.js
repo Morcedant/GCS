@@ -70,6 +70,16 @@ export function buildList(objects, manifest, folder, base, publicBase = "") {
   });
 }
 
+/** The portraits in peoples/: { name: url }, the name being the file's, lowercased, without its extension. */
+export function peopleImages(/** @type {any[]} */ objects, /** @type {string} */ base) {
+  /** @type {Record<string, string>} */ const out = {};
+  for (const o of objects) {
+    const m = /^peoples\/([^/]+)\.(png|jpe?g|webp|gif|avif)$/i.exec(o.key || ""); if (!m) continue;
+    const v = String(o.etag || o.httpEtag || (o.uploaded && new Date(o.uploaded).getTime()) || o.size || "").replace(/[^\w-]/g, "").slice(0, 16);
+    out[m[1].toLowerCase()] = `${base}/peoples/${encodeURIComponent(m[1] + "." + m[2])}${v ? `?v=${v}` : ""}`;
+  }
+  return out;
+}
 /** Every object under a prefix (R2 lists a thousand at a time). @param {any} bucket @param {string} prefix */
 async function listAll(bucket, prefix) {
   const out = []; let cursor;
@@ -96,8 +106,15 @@ const publicMusic = (/** @type {any} */ env) => { const v = (env && env.MUSIC_PU
  */
 export async function musicFetch(req, env, h) {
   const url = new URL(req.url), path = url.pathname;
-  if (path !== "/api/music" && !path.startsWith("/music/")) return null;
+  if (path !== "/api/music" && path !== "/api/peoples" && !path.startsWith("/music/")) return null;
   const json = (/** @type {any} */ b, /** @type {number} */ s, /** @type {Record<string, string>} */ x = {}) => new Response(JSON.stringify(b), { status: s, headers: { "Content-Type": "application/json", ...h, ...x } });
+  // The strategy game's portraits: every image in the bucket's peoples/ folder, by name, at its public address with a
+  // version tag (so a picture replaced, or one looked for before it was uploaded, isn't stuck in the cache).
+  if (path === "/api/peoples") {
+    if (req.method !== "GET" && req.method !== "HEAD") return json({ error: "Not found." }, 404);
+    const base = publicMusic(env); if (!env.MUSIC || !base) return json({ images: {} }, 200, { "Cache-Control": "no-store" });
+    return json({ images: peopleImages(await listAll(env.MUSIC, "peoples/"), base) }, 200, { "Cache-Control": "public, max-age=60" });
+  }
   if (req.method !== "GET" && req.method !== "HEAD") return json({ error: "Not found." }, 404);
   const bucket = env.MUSIC;
   if (path === "/api/music") {

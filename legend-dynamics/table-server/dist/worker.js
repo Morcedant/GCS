@@ -641,6 +641,16 @@ function buildList(objects, manifest, folder, base, publicBase = "") {
     return out;
   });
 }
+function peopleImages(objects, base) {
+  const out = {};
+  for (const o of objects) {
+    const m = /^peoples\/([^/]+)\.(png|jpe?g|webp|gif|avif)$/i.exec(o.key || "");
+    if (!m) continue;
+    const v = String(o.etag || o.httpEtag || o.uploaded && new Date(o.uploaded).getTime() || o.size || "").replace(/[^\w-]/g, "").slice(0, 16);
+    out[m[1].toLowerCase()] = `${base}/peoples/${encodeURIComponent(m[1] + "." + m[2])}${v ? `?v=${v}` : ""}`;
+  }
+  return out;
+}
 async function listAll(bucket, prefix) {
   const out = [];
   let cursor;
@@ -668,8 +678,14 @@ var publicMusic = (env) => {
 };
 async function musicFetch(req, env, h) {
   const url = new URL(req.url), path = url.pathname;
-  if (path !== "/api/music" && !path.startsWith("/music/")) return null;
+  if (path !== "/api/music" && path !== "/api/peoples" && !path.startsWith("/music/")) return null;
   const json2 = (b, s, x = {}) => new Response(JSON.stringify(b), { status: s, headers: { "Content-Type": "application/json", ...h, ...x } });
+  if (path === "/api/peoples") {
+    if (req.method !== "GET" && req.method !== "HEAD") return json2({ error: "Not found." }, 404);
+    const base = publicMusic(env);
+    if (!env.MUSIC || !base) return json2({ images: {} }, 200, { "Cache-Control": "no-store" });
+    return json2({ images: peopleImages(await listAll(env.MUSIC, "peoples/"), base) }, 200, { "Cache-Control": "public, max-age=60" });
+  }
   if (req.method !== "GET" && req.method !== "HEAD") return json2({ error: "Not found." }, 404);
   const bucket = env.MUSIC;
   if (path === "/api/music") {

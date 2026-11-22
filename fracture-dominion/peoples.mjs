@@ -3,7 +3,11 @@
 // Painted portraits come from the music bucket's peoples/ folder (src/peoples.js, peopleArt), when there are any.
 import { writeFileSync, mkdirSync } from "node:fs";
 import { FACTIONS, PERSONALITIES, FLEET_STYLES, SHIPS } from "./src/data.js";
-import { peopleToken, peopleArt, LOOKS } from "./src/peoples.js";
+import { peopleToken, peopleArt, installPeopleArt, PEOPLE_CLIP, LOOKS } from "./src/peoples.js";
+import { readFileSync } from "node:fs";
+// The table server (for the portraits list), as for the game's music.
+let server = ""; try { server = readFileSync(new URL("../legend-dynamics/table-server/server-url.txt", import.meta.url), "utf8").trim(); } catch {}
+if (!/^https:\/\/[\w.-]+(:\d+)?$/.test(server)) server = "";
 
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "colony", "outpost", "transport", "tanker"];
@@ -41,7 +45,7 @@ details{margin-top:30px;background:var(--card);border:1px solid var(--line);bord
 <div class="row">${FACTIONS.map((f) => `<a href="#${f.id}">${peopleArt(f.id, f.color, 72)}<br>${esc(f.people.replace(/ and .*/, ""))}</a>`).join("")}</div>
 ${FACTIONS.map(card).join("\n")}
 <p class="muted" style="margin-top:30px">Fracture Lines: Dominion, a strategy game in the Fracture Lines setting of the Legend Dynamics RPG. The peoples are described in the setting's guide.</p>
-</main></body></html>`;
+</main><script>(${installPeopleArt.toString()})(${JSON.stringify(server)}, ${JSON.stringify(PEOPLE_CLIP)});</script></body></html>`;
 mkdirSync(new URL("dist/", import.meta.url), { recursive: true });
 writeFileSync(new URL("dist/peoples.html", import.meta.url), page);
 console.log("wrote dist/peoples.html");

@@ -4,6 +4,15 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-22",
+      "kind": "site",
+      "title": "Dominion: portraits found by name",
+      "items": [
+        "The table server now lists the pictures in the music bucket's peoples/ folder, and the game and the Peoples page use them by their real names. Any of png, jpg, jpeg, webp, gif or avif works, in any capitalisation, named after the empire or its people (mirrun.png, Human.jpeg, Ozhvek.webp).",
+        "Each picture's address carries a version tag, so a picture replaced or uploaded after the page first looked for it shows at once instead of waiting out the cache."
+      ]
+    },
+    {
       "date": "2026-11-21",
       "kind": "site",
       "title": "Dominion: clearer travel times",

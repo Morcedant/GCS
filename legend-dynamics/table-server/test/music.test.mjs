@@ -72,3 +72,11 @@ test("songs play from the bucket's public address, with this server as the fallb
   assert.equal(u.src, "https://srv.example/music/dominion/war%20-%20a.mp3"); assert.equal(u.via, undefined);
   assert.ok(/^https:\/\//.test(MUSIC_PUBLIC_URL));
 });
+
+test("the strategy game's portraits: any image in peoples/, by name, with a version tag", async () => {
+  const { peopleImages } = await import("../src/music.js");
+  const out = peopleImages([{ key: "peoples/Mirrun.JPEG", etag: "abc123" }, { key: "peoples/zhaq.png", size: 9 }, { key: "peoples/readme.txt" }, { key: "dominion/war.mp3" }], "https://m.example");
+  assert.deepEqual(Object.keys(out).sort(), ["mirrun", "zhaq"]);
+  assert.equal(out.mirrun, "https://m.example/peoples/Mirrun.JPEG?v=abc123");
+  assert.ok(out.zhaq.startsWith("https://m.example/peoples/zhaq.png"));
+});
