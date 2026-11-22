@@ -1467,3 +1467,25 @@ test("repairs: damaged ships split off to the best yard, mend, and rejoin their 
   const w = sendForRepairs(s, f.id); assert.ok(w.ok && w.withdrawing);
   assert.ok(s.fleets[w.fleet].withdraw);
 });
+
+test("computer players send badly damaged ships for repairs when it's safe, and keep the rest on station", async () => {
+  const { aiTurn } = await import("../src/ai.js");
+  const s = newGame({ seed: 53, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const F = s.factions[1], home = s.systems[F.capital]; home.colony.buildings.drydock = true; F.credits = 2000; home.colony.pop = 30; home.colony.buildings.market = true;   // rich enough to keep them (no scrapping for upkeep)
+  const spot = Object.keys(s.hexes).find((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && distance(k, home.at) === 3);
+  const f = spawnFleet(s, F.id, spot, ["cruiser", "cruiser", "cruiser", "cruiser", "cruiser"]);
+  f.ships[0].hull = 1; f.ships[1].hull = 1; f.ships[2].hull = 3;   // two badly damaged, one scratched
+  aiTurn(s, F);
+  const away = Object.values(s.fleets).find((g) => g.owner === F.id && g.repairAt);
+  assert.ok(away, "a repair trip");
+  assert.equal(away.ships.length, 2, "only the badly damaged");
+  assert.equal(f.ships.length, 3, "the rest stay");
+  // Not with an enemy close by.
+  const t = newGame({ seed: 53, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const G2 = t.factions[1], me = t.factions[0]; t.systems[G2.capital].colony.buildings.drydock = true; G2.credits = 2000; t.systems[G2.capital].colony.pop = 30; t.systems[G2.capital].colony.buildings.market = true; me.relations[G2.id].status = G2.relations[me.id].status = "war";
+  const g = spawnFleet(t, G2.id, spot, ["cruiser", "cruiser", "cruiser", "cruiser", "cruiser"]); g.ships[0].hull = 1; g.ships[1].hull = 1;
+  const near = Object.keys(t.hexes).find((k) => t.hexes[k].terrain === "space" && !t.sysAt[k] && distance(k, spot) === 2);
+  spawnFleet(t, me.id, near, ["frigate"]);
+  aiTurn(t, G2);
+  assert.ok(!Object.values(t.fleets).some((x) => x.owner === G2.id && x.repairAt), "no trip with enemies near");
+});

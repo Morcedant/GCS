@@ -3,7 +3,7 @@
 import { distance, neighbors, hexLine, makeRng } from "./hex.js";
 import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE } from "./data.js";
 import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, sendForRepairs, repairPlace, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
 
 const PRIORITY = {
   // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
@@ -147,6 +147,30 @@ function influence(s, F) {
   const prey = met.filter((O) => O.ai && !atWar(s, F.id, O.id) && !allied(s, F.id, O.id) && militaryPower(s, O.id) < mine * INFLUENCE.tribute.weaker && O.credits >= INFLUENCE.tribute.min).sort((a, b) => b.credits - a.credits)[0];
   if (prey && go("tribute") && exactTribute(s, F.id, prey.id).ok) return done();
 }
+/** How damaged a ship must be (share of its hull left) before each people sends it for repairs: the cautious sooner. */
+const REPAIR_AT = { concord: 0.6, mirrun: 0.6, tessan: 0.6, ylith: 0.5, vael: 0.5, zhaq: 0.5, kel: 0.4, hegemony: 0.4 };
+/** A war fleet out of combat, not on its way to strike an enemy world: its badly damaged ships go to the nearest
+ * yard that can mend them within 6 turns, and come back to it. True if it sent them. */
+function repairNow(s, F, f, enemies) {
+  if (!armed(f) || f.coalition || engaged(s, f)) return false;
+  const dsys = f.dest && s.sysAt[f.dest] && s.systems[s.sysAt[f.dest]];
+  if (dsys && dsys.colony && enemies.includes(dsys.colony.owner)) return false;   // on its way to strike: no stopping
+  const at = REPAIR_AT[F.id] || 0.5;
+  const bad = f.ships.filter((x) => x.hull <= shipStats(s, F.id, x.type, x).hull * at && shipStats(s, F.id, x.type, x).speed);
+  if (!bad.length) return false;
+  const sp = Math.min(...bad.map((x) => shipStats(s, F.id, x.type, x).speed)), rp = repairPlace(s, F.id, f.at, bad, sp);
+  if (!rp || rp.turns > 6) return false;
+  // Not with enemy warships close by: the trip has to be safe.
+  if (Object.values(s.fleets).some((o) => armed(o) && atWar(s, F.id, o.owner) && distance(o.at, f.at) <= 3)) return false;
+  // Only the badly damaged go, unless what would stay is too small to hold on its own: then the whole fleet goes.
+  const stay = f.ships.length - bad.length;
+  if (stay < 3 || stay < f.ships.length * 0.4) {
+    if (f.at === rp.sys.at) return false;   // already there: it mends where it is
+    if (!setDestination(s, f.id, rp.sys.at).ok) return false;
+    f.repairAt = rp.sys.id; f.rejoin = null; return true;
+  }
+  return !!sendForRepairs(s, f.id, true, bad).ok;
+}
 function diplomacy(s, F, diff) {
   for (const [oid, r] of Object.entries(F.relations)) {
     const O = faction(s, oid); if (!O.alive || !F.met[oid]) continue;
@@ -280,6 +304,7 @@ function fleets(s, F) {
   for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
+    if (f.repairAt) continue;   // away for repairs: it comes back by itself (game.js repairsTurn)
     // Answering a coalition against the Wardens: to the target, and hold there (no withdrawing) until it falls.
     const A = s.crisis && s.crisis.coalition;
     if (f.coalition && A && !A.done && A.from === f.coalition) { if (f.at !== A.at && (!f.path.length || f.dest !== A.at)) setDestination(s, f.id, A.at); continue; }
@@ -348,6 +373,8 @@ function fleets(s, F) {
         foe: fleetsAt(s, sys.at).filter((g) => armed(g) && atWar(s, g.owner, F.id)).reduce((t, g) => t + g.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? x.hull : 0), 0), 0) }))
         .filter((x) => x.foe <= mineHull * 1.2).sort((a, b) => a.d - b.d)[0];
       if (relief) { if (relief.sys.at !== f.at && setDestination(s, f.id, relief.sys.at).ok && usesReserve(F.id) && fuelStock(s, F.id) > fuelCap(s, F.id) / 2) f.burn = true; continue; }   // burn hard to the rescue while the reserve allows
+      // Badly damaged ships off for repairs (then back to this fleet), when a yard is near and nothing urgent is on.
+      if (repairNow(s, F, f, enemies)) continue;
       // Out of date: to the nearest drydock, for a refit with what's been researched since these ships were built
       // (before going on the attack; a world of ours under siege comes first).
       if (f.ships.some((x) => missingFit(s, F.id, x).length)) {

@@ -713,9 +713,9 @@ export function repairPlace(s, fid, hex, ships, speedOf) {
 }
 /** Send a fleet's damaged ships for repairs: split off (the soundest stay, with the admiral), to the best place to
  * repair, withdrawing first if the fleet is engaged; with rejoin, they come back to the fleet once mended. */
-export function sendForRepairs(s, fleetId, rejoin = false) {
+export function sendForRepairs(s, fleetId, rejoin = false, only = null) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
-  const hurt = damagedShips(s, f); if (!hurt.length) return { error: "No ship in this fleet is damaged." };
+  const hurt = damagedShips(s, f).filter((x) => !only || only.includes(x)); if (!hurt.length) return { error: "No ship in this fleet is damaged." };
   if (hurt.some((x) => !shipStats(s, f.owner, x.type, x).speed)) return { error: "These can't move." };
   const speed = Math.min(...hurt.map((x) => shipStats(s, f.owner, x.type, x).speed)) + (admTrait(f, "swift") ? 1 : 0);
   const place = repairPlace(s, f.owner, f.at, hurt, speed); if (!place) return { error: "There's nowhere of yours to repair them that they can reach." };

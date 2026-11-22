@@ -6,6 +6,16 @@
     {
       "date": "2026-11-22",
       "kind": "site",
+      "title": "Dominion: computer players repair their ships",
+      "items": [
+        "A computer player's war fleet now sends its badly damaged ships for repairs, then back to the fleet. It does this when the fleet is out of combat, no enemy warships are within 3 hexes, and a yard can mend them within 6 turns. The cautious peoples (Concord, Mirrun, Tessan) send ships at 60% hull, the aggressive (Hegemony, Kel) only at 40%.",
+        "Never on the way to relieve a besieged world, answering a coalition, or heading to strike an enemy world. If too little of the fleet would stay behind, the whole fleet goes to the yard together.",
+        "Wars against computer players last a little longer: in tests they kept about 3% more warships and lost 2% fewer."
+      ]
+    },
+    {
+      "date": "2026-11-22",
+      "kind": "site",
       "title": "Dominion: stronger dreadnoughts",
       "items": [
         "Dreadnoughts now have 10 hull instead of 8. A dreadnought costs as much as two cruisers but used to lose to them badly: 10 dreadnoughts beat 20 cruisers only 1 time in 40. Now that fight is about even at base technology, and dreadnoughts pull ahead once Deflector shields are researched.",
