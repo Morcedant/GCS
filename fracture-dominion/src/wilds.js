@@ -130,10 +130,19 @@ function convoyPrey(s, f) {
     .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
   return c ? (c.path.length ? c.path[Math.min(c.path.length - 1, 1)].hex : c.at) : null;
 }
+/** Mining ships at work in reach with no warships of their own to guard them (and not paid off): easy pickings. */
+function minerPrey(s, f) {
+  const m = Object.values(s.fleets).filter((x) => x.owner !== PIRATES && x.ships.some((y) => SHIPS[y.type].mine) && s.fields && s.fields[x.at] && distance(x.at, f.at) <= WILDS.raidRange
+    && !protectedFrom(s, x.owner, f.home) && !fleetsAt(s, x.at).some((o) => o.owner === x.owner && o.ships.some((y) => SHIPS[y.type].skill > 0)))
+    .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  return m ? m.at : null;
+}
 function raid(s, f, R) {
   const hurt0 = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
   // On the way somewhere, or between raids: a convoy in reach is worth turning for.
   if (!hurt0 && !(f.stay > 0)) { const meet = convoyPrey(s, f); if (meet && meet !== f.at && setDestination(s, f.id, meet).ok) return; }
+  // Mining ships out in the open: worth a detour too (now and then, so they don't only ever hunt miners).
+  if (!hurt0 && !(f.stay > 0) && !f.path.length && R.next() < 0.5) { const m = minerPrey(s, f); if (m && m !== f.at && setDestination(s, f.id, m).ok) return; }
   if (f.path.length) return;
   const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
   const hurt = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;

@@ -76,6 +76,9 @@ export const SHIPS = {
   tanker: { name: "Fuel tanker", cost: 50, fuel: 12, upkeep: 1, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, cargo: 12, text: "Carries fuel: with a fleet, it tops up the tank when it runs dry; parked, it gives supply within 2 hexes (a unit of fuel per fleet a turn). Unarmed: escort it." },
   cruiser: { name: "Cruiser", cost: 90, fuel: 5, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
   dreadnought: { name: "Dreadnought", cost: 180, fuel: 4, exotics: 3, upkeep: 4, speed: 2, hull: 10, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
+  torpedo: { name: "Torpedo boat", cost: 55, fuel: 5, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 1, needs: "heavyHulls", text: "Small and fragile, with one job: against dreadnoughts and the biggest hulls its torpedoes do double damage." },
+  stealth: { name: "Stealth corvette", cost: 60, fuel: 8, upkeep: 1, speed: 3, hull: 2, skill: 12, dmg: 1, sensors: 2, cloak: true, needs: "phaseCloaks", text: "Cloaked: unseen except close up or by scouts, it slips past enemy fleets, and strikes first from the dark." },
+  miner: { name: "Mining ship", cost: 40, fuel: 8, upkeep: 0.5, speed: 2, hull: 2, skill: 0, dmg: 0, sensors: 1, mine: true, text: "Parks at an asteroid field, gas cloud or crystal drift in open space and mines it every turn. Unarmed: pirates hunt them." },
   // The wild things (wilds.js): pirates and the creatures of the deep. Nobody builds these either.
   raider: { name: "Raider", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, wild: true, text: "A pirate gunship: fast, lightly armed, and after your credits." },
   haven: { name: "Pirate haven", cost: 0, upkeep: 0, speed: 0, hull: 8, skill: 12, dmg: 2, shots: 2, sensors: 2, wild: true, text: "A fortified pirate base in an empty system. It sends out raiders until someone burns it." },
@@ -86,11 +89,45 @@ export const SHIPS = {
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
-  probe: { name: "Warden probe", cost: 0, upkeep: 0, speed: 4, hull: 3, skill: 0, dmg: 0, sensors: 4, warden: true, evasive: 3, text: "A Warden scout out of the rifts: it maps worlds and their defences, then goes back with what it saw. Unarmed, small and quick (−3 to hit it): only warships can catch it." },
+  probe: { name: "Warden probe", cost: 0, upkeep: 0, speed: 4, hull: 3, skill: 0, dmg: 0, sensors: 4, warden: true, evasive: 3, cloak: true, text: "A Warden scout out of the rifts: it maps worlds and their defences, then goes back with what it saw. Unarmed, small, quick (−3 to hit it) and cloaked: seen only close up or by scouts, and only warships can catch it." },
   watcher: { name: "Watcher", cost: 0, upkeep: 0, speed: 0, hull: 6, skill: 12, dmg: 2, sensors: 3, warden: true, text: "A Warden machine half-buried by a rift, dormant but watching. It fights whatever comes near. When the Wardens wake, it wakes as a Node." },
   node: { name: "Warden Node", cost: 0, upkeep: 0, speed: 0, hull: 10, skill: 12, dmg: 2, shots: 2, sensors: 3, warden: true, text: "A Warden forge, built on a world they've burned. It sends out hunters and holds the system. While one stands, a new Heart can grow." },
   heart: { name: "Heart", cost: 0, upkeep: 0, speed: 0, hull: 20, skill: 14, dmg: 3, sensors: 3, warden: true, text: "The Wardens' mind and forge. It never moves, mends itself, and sends out the waves. Break it and they go dark." },
 };
+
+// Ship roles and counters: each warship is built to beat one kind of ship. Against what it counters it gets
+// COUNTER.bonus to hit, and it aims for those first. Frigates screen against the small and quick; cruisers break
+// frigate lines; dreadnoughts crush cruisers and fortifications; torpedo boats crack the biggest hulls; stealth
+// corvettes prey on unarmed ships.
+export const ROLES = {
+  scout: "light", probe: "light", raider: "light", sentinel: "light", torpedo: "strike", stealth: "raider",
+  frigate: "escort", cruiser: "line", colossus: "line", dreadnought: "capital", leviathan: "capital", heart: "capital",
+  haven: "fort", swarm: "fort", husk: "fort", watcher: "fort", node: "fort", guns: "fort",
+  colony: "support", outpost: "support", transport: "support", tanker: "support", miner: "support", merchant: "support",
+};
+export const COUNTER = { bonus: 2, dmg: { strike: 1 },   // and torpedo boats do 1 more damage to what they counter
+
+  beats: { escort: ["light", "strike", "raider"], line: ["escort"], capital: ["line", "fort"], strike: ["capital"], raider: ["support"] },
+  names: { light: "scouts and small, quick ships", strike: "torpedo boats", raider: "stealth corvettes", escort: "frigates", line: "cruisers", capital: "dreadnoughts and the biggest hulls", fort: "orbital guns, bases and fixed defences", support: "unarmed ships (transports, tankers, colony and mining ships)" } };
+/** What a ship type counters, in words: "frigates" etc. */
+export const countersOf = (type) => (COUNTER.beats[ROLES[type]] || []).map((r) => COUNTER.names[r]);
+/** Who counters this ship type. */
+export const counteredBy = (type) => Object.keys(SHIPS).filter((t) => !SHIPS[t].wild && !SHIPS[t].warden && !SHIPS[t].trader && (COUNTER.beats[ROLES[t]] || []).includes(ROLES[type]));
+
+// Cloaking: a fleet of nothing but cloaked ships is seen by another power only inside its detection range. Worlds
+// detect DETECT.world hexes out (more with a station, Deep sensors, Resonance arrays, and for the Ylith); scouts
+// DETECT.scout; every other ship only in its own hex. A cloaked ship gets DETECT.ambush to hit in the first exchange.
+export const DETECT = { world: 1, station: 1, scout: 2, ship: 0, sensors: 1, resonance: 1, ylith: 1, ambush: 2 };
+
+// Space mining: fields in open space between the systems. A mining ship parked at one (not moving) mines `per` a turn
+// of its resource (credits, fuel into the reserve, or exotics), up to `perField` ships on a field; a deep-space station
+// of yours within stationRange adds stationBonus. A field runs dry when its `size` is mined out.
+export const MINING = { perField: 3, stationRange: 2, stationBonus: 0.5, density: 0.35, near: [2, 4], apart: 3,
+  kinds: {
+    ore: { name: "Asteroid field", res: "credits", per: 3, size: [180, 260], odds: 0.5, text: "Metal-rich rock: credits." },
+    gas: { name: "Gas cloud", res: "fuel", per: 1.5, size: [90, 140], odds: 0.3, text: "Fuel to skim, straight into your reserve." },
+    crystal: { name: "Crystal drift", res: "exotics", per: 0.5, size: [18, 28], odds: 0.2, text: "Rare crystal: exotics." },
+  } };
 
 // Ship outlines, bow pointing right (+x), in a box from −12 to 12: SVG path data, for the map (a canvas Path2D), the
 // page and the printable token sheet (tokens.mjs).
@@ -117,6 +154,9 @@ export const SHIP_SHAPES = {
 
 // Outlines for ships that had none: the fuel tanker, and the free traders' merchant convoys.
 SHIP_SHAPES.tanker = "M11 0 Q11 -5 6 -5 L-8 -5 Q-11 -5 -11 0 Q-11 5 -8 5 L6 5 Q11 5 11 0 Z M-11 -2 L-13 -2 M-11 2 L-13 2 M0 -5 L0 5";
+SHIP_SHAPES.torpedo = "M12 0 L4 -2.5 L-8 -2.5 L-11 -6 L-11 6 L-8 2.5 L4 2.5 Z M2 -2.5 L2 -6 L-4 -6 L-4 -2.5 M2 2.5 L2 6 L-4 6 L-4 2.5";
+SHIP_SHAPES.stealth = "M12 0 L-2 -8 L-10 -9 L-6 0 L-10 9 L-2 8 Z M4 0 L-4 -4 M4 0 L-4 4";
+SHIP_SHAPES.miner = "M10 -4 L10 4 L-6 4 L-10 7 L-12 4 L-12 -4 L-10 -7 L-6 -4 Z M10 -2 L13 -5 M10 2 L13 5 M-2 -4 L-2 4 M3 -4 L3 4";
 SHIP_SHAPES.merchant = "M11 0 L7 -5 L-9 -5 L-11 -3 L-11 3 L-9 5 L7 5 Z M-3 -5 L-3 5 M2 -5 L2 5 M-11 0 L-13 0";
 
 /**
@@ -214,6 +254,11 @@ export const FLEET_STYLES = {
       cruiser: "M12 0 L6 -5 L-4 -5 L-8 -12 L-9 -5 L-12 -4 L-10 0 L-12 4 L-9 5 L-8 12 L-4 5 L6 5 Z M0 -5 L0 5 M-10 0 L-13 0",
       dreadnought: "M12 -3 L12 3 L6 7 L-4 7 L-6 13 L-10 7 L-12 0 L-10 -7 L-6 -13 L-4 -7 L6 -7 Z M2 -7 L2 7 M-4 -7 L-4 7 M-12 0 L-14 0" } },
 };
+// Class names for the torpedo boats, stealth corvettes and mining ships (their outlines are the common ones).
+for (const [fid, [torpedo, stealth, miner]] of Object.entries({
+  concord: ["Harpoon", "Nightjar", "Prospector"], tessan: ["Stiletto", "Masquerade", "Assayer"], kel: ["Barb", "Burrower", "Gnawer"],
+  hegemony: ["Breaker", "Assassin", "Quarry"], vael: ["Thorn", "Shade", "Grazer"], mirrun: ["Narwhal", "Riptide", "Dredger"],
+  ylith: ["Needle", "Veil", "Sifter"], zhaq: ["Spike", "Hush", "Hauler"] })) Object.assign(FLEET_STYLES[fid].classes, { torpedo, stealth, miner });
 /** A ship's outline for its owner: the people's own, or the common one (the Wardens, pirates, creatures, traders). */
 export const shipShape = (fid, type) => (FLEET_STYLES[fid] && FLEET_STYLES[fid].shapes[type]) || SHIP_SHAPES[type] || SHIP_SHAPES.frigate;
 /** "Aegis-class cruiser" (plural: "Aegis-class cruisers"); a ship with no class keeps its plain name. */
@@ -229,6 +274,7 @@ export const TECHS = [
   { id: "foldDrives", name: "Fold drives", field: "Physics", cost: 300, needs: ["sensors"], text: "+1 speed for every ship." },
   { id: "shields", name: "Deflector shields", field: "Physics", cost: 375, needs: ["sensors"], text: "+1 hull for every warship." },
   { id: "targeting", name: "Targeting computers", field: "Physics", cost: 450, needs: ["shields"], text: "+1 to every ship's and battery's skill." },
+  { id: "phaseCloaks", name: "Phase cloaks", field: "Physics", cost: 450, needs: ["sensors"], text: "Lets your shipyards build stealth corvettes: cloaked raiders that slip past fleets and strike first." },
   { id: "riftDrives", name: "Rift drives", field: "Physics", cost: 600, needs: ["foldDrives"], text: "Your ships can cross into sealed sectors (the Dead Zone, the Warden Graveyard) without a Rift beacon." },
   { id: "corridorTheory", name: "Corridor theory", field: "Physics", cost: 800, needs: ["foldDrives", "targeting"], text: "Moving along a corridor costs nothing." },
   { id: "engine", name: "The Corridor Engine", field: "Physics", cost: 1500, needs: ["corridorTheory", "refining"], text: "Lets your capital build the Corridor Engine: the science victory. In an open game it's the galaxy's great prize instead, and only one can stand at a time." },

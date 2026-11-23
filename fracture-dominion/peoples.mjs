@@ -10,7 +10,7 @@ let server = ""; try { server = readFileSync(new URL("../legend-dynamics/table-s
 if (!/^https:\/\/[\w.-]+(:\d+)?$/.test(server)) server = "";
 
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "colony", "outpost", "transport", "tanker"];
+const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "torpedo", "stealth", "colony", "outpost", "transport", "tanker", "miner"];
 const HEX = "50,2 92,26 92,74 50,98 8,74 8,26";
 const card = (f) => {
   const P = PERSONALITIES[f.id] || {}, St = FLEET_STYLES[f.id];

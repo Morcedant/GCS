@@ -236,7 +236,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-23 19:55 UTC";
+const BUILD = "2026-11-23 20:52 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -397,6 +397,9 @@ const SHIPS = {
   tanker: { name: "Fuel tanker", cost: 50, fuel: 12, upkeep: 1, speed: 3, hull: 2, skill: 0, dmg: 0, sensors: 1, cargo: 12, text: "Carries fuel: with a fleet, it tops up the tank when it runs dry; parked, it gives supply within 2 hexes (a unit of fuel per fleet a turn). Unarmed: escort it." },
   cruiser: { name: "Cruiser", cost: 90, fuel: 5, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
   dreadnought: { name: "Dreadnought", cost: 180, fuel: 4, exotics: 3, upkeep: 4, speed: 2, hull: 10, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
+  torpedo: { name: "Torpedo boat", cost: 55, fuel: 5, upkeep: 1, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 1, needs: "heavyHulls", text: "Small and fragile, with one job: against dreadnoughts and the biggest hulls its torpedoes do double damage." },
+  stealth: { name: "Stealth corvette", cost: 60, fuel: 8, upkeep: 1, speed: 3, hull: 2, skill: 12, dmg: 1, sensors: 2, cloak: true, needs: "phaseCloaks", text: "Cloaked: unseen except close up or by scouts, it slips past enemy fleets, and strikes first from the dark." },
+  miner: { name: "Mining ship", cost: 40, fuel: 8, upkeep: 0.5, speed: 2, hull: 2, skill: 0, dmg: 0, sensors: 1, mine: true, text: "Parks at an asteroid field, gas cloud or crystal drift in open space and mines it every turn. Unarmed: pirates hunt them." },
   // The wild things (wilds.js): pirates and the creatures of the deep. Nobody builds these either.
   raider: { name: "Raider", cost: 0, upkeep: 0, speed: 3, hull: 2, skill: 11, dmg: 1, sensors: 2, wild: true, text: "A pirate gunship: fast, lightly armed, and after your credits." },
   haven: { name: "Pirate haven", cost: 0, upkeep: 0, speed: 0, hull: 8, skill: 12, dmg: 2, shots: 2, sensors: 2, wild: true, text: "A fortified pirate base in an empty system. It sends out raiders until someone burns it." },
@@ -407,11 +410,45 @@ const SHIPS = {
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
-  probe: { name: "Warden probe", cost: 0, upkeep: 0, speed: 4, hull: 3, skill: 0, dmg: 0, sensors: 4, warden: true, evasive: 3, text: "A Warden scout out of the rifts: it maps worlds and their defences, then goes back with what it saw. Unarmed, small and quick (−3 to hit it): only warships can catch it." },
+  probe: { name: "Warden probe", cost: 0, upkeep: 0, speed: 4, hull: 3, skill: 0, dmg: 0, sensors: 4, warden: true, evasive: 3, cloak: true, text: "A Warden scout out of the rifts: it maps worlds and their defences, then goes back with what it saw. Unarmed, small, quick (−3 to hit it) and cloaked: seen only close up or by scouts, and only warships can catch it." },
   watcher: { name: "Watcher", cost: 0, upkeep: 0, speed: 0, hull: 6, skill: 12, dmg: 2, sensors: 3, warden: true, text: "A Warden machine half-buried by a rift, dormant but watching. It fights whatever comes near. When the Wardens wake, it wakes as a Node." },
   node: { name: "Warden Node", cost: 0, upkeep: 0, speed: 0, hull: 10, skill: 12, dmg: 2, shots: 2, sensors: 3, warden: true, text: "A Warden forge, built on a world they've burned. It sends out hunters and holds the system. While one stands, a new Heart can grow." },
   heart: { name: "Heart", cost: 0, upkeep: 0, speed: 0, hull: 20, skill: 14, dmg: 3, sensors: 3, warden: true, text: "The Wardens' mind and forge. It never moves, mends itself, and sends out the waves. Break it and they go dark." },
 };
+
+// Ship roles and counters: each warship is built to beat one kind of ship. Against what it counters it gets
+// COUNTER.bonus to hit, and it aims for those first. Frigates screen against the small and quick; cruisers break
+// frigate lines; dreadnoughts crush cruisers and fortifications; torpedo boats crack the biggest hulls; stealth
+// corvettes prey on unarmed ships.
+const ROLES = {
+  scout: "light", probe: "light", raider: "light", sentinel: "light", torpedo: "strike", stealth: "raider",
+  frigate: "escort", cruiser: "line", colossus: "line", dreadnought: "capital", leviathan: "capital", heart: "capital",
+  haven: "fort", swarm: "fort", husk: "fort", watcher: "fort", node: "fort", guns: "fort",
+  colony: "support", outpost: "support", transport: "support", tanker: "support", miner: "support", merchant: "support",
+};
+const COUNTER = { bonus: 2, dmg: { strike: 1 },   // and torpedo boats do 1 more damage to what they counter
+
+  beats: { escort: ["light", "strike", "raider"], line: ["escort"], capital: ["line", "fort"], strike: ["capital"], raider: ["support"] },
+  names: { light: "scouts and small, quick ships", strike: "torpedo boats", raider: "stealth corvettes", escort: "frigates", line: "cruisers", capital: "dreadnoughts and the biggest hulls", fort: "orbital guns, bases and fixed defences", support: "unarmed ships (transports, tankers, colony and mining ships)" } };
+/** What a ship type counters, in words: "frigates" etc. */
+const countersOf = (type) => (COUNTER.beats[ROLES[type]] || []).map((r) => COUNTER.names[r]);
+/** Who counters this ship type. */
+const counteredBy = (type) => Object.keys(SHIPS).filter((t) => !SHIPS[t].wild && !SHIPS[t].warden && !SHIPS[t].trader && (COUNTER.beats[ROLES[t]] || []).includes(ROLES[type]));
+
+// Cloaking: a fleet of nothing but cloaked ships is seen by another power only inside its detection range. Worlds
+// detect DETECT.world hexes out (more with a station, Deep sensors, Resonance arrays, and for the Ylith); scouts
+// DETECT.scout; every other ship only in its own hex. A cloaked ship gets DETECT.ambush to hit in the first exchange.
+const DETECT = { world: 1, station: 1, scout: 2, ship: 0, sensors: 1, resonance: 1, ylith: 1, ambush: 2 };
+
+// Space mining: fields in open space between the systems. A mining ship parked at one (not moving) mines `per` a turn
+// of its resource (credits, fuel into the reserve, or exotics), up to `perField` ships on a field; a deep-space station
+// of yours within stationRange adds stationBonus. A field runs dry when its `size` is mined out.
+const MINING = { perField: 3, stationRange: 2, stationBonus: 0.5, density: 0.35, near: [2, 4], apart: 3,
+  kinds: {
+    ore: { name: "Asteroid field", res: "credits", per: 3, size: [180, 260], odds: 0.5, text: "Metal-rich rock: credits." },
+    gas: { name: "Gas cloud", res: "fuel", per: 1.5, size: [90, 140], odds: 0.3, text: "Fuel to skim, straight into your reserve." },
+    crystal: { name: "Crystal drift", res: "exotics", per: 0.5, size: [18, 28], odds: 0.2, text: "Rare crystal: exotics." },
+  } };
 
 // Ship outlines, bow pointing right (+x), in a box from −12 to 12: SVG path data, for the map (a canvas Path2D), the
 // page and the printable token sheet (tokens.mjs).
@@ -438,6 +475,9 @@ const SHIP_SHAPES = {
 
 // Outlines for ships that had none: the fuel tanker, and the free traders' merchant convoys.
 SHIP_SHAPES.tanker = "M11 0 Q11 -5 6 -5 L-8 -5 Q-11 -5 -11 0 Q-11 5 -8 5 L6 5 Q11 5 11 0 Z M-11 -2 L-13 -2 M-11 2 L-13 2 M0 -5 L0 5";
+SHIP_SHAPES.torpedo = "M12 0 L4 -2.5 L-8 -2.5 L-11 -6 L-11 6 L-8 2.5 L4 2.5 Z M2 -2.5 L2 -6 L-4 -6 L-4 -2.5 M2 2.5 L2 6 L-4 6 L-4 2.5";
+SHIP_SHAPES.stealth = "M12 0 L-2 -8 L-10 -9 L-6 0 L-10 9 L-2 8 Z M4 0 L-4 -4 M4 0 L-4 4";
+SHIP_SHAPES.miner = "M10 -4 L10 4 L-6 4 L-10 7 L-12 4 L-12 -4 L-10 -7 L-6 -4 Z M10 -2 L13 -5 M10 2 L13 5 M-2 -4 L-2 4 M3 -4 L3 4";
 SHIP_SHAPES.merchant = "M11 0 L7 -5 L-9 -5 L-11 -3 L-11 3 L-9 5 L7 5 Z M-3 -5 L-3 5 M2 -5 L2 5 M-11 0 L-13 0";
 
 /**
@@ -535,6 +575,11 @@ const FLEET_STYLES = {
       cruiser: "M12 0 L6 -5 L-4 -5 L-8 -12 L-9 -5 L-12 -4 L-10 0 L-12 4 L-9 5 L-8 12 L-4 5 L6 5 Z M0 -5 L0 5 M-10 0 L-13 0",
       dreadnought: "M12 -3 L12 3 L6 7 L-4 7 L-6 13 L-10 7 L-12 0 L-10 -7 L-6 -13 L-4 -7 L6 -7 Z M2 -7 L2 7 M-4 -7 L-4 7 M-12 0 L-14 0" } },
 };
+// Class names for the torpedo boats, stealth corvettes and mining ships (their outlines are the common ones).
+for (const [fid, [torpedo, stealth, miner]] of Object.entries({
+  concord: ["Harpoon", "Nightjar", "Prospector"], tessan: ["Stiletto", "Masquerade", "Assayer"], kel: ["Barb", "Burrower", "Gnawer"],
+  hegemony: ["Breaker", "Assassin", "Quarry"], vael: ["Thorn", "Shade", "Grazer"], mirrun: ["Narwhal", "Riptide", "Dredger"],
+  ylith: ["Needle", "Veil", "Sifter"], zhaq: ["Spike", "Hush", "Hauler"] })) Object.assign(FLEET_STYLES[fid].classes, { torpedo, stealth, miner });
 /** A ship's outline for its owner: the people's own, or the common one (the Wardens, pirates, creatures, traders). */
 const shipShape = (fid, type) => (FLEET_STYLES[fid] && FLEET_STYLES[fid].shapes[type]) || SHIP_SHAPES[type] || SHIP_SHAPES.frigate;
 /** "Aegis-class cruiser" (plural: "Aegis-class cruisers"); a ship with no class keeps its plain name. */
@@ -550,6 +595,7 @@ const TECHS = [
   { id: "foldDrives", name: "Fold drives", field: "Physics", cost: 300, needs: ["sensors"], text: "+1 speed for every ship." },
   { id: "shields", name: "Deflector shields", field: "Physics", cost: 375, needs: ["sensors"], text: "+1 hull for every warship." },
   { id: "targeting", name: "Targeting computers", field: "Physics", cost: 450, needs: ["shields"], text: "+1 to every ship's and battery's skill." },
+  { id: "phaseCloaks", name: "Phase cloaks", field: "Physics", cost: 450, needs: ["sensors"], text: "Lets your shipyards build stealth corvettes: cloaked raiders that slip past fleets and strike first." },
   { id: "riftDrives", name: "Rift drives", field: "Physics", cost: 600, needs: ["foldDrives"], text: "Your ships can cross into sealed sectors (the Dead Zone, the Warden Graveyard) without a Rift beacon." },
   { id: "corridorTheory", name: "Corridor theory", field: "Physics", cost: 800, needs: ["foldDrives", "targeting"], text: "Moving along a corridor costs nothing." },
   { id: "engine", name: "The Corridor Engine", field: "Physics", cost: 1500, needs: ["corridorTheory", "refining"], text: "Lets your capital build the Corridor Engine: the science victory. In an open game it's the galaxy's great prize instead, and only one can stand at a time." },
@@ -1277,6 +1323,7 @@ function newGame(opts) {
   for (const a of state.factions) for (const b of state.factions) if (a !== b) a.relations[b.id] = { status: "peace", treaty: false, score: 0, turnsAtWar: 0 };
   placeAnomalies(state);
   placeRelics(state);
+  placeFields(state);
   for (const f of state.factions) updateVision(state, f);
   log(state, null, "The corridors are open. Turn 1.");
   return state;
@@ -1476,7 +1523,7 @@ function fuelIncome(s, fid) {
     if (x.colony.kind === "colony") n += FUEL.perColony + (x.colony.capital ? FUEL.capital : 0) + gas;
     if (isDepot(s, x)) n += FUEL.perDepot + gas;
   }
-  return round1(n);
+  return round1(n + miningIncome(s, fid).fuel);
 }
 /** How much fuel a power can store: more with every working depot or station. */
 const fuelCap = (s, fid) => FUEL.capBase + FUEL.capPerDepot * coloniesOf(s, fid).filter((x) => isDepot(s, x)).length;
@@ -1686,6 +1733,69 @@ function spawnFleet(s, owner, at, types) {
 }
 const fleetSpeed = (s, f) => Math.min(...f.ships.map((x) => shipStats(s, f.owner, x.type, x).speed)) + (admTrait(f, "swift") && f.ships.every((x) => SHIPS[x.type].speed > 0) ? 1 : 0);
 const armed = (f) => f.ships.some((x) => SHIPS[x.type].skill > 0);
+// ---- cloaking and detection ----
+/** A fleet of nothing but cloaked ships (stealth corvettes, Warden probes). */
+const cloaked = (f) => f.ships.length > 0 && f.ships.every((x) => SHIPS[x.type].cloak);
+/** Whether power F sees fleet f: its own and its allies', anything in view that isn't cloaked, and a cloaked fleet only
+ * inside F's detection range (F.detect, set with its vision each turn). */
+function seesFleet(s, F, f) {
+  if (!F || f.owner === F.id) return true;
+  if (!(F.visible || {})[f.at]) return false;
+  if (!cloaked(f)) return true;
+  if (s.factions.some((x) => x.id === f.owner) && s.factions.includes(F) && allied(s, F.id, f.owner)) return true;
+  return !!(F.detect || {})[f.at];
+}
+// ---- space mining ----
+const fieldAt = (s, hex) => (s.fields && s.fields[hex]) || null;
+/** Scatter mining fields through open space: MINING.near hexes from a system, apart from each other and from capitals. */
+function placeFields(s, hexes = null, tag = "", want = null) {
+  s.fields = s.fields || {};
+  const R = makeRng("fields:" + s.seed + tag);
+  const sysAt = Object.values(s.systems).filter((x) => !x.deep).map((x) => x.at);
+  const caps = s.factions.map((F) => s.systems[F.capital] && s.systems[F.capital].at).filter(Boolean);
+  const pool = (hexes || Object.keys(s.hexes)).filter((k) => s.hexes[k] && s.hexes[k].terrain !== "rift" && !s.sysAt[k]).sort();
+  for (let i = pool.length - 1; i > 0; i--) { const j = R.int(i + 1); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  let n = want ?? Math.round(sysAt.length * MINING.density);
+  const kinds = Object.entries(MINING.kinds);
+  for (const k of pool) {
+    if (n <= 0) break;
+    const d = Math.min(...sysAt.map((h) => distance(h, k)));
+    if (d < MINING.near[0] || d > MINING.near[1] || caps.some((c) => distance(c, k) < 3) || Object.keys(s.fields).some((h) => distance(h, k) < MINING.apart)) continue;
+    let roll = R.next(), kind = kinds[0][0]; for (const [id, K] of kinds) { if (roll < K.odds) { kind = id; break; } roll -= K.odds; }
+    const K = MINING.kinds[kind], size = K.size[0] + R.int(K.size[1] - K.size[0] + 1);
+    s.fields[k] = { kind, left: size, size }; n--;
+  }
+}
+/** What a power's mining ships take this turn: one entry per field being mined. A ship mines only parked (not moving),
+ * and not while enemy warships hold the field. */
+function miningYields(s, fid) {
+  const out = []; if (!s.fields) return out;
+  const at = {};
+  for (const f of fleetsOf(s, fid)) {
+    const fd = s.fields[f.at]; if (!fd || fd.left <= 0 || f.path.length) continue;
+    const n = f.ships.filter((x) => SHIPS[x.type].mine).length; if (!n) continue;
+    if (fleetsAt(s, f.at).some((o) => o.owner !== fid && armed(o) && atWar(s, fid, o.owner))) continue;
+    at[f.at] = (at[f.at] || 0) + n;
+  }
+  for (const [hex, n0] of Object.entries(at)) {
+    const fd = s.fields[hex], K = MINING.kinds[fd.kind], n = Math.min(n0, MINING.perField);
+    const station = coloniesOf(s, fid).some((x) => x.deep && x.colony.buildings.station && distance(x.at, hex) <= MINING.stationRange);
+    out.push({ hex, kind: fd.kind, res: K.res, n, idle: n0 - n, station, amt: round1(Math.min(fd.left, n * K.per * (station ? 1 + MINING.stationBonus : 1))) });
+  }
+  return out;
+}
+const miningIncome = (s, fid) => { const t = { credits: 0, fuel: 0, exotics: 0 }; for (const y of miningYields(s, fid)) t[y.res] = round1(t[y.res] + y.amt); return t; };
+/** After the economy (which counted the credits and fuel): exotics (a whole one at a time), and the fields run down. */
+function miningTurn(s) {
+  if (!s.fields) return;
+  for (const F of s.factions) if (F.alive) for (const y of miningYields(s, F.id)) {
+    const fd = s.fields[y.hex]; if (!fd) continue;
+    if (y.res === "exotics") { F.exoCarry = round1((F.exoCarry || 0) + y.amt); const w = Math.floor(F.exoCarry + 1e-9); if (w) { F.exotics += w; F.exoCarry = round1(F.exoCarry - w); } }
+    F.stats.mined = round1((F.stats.mined || 0) + y.amt);
+    fd.left = round1(fd.left - y.amt);
+    if (fd.left <= 0) { delete s.fields[y.hex]; log(s, F.id, `The ${MINING.kinds[fd.kind].name.toLowerCase()} near ${nearestName(s, y.hex)} is mined out. Send its mining ships on to another field.`, "build"); }
+  }
+}
 
 // ---- worlds ----
 function canSettle(s, fid, sys, kind) {
@@ -1739,7 +1849,8 @@ function totals(s, fid) {
   const F = faction(s, fid);
   for (const [oid, r] of Object.entries(F.relations)) if (r.treaty && faction(s, oid).alive) cr += fid === "tessan" ? 6 : 3;
   sci *= 1 + SCIENCE.pactBonus * pacts(s, fid);
-  return { cr: round1(cr), sci: round1(sci), ind: round1(ind), exo, upkeep: round1(upkeep), net: round1(cr - upkeep) };
+  const mine = miningIncome(s, fid).credits; cr += mine;
+  return { cr: round1(cr), sci: round1(sci), ind: round1(ind), exo, upkeep: round1(upkeep), net: round1(cr - upkeep), mine };
 }
 
 // ---- what a world can build ----
@@ -2050,7 +2161,8 @@ function moveFleets(s) {
       const step = f.path[0];
       // A fleet stops where an enemy at war guards the hex.
       mp -= step.cost; f.from = f.at; f.at = step.hex; f.path.shift();
-      if (fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; }
+      // (A cloaked fleet slips past.)
+      if (!cloaked(f) && fleetsAt(s, f.at).some((o) => atWar(s, f.owner, o.owner) && armed(o))) { f.path = []; break; }
     }
     if (!f.path.length) { f.dest = null; delete f.burn; }
     if (inSupply(s, f)) refuel(s, f);   // refuelled, from the reserve
@@ -2309,16 +2421,21 @@ function battles(s) {
         if (!u.st.skill || hp(u) <= 0) continue;
         // The Heart of the Wardens can't be fired on while its guard still stands, nor while its own Nodes do.
         // Pirates, crystal swarms and Warden husks don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && (u.ship.type === "swarm" || u.ship.type === "husk")))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)) && !(u.world && v.ship && v.ship.type === "probe"));   // a probe scans from high orbit: only warships can catch it
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && ((u.fid === "pirates" && !SHIPS[v.ship.type].mine) || (u.ship && (u.ship.type === "swarm" || u.ship.type === "husk")))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)) && !(u.world && v.ship && v.ship.type === "probe"));   // a probe scans from high orbit: only warships can catch it
         if (!foes.length) continue;
         // A world's guns are laid by its gunnery officers: they finish off the most damaged ship in range. Ships pick at random.
         let t = foes[R.int(foes.length)];
         if (u.world) { const ships = foes.filter((v) => v.ship); if (ships.length) { const low = Math.min(...ships.map(hp)), weakest = ships.filter((v) => hp(v) === low); t = weakest[R.int(weakest.length)]; } }
+        // Counters: a ship aims first for what it's built to beat (COUNTER), and hits it more easily.
+        const beats = (u.ship && COUNTER.beats[ROLES[u.ship.type]]) || [], roleOf = (v) => ROLES[v.world ? "guns" : v.ship.type];
+        if (beats.length) { const pref = foes.filter((v) => beats.includes(roleOf(v))); if (pref.length) t = pref[R.int(pref.length)]; }
+        const ctr = beats.includes(roleOf(t)) ? COUNTER.bonus : 0, ambush = round === 0 && u.ship && SHIPS[u.ship.type].cloak ? DETECT.ambush : 0;   // a cloaked ship strikes first from the dark
         const dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
-        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) + (t.fid === "wardens" && s.crisis && s.crisis.decoded && s.crisis.decoded[u.fid] ? 1 : 0) - (t.ship && SHIPS[t.ship.type].evasive || 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
+        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) + (t.fid === "wardens" && s.crisis && s.crisis.decoded && s.crisis.decoded[u.fid] ? 1 : 0) - (t.ship && SHIPS[t.ship.type].evasive || 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0) + ctr + ambush, landed = roll <= 4 || (roll < 17 && roll <= need);
+        const dmg = u.st.dmg + (ctr ? (COUNTER.dmg[ROLES[u.ship.type]] || 0) : 0);
         if (landed) {
-          const was = hp(t); hit(t, u.st.dmg);
+          const was = hp(t); hit(t, dmg);
           // A Warden machine destroyed counts for whoever destroyed it; the Heart, for everyone who fought it.
           if (was > 0 && hp(t) <= 0 && t.fid === "wardens" && u.fid !== "wardens") {
             const K = faction(s, u.fid); K.stats.wardens = (K.stats.wardens || 0) + 1;
@@ -2333,7 +2450,7 @@ function battles(s) {
           // Raiders who lose ships at a world remember it, and stay away for a while.
           if (was > 0 && hp(t) <= 0 && t.fid === "pirates" && sys && sys.colony && s.wilds) (s.wilds.avoid = s.wilds.avoid || {})[sys.id] = s.turn + RAID_AVOID;
         }
-        if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? u.st.dmg : 0 });
+        if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? dmg : 0, ctr: ctr > 0, ambush: ambush > 0 });
         }
       }
     }
@@ -2587,6 +2704,12 @@ function updateVision(s, F) {
   // Allies share what their worlds see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && allied(s, F.id, o.id)) for (const sys of coloniesOf(s, o.id)) see(sys.at, 1);
   F.visible = vis;
+  // Detection (cloaked ships): worlds a hex or so out, scouts farther, other ships only in their own hex.
+  const det = {}, mark = (hex, n) => { for (const k of within(hex, n)) det[k] = 1; };
+  const plus = (has(s, F.id, "sensors") ? DETECT.sensors : 0) + (has(s, F.id, "resonanceArrays") ? DETECT.resonance : 0) + (F.id === "ylith" ? DETECT.ylith : 0);
+  for (const sys of coloniesOf(s, F.id)) mark(sys.at, DETECT.world + plus + (sys.colony.buildings.station ? DETECT.station : 0));
+  for (const f of fleetsOf(s, F.id)) mark(f.at, f.ships.some((x) => x.type === "scout") ? DETECT.scout + plus : DETECT.ship);
+  F.detect = det;
   // Every system the player charts goes into the log, with what's there.
   for (const sys of charted) {
     const what = [worldDesc(sys)];
@@ -2596,11 +2719,11 @@ function updateVision(s, F) {
   }
   // Meeting: anyone whose world or fleet you can see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && !F.met[o.id]) {
-    const seen = coloniesOf(s, o.id).some((x) => vis[x.at]) || fleetsOf(s, o.id).some((f) => vis[f.at]);
+    const seen = coloniesOf(s, o.id).some((x) => vis[x.at]) || fleetsOf(s, o.id).some((f) => seesFleet(s, F, f));
     if (seen) {
       F.met[o.id] = true; o.met[F.id] = true;
       if (!F.ai && o.ai) sendEnvoy(s, o.id, "hello"); else if (!o.ai && F.ai) sendEnvoy(s, F.id, "hello");
-      const w = coloniesOf(s, o.id).find((x) => vis[x.at]), fl = fleetsOf(s, o.id).find((f) => vis[f.at]);
+      const w = coloniesOf(s, o.id).find((x) => vis[x.at]), fl = fleetsOf(s, o.id).find((f) => seesFleet(s, F, f));
       const where = w ? `their world ${w.name}` : `${fl.ships.length > 1 ? "a fleet" : "a ship"} of theirs${s.sysAt[fl.at] ? ` at ${s.systems[s.sysAt[fl.at]].name}` : " in deep space"}`;
       log(s, F.id, `${F.name} made contact with ${o.name}: ${where} came into view. Diplomacy is open with them now.`, "contact");
     }
@@ -2625,6 +2748,7 @@ function updateVision(s, F) {
 /** aiTurn(state, faction) gives each computer faction's orders (ai.js); the player has given theirs. */
 function endTurn(s, aiTurn) {
   if (s.winner) return;
+  if (!s.fields) placeFields(s);   // a game from before space mining
   for (const F of s.factions) if (F.ai && F.alive && aiTurn) aiTurn(s, F);
   // The standing order: idle fleets with out-of-date ships go to the nearest drydock (not ones told to hold).
   for (const F of s.factions) if (!F.ai && F.alive && F.autoRefit) for (const f of fleetsOf(s, F.id)) if (!f.path.length && !f.sentry && needsRefit(s, f)) sendToDrydock(s, f.id);
@@ -2634,6 +2758,7 @@ function endTurn(s, aiTurn) {
   withdrawals(s);
   repairsTurn(s);
   for (const F of s.factions) if (F.alive) economy(s, F);
+  miningTurn(s);
   checkEngine(s);
   checkRelics(s);
   clearDeepSites(s);
@@ -2970,6 +3095,7 @@ function expandGalaxy(s, reader, P = {}) {
   const sites = made.filter((x) => x.ruins || x.anomaly);
   for (const id of s.relicsReach || []) { const pool = sites.length ? sites : made; if (!pool.length) break; const x = pool.splice(R.int(pool.length), 1)[0]; x.relic = id; s.relics[id] = { at: null }; }
   s.relicsReach = [];
+  placeFields(s, fresh, ":" + s.turn + (P.kind || ""), Math.round(made.length * MINING.density));
   s.radius = R1;
   if (reader) for (const k of fresh) reader.explored[k] = 1;
   return made;
@@ -3491,9 +3617,9 @@ function probesTurn(s, R) {
   }
   // Who has seen a probe (what they can tell others).
   C.sawProbe = C.sawProbe || {};
-  for (const F of crAlive(s)) if (!C.sawProbe[F.id] && probes(s).some((f) => F.visible[f.at])) C.sawProbe[F.id] = s.turn;
+  for (const F of crAlive(s)) if (!C.sawProbe[F.id] && probes(s).some((f) => seesFleet(s, F, f))) C.sawProbe[F.id] = s.turn;
   // The first probe the player sees: a choice about what to do with them.
-  if (!C.probeEvent && !s.galEvent && probes(s).some((f) => me.visible[f.at])) { C.probeEvent = s.turn; s.galEvent = { id: "probes", ctx: {}, turn: s.turn }; }
+  if (!C.probeEvent && !s.galEvent && probes(s).some((f) => seesFleet(s, me, f))) { C.probeEvent = s.turn; s.galEvent = { id: "probes", ctx: {}, turn: s.turn }; }
   // Later, one of them will stop at a world of the player's and speak.
   if (!C.contactDue && s.turn >= C.at - P.contactLead) C.contactDue = s.turn;
 }
@@ -3870,7 +3996,7 @@ function wardenIntel(s, fid, to) {
   if (!["quiet", "stirring", "awake", "dormant"].includes(C.stage) || (C.stage === "quiet" && !C.signs)) return [];
   const done = ((C.shared || {})[fid] || {})[to] || [], out = [];
   const add = (id, name, text, regard) => { if (!done.includes(id)) out.push({ id, name, text, regard }); };
-  if ((C.sawProbe && C.sawProbe[fid]) || (fid === crMe(s).id && C.probeEvent) || probes(s).some((f) => F.visible[f.at])) add("probes", "The probes", "What the probes are, and that only warships can catch them: they'll hunt them harder.", 5);
+  if ((C.sawProbe && C.sawProbe[fid]) || (fid === crMe(s).id && C.probeEvent) || probes(s).some((f) => seesFleet(s, F, f))) add("probes", "The probes", "What the probes are, and that only warships can catch them: they'll hunt them harder.", 5);
   if (C.stage !== "quiet" || (C.signs && s.turn - C.signs >= 14)) add("signal", "The signal", `What the signal from the rifts means: the Wardens are waking${C.stage === "quiet" || C.stage === "stirring" ? `, around turn ${C.at}` : ""}. A truce will come easier.`, 5);
   const scanned = coloniesOf(s, to).filter((x) => x.colony.scanned && F.explored[x.at]);
   if (scanned.length && ["quiet", "stirring"].includes(C.stage)) add("scans", "Their scanned worlds", `That the probes scanned ${scanned.slice(0, 3).map((x) => x.name).join(", ")}${scanned.length > 3 ? "…" : ""}: the Wardens' first targets.`, Math.min(9, 3 * scanned.length));
@@ -4030,10 +4156,19 @@ function convoyPrey(s, f) {
     .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
   return c ? (c.path.length ? c.path[Math.min(c.path.length - 1, 1)].hex : c.at) : null;
 }
+/** Mining ships at work in reach with no warships of their own to guard them (and not paid off): easy pickings. */
+function minerPrey(s, f) {
+  const m = Object.values(s.fleets).filter((x) => x.owner !== PIRATES && x.ships.some((y) => SHIPS[y.type].mine) && s.fields && s.fields[x.at] && distance(x.at, f.at) <= WILDS.raidRange
+    && !protectedFrom(s, x.owner, f.home) && !fleetsAt(s, x.at).some((o) => o.owner === x.owner && o.ships.some((y) => SHIPS[y.type].skill > 0)))
+    .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+  return m ? m.at : null;
+}
 function raid(s, f, R) {
   const hurt0 = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
   // On the way somewhere, or between raids: a convoy in reach is worth turning for.
   if (!hurt0 && !(f.stay > 0)) { const meet = convoyPrey(s, f); if (meet && meet !== f.at && setDestination(s, f.id, meet).ok) return; }
+  // Mining ships out in the open: worth a detour too (now and then, so they don't only ever hunt miners).
+  if (!hurt0 && !(f.stay > 0) && !f.path.length && R.next() < 0.5) { const m = minerPrey(s, f); if (m && m !== f.at && setDestination(s, f.id, m).ok) return; }
   if (f.path.length) return;
   const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
   const hurt = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.length * SHIPS.raider.hull * 0.5;
@@ -4736,12 +4871,12 @@ function answerEnvoy(s, optId) {
 const PRIORITY = {
   // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
   concord: ["xenology", "automation", "sensors", "orbitalYards", "domes", "commerce", "heavyHulls", "foldDrives", "terraforming", "refining"],
-  tessan: ["commerce", "automation", "xenology", "orbitalYards", "sensors", "refining", "heavyHulls", "terraforming", "domes"],
+  tessan: ["commerce", "automation", "xenology", "orbitalYards", "sensors", "refining", "heavyHulls", "phaseCloaks", "terraforming", "domes"],
   kel: ["automation", "xenology", "commerce", "orbitalYards", "domes", "terraforming", "sensors", "batteries", "heavyHulls"],
   hegemony: ["automation", "heavyHulls", "orbitalYards", "shields", "targeting", "xenology", "batteries", "refining", "capitalShips"],
-  vael: ["sensors", "automation", "orbitalYards", "foldDrives", "xenology", "shields", "heavyHulls", "corridorTheory", "refining"],
+  vael: ["sensors", "automation", "orbitalYards", "foldDrives", "xenology", "shields", "heavyHulls", "phaseCloaks", "corridorTheory", "refining"],
   mirrun: ["automation", "sensors", "orbitalYards", "xenology", "domes", "commerce", "terraforming", "refining", "corridorTheory"],
-  ylith: ["sensors", "foldDrives", "automation", "orbitalYards", "xenology", "commerce", "shields", "corridorTheory", "refining"],
+  ylith: ["sensors", "foldDrives", "automation", "orbitalYards", "xenology", "commerce", "shields", "phaseCloaks", "corridorTheory", "refining"],
   zhaq: ["automation", "batteries", "orbitalYards", "sensors", "shields", "heavyHulls", "xenology", "targeting", "refining"],
 };
 const AGGRESSION = { concord: 0.9, tessan: 0.7, kel: 0.9, hegemony: 1.4, vael: 1.0, mirrun: 0.7, ylith: 1.0, zhaq: 1.1 };
@@ -4968,6 +5103,33 @@ function settleTargets(s, F, kind) {
 const count = (s, F, type) => fleetsOf(s, F.id).reduce((t, f) => t + f.ships.filter((x) => x.type === type).length, 0)
   + coloniesOf(s, F.id).reduce((t, c) => t + c.colony.queue.filter((q) => q.id === type).length, 0);
 
+/** The warship to build. Each counter type gets a share of the fleet in proportion to how much of the enemy's fleet
+ * (by cost) it beats: the type furthest below its share is built next; with none short, the heaviest it can afford. */
+function warship(s, F, enemies) {
+  const base = has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate";
+  const foes = enemies.length ? [...enemies] : Object.keys(F.relations).filter((o) => faction(s, o).alive && F.met[o]);
+  if (s.crisis && s.crisis.stage === "awake") foes.push("wardens");
+  const mix = {}; let total = 0;
+  for (const o of foes) for (const f of fleetsOf(s, o)) for (const x of f.ships) if (SHIPS[x.type].skill) { const v = SHIPS[x.type].cost || SHIPS[x.type].hull * 15; mix[ROLES[x.type]] = (mix[ROLES[x.type]] || 0) + v; total += v; }
+  if (!total) return base;
+  const own = {}; let ownN = 0; for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) { own[x.type] = (own[x.type] || 0) + 1; ownN++; }
+  for (const c of coloniesOf(s, F.id)) for (const q of c.colony.queue) if (q.kind === "ship" && SHIPS[q.id].skill) { own[q.id] = (own[q.id] || 0) + 1; ownN++; }
+  const short = ["frigate", "cruiser", "dreadnought", "torpedo"].filter((t) => (!SHIPS[t].needs || has(s, F.id, SHIPS[t].needs)) && (SHIPS[t].exotics || 0) <= F.exotics)
+    .map((t) => ({ t, gap: 0.5 * (COUNTER.beats[ROLES[t]] || []).reduce((n, r) => n + (mix[r] || 0), 0) / total - (own[t] || 0) / Math.max(1, ownN) }))
+    .filter((x) => x.gap > 0.05).sort((a, b) => b.gap - a.gap);
+  return short[0] ? short[0].t : base;
+}
+/** Mining fields worth working: charted, not mined out, near this power's worlds, with no enemy warships about, and
+ * room for another of its mining ships. */
+function minerTargets(s, F, from) {
+  if (!s.fields) return [];
+  const cols = coloniesOf(s, F.id), mine = fleetsOf(s, F.id).filter((f) => f.ships.some((x) => x.type === "miner"));
+  return Object.entries(s.fields).filter(([k, fd]) => F.explored[k] && fd.left > 10 && cols.some((c) => distance(c.at, k) <= 7)
+    && !Object.values(s.fleets).some((o) => o.owner !== F.id && armed(o) && atWar(s, F.id, o.owner) && distance(o.at, k) <= 2)
+    && mine.filter((f) => f.at === k || f.dest === k).length < MINING.perField)
+    .map(([k, fd]) => ({ k, fd, d: from ? distance(from, k) : Math.min(...cols.map((c) => distance(c.at, k))), v: { credits: 1, fuel: 0.8, exotics: 1.3 }[MINING.kinds[fd.kind].res] }))
+    .sort((a, b) => a.d / a.v - b.d / b.v);
+}
 function production(s, F, diff) {
   // In debt, or paying out more than it earns: scrap warships (frigates first) until the books balance.
   for (let n = 0; n < 6 && (F.credits < 0 || totals(s, F.id).net < -1) && totals(s, F.id).net < 1; n++) {
@@ -5005,9 +5167,12 @@ function production(s, F, diff) {
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
       ships && c.capital && count(s, F, "outpost") < 1 && F.credits >= 150 && stationTarget(s, F) ? ["ship", "outpost"] : null,   // for a deep-space station
       c.capital && has(s, F.id, "orbitalYards") && !c.buildings.drydock ? ["building", "drydock"] : null,   // one, at the capital: the refits
-      ships && power < wantPower ? ["ship", has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
+      // Mining ships: one for each good field nearby, a few at most, when the fleet's strong enough to spare the yards.
+      ships && s.turn >= 6 && (!enemies.length || power >= wantPower * 0.8) && count(s, F, "miner") < Math.min(1 + Math.floor(cols.length / 2), 5) && minerTargets(s, F).length ? ["ship", "miner"] : null,
+      ships && power < wantPower ? ["ship", warship(s, F, enemies)] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "tanker") < 1 ? ["ship", "tanker"] : null,
+      ships && enemies.length && has(s, F.id, "phaseCloaks") && power >= wantPower * 0.7 && count(s, F, "stealth") < 2 ? ["ship", "stealth"] : null,   // raiders, for their transports and mining ships
       c.pop >= 3 && !c.buildings.factory ? ["building", "factory"] : null,
       t.net < 3 && !c.buildings.market ? ["building", "market"] : null,
       c.pop >= 4 && !c.buildings.lab ? ["building", "lab"] : null,
@@ -5017,7 +5182,7 @@ function production(s, F, diff) {
       enemies.length && has(s, F.id, "batteries") && !c.buildings.battery ? ["building", "battery"] : null,
       sys.exotics && has(s, F.id, "refining") && !c.buildings.refinery ? ["building", "refinery"] : null,
       c.capital && has(s, F.id, "engine") && !c.buildings.engine && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] ? ["building", "engine"] : null,
-      ships && t.net > 2 && power < wantPower * 1.6 ? ["ship", has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
+      ships && t.net > 2 && power < wantPower * 1.6 ? ["ship", warship(s, F, enemies)] : null,
       !c.buildings.market ? ["building", "market"] : null,
     ]);
     if (pick && !c.queue.some((q) => q.id === pick[1])) enqueue(s, sys.id, pick[0], pick[1]);
@@ -5041,7 +5206,7 @@ function fleets(s, F) {
   // First, split the specialists off into their own fleets.
   for (const f of fleetsOf(s, F.id)) {
     if (f.ships.length < 2) continue;
-    for (const type of ["colony", "outpost", "scout"]) while (f.ships.length > 1 && f.ships.some((x) => x.type === type)) splitFleet(s, f.id, type);
+    for (const type of ["colony", "outpost", "scout", "miner", "stealth"]) while (f.ships.length > 1 && f.ships.some((x) => x.type === type)) splitFleet(s, f.id, type);
   }
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const cap = s.systems[F.capital];
@@ -5085,6 +5250,22 @@ function fleets(s, F) {
       if (br) { f.path = []; f.dest = null; continue; }   // there: rest a turn and chart it
       if (!f.path.length) { const k = nearestUnexplored(s, F, f.at); if (k) setDestination(s, f.id, k); }
       continue;
+    }
+    // Mining ships: to the best field nearby, and stay there mining; away from enemy warships.
+    if (types.size === 1 && types.has("miner")) {
+      const danger = Object.values(s.fleets).some((o) => o.owner !== F.id && armed(o) && atWar(s, F.id, o.owner) && seesFleet(s, F, o) && distance(o.at, f.at) <= 1);
+      const fd = s.fields && s.fields[f.at];
+      if (fd && fd.left > 0 && !danger && !f.path.length) continue;   // mining
+      if (danger) { const home = coloniesOf(s, F.id).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0]; if (home && home.at !== f.at) setDestination(s, f.id, home.at); continue; }
+      if (f.path.length && f.dest && s.fields && s.fields[f.dest]) continue;
+      const t = minerTargets(s, F, f.at)[0]; if (t) setDestination(s, f.id, t.k);
+      continue;
+    }
+    // Stealth corvettes: raid what's unarmed (transports, tankers, colony and mining ships) of an enemy it can see.
+    if (types.size === 1 && types.has("stealth") && enemies.length && !f.path.length) {
+      const prey = Object.values(s.fleets).filter((o) => enemies.includes(o.owner) && !armed(o) && seesFleet(s, F, o) && distance(o.at, f.at) <= 10 && !fleetsAt(s, o.at).some((g) => g.owner === o.owner && armed(g)))
+        .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+      if (prey && prey.at !== f.at && setDestination(s, f.id, prey.at).ok) continue;
     }
     // Tankers keep with the strongest war fleet, and park where it does: a supply point behind the front.
     if (types.size === 1 && types.has("tanker")) {
@@ -5165,7 +5346,7 @@ function huntWardens(s, F, f, reach) {
   const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
   // Only what it can see (or, for the machines that never move, has found): no chasing what's out of sight.
   // A probe (quick, and gone again) is worth chasing only if it's close by.
-  const known = (w) => (F.visible[w.at] || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > (s.crisis.alerted2 && s.crisis.alerted2[F.id] ? 5 : 2));   // warned of them: chase them farther
+  const known = (w) => (seesFleet(s, F, w) || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > (s.crisis.alerted2 && s.crisis.alerted2[F.id] ? 5 : 2));   // warned of them: chase them farther
   const waves = fleetsOf(s, "wardens").filter(known).map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
   const heartAt = (waves.find((x) => x.heart) || {}).w;
   const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]
@@ -5422,7 +5603,7 @@ function bindMap() {
 function zoomBy(f) { view.zoom = Math.max(0.35, Math.min(2.6, view.zoom * f)); draw(); }
 function clickHex(hex) {
   const me = player(S).id;
-  const fl = fleetsAt(S, hex).filter((f) => f.owner === me || player(S).visible[hex]);
+  const fl = fleetsAt(S, hex).filter((f) => seesFleet(S, player(S), f));
   const sid = S.sysAt[hex];
   // Click again on a hex with both: alternate between the fleet and the system.
   const mine = fl.filter((f) => f.owner === me);
@@ -5431,6 +5612,7 @@ function clickHex(hex) {
     select({ kind: "fleet", id: mine[(i + 1) % mine.length].id });
   } else if (sid && player(S).explored[hex]) select({ kind: "system", id: sid });
   else if (fl.length) select({ kind: "fleet", id: fl[0].id });
+  else if (fieldAt(S, hex) && player(S).explored[hex]) select({ kind: "field", hex });
   else { sel = null; renderPanel(); draw(); }
 }
 function select(x) { sel = x; moveMode = false; tab = "selected"; renderTabs(); renderPanel(); draw(); }
@@ -5643,6 +5825,15 @@ function draw() {
     ctx.strokeStyle = h.terrain === "rift" ? "rgba(220,70,60,.6)" : "rgba(120,140,200,.16)"; ctx.lineWidth = 1; ctx.stroke();
     if (h.terrain === "rift") { ctx.strokeStyle = "rgba(255,120,90,.55)"; ctx.beginPath(); ctx.moveTo(x - size * 0.5, y - size * 0.2); ctx.lineTo(x - size * 0.1, y + size * 0.15); ctx.lineTo(x + size * 0.15, y - size * 0.15); ctx.lineTo(x + size * 0.5, y + size * 0.2); ctx.stroke(); }
   }
+  // Mining fields you've charted: asteroids (ore), a gas cloud (fuel), crystal (exotics).
+  for (const [k, fd] of Object.entries(S.fields || {})) {
+    if (!me.explored[k]) continue;
+    const { x, y } = toPixel(k, size), r = size * 0.5;
+    if (fd.kind === "gas") { const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, "rgba(120,220,170,.55)"); g.addColorStop(1, "rgba(120,220,170,0)"); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+    else { ctx.fillStyle = fd.kind === "crystal" ? "rgba(200,140,255,.85)" : "rgba(190,170,140,.85)";
+      for (let i = 0; i < 6; i++) { const a = i * 1.9 + 0.5, d = r * (0.25 + (i % 3) * 0.25), px = x + Math.cos(a) * d, py = y + Math.sin(a) * d, q = size * (fd.kind === "crystal" ? 0.07 : 0.09) * (1 + (i % 2));
+        ctx.beginPath(); if (fd.kind === "crystal") { ctx.moveTo(px, py - q * 1.6); ctx.lineTo(px + q, py); ctx.lineTo(px, py + q * 1.6); ctx.lineTo(px - q, py); } else ctx.arc(px, py, q, 0, Math.PI * 2); ctx.fill(); } }
+  }
   // Corridors between systems you know.
   ctx.lineWidth = 2.2;
   for (const [a, b] of S.corridors) {
@@ -5708,7 +5899,7 @@ function draw() {
   }
   // Fleets you can see.
   const byHex = {};
-  for (const f of Object.values(S.fleets)) if (f.owner === me.id || me.visible[f.at]) (byHex[f.at] = byHex[f.at] || []).push(f);
+  for (const f of Object.values(S.fleets)) if (seesFleet(S, me, f)) (byHex[f.at] = byHex[f.at] || []).push(f);
   for (const [hex, list] of Object.entries(byHex)) {
     const { x, y } = toPixel(hex, size);
     list.forEach((f, i) => {
@@ -5717,7 +5908,9 @@ function draw() {
       // The fleet's outline: its biggest ship, pointing where it's going.
       const ring = sel && sel.id === f.id ? "#fff6b0" : war ? "#ff6b5b" : null;
       const to = f.path.length ? toPixel(f.path[0].hex, size) : null, angle = to ? Math.atan2(to.y - y, to.x - x) : 0;
+      if (cloaked(f)) ctx.globalAlpha = 0.5;   // cloaked: shown faded (yours, or one you've detected)
       drawShip(ctx, flagship(f), fx, fy, angle, 0.62, colorOf(f.owner), ring, f.owner);
+      ctx.globalAlpha = 1;
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
   }
@@ -5741,7 +5934,7 @@ function renderWardenBar() {
   const K = S && S.crisis, c = S && crisisState(S);
   if (c && ["signs", "stirring"].includes(c.stage) && !S.winner) {
     // The Signs: the probes in sight (and what they're scanning), the Watchers, and how long the warnings have run.
-    const me = player(S), probes = Object.values(S.fleets).filter((f) => f.owner === "wardens" && me.visible[f.at] && f.ships.some((x) => x.type === "probe"));
+    const me = player(S), probes = Object.values(S.fleets).filter((f) => f.owner === "wardens" && seesFleet(S, me, f) && f.ships.some((x) => x.type === "probe"));
     const scanning = probes.map((f) => f.probe && f.probe.target && S.systems[f.probe.target]).filter((x) => x && x.colony && x.colony.owner === me.id && distance(x.at, probes[0].at) <= 3);
     if (!probes.length && !c.watchers && c.stage === "signs") { el.hidden = true; return; }
     el.classList.add("calm");
@@ -5774,7 +5967,7 @@ function renderBar() {
     `<span title="Credits: income minus upkeep each turn"><b>Credits<\/b> ${fmt(me.credits)} <i class="${t.net < 0 ? "neg" : ""}">${signed(t.net)}<\/i><\/span>`,
     `<span title="Industry from all your worlds"><b>Industry<\/b> ${fmt(t.ind)}<\/span>`,
     `<span title="Research each turn"><b>Science<\/b> ${fmt(t.sci)}${tech ? ` → ${esc(tech.name)} ${Math.floor((R.progress / tech.cost) * 100)}%` : ` <i class="neg">pick research<\/i>`}<\/span>`,
-    `<span title="Exotics: for cruisers, dreadnoughts and great works"><b>Exotics<\/b> ${me.exotics} <i>${signed(t.exo)}<\/i><\/span>`,
+    `<span title="Exotics: for cruisers, dreadnoughts and great works"><b>Exotics<\/b> ${me.exotics} <i>${signed(Math.round((t.exo + miningIncome(S, me.id).exotics) * 10) / 10)}<\/i><\/span>`,
     usesReserve(me.id) ? `<span title="Fuel reserve: made by your colonies and (most) by fuel depots and stations, which also raise how much you can store. Fleets moving in supply, refuelling, filling tankers and burning hard draw on it; short of it, your fleets move slower and can't refuel."><b>Fuel<\/b> <span class="${fuelStock(S, me.id) < 10 ? "neg" : ""}">${fmt(fuelStock(S, me.id))}<\/span><small>/${fuelCap(S, me.id)}<\/small> <i>${signed(fuelIncome(S, me.id))}<\/i><\/span>` : "",
   ].join("");
   $("bar-turn").textContent = turnText();
@@ -5789,7 +5982,7 @@ function renderPanel() {
   const P = $("panel");
   if (tab === "objectives") P.innerHTML = objectivesHTML();
   else if (tab === "mission") P.innerHTML = missionHTML();
-  else if (tab === "selected") P.innerHTML = sel ? (sel.kind === "fleet" ? fleetHTML() : systemHTML()) : `<p class="muted">Select a world or a fleet on the map. Drag to pan, scroll or use the buttons to zoom. With a fleet selected, right-click a hex (or press <b>Move<\/b>) to send it there.<\/p>`;
+  else if (tab === "selected") P.innerHTML = sel ? (sel.kind === "fleet" ? fleetHTML() : sel.kind === "field" ? fieldHTML() : systemHTML()) : `<p class="muted">Select a world or a fleet on the map. Drag to pan, scroll or use the buttons to zoom. With a fleet selected, right-click a hex (or press <b>Move<\/b>) to send it there.<\/p>`;
   else if (tab === "empire") P.innerHTML = empireHTML();
   else if (tab === "research") P.innerHTML = researchHTML();
   else if (tab === "diplomacy") P.innerHTML = diplomacyHTML();
@@ -5843,7 +6036,7 @@ function systemHTML() {
     h += `<ol class="queue">${c.queue.map((q, i) => `<li><span>${esc(q.name)}${q.exotics ? ` <i class="exo">${q.exotics}◆<\/i>` : ""}<\/span>${bar(q.progress, q.cost)}<span class="small">${Math.floor(q.progress)}/${q.cost}${i === 0 ? ` · ${y.ind ? Math.max(1, Math.ceil((q.cost - q.progress) / y.ind)) + "t" : "—"}` : ""}<\/span><button class="x" data-deq="${i}" title="Remove">×<\/button><\/li>`).join("")}<\/ol>`;
     if (c.queue.length) { const rc = rushCost(S, sys.id); h += `<button class="btn small" data-rush ${me.credits < rc ? "disabled" : ""}>Rush ${esc(c.queue[0].name)} for ${rc} credits<\/button>`; }
     const opts = buildOptions(S, sys);
-    h += `<h3>Add to the queue<\/h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18, player(S).id) + " " : ""}${esc(o.name)}<\/b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}<\/span><\/button>`).join("")}<\/div>`;
+    h += `<h3>Add to the queue<\/h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text + (countersOf(o.id).length ? ` Strong against ${countersOf(o.id).join(", ")}.` : "") + (SHIPS[o.id].skill && counteredBy(o.id).length ? ` Weak against ${counteredBy(o.id).map((u) => SHIPS[u].name.toLowerCase() + "s").join(", ")}.` : "") : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18, player(S).id) + " " : ""}${esc(o.name)}<\/b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}<\/span><\/button>`).join("")}<\/div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.<\/p>`;
   }
   if (me.explored[sys.at]) h += rallyHTML(sys);
@@ -5870,6 +6063,21 @@ function fleetName(f) {
   const counts = {}; for (const x of f.ships) counts[x.type] = (counts[x.type] || 0) + 1;
   return Object.entries(counts).map(([t, n]) => `${n > 1 ? n + " " : ""}${shipLabel(f.owner, t, n > 1)}`).join(", ");
 }
+/** A mining field: what it gives, what's left, and who's mining it. */
+function fieldHTML() {
+  const fd = fieldAt(S, sel.hex), me = player(S);
+  if (!fd) { sel = null; return `<p class="muted">That field is mined out.<\/p>`; }
+  const K = MINING.kinds[fd.kind], unit = K.res === "credits" ? "credits" : K.res === "fuel" ? "fuel" : "exotics";
+  const at = fleetsAt(S, sel.hex).filter((f) => seesFleet(S, me, f) && f.ships.some((x) => SHIPS[x.type].mine));
+  const y = miningYields(S, me.id).find((x) => x.hex === sel.hex);
+  return `<h2>${esc(K.name)}<\/h2><p class="muted">In open space near ${esc(nearestSys(sel.hex))}. ${esc(K.text)}<\/p>
+    <div class="kv"><span>Left<\/span><b>${Math.round(fd.left)} ${unit}<\/b>${bar(fd.left, fd.size, "#c9a66b")}<\/div>
+    <p class="small">A mining ship parked here mines <b>${K.per} ${unit}<\/b> a turn (up to ${MINING.perField} ships of yours at once; half as much again with a deep-space station of yours within ${MINING.stationRange} hexes). It doesn't mine while moving, or while enemy warships are here.<\/p>
+    ${y ? `<p class="good small"><b>Yours:<\/b> ${y.n} mining ship${y.n === 1 ? "" : "s"} here, +${y.amt} ${unit} a turn${y.station ? " (with your station's help)" : ""}.<\/p>` : ""}
+    ${at.filter((f) => f.owner !== me.id).map((f) => `<p class="small muted">${esc(faction(S, f.owner).name)} has mining ships here.<\/p>`).join("")}
+    <p class="small muted">Build mining ships at a shipyard and send them here. They're unarmed, and pirates hunt them: guard them, or keep them close to home.<\/p>`;
+}
+const nearestSys = (hex) => { const n = Object.values(S.systems).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0]; return n ? n.name : "deep space"; };
 function fleetHTML() {
   const f = S.fleets[sel.id], me = player(S);
   if (!f) { sel = null; return `<p class="muted">That fleet is gone.<\/p>`; }
@@ -5881,6 +6089,16 @@ function fleetHTML() {
   h += `<ul class="ships grouped">${byType.map(({ t, st, list }) => { const hull = list.reduce((a, x) => a + x.hull, 0), max = list.reduce((a, x) => a + shipStats(S, f.owner, t, x).hull, 0), hurt = list.filter((x) => x.hull < shipStats(S, f.owner, t, x).hull).length;
     return `<li><b>${shipSVG(t, F.color, 22, f.owner)} ${list.length > 1 ? `${list.length} × ` : ""}${esc(shipLabel(f.owner, t))}<\/b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg each<\/span>` : ""}${bar(hull, max, hurt ? "#e0a050" : "#7bc47f")}<span class="small">${hull}/${max} hull${hurt ? ` · ${hurt} damaged` : ""}<\/span>${list.length > 1 ? `<details class="small"><summary>Each ship<\/summary>${list.map((x) => `<div>${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")} ${x.hull}/${st.hull}<\/div>`).join("")}<\/details>` : ""}<\/li>`; }).join("")}<\/ul>`;
   if (f.ships.length > 1) h += `<p class="small muted">${f.ships.length} ships in all.<\/p>`;
+  // What its warships are built to beat, and what beats them.
+  const roles = [...new Set(f.ships.map((x) => x.type))].filter((t) => countersOf(t).length || (SHIPS[t].skill && counteredBy(t).length));
+  if (roles.length) h += `<p class="small muted">${roles.map((t) => `<b>${esc(SHIPS[t].name)}s<\/b>${countersOf(t).length ? ` beat ${esc(countersOf(t).join(", "))}` : ""}${counteredBy(t).length ? `${countersOf(t).length ? "; " : " "}weak against ${esc(counteredBy(t).map((u) => SHIPS[u].name.toLowerCase() + "s").join(", "))}` : ""}.`).join(" ")}<\/p>`;
+  if (cloaked(f)) h += `<p class="small ${mine ? "muted" : "bad"}"><b>Cloaked.<\/b> ${mine ? "Other powers see it only close up: a world within a hex or so, a scout within " + DETECT.scout + ", other ships only in its own hex. It slips past enemy fleets, and strikes first in battle." : "You've detected it: it's close to one of your worlds, or a scout of yours has it in range."}<\/p>`;
+  else if (mine && f.ships.some((x) => SHIPS[x.type].cloak)) h += `<p class="small muted">Its stealth corvettes are cloaked, but the rest of the fleet isn't, so it's seen as usual. Detach them to sail unseen.<\/p>`;
+  if (mine && f.ships.some((x) => SHIPS[x.type].mine)) {
+    const fd = fieldAt(S, f.at), y = miningYields(S, me.id).find((x) => x.hex === f.at);
+    h += fd ? (y ? `<p class="small good"><b>Mining<\/b> the ${esc(MINING.kinds[fd.kind].name.toLowerCase())}: +${y.amt} ${MINING.kinds[fd.kind].res} a turn, ${Math.round(fd.left)} left.${y.idle ? ` (${y.idle} ship${y.idle === 1 ? "" : "s"} idle: at most ${MINING.perField} mine a field.)` : ""}<\/p>` : `<p class="small bad">At the ${esc(MINING.kinds[fd.kind].name.toLowerCase())}, but not mining: ${f.path.length ? "it's moving on" : "enemy warships are here"}.<\/p>`)
+      : `<p class="small muted">Mining ships mine at asteroid fields, gas clouds and crystal drifts in open space (on the map between the systems). Send them to one and leave them there.<\/p>`;
+  }
   if (mine && fuelMax(S, f) !== Infinity) { const fu = fuelOf(S, f), mx = fuelMax(S, f), here = inSupplyAt(S, f.owner, f.at);
     h += `<div class="kv"><span>Fuel<\/span><b class="${fu ? "" : "bad"}">${fu} / ${mx}<\/b>${bar(fu, mx, fu > 1 ? "#7bc47f" : "#e0a050")}<\/div><p class="small ${fu ? "muted" : "bad"}" style="margin-top:-4px">${here ? (f.dry === S.turn ? `<b class="bad">In supply, but your fuel reserve is short:<\/b> it refuels and moves at full speed only when the reserve can pay.` : "In supply: it refuels from your fuel reserve.") : fu ? `Beyond supply: each turn it moves burns one. ${fu} turn${fu === 1 ? "" : "s"} of travel left.` : "Out of fuel: it crawls a hex a turn. Bring it back within reach of a colony or a fuel depot."} Colonies and outposts with a fuel depot refuel it.<\/p>`; }
   // Fuel tankers: what they carry, and what they're doing with it.
@@ -6568,7 +6786,7 @@ function showBattle(then) {
     const lines = B.events.slice(0, shown).map((e, k) => {
       const a = B.units[e.a], t = B.units[e.t], killed = e.hit && hullAt(k + 1)[e.t] <= 0 && hullAt(k)[e.t] > 0;
       const head = k === 0 || B.events[k - 1].round !== e.round ? `<li class="bround">Exchange ${e.round + 1}<\/li>` : "";
-      return `${head}<li class="${e.hit ? (a.fid === me ? "good" : "bad") : "muted"}${k === shown - 1 ? " now" : ""}">${esc(unitName(a))} fires on ${esc(unitName(t).replace(/^Your /, "your "))}: <span class="dice">${e.dice.map((d) => `<span class="die">${d}<\/span>`).join("")}<\/span> ${e.dice.reduce((x, y) => x + y, 0)} against ${e.need}: <b>${e.hit ? (killed ? "destroyed!" : `hit, −${e.dmg}`) : "miss"}<\/b><\/li>`;
+      return `${head}<li class="${e.hit ? (a.fid === me ? "good" : "bad") : "muted"}${k === shown - 1 ? " now" : ""}">${esc(unitName(a))} fires on ${esc(unitName(t).replace(/^Your /, "your "))}: <span class="dice">${e.dice.map((d) => `<span class="die">${d}<\/span>`).join("")}<\/span> ${e.dice.reduce((x, y) => x + y, 0)} against ${e.need}${e.ctr ? ` <span class="small" title="It's built to beat this kind of ship: +${COUNTER.bonus} to hit">(counter)<\/span>` : ""}${e.ambush ? ` <span class="small" title="A cloaked ship's first shot: +${DETECT.ambush} to hit">(from cloak)<\/span>` : ""}: <b>${e.hit ? (killed ? "destroyed!" : `hit, −${e.dmg}`) : "miss"}<\/b><\/li>`;
     }).join("");
     const lostMine = (B.lost || {})[me] || 0, lostTheirs = Object.entries(B.lost || {}).filter(([f]) => f !== me).reduce((t, [, x]) => t + x, 0);
     const gunsOut = B.silenced ? (B.silenced === me ? ` <b class="bad">Your orbital guns are knocked out:<\/b> they can't be repaired while enemy warships hold the orbit.` : ` <b class="good">Their orbital guns are knocked out:<\/b> the orbit is yours while you hold it. Bring troop transports to invade, or a barrage to bring down what they've built.`) : "";
@@ -6840,6 +7058,9 @@ function showHelp(back) {
       <li><b>Colony ships<\/b> settle worlds you can live on; <b>outpost ships<\/b> claim any system, for its exotics ◆ and territory. Xenology and Habitat domes open harsher worlds.<\/li>
       <li><b>Exotics<\/b> ◆ come from deposits. Cruisers, dreadnoughts and the Corridor Engine need them.<\/li>
       <li><b>Battles<\/b> happen when fleets of factions at war share a hex. Each armed ship rolls 3d6 under its skill to hit (3–4 always hits, 17–18 always misses), three exchanges a turn. Worlds with guns fire back: they fire first in each exchange and finish off the most damaged ship. Knocking a world's guns out counts toward winning the battle, and they can't be repaired while you hold the orbit.<\/li>
+      <li><b>Ship counters:<\/b> every warship is built to beat one kind of ship, and aims for it first with +${COUNTER.bonus} to hit. <b>Frigates<\/b> beat scouts, torpedo boats and stealth corvettes; <b>cruisers<\/b> beat frigates; <b>dreadnoughts<\/b> beat cruisers and orbital guns; <b>torpedo boats<\/b> (Heavy hulls) beat dreadnoughts and the biggest hulls, with double damage; <b>stealth corvettes<\/b> prey on unarmed ships. A mixed fleet covers its weaknesses. Hover a ship in a build queue to see what it beats and what beats it.<\/li>
+      <li><b>Cloaking:<\/b> with Phase cloaks you can build <b>stealth corvettes<\/b>. A fleet of nothing but corvettes is invisible to other powers except within their detection range: ${DETECT.world} hex from their worlds (more with stations, Deep sensors or Resonance arrays), ${DETECT.scout} from their scouts, and only the same hex for other ships. It slips past enemy fleets without stopping, and gets +${DETECT.ambush} to hit on its first shot. <b>Warden probes are cloaked too:<\/b> keep scouts out to see them coming. Your own cloaked fleets show faded on the map.<\/li>
+      <li><b>Space mining:<\/b> asteroid fields (credits), gas clouds (fuel) and crystal drifts (exotics) lie in open space between the systems. Build a <b>mining ship<\/b> and park it on one: it mines every turn it isn't moving and no enemy warships are there (up to ${MINING.perField} of your ships a field; half as much again with a deep-space station of yours within ${MINING.stationRange} hexes). Fields run dry. Click one for what's left. Pirates hunt mining ships, so guard them.<\/li>
       <li><b>Engaged:<\/b> a fleet sharing a hex with enemy warships (or an enemy world's guns) is engaged. It can't simply sail away. Press <b>Withdraw<\/b>: it fights the next battle's first exchange defensively, then pulls back toward your nearest world.<\/li>
       <li><b>Repairs:<\/b> a fleet with damaged ships shows where best to mend them (a drydock repairs everything at once, a station ${YARDS.station} hull a turn, any other world of yours 1) and how long it takes. <b>Send for repairs<\/b> splits off the damaged ships and sends them, withdrawing them from a battle first. <b>Repair, then rejoin this fleet<\/b> brings them back once they're whole.<\/li>
       <li><b>Detach and send:<\/b> on a fleet's panel, choose how many of each ship to take, then click where to send them (a world, or an enemy fleet). The soundest ships go and the admiral stays. In a battle you can detach some ships and withdraw just those. <b>Split off by type<\/b> does the same for one type at a time, most damaged first.<\/li>

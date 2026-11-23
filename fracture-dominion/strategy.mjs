@@ -75,6 +75,8 @@ const body = [
     "<b>Fight on your terms.</b> Choose when and where. Attacking prepared defenses with too little is the fastest way to lose a fleet.",
     "<b>Concentrate.</b> Strength in one place beats the same strength spread thin.",
     "<b>Quality matters.</b> Better technology and refitted ships often matter more than numbers.",
+    "<b>Build what beats theirs.</b> Every warship counters one kind: frigates beat torpedo boats, stealth corvettes and scouts; cruisers beat frigates; dreadnoughts beat cruisers and orbital guns; torpedo boats beat dreadnoughts. Look at what your enemy fields and build its counter, and keep your own fleet mixed so no single counter beats it.",
+    "<b>Use cloaks to raid.</b> Stealth corvettes slip past fleets unseen and prey on transports, tankers and mining ships. Against them, keep scouts and frigates with what matters.",
     "<b>Mind your supply.</b> Fleets far from home run short. Plan how you'll keep them fuelled before you go.",
     "<b>Finish what you start.</b> Taking a world means winning its orbit, holding it, and bringing enough troops. Leave halfway and you'll start again.",
     "<b>Once you're in a battle, you're committed.</b> A fleet that shares a hex with the enemy can't just sail off. Pulling back is an order of its own, and it costs a last exchange of fire. Decide before you engage whether you can win.",
@@ -106,6 +108,7 @@ const body = [
 
   sec("explore", "Exploration", ul([
     "<b>Keep exploring all game.</b> Ruins and anomalies give research, and some hide relics of the old empires.",
+    "<b>Mine the open space.</b> Asteroid fields, gas clouds and crystal drifts between the systems pay every turn a mining ship sits on them. A deep-space station nearby raises the yield by half. Fields run dry, so keep finding new ones, and guard your mining ships: pirates hunt them.",
     "<b>Treat fuel as a budget.</b> Depots are what let you keep fleets moving through a long war. Build up the reserve in peacetime, and save burning hard for when speed decides the outcome.",
     "<b>Keep a scout or two all game.</b> When a corridor collapses, whoever charts the new route first gets research, and the route back.",
     "<b>Plan for new sectors.</b> In a long game the map grows, and you hear what kind of sector is coming before it opens. Have scouts and settlers ready, and be ready to defend what you claim: a new sector is a fresh race.",

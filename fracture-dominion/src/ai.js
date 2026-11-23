@@ -2,19 +2,19 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors, hexLine, makeRng } from "./hex.js";
 import { wardenIntel, shareIntel } from "./crisis.js";
-import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE } from "./data.js";
-import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE, ROLES, COUNTER, MINING } from "./data.js";
+import { seesFleet, cloaked, miningYields, findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, sendForRepairs, repairPlace, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
 
 const PRIORITY = {
   // Orbital shipyards early: research reaches a power's existing ships only at a drydock.
   concord: ["xenology", "automation", "sensors", "orbitalYards", "domes", "commerce", "heavyHulls", "foldDrives", "terraforming", "refining"],
-  tessan: ["commerce", "automation", "xenology", "orbitalYards", "sensors", "refining", "heavyHulls", "terraforming", "domes"],
+  tessan: ["commerce", "automation", "xenology", "orbitalYards", "sensors", "refining", "heavyHulls", "phaseCloaks", "terraforming", "domes"],
   kel: ["automation", "xenology", "commerce", "orbitalYards", "domes", "terraforming", "sensors", "batteries", "heavyHulls"],
   hegemony: ["automation", "heavyHulls", "orbitalYards", "shields", "targeting", "xenology", "batteries", "refining", "capitalShips"],
-  vael: ["sensors", "automation", "orbitalYards", "foldDrives", "xenology", "shields", "heavyHulls", "corridorTheory", "refining"],
+  vael: ["sensors", "automation", "orbitalYards", "foldDrives", "xenology", "shields", "heavyHulls", "phaseCloaks", "corridorTheory", "refining"],
   mirrun: ["automation", "sensors", "orbitalYards", "xenology", "domes", "commerce", "terraforming", "refining", "corridorTheory"],
-  ylith: ["sensors", "foldDrives", "automation", "orbitalYards", "xenology", "commerce", "shields", "corridorTheory", "refining"],
+  ylith: ["sensors", "foldDrives", "automation", "orbitalYards", "xenology", "commerce", "shields", "phaseCloaks", "corridorTheory", "refining"],
   zhaq: ["automation", "batteries", "orbitalYards", "sensors", "shields", "heavyHulls", "xenology", "targeting", "refining"],
 };
 const AGGRESSION = { concord: 0.9, tessan: 0.7, kel: 0.9, hegemony: 1.4, vael: 1.0, mirrun: 0.7, ylith: 1.0, zhaq: 1.1 };
@@ -241,6 +241,33 @@ function settleTargets(s, F, kind) {
 const count = (s, F, type) => fleetsOf(s, F.id).reduce((t, f) => t + f.ships.filter((x) => x.type === type).length, 0)
   + coloniesOf(s, F.id).reduce((t, c) => t + c.colony.queue.filter((q) => q.id === type).length, 0);
 
+/** The warship to build. Each counter type gets a share of the fleet in proportion to how much of the enemy's fleet
+ * (by cost) it beats: the type furthest below its share is built next; with none short, the heaviest it can afford. */
+function warship(s, F, enemies) {
+  const base = has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate";
+  const foes = enemies.length ? [...enemies] : Object.keys(F.relations).filter((o) => faction(s, o).alive && F.met[o]);
+  if (s.crisis && s.crisis.stage === "awake") foes.push("wardens");
+  const mix = {}; let total = 0;
+  for (const o of foes) for (const f of fleetsOf(s, o)) for (const x of f.ships) if (SHIPS[x.type].skill) { const v = SHIPS[x.type].cost || SHIPS[x.type].hull * 15; mix[ROLES[x.type]] = (mix[ROLES[x.type]] || 0) + v; total += v; }
+  if (!total) return base;
+  const own = {}; let ownN = 0; for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) { own[x.type] = (own[x.type] || 0) + 1; ownN++; }
+  for (const c of coloniesOf(s, F.id)) for (const q of c.colony.queue) if (q.kind === "ship" && SHIPS[q.id].skill) { own[q.id] = (own[q.id] || 0) + 1; ownN++; }
+  const short = ["frigate", "cruiser", "dreadnought", "torpedo"].filter((t) => (!SHIPS[t].needs || has(s, F.id, SHIPS[t].needs)) && (SHIPS[t].exotics || 0) <= F.exotics)
+    .map((t) => ({ t, gap: 0.5 * (COUNTER.beats[ROLES[t]] || []).reduce((n, r) => n + (mix[r] || 0), 0) / total - (own[t] || 0) / Math.max(1, ownN) }))
+    .filter((x) => x.gap > 0.05).sort((a, b) => b.gap - a.gap);
+  return short[0] ? short[0].t : base;
+}
+/** Mining fields worth working: charted, not mined out, near this power's worlds, with no enemy warships about, and
+ * room for another of its mining ships. */
+function minerTargets(s, F, from) {
+  if (!s.fields) return [];
+  const cols = coloniesOf(s, F.id), mine = fleetsOf(s, F.id).filter((f) => f.ships.some((x) => x.type === "miner"));
+  return Object.entries(s.fields).filter(([k, fd]) => F.explored[k] && fd.left > 10 && cols.some((c) => distance(c.at, k) <= 7)
+    && !Object.values(s.fleets).some((o) => o.owner !== F.id && armed(o) && atWar(s, F.id, o.owner) && distance(o.at, k) <= 2)
+    && mine.filter((f) => f.at === k || f.dest === k).length < MINING.perField)
+    .map(([k, fd]) => ({ k, fd, d: from ? distance(from, k) : Math.min(...cols.map((c) => distance(c.at, k))), v: { credits: 1, fuel: 0.8, exotics: 1.3 }[MINING.kinds[fd.kind].res] }))
+    .sort((a, b) => a.d / a.v - b.d / b.v);
+}
 function production(s, F, diff) {
   // In debt, or paying out more than it earns: scrap warships (frigates first) until the books balance.
   for (let n = 0; n < 6 && (F.credits < 0 || totals(s, F.id).net < -1) && totals(s, F.id).net < 1; n++) {
@@ -278,9 +305,12 @@ function production(s, F, diff) {
       ships && settleTargets(s, F, "outpost").filter((x) => x.sys.exotics || WORLDS[x.sys.world].outpostOnly).length && count(s, F, "outpost") < 1 ? ["ship", "outpost"] : null,
       ships && c.capital && count(s, F, "outpost") < 1 && F.credits >= 150 && stationTarget(s, F) ? ["ship", "outpost"] : null,   // for a deep-space station
       c.capital && has(s, F.id, "orbitalYards") && !c.buildings.drydock ? ["building", "drydock"] : null,   // one, at the capital: the refits
-      ships && power < wantPower ? ["ship", has(s, F.id, "capitalShips") && F.exotics >= 3 ? "dreadnought" : has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
+      // Mining ships: one for each good field nearby, a few at most, when the fleet's strong enough to spare the yards.
+      ships && s.turn >= 6 && (!enemies.length || power >= wantPower * 0.8) && count(s, F, "miner") < Math.min(1 + Math.floor(cols.length / 2), 5) && minerTargets(s, F).length ? ["ship", "miner"] : null,
+      ships && power < wantPower ? ["ship", warship(s, F, enemies)] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "tanker") < 1 ? ["ship", "tanker"] : null,
+      ships && enemies.length && has(s, F.id, "phaseCloaks") && power >= wantPower * 0.7 && count(s, F, "stealth") < 2 ? ["ship", "stealth"] : null,   // raiders, for their transports and mining ships
       c.pop >= 3 && !c.buildings.factory ? ["building", "factory"] : null,
       t.net < 3 && !c.buildings.market ? ["building", "market"] : null,
       c.pop >= 4 && !c.buildings.lab ? ["building", "lab"] : null,
@@ -290,7 +320,7 @@ function production(s, F, diff) {
       enemies.length && has(s, F.id, "batteries") && !c.buildings.battery ? ["building", "battery"] : null,
       sys.exotics && has(s, F.id, "refining") && !c.buildings.refinery ? ["building", "refinery"] : null,
       c.capital && has(s, F.id, "engine") && !c.buildings.engine && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] ? ["building", "engine"] : null,
-      ships && t.net > 2 && power < wantPower * 1.6 ? ["ship", has(s, F.id, "heavyHulls") && F.exotics >= 1 ? "cruiser" : "frigate"] : null,
+      ships && t.net > 2 && power < wantPower * 1.6 ? ["ship", warship(s, F, enemies)] : null,
       !c.buildings.market ? ["building", "market"] : null,
     ]);
     if (pick && !c.queue.some((q) => q.id === pick[1])) enqueue(s, sys.id, pick[0], pick[1]);
@@ -314,7 +344,7 @@ function fleets(s, F) {
   // First, split the specialists off into their own fleets.
   for (const f of fleetsOf(s, F.id)) {
     if (f.ships.length < 2) continue;
-    for (const type of ["colony", "outpost", "scout"]) while (f.ships.length > 1 && f.ships.some((x) => x.type === type)) splitFleet(s, f.id, type);
+    for (const type of ["colony", "outpost", "scout", "miner", "stealth"]) while (f.ships.length > 1 && f.ships.some((x) => x.type === type)) splitFleet(s, f.id, type);
   }
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const cap = s.systems[F.capital];
@@ -358,6 +388,22 @@ function fleets(s, F) {
       if (br) { f.path = []; f.dest = null; continue; }   // there: rest a turn and chart it
       if (!f.path.length) { const k = nearestUnexplored(s, F, f.at); if (k) setDestination(s, f.id, k); }
       continue;
+    }
+    // Mining ships: to the best field nearby, and stay there mining; away from enemy warships.
+    if (types.size === 1 && types.has("miner")) {
+      const danger = Object.values(s.fleets).some((o) => o.owner !== F.id && armed(o) && atWar(s, F.id, o.owner) && seesFleet(s, F, o) && distance(o.at, f.at) <= 1);
+      const fd = s.fields && s.fields[f.at];
+      if (fd && fd.left > 0 && !danger && !f.path.length) continue;   // mining
+      if (danger) { const home = coloniesOf(s, F.id).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0]; if (home && home.at !== f.at) setDestination(s, f.id, home.at); continue; }
+      if (f.path.length && f.dest && s.fields && s.fields[f.dest]) continue;
+      const t = minerTargets(s, F, f.at)[0]; if (t) setDestination(s, f.id, t.k);
+      continue;
+    }
+    // Stealth corvettes: raid what's unarmed (transports, tankers, colony and mining ships) of an enemy it can see.
+    if (types.size === 1 && types.has("stealth") && enemies.length && !f.path.length) {
+      const prey = Object.values(s.fleets).filter((o) => enemies.includes(o.owner) && !armed(o) && seesFleet(s, F, o) && distance(o.at, f.at) <= 10 && !fleetsAt(s, o.at).some((g) => g.owner === o.owner && armed(g)))
+        .sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+      if (prey && prey.at !== f.at && setDestination(s, f.id, prey.at).ok) continue;
     }
     // Tankers keep with the strongest war fleet, and park where it does: a supply point behind the front.
     if (types.size === 1 && types.has("tanker")) {
@@ -438,7 +484,7 @@ function huntWardens(s, F, f, reach) {
   const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
   // Only what it can see (or, for the machines that never move, has found): no chasing what's out of sight.
   // A probe (quick, and gone again) is worth chasing only if it's close by.
-  const known = (w) => (F.visible[w.at] || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > (s.crisis.alerted2 && s.crisis.alerted2[F.id] ? 5 : 2));   // warned of them: chase them farther
+  const known = (w) => (seesFleet(s, F, w) || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > (s.crisis.alerted2 && s.crisis.alerted2[F.id] ? 5 : 2));   // warned of them: chase them farther
   const waves = fleetsOf(s, "wardens").filter(known).map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
   const heartAt = (waves.find((x) => x.heart) || {}).w;
   const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]

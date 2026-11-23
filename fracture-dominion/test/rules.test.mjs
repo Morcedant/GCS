@@ -1063,7 +1063,7 @@ test("the early game is calmer: at peace before turn 75 a computer power keeps a
   s.turn = AI_CALM.engineFrom.standard + 1; let queued = false;
   for (let i = 0; i < 12 && !queued; i++) {
     cap.colony.queue = []; aiTurn(s, F); queued = cap.colony.queue.some((q) => q.id === "engine");
-    for (const q of cap.colony.queue) if (q.kind === "building") cap.colony.buildings[q.id] = true;
+    for (const q of cap.colony.queue) if (q.kind === "building") cap.colony.buildings[q.id] = true; else spawnFleet(s, F.id, cap.at, [q.id]);
   }
   assert.ok(queued, "then it builds it");
 });
@@ -1521,7 +1521,7 @@ test("Warden probes: out of the rifts, they scan worlds from a hex away; the fir
   const s = newGame({ seed: 41, size: "medium", player: "concord", rivals: 2, wilds: "none" });
   const me = s.factions[0];
   crisisTurn(s); s.turn = s.crisis.at - CRISIS.signsLead; crisisTurn(s);
-  for (let i = 0; i < 40 && !s.galEvent; i++) { for (const k of Object.keys(s.hexes)) me.visible[k] = 1; s.turn++; crisisTurn(s); }
+  for (let i = 0; i < 40 && !s.galEvent; i++) { me.detect = {}; for (const k of Object.keys(s.hexes)) me.visible[k] = me.detect[k] = 1; s.turn++; crisisTurn(s); }   // (probes are cloaked: seen only where detected)
   assert.equal(s.galEvent && s.galEvent.id, "probes", "the first sighting is a choice");
   assert.ok(chooseEvent(s, "learn").ok); assert.ok(s.crisis.learn[me.id]);
   // A probe home again: the Wardens learn, and wake stronger.
@@ -1595,4 +1595,68 @@ test("signature technologies: only their people can research them; taking a worl
   assert.ok(r.ok, JSON.stringify(r)); assert.equal(w.colony.owner, me.id);
   assert.ok(has(s, me.id, rt.id), "the captor learned it");
   assert.ok(BUILDINGS[hub].hub === rt.id);
+});
+
+test("ship counters: torpedo boats beat dreadnoughts, frigates beat torpedo boats, cruisers beat frigates, dreadnoughts beat cruisers", () => {
+  const duel = (A, B, N = 30) => {
+    let a = 0;
+    for (let seed = 1; seed <= N; seed++) {
+      const s = newGame({ seed, size: "small", player: "concord", rivals: 1, wilds: "none" }); s.crisisOff = true;
+      const o = s.factions[1].id; declareWar(s, "concord", o);
+      const hex = Object.keys(s.hexes).filter((h) => !s.sysAt[h] && Object.values(s.systems).every((x) => distance(x.at, h) >= 3)).sort()[0];
+      const fa = spawnFleet(s, "concord", hex, A), fb = spawnFleet(s, o, hex, B);
+      for (let t = 0; t < 8 && s.fleets[fa.id] && s.fleets[fb.id]; t++) endTurn(s);
+      const v = (f) => (s.fleets[f.id] ? s.fleets[f.id].ships.reduce((n, x) => n + SHIPS[x.type].cost * x.hull / shipStats(s, f.owner, x.type, x).hull, 0) : 0);
+      if (v(fa) > v(fb)) a++;
+    }
+    return a / N;
+  };
+  assert.ok(duel(["torpedo", "torpedo", "torpedo"], ["dreadnought"]) >= 0.65, "torpedo boats crack a dreadnought");
+  assert.ok(duel(["frigate", "frigate", "frigate", "frigate"], ["torpedo", "torpedo", "torpedo"]) >= 0.8, "frigates screen against torpedo boats");
+  assert.ok(duel(["dreadnought"], ["cruiser", "cruiser"]) >= 0.6, "a dreadnought crushes cruisers");
+});
+
+test("cloaking: a stealth corvette is seen only where it's detected (scouts, worlds close by), slips past enemy fleets, and strikes first", async () => {
+  const { seesFleet, updateVision } = await import("../src/game.js");
+  const s = newGame({ seed: 12, size: "medium", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0], O = s.factions[1];
+  declareWar(s, me.id, O.id);
+  const free = (h) => s.hexes[h] && !s.sysAt[h] && s.hexes[h].terrain === "space" && Object.values(s.systems).every((x) => distance(x.at, h) >= 3);
+  const hex = Object.keys(s.hexes).filter(free).sort()[0];
+  const two = Object.keys(s.hexes).find((h) => distance(h, hex) === 2 && free(h));
+  const watch = spawnFleet(s, O.id, two, ["frigate"]);
+  const sc = spawnFleet(s, me.id, hex, ["stealth"]);
+  updateVision(s, O);
+  assert.ok(O.visible[hex], "the hex is in view");
+  assert.ok(!seesFleet(s, O, sc), "but the corvette isn't seen: a frigate detects only its own hex");
+  spawnFleet(s, O.id, two, ["scout"]); updateVision(s, O);
+  assert.ok(seesFleet(s, O, sc), "a scout detects it");
+  // Slipping past: a fleet of corvettes goes through a hex an enemy fleet holds; a frigate would stop there.
+  delete s.fleets[watch.id]; for (const f of fleetsOf(s, O.id)) if (f.at === two) delete s.fleets[f.id];
+  const mid = neighbors(hex).find(free), end = neighbors(mid).find((h) => h !== hex && free(h) && distance(h, hex) === 2);
+  spawnFleet(s, O.id, mid, ["frigate"]);
+  sc.path = [{ hex: mid, cost: 1 }, { hex: end, cost: 1 }]; sc.dest = end;
+  const fr = spawnFleet(s, me.id, hex, ["frigate"]); fr.path = [{ hex: mid, cost: 1 }, { hex: end, cost: 1 }]; fr.dest = end;
+  endTurn(s);
+  assert.equal(s.fleets[sc.id].at, end, "the corvette slipped past");
+  assert.ok(!s.fleets[fr.id] || s.fleets[fr.id].at === mid, "the frigate was stopped");
+});
+
+test("space mining: fields in open space; a parked mining ship mines them each turn (more with a station near); they run dry", async () => {
+  const { miningYields, miningIncome, fieldAt } = await import("../src/game.js");
+  const { MINING } = await import("../src/data.js");
+  const s = newGame({ seed: 7, size: "medium", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0];
+  const fields = Object.entries(s.fields);
+  assert.ok(fields.length >= 10, "fields scattered through open space");
+  for (const [k] of fields) assert.ok(!s.sysAt[k], "never in a system");
+  const [ore] = fields.find(([, f]) => f.kind === "ore");
+  const m = spawnFleet(s, me.id, ore, ["miner", "miner"]);
+  assert.equal(miningIncome(s, me.id).credits, 2 * MINING.kinds.ore.per, "two ships, a share each");
+  assert.equal(totals(s, me.id).mine, 2 * MINING.kinds.ore.per, "counted in the books");
+  m.path = [{ hex: neighbors(ore)[0], cost: 1 }]; assert.equal(miningYields(s, me.id).length, 0, "not while moving"); m.path = [];
+  // Run it dry.
+  const left = fieldAt(s, ore).left; fieldAt(s, ore).left = 4; endTurn(s);
+  assert.ok(left > 4 && !fieldAt(s, ore), "mined out, and gone");
+  // Exotics, a whole one at a time.
+  const cr = fields.find(([, f]) => f.kind === "crystal");
+  if (cr) { spawnFleet(s, me.id, cr[0], ["miner", "miner"]); const e0 = me.exotics; endTurn(s); assert.equal(me.exotics - e0, 1, "two ships: an exotic a turn"); }
 });

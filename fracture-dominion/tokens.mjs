@@ -6,7 +6,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { peopleToken } from "./src/peoples.js";
 import { SHIP_SHAPES, SHIPS, FACTIONS, CRISIS, FLEET_STYLES, WILDS, TRADERS, BUILDINGS, BATTERY, shipShape, shipLabel } from "./src/data.js";
 
-const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "transport", "tanker", "colony", "outpost"];
+const ORDER = ["scout", "frigate", "cruiser", "dreadnought", "torpedo", "stealth", "transport", "tanker", "miner", "colony", "outpost"];
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 /** One round token: the outline in a circle, tinted with the colour (or plain, to colour in), an arrow at the bow. */
 const token = (d, color, size) => `<figure class="tok"><svg viewBox="-14 -14 28 28" style="width:${size};height:${size}"><circle r="13.4" fill="${color ? color + "26" : "none"}" stroke="#000" stroke-width=".35"/><g transform="scale(.84)"><path d="${d}" fill="${color || "none"}" fill-opacity="${color ? ".55" : "0"}" stroke="#000" stroke-width=".8" stroke-linejoin="round"/></g><path d="M13.4 0 L11.8 -1 L11.8 1 Z" fill="#000"/></svg></figure>`;

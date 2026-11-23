@@ -6,6 +6,17 @@
     {
       "date": "2026-11-23",
       "kind": "site",
+      "title": "Dominion: ship counters, cloaking and space mining",
+      "items": [
+        "Ship counters: every warship is built to beat one kind of ship and aims for it first (+2 to hit). Frigates beat scouts, torpedo boats and stealth corvettes; cruisers beat frigates; dreadnoughts beat cruisers and orbital guns; the new torpedo boats (Heavy hulls) beat dreadnoughts with double damage.",
+        "Cloaking: the new Phase cloaks technology builds stealth corvettes. A fleet of only corvettes is unseen except near enemy worlds or by scouts, slips past enemy fleets, strikes first, and preys on unarmed ships. Warden probes are cloaked too.",
+        "Space mining: asteroid fields (credits), gas clouds (fuel) and crystal drifts (exotics) in open space. Park a mining ship on one to mine it each turn; a deep-space station nearby adds half. Fields run dry, and pirates hunt mining ships.",
+        "Computer players build counters to what their enemies field, send mining ships to nearby fields, and use stealth corvettes as raiders."
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "kind": "site",
       "title": "Dominion: signature technologies",
       "items": [
         "Each of the eight peoples has a signature technology only it can research, such as the Kel's Chitin printers (cheaper, tougher frigates) or the Ylith's Skyhook batteries (an extra battery shot).",
