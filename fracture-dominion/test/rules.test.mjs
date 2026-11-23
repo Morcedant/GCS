@@ -1431,7 +1431,7 @@ test("a coalition against the Wardens: friends come free, the lukewarm for credi
   for (const X of [A, B, C]) { me.met[X.id] = X.met[me.id] = true; for (let i = 0; i < 2; i++) spawnFleet(s, X.id, s.systems[X.capital].at, ["cruiser", "cruiser", "cruiser"]); }
   crisisTurn(s); s.turn = s.crisis.at - 6; crisisTurn(s); s.galEvent = null; s.turn = s.crisis.at; crisisTurn(s); s.galEvent = null;
   for (const k of Object.keys(s.hexes)) me.explored[k] = 1;
-  const tg = coalitionTargets(s, me.id); assert.ok(tg.length && tg[0].kind === "heart");
+  const tg = coalitionTargets(s, me.id).filter((x) => x.kind === "heart"); assert.ok(tg.length, "the Heart is a target");
   A.relations[me.id].score = 20; B.relations[me.id].score = 0; C.relations[me.id].score = -30;
   const ans = Object.fromEntries(coalitionAnswers(s, me.id).map((a) => [a.id, a]));
   assert.equal(ans[A.id].answer, "free"); assert.equal(ans[B.id].answer, "paid"); assert.equal(ans[C.id].answer, "no");
@@ -1488,4 +1488,28 @@ test("computer players send badly damaged ships for repairs when it's safe, and 
   spawnFleet(t, me.id, near, ["frigate"]);
   aiTurn(t, G2);
   assert.ok(!Object.values(t.fleets).some((x) => x.owner === G2.id && x.repairAt), "no trip with enemies near");
+});
+
+test("calls to arms: a wave at your world brings a message with a coalition against it; a friend under attack asks for help", async () => {
+  const { crisisTurn, wardenThreats, coalitionTargets, callCoalition } = await import("../src/crisis.js");
+  const { currentEnvoy, answerEnvoy } = await import("../src/envoys.js");
+  const s = newGame({ seed: 41, size: "medium", player: "concord", rivals: 3, wilds: "none" });
+  const me = s.factions[0], [A, B] = s.factions.slice(1);
+  for (const X of s.factions.slice(1)) { me.met[X.id] = X.met[me.id] = true; spawnFleet(s, X.id, s.systems[X.capital].at, ["cruiser", "cruiser", "cruiser"]); }
+  crisisTurn(s); s.turn = s.crisis.at - 6; crisisTurn(s); s.galEvent = null; s.turn = s.crisis.at; crisisTurn(s); s.galEvent = null; s.inbox = [];
+  A.relations[me.id].score = 20;
+  // A wave at our capital, and another at A's.
+  const W = "wardens", cap = s.systems[me.capital], acap = s.systems[A.capital];
+  const w1 = spawnFleet(s, W, cap.at, ["sentinel", "sentinel"]), w2 = spawnFleet(s, W, acap.at, ["sentinel"]);
+  for (const k of [cap.at, acap.at]) me.visible[k] = me.explored[k] = 1;
+  assert.ok(wardenThreats(s, me.id).some((t) => t.fleet === w1.id));
+  s.turn++; crisisTurn(s);
+  const m = currentEnvoy(s); assert.equal(m.kind, "wardenAttack"); assert.ok(m.options.some((o) => o.id === "call"), "a coalition, right there");
+  assert.ok(coalitionTargets(s, me.id).some((t) => t.kind === "wave" && t.fleet === w1.id));
+  const r = answerEnvoy(s, "call"); assert.ok(r.ok && /The call goes out/.test(r.text));
+  assert.equal(s.crisis.coalition.fleet, w1.id, "the coalition follows that wave");
+  const help = currentEnvoy(s); assert.equal(help && help.kind, "wardenHelp", "A asks for help");
+  assert.ok(answerEnvoy(s, "no").ok);
+  // The wave destroyed: the coalition ends.
+  delete s.fleets[w1.id]; s.turn++; crisisTurn(s); assert.ok(s.crisis.coalition.done);
 });

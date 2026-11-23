@@ -101,6 +101,7 @@ export function crisisTurn(s) {
   if (s.crisisOff || s.winner) return;
   const C = s.crisis || (s.crisis = { stage: "quiet", at: Math.max(s.turn + CRISIS.warning + 2, CRISIS.earliest + makeRng("crisis:" + s.seed).int(CRISIS.spread)) });
   coalitionTurn(s);
+  callsToArms(s);
   if (C.stage === "quiet") {
     if (s.turn >= C.at - CRISIS.signsLead) { const R = rng(s); signs(s, R); R.save(); }
     if (s.turn >= C.at - CRISIS.warning && !s.galEvent) {
@@ -243,7 +244,7 @@ export const CRISIS_EVENTS = {
   },
   waking: {
     title: "The Wardens wake",
-    text: (s) => `It came out of the rift at ${crPlace(s, s.crisis.heart)}: the Heart of the Wardens, a machine the size of a small moon, and the first wave of its hunters with it. It doesn't answer hails. Its waves will come every ${CRISIS.waveEvery} turns, each larger than the last, and they'll burn the worlds nearest them, whoever's they are. Break the Heart and they go dark. Every power has heard. Some are already making peace with each other.`,
+    text: (s) => `It came out of the rift at ${crPlace(s, s.crisis.heart)}: the Heart of the Wardens, a machine the size of a small moon, and the first wave of its hunters with it. It doesn't answer hails. Its waves will come every ${CRISIS.waveEvery} turns, each larger than the last, and they'll burn the worlds nearest them, whoever's they are. Break the Heart and they go dark. Every power has heard. Some are already making peace with each other. The red bar over the map follows them from now on: from it you can call the other powers into a coalition, and see what is attacking your worlds.`,
     options: [
       { id: "truce", label: "Call a truce against them", does: "Your wars end where the rival will listen, and no one declares a new war while the Heart lives.", apply: (s) => {
         const me = crMe(s), C = s.crisis; C.truce = true;
@@ -314,10 +315,13 @@ const CO = () => CRISIS.coalition;
 export function coalitionTargets(s, fid) {
   const F = faction(s, fid), out = [];
   for (const f of wardenFleets(s)) {
-    const t = f.ships.some((x) => x.type === "heart") ? "heart" : f.ships.some((x) => x.type === "node") ? "node" : null;
-    if (t && F.explored[f.at]) out.push({ at: f.at, kind: t, place: crPlace(s, f.at), name: t === "heart" ? "the Heart" : `the Node at ${crPlace(s, f.at)}` });
+    const t = f.ships.some((x) => x.type === "heart") ? "heart" : f.ships.some((x) => x.type === "node") ? "node" : stationary(f) ? null : "wave";
+    if (!t) continue;
+    if (t === "wave" ? F.visible[f.at] : F.explored[f.at]) out.push({ at: f.at, kind: t, fleet: t === "wave" ? f.id : null, place: crPlace(s, f.at), name: t === "heart" ? "the Heart" : t === "node" ? `the Node at ${crPlace(s, f.at)}` : `the Warden wave at ${crPlace(s, f.at)}` });
   }
-  return out.sort((a, b) => (a.kind === "heart" ? -1 : 1) - (b.kind === "heart" ? -1 : 1));
+  // The waves first, nearest our worlds first (they're the ones burning worlds), then the Heart, then the Nodes.
+  const order = { wave: 0, heart: 1, node: 2 }, cols = coloniesOf(s, fid), gap = (h) => Math.min(99, ...cols.map((c) => distance(c.at, h)));
+  return out.sort((a, b) => order[a.kind] - order[b.kind] || (a.kind === "wave" ? gap(a.at) - gap(b.at) : 0));
 }
 /** Who would answer a call from `fid`: [{ id, name, answer: "free" | "paid" | "no", price, why }]. */
 export function coalitionAnswers(s, fid) {
@@ -345,7 +349,7 @@ export function callCoalition(s, fid, hex, pay = false) {
   if (!members.length) return { error: "No one would answer the call." };
   F.credits -= cost;
   (K.lastCall = K.lastCall || {})[fid] = s.turn;
-  K.coalition = { by: fid, at: hex, kind: target.kind, name: target.name, until: s.turn + C.turns, members: members.map((a) => a.id), from: s.turn };
+  K.coalition = { by: fid, at: hex, kind: target.kind, fleet: target.fleet || null, name: target.name, until: s.turn + C.turns, members: members.map((a) => a.id), from: s.turn };
   let ships = 0;
   for (const a of members) {
     const X = faction(s, a.id); if (a.answer === "paid") X.credits += a.price;
@@ -362,7 +366,10 @@ export function callCoalition(s, fid, hex, pay = false) {
 /** Once a turn: the coalition holds its target until it falls or the time runs out; members who fought earn regard. */
 export function coalitionTurn(s) {
   const K = s.crisis, A = K && K.coalition; if (!A || A.done) return;
-  const there = wardenFleets(s).some((f) => f.at === A.at && f.ships.some((x) => x.type === A.kind));
+  // A wave moves: the coalition follows it. A Node or the Heart stays put.
+  const wave = A.fleet && s.fleets[A.fleet];
+  if (wave) A.at = wave.at;
+  const there = A.fleet ? !!wave : wardenFleets(s).some((f) => f.at === A.at && f.ships.some((x) => x.type === A.kind));
   if (there && s.turn < A.until) return;
   A.done = true; A.until = s.turn;
   for (const f of Object.values(s.fleets)) if (f.coalition === A.from) delete f.coalition;
@@ -371,4 +378,42 @@ export function coalitionTurn(s) {
     for (const a of side) for (const b of side) if (a !== b && faction(s, a) && faction(s, a).ai) remember(s, a, b, `fought beside us against ${A.name}`, CO().regard);
     log(s, null, `The coalition's target has fallen: ${A.name}. ${side.map((x) => faction(s, x).name).join(", ")} fought it together.`, "war");
   } else log(s, null, `The coalition against ${A.name} has broken up: its time ran out with the machine still standing.`, "war");
+}
+
+// ---- calls to arms: the Wardens at a power's worlds ----
+/** Warden machines on the move at (or within 2 hexes of, or heading for) a power's worlds: [{ fleet, world, n }]. */
+export function wardenThreats(s, fid) {
+  const cols = coloniesOf(s, fid), out = [];
+  for (const f of wardenFleets(s)) {
+    if (stationary(f) || f.ships.some((x) => x.type === "heart")) continue;
+    const world = cols.filter((x) => distance(x.at, f.at) <= 2 || f.dest === x.at).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+    if (world) out.push({ fleet: f.id, world: world.id, n: f.ships.length });
+  }
+  return out;
+}
+/** Once a turn while the Wardens are about: tell the player when their machines come for a world of theirs, and let a
+ * friendly power under attack ask the player for help (each wave once; each power at most every 10 turns). */
+function callsToArms(s) {
+  const C = s.crisis; if (!C || !["awake", "dormant"].includes(C.stage)) return;
+  const me = crMe(s); C.alerted = C.alerted || {}; C.asked = C.asked || {};
+  s.inbox = s.inbox || [];
+  for (const t of wardenThreats(s, me.id)) {
+    const k = t.fleet + ":" + me.id; if (C.alerted[k]) continue; C.alerted[k] = s.turn;
+    if (!s.inbox.some((m) => m.kind === "wardenAttack")) s.inbox.push({ kind: "wardenAttack", from: WARDENS, ctx: t, turn: s.turn });
+  }
+  if (s.inbox.some((m) => m.kind === "wardenHelp")) return;
+  for (const F of crAlive(s)) {
+    if (!F.ai || F.id === me.id || !me.met[F.id] || atWar(s, F.id, me.id) || (C.asked[F.id] && s.turn - C.asked[F.id] < 10)) continue;
+    const r = F.relations[me.id]; if (!(r.allied || r.score >= 5)) continue;
+    const t = wardenThreats(s, F.id).find((x) => !C.alerted[x.fleet + ":" + F.id]); if (!t) continue;
+    C.alerted[t.fleet + ":" + F.id] = s.turn; C.asked[F.id] = s.turn;
+    s.inbox.push({ kind: "wardenHelp", from: F.id, ctx: t, turn: s.turn }); break;
+  }
+}
+/** Send the player's strongest idle war fleet (that can get there) to a world under Warden attack. */
+export function sendHelp(s, fid, worldId) {
+  const w = s.systems[worldId]; if (!w) return { error: "No such world." };
+  const fleets = fleetsOf(s, fid).filter((f) => f.ships.some((x) => SHIPS[x.type].skill > 0) && !f.path.length && !f.repairAt && !f.coalition).sort((a, b) => b.ships.length - a.ships.length);
+  for (const f of fleets) { const r = setDestination(s, f.id, w.at); if (r.ok) return { ok: true, fleet: f.id, ships: f.ships.length, turns: r.turns }; }
+  return { error: "None of your war fleets is free to go (they're all moving, at the yards, or can't reach it)." };
 }

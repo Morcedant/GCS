@@ -6,7 +6,7 @@ import { newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gun
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
-import { crisisTurn, crisisState, coalitionTargets, coalitionAnswers, callCoalition } from "./crisis.js";
+import { crisisTurn, crisisState, coalitionTargets, coalitionAnswers, callCoalition, wardenThreats } from "./crisis.js";
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
 import { sectorsTurn, sectorsState, corridorsTurn, collapseState } from "./sectors.js";
@@ -442,7 +442,24 @@ function draw() {
 }
 
 // ---------- the bar and the panels ----------
-function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); renderCoach(); }
+function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); renderCoach(); renderWardenBar(); }
+/** While the Wardens are about: a bar over the map, with what's attacking your worlds and the call to arms at hand. */
+function renderWardenBar() {
+  const el = $("warden-bar"); if (!el) return;
+  const K = S && S.crisis, c = S && crisisState(S);
+  if (!c || !["awake", "dormant"].includes(c.stage) || S.winner) { el.hidden = true; return; }
+  const me = player(S), threats = wardenThreats(S, me.id), A = K.coalition && !K.coalition.done && K.coalition.until > S.turn ? K.coalition : null;
+  const near = threats.reduce((t, x) => t + x.n, 0), worlds = [...new Set(threats.map((x) => S.systems[x.world].name))];
+  el.classList.toggle("calm", c.stage === "dormant" && !threats.length);
+  el.innerHTML = `<span class="pulse" aria-hidden="true"></span><span>${c.stage === "dormant" ? `<b>The Heart is broken</b>, but ${c.nodes.length} Node${c.nodes.length === 1 ? "" : "s"} stand${c.nodes.length === 1 ? "s" : ""}` : `<b>The Wardens are awake.</b> The Heart: ${Math.round(c.hull)} of ${c.max} hull`}${near ? ` · <b>${near} machine${near === 1 ? "" : "s"} at ${esc(worlds.slice(0, 2).join(", "))}${worlds.length > 2 ? "…" : ""}</b>` : ""}${A ? ` · coalition against ${esc(A.name)} until turn ${A.until}` : ""}</span>
+    ${A ? "" : `<button class="btn small primary" id="wb-call">Call a coalition</button>`}${threats.length ? `<button class="btn small" id="wb-threat">Show the attack</button>` : ""}${c.heart ? `<button class="btn small" id="wb-heart">Show the Heart</button>` : ""}<button class="btn small" id="wb-more">Details</button>`;
+  el.hidden = false;
+  if ($("wb-call")) $("wb-call").onclick = () => { modal(`<h1>Call a coalition</h1>${coalitionHTML() || `<p>There's nothing in sight to call them against.</p>`}<div class="btn-row"><button class="btn" id="wb-close">Close</button></div>`); $("wb-close").onclick = closeModal;
+    for (const b of document.querySelectorAll("#modal-body [data-coalition]")) b.onclick = () => { const hex = ($("co-target") || {}).value, r = callCoalition(S, player(S).id, hex, b.dataset.coalition === "pay"); if (r.error) toast(r.error, true); else { toast(`The coalition is called: ${r.members} power${r.members === 1 ? "" : "s"} send ${r.ships} ships${r.cost ? `, for ${r.cost} credits` : ""}.`); closeModal(); save(); renderAll(); } }; };
+  if ($("wb-threat")) $("wb-threat").onclick = () => { const f = S.fleets[threats[0].fleet]; if (f) { centerOn(f.at); draw(); } };
+  if ($("wb-heart")) $("wb-heart").onclick = () => { centerOn(c.heart); draw(); };
+  $("wb-more").onclick = () => { tab = "objectives"; renderTabs(); renderPanel(); };
+}
 function renderBar() {
   const me = player(S), t = totals(S, me.id), R = me.research, tech = researchItem(S, me.id);
   $("bar-faction").innerHTML = `<span class="dot" style="background:${me.color}"></span>${esc(me.name)}`;
@@ -1499,7 +1516,7 @@ function showHelp(back) {
       <li><b>Refits:</b> research that improves ships goes into new ones; ships already in service get it at a Drydock (a Shipyard fits the early systems: sensors, drives, shields). A fleet's panel says when its ships need a refit.</li>
       <li><b>Pirate ransom and tribute:</b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts</b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.</li>
       <li><b>Traders:</b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot</b> to fill its tanks and cut the depot's supply.</li>
-      <li><b>The Wardens:</b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out. To rally the others, <b>call a coalition</b> from the Wardens card on the Objectives tab: pick the Heart or a Node, and every power that likes you sends its fleets to hold it with you (the lukewarm for credits).</li>
+      <li><b>The Wardens:</b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out. While they are about, a red bar over the map shows what they are attacking. To rally the others, <b>call a coalition</b> from that bar (or the Wardens card on the Objectives tab): pick the Heart or a Node, and every power that likes you sends its fleets to hold it with you (the lukewarm for credits). When they attack one of your worlds, a Call to arms offers a coalition against that wave on the spot, and friendly powers under attack ask you for help.</li>
       <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>
       <li><b>New sectors:</b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.</li>
       <li><b>Corridor collapses:</b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). It's rare, and it's always one that matters. Ships then go the long way, until a scout rests ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).</li>

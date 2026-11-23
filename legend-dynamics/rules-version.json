@@ -4,6 +4,17 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-23",
+      "kind": "site",
+      "title": "Dominion: the Wardens, front and centre",
+      "items": [
+        "While the Wardens are awake, a red bar over the map shows the Heart's state, how many machines are at your worlds and where, and any coalition under way. Its buttons call a coalition, show the attack, show the Heart, or open the details.",
+        "Call to arms: when Warden machines come for one of your worlds, a message offers a coalition against that wave on the spot (free, or paying the lukewarm), or sends your strongest free fleet there.",
+        "A plea for help: when a computer power that likes you is attacked by the Wardens, it asks you to send a fleet or rally the others. Helping is remembered, and so is refusing, a little.",
+        "Coalitions can now be called against a moving Warden wave; the members follow it until it's destroyed."
+      ]
+    },
+    {
       "date": "2026-11-22",
       "kind": "site",
       "title": "Dominion: an introduction",

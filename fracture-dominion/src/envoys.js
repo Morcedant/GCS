@@ -6,6 +6,7 @@
 import { PERSONALITIES, TECHS, PROTECTION } from "./data.js";
 import { player, faction, coloniesOf, fleetsOf, armed, atWar, allied, militaryPower, declareWar, remember, log, rng, admiralsOf, admTitle, setDestination, researchItem, spawnFleet, aiOpt } from "./game.js";
 import { payPirates } from "./wilds.js";
+import { coalitionAnswers, coalitionTargets, callCoalition, sendHelp } from "./crisis.js";
 import { distance } from "./hex.js";
 
 const enMe = (s) => player(s);
@@ -133,7 +134,32 @@ const CALL_TO_ARMS = "{them} have attacked us. By our alliance, we call on {you}
  * haven sets up near you) and the free traders (a deal, when a convoy reaches one of your worlds). Their answers are
  * built for the message; `apply` returns what came of it.
  */
+/** The coalition choices for a call to arms against one Warden wave: free, paying, as coalitionAnswers says. */
+const waveCall = (s, c) => {
+  const ans = coalitionAnswers(s, enMe(s).id), free = ans.filter((a) => a.answer === "free"), paid = ans.filter((a) => a.answer === "paid"), cost = paid.reduce((t, a) => t + a.price, 0);
+  const K = s.crisis, busy = K && K.coalition && !K.coalition.done && K.coalition.until > s.turn;
+  const at = () => { const t = coalitionTargets(s, enMe(s).id).find((x) => x.fleet === c.fleet); return t && t.at; };
+  const go = (pay) => (s) => { const hex = at(); if (!hex) return "The wave has moved out of sight."; const r = callCoalition(s, enMe(s).id, hex, pay); return r.error ? `No coalition: ${r.error}` : `The call goes out: ${r.members} power${r.members === 1 ? "" : "s"} send ${r.ships} ships against the wave${r.cost ? `, for ${r.cost} credits` : ""}.`; };
+  return busy ? [] : [
+    ...(free.length ? [{ id: "call", label: `Call a coalition (${free.length} will come)`, does: `${free.map((a) => a.name).join(", ")} send their fleets against this wave and hold it with you.`, apply: go(false) }] : []),
+    ...(paid.length ? [{ id: "callpay", label: `Call everyone, paying ${cost} credits`, does: `${[...free, ...paid].map((a) => a.name).join(", ")} come.`, apply: go(true) }] : []),
+  ];
+};
 const OUTSIDERS = {
+  wardenAttack: { leader: "Fleet command", title: "Call to arms", attitude: "hostile",
+    text: (s, c) => `Warden machines${c.n ? `, ${c.n} of them,` : ""} are coming for ${s.systems[c.world].name}. A world with guns or warships in orbit can't be burned, only fought over. Send what you can, and call on the other powers.`,
+    options: (s, c) => [
+      ...waveCall(s, c),
+      { id: "send", label: "Send our strongest free fleet", does: `Your biggest war fleet that isn't busy heads for ${s.systems[c.world].name}.`, apply: (s) => { const r = sendHelp(s, enMe(s).id, c.world); return r.error ? r.error : `${r.ships} ships head for ${s.systems[c.world].name}: ${r.turns} turn${r.turns === 1 ? "" : "s"}.`; } },
+      { id: "ok", label: "We'll handle it", does: "No orders now.", apply: () => "Fleet command stands by." },
+    ] },
+  wardenHelp: { leader: "Their envoy", title: "A plea for help", attitude: "friendly",
+    text: (s, c) => `The Wardens are at ${s.systems[c.world].name}, and they can't hold it alone. They ask you, as a friend, to send ships, or to rally the others against the machines.`,
+    options: (s, c) => [
+      { id: "send", label: "Send a fleet", does: `Your biggest free war fleet heads for ${s.systems[c.world].name}; they'll remember it.`, apply: (s) => { const r = sendHelp(s, enMe(s).id, c.world); if (r.error) return r.error; remember(s, s.systems[c.world].colony ? s.systems[c.world].colony.owner : enMe(s).id, enMe(s).id, "sent ships when the Wardens came for us", 8); return `${r.ships} ships head for ${s.systems[c.world].name}: ${r.turns} turn${r.turns === 1 ? "" : "s"}.`; } },
+      ...waveCall(s, c),
+      { id: "no", label: "We can't spare ships", does: "They'll understand, a little.", apply: (s) => { const o = s.systems[c.world].colony && s.systems[c.world].colony.owner; if (o) remember(s, o, enMe(s).id, "couldn't help us against the Wardens", -2); return "You send your regrets."; } },
+    ] },
   ransom: { leader: "The raider captain", title: "Pirates", attitude: "hostile",
     text: (s, c) => `We hold the sky over ${s.systems[c.world].name}. ${c.n} credits and we're gone, and we'll leave every world of yours alone for ${PROTECTION.turns} turns. Or we stay, and take it a little at a time.`,
     options: (s, c) => [
@@ -172,6 +198,7 @@ export function currentEnvoy(s) {
   if (OUTSIDERS[m.kind]) {
     const O = OUTSIDERS[m.kind], F = faction(s, m.from);
     if ((m.kind === "ransom" || m.kind === "tribute") && !fleetsOf(s, "pirates").some((r) => r.home === m.ctx.home || r.at === m.ctx.home)) { s.inbox.shift(); return currentEnvoy(s); }
+    if ((m.kind === "wardenAttack" || m.kind === "wardenHelp") && (!s.fleets[m.ctx.fleet] || !s.systems[m.ctx.world] || !s.systems[m.ctx.world].colony)) { s.inbox.shift(); return currentEnvoy(s); }   // the wave's gone, or the world
     return { from: m.from, name: F ? F.name : O.title, color: F ? F.color : "#999", leader: O.leader, title: O.title, kind: m.kind, text: O.text(s, m.ctx), attitude: O.attitude,
       options: O.options(s, m.ctx).map((o) => ({ id: o.id, label: o.label, does: o.does })) };
   }
