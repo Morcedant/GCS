@@ -1740,3 +1740,13 @@ test("the Corridor Engine charges: finishing it wakes the Wardens, it waits whil
   for (let i = 0; i < ENGINE.charge + 2 && !s.winner; i++) endTurn(s);
   assert.equal(s.winner, me.id); assert.equal(s.winReason, "engine");
 });
+
+test("Watchers have to be found: off the map until a ship or world of yours sees one, then remembered", async () => {
+  const { updateVision } = await import("../src/game.js");
+  const s = newGame({ seed: 5, size: "medium", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0];
+  const far = Object.keys(s.hexes).filter((h) => !me.visible[h] && !s.sysAt[h] && s.hexes[h].terrain === "space").sort()[0];
+  const w = spawnFleet(s, "wardens", far, ["watcher"]);
+  updateVision(s, me); assert.ok(!(me.foundW || {})[w.id], "not found yet");
+  const sc = spawnFleet(s, me.id, far, ["scout"]); updateVision(s, me); assert.ok(me.foundW[w.id], "a scout finds it");
+  delete s.fleets[sc.id]; updateVision(s, me); assert.ok(!me.visible[far] && me.foundW[w.id], "out of sight again, but remembered");
+});

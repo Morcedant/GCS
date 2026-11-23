@@ -1515,6 +1515,8 @@ export function updateVision(s, F) {
   // Allies share what their worlds see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && allied(s, F.id, o.id)) for (const sys of coloniesOf(s, o.id)) see(sys.at, 1);
   F.visible = vis;
+  // Warden machines that never move (Watchers, Nodes): once seen, this power knows where they stand.
+  for (const f of Object.values(s.fleets)) if (f.owner === "wardens" && vis[f.at] && f.ships.some((x) => x.type === "watcher" || x.type === "node")) (F.foundW = F.foundW || {})[f.id] = s.turn;
   // Detection (cloaked ships): worlds a hex or so out, scouts farther, other ships only in their own hex.
   const det = {}, mark = (hex, n) => { for (const k of within(hex, n)) det[k] = 1; };
   const plus = (has(s, F.id, "sensors") ? DETECT.sensors : 0) + (has(s, F.id, "resonanceArrays") ? DETECT.resonance : 0) + (F.id === "ylith" ? DETECT.ylith : 0);
