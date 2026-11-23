@@ -1573,3 +1573,26 @@ test("computer players share what they know of the Wardens with the powers they 
   assert.ok(!(s.crisis.aiShares || []).some((x) => x.from === A.id && x.to === B.id), "not the one it dislikes");
   assert.ok(me.relations[A.id] && (me.relations[A.id].memory || []).some((m) => /Wardens/.test(m.text)), "remembered");
 });
+
+test("signature technologies: only their people can research them; taking a world with the hub teaches the captor", async () => {
+  const { TECHS, BUILDINGS } = await import("../src/data.js");
+  const { availableTechs, has, setResearch } = await import("../src/game.js");
+  const s = newGame({ seed: 61, size: "small", player: "concord", rivals: 1, wilds: "none", crisis: false, sectors: false, collapses: false });
+  const me = s.factions[0], R = s.factions[1];
+  me.research.done.push("xenology", "commerce", "automation", "sensors", "batteries", "heavyHulls");
+  const mineIds = availableTechs(s, me.id).filter((t) => t.only).map((t) => t.id);
+  assert.deepEqual(mineIds, ["frontierCharters"], "only our own");
+  assert.ok(setResearch(s, me.id, TECHS.find((t) => t.only === R.id).id).error !== undefined || !availableTechs(s, me.id).some((t) => t.only === R.id));
+  // The rival's hub on a world; we take it.
+  const rt = TECHS.find((t) => t.only === R.id), hub = rt.hub, w = s.systems[R.capital];
+  R.research.done.push(rt.id); w.colony.buildings[hub] = true;
+  assert.ok(!has(s, me.id, rt.id));
+  me.relations[R.id].status = R.relations[me.id].status = "war";
+  for (const f of Object.values(s.fleets)) if (f.at === w.at) delete s.fleets[f.id];
+  w.colony.defense = 0; w.colony.pop = 1; w.colony.capital = false;
+  const t = spawnFleet(s, me.id, w.at, Array(8).fill("transport"));
+  const r = invade(s, t.id);
+  assert.ok(r.ok, JSON.stringify(r)); assert.equal(w.colony.owner, me.id);
+  assert.ok(has(s, me.id, rt.id), "the captor learned it");
+  assert.ok(BUILDINGS[hub].hub === rt.id);
+});

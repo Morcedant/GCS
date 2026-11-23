@@ -2,7 +2,7 @@
 // character, and its ships. Writes dist/peoples.html.   node peoples.mjs
 // Painted portraits come from the music bucket's peoples/ folder (src/peoples.js, peopleArt), when there are any.
 import { writeFileSync, mkdirSync } from "node:fs";
-import { FACTIONS, PERSONALITIES, FLEET_STYLES, SHIPS } from "./src/data.js";
+import { FACTIONS, PERSONALITIES, FLEET_STYLES, SHIPS, TECHS, BUILDINGS } from "./src/data.js";
 import { peopleToken, peopleArt, installPeopleArt, PEOPLE_CLIP, LOOKS } from "./src/peoples.js";
 import { readFileSync } from "node:fs";
 // The table server (for the portraits list), as for the game's music.
@@ -22,6 +22,7 @@ const card = (f) => {
     <p>${esc(LOOKS[f.id] || "")}</p>
     <dl>
       <dt>Trait</dt><dd><b>${esc(f.trait)}.</b> ${esc(f.traitText)}</dd>
+      ${(() => { const T = TECHS.find((x) => x.only === f.id); return T ? `<dt>Signature</dt><dd><b>${esc(T.name)}.</b> ${esc(T.text.replace(/ Unique to this people.*$/, ""))} <span class="muted">Only they can research it. Its hub, the ${esc(BUILDINGS[T.hub].name)}, gives 2 science; whoever captures a world with one learns it.</span></dd>` : ""; })()}
       <dt>Leader</dt><dd><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}</b>, ${esc((P.title || "").toLowerCase())}: ${esc(P.text || "")}</dd>
       <dt>Ships</dt><dd>${esc(St.style)} <span class="muted">${ORDER.map((t) => `${esc(St.classes[t])} ${esc(SHIPS[t].name.toLowerCase())}`).join(" · ")}</span></dd>
     </dl>

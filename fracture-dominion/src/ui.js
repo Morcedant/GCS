@@ -976,11 +976,19 @@ function researchHTML() {
   let h = `<h2>Research</h2><p class="small muted">What improves ships is built into new ships at once. Ships already in service get it when they end a turn at a Drydock; a Shipyard fits the early systems (Deep sensors, Fold drives, Deflector shields).</p>`;
   h += cur ? `<p><b>${esc(cur.name)}</b>: ${Math.floor(R.progress)} / ${cur.cost}${t.sci ? ` · ${Math.ceil((cur.cost - R.progress) / t.sci)} turns` : ""}</p>${bar(R.progress, cur.cost)}` : `<p class="bad">Choose what to research next.${R.progress ? ` ${Math.floor(R.progress)} points are waiting.` : ""}</p>`;
   for (const field of ["Physics", "Industry", "Society"]) {
-    h += `<h3>${field}</h3><div class="techs">` + TECHS.filter((x) => x.field === field).map((x) => {
+    h += `<h3>${field}</h3><div class="techs">` + TECHS.filter((x) => x.field === field && !x.only).map((x) => {
       const done = R.done.includes(x.id), can = availableTechs(S, me.id).some((a) => a.id === x.id);
       return `<button class="tech ${done ? "done" : can ? "can" : "locked"} ${R.current === x.id ? "cur" : ""}" ${can ? `data-tech="${x.id}"` : "disabled"}><b>${esc(x.name)}</b><span>${done ? "Done" : x.cost}</span><small>${esc(x.text)}${!done && !can ? ` Needs ${x.needs.map((n) => TECHS.find((y) => y.id === n).name).join(", ")}.` : ""}</small></button>`;
     }).join("") + `</div>`;
   }
+  // Signature technologies: each people's own. Yours to research; another's only by taking a world with its hub.
+  const sig = TECHS.filter((x) => x.only);
+  h += `<h3>Signature technologies</h3><p class="small muted">Each people has one technology no one else can research. The others learn it only by capturing a world with its hub building (and the hub's world gives 2 science to whoever holds it).</p><div class="techs">` + sig.map((x) => {
+    const F = FACTIONS.find((f) => f.id === x.only), mine = x.only === me.id, done = R.done.includes(x.id), can = availableTechs(S, me.id).some((a) => a.id === x.id), hub = BUILDINGS[x.hub];
+    const seen = !mine && !done ? Object.values(S.systems).filter((y) => y.colony && y.colony.buildings[x.hub] && me.explored[y.at]).map((y) => y.name) : [];
+    const note = done ? (mine ? "" : " Captured.") : mine ? (can ? ` Then build its ${hub.name} (keep it safe: whoever takes that world learns it).` : ` Needs ${x.needs.map((n) => TECHS.find((y) => y.id === n).name).join(", ")}.`) : ` Capture a world with a ${hub.name} to learn it.${seen.length ? ` Known at ${seen.join(", ")}.` : ""}`;
+    return `<button class="tech ${done ? "done" : can ? "can" : "locked"} ${R.current === x.id ? "cur" : ""}" ${can ? `data-tech="${x.id}"` : "disabled"} style="border-left:4px solid ${F ? F.color : "var(--line)"}"><b>${esc(x.name)}</b><span>${done ? "Done" : mine ? x.cost : esc(F ? F.people : "")}</span><small>${esc(x.text.replace(/ Unique to this people.*$/, ""))}${esc(note)}</small></button>`;
+  }).join("") + `</div>`;
   // Advances: repeatable research, a level at a time.
   const advs = ADVANCES.map((a) => ({ a, it: advanceItem(S, me.id, a.id), lv: advLevel(S, me.id, a.id), open: has(S, me.id, a.needs) }));
   h += `<h3>Advances</h3><p class="small muted">Research them again and again: each level adds to the last, and costs a little more.</p><div class="techs">` + advs.map(({ a, it, lv, open }) => {
@@ -1340,7 +1348,7 @@ function showNewGame(canContinue, preset) {
   modal(`<h1>Fracture Lines: Dominion</h1>
     <p class="lede">The old empires are breaking along the corridors. Lead a people of the Fracture Lines from one world to an empire: explore, settle, trade, research and fight, turn by turn.</p>
     ${canContinue ? `<div class="btn-row"><button class="btn primary" id="ng-continue">Continue your game</button></div>` : ""}
-    <h3>Choose your people</h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span class="fac-tok">${peopleArt(f.id, f.color, 46)}</span><span><b>${esc(f.name)}</b><small><b>${esc(f.trait)}:</b> ${esc(f.traitText)}</small><small class="muted">${esc(LOOKS[f.id] || "")}</small></span></label>`).join("")}</div>
+    <h3>Choose your people</h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span class="fac-tok">${peopleArt(f.id, f.color, 46)}</span><span><b>${esc(f.name)}</b><small><b>${esc(f.trait)}:</b> ${esc(f.traitText)}</small>${(() => { const T = TECHS.find((x) => x.only === f.id); return T ? `<small><b>${esc(T.name)}</b> (signature tech): ${esc(T.text.replace(/ Unique to this people.*$/, ""))}</small>` : ""; })()}<small class="muted">${esc(LOOKS[f.id] || "")}</small></span></label>`).join("")}</div>
     <div class="ng-row">
       <label>Galaxy <select id="ng-size"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option><option value="vast">Vast</option></select></label>
       <label>Game <select id="ng-mode"><option value="standard" selected>Standard: 200 turns</option><option value="open">Open: no end</option></select></label>
@@ -1526,6 +1534,7 @@ function showHelp(back) {
     <ul class="help">
       <li><b>Each turn</b>, give orders, then press <b>End turn</b> (or Enter). Everyone moves at once.</li>
       <li><b>Worlds</b> grow population, which makes <b>industry</b> (to build), <b>science</b> (to research) and <b>credits</b> (to pay upkeep). Pick what each world builds in its queue; rush the first item with credits. A world finishes one item a turn: industry left over goes into the next, which finishes the turn after.</li>
+      <li><b>Signature technologies.</b> Each people has one technology only it can research (the Research tab lists all eight). Researching yours unlocks its hub building, which gives 2 science. Capture a world with a rival's hub and you learn their technology; lose yours and they learn it.</li>
       <li><b>Space travel.</b> Each ship has a speed: the moves it gets each turn (a scout 4, frigates and cruisers 3, colony ships and dreadnoughts 2; Fold drives add 1). A fleet moves at its slowest ship's speed. Right-click where it should go; the route and the turns it takes show on the map.
         <ul>
           <li><b>The galaxy</b> is made of star clusters with open voids between them. Inside a cluster, corridors are short; long corridors cross the voids. A void is beyond anyone's supply: hold one with a deep-space station (an outpost ship and Orbital shipyards).</li>

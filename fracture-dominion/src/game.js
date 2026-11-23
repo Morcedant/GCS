@@ -181,11 +181,11 @@ export function shipStats(s, fid, type, ship) {
   const k = fitOf(s, fid, ship);
   return { ...base,
     speed: base.speed + (k.foldDrives ? 1 : 0) + (fid === "vael" ? 1 : 0) + (fid === "ylith" && (type === "scout" || type === "colony") ? 1 : 0) + (base.speed > 0 && relicHeld(s, fid, "anchor") ? 1 : 0),
-    hull: base.hull + (warship && k.shields ? 1 : 0) + (warship && k.plating ? 1 : 0) + (warship ? k.armor || 0 : 0),
+    hull: base.hull + (warship && k.shields ? 1 : 0) + (warship && k.plating ? 1 : 0) + (warship ? k.armor || 0 : 0) + (type === "frigate" && has(s, fid, "broodYards") ? 1 : 0),
     skill: warship ? base.skill + (k.targeting ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (k.lances ? 1 : 0) + (k.fireControl || 0) : 0,
-    sensors: base.sensors + (k.sensors ? 1 : 0) + (k.scanners ? 1 : 0) + (relicHeld(s, fid, "oracle") ? 2 : 0) + (fid === "ylith" ? 2 : 0),
-    troops: (base.troops || 0) * (fid === "hegemony" ? 2 : 1),
-    cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * (proto(s, fid, "drones") ? 0.9 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1)) };
+    sensors: base.sensors + (k.sensors ? 1 : 0) + (k.scanners ? 1 : 0) + (relicHeld(s, fid, "oracle") ? 2 : 0) + (fid === "ylith" ? 2 : 0) + (has(s, fid, "resonanceArrays") ? 2 : 0),
+    troops: (base.troops || 0) * (fid === "hegemony" ? 2 : 1) * (has(s, fid, "dropLegions") ? 1.5 : 1),
+    cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * (proto(s, fid, "drones") ? 0.9 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1) * (type === "frigate" && has(s, fid, "broodYards") ? 0.75 : 1)) };
 }
 // ---- the empire's Focus ----
 export const focusOf = (s, fid) => (faction(s, fid).focus = faction(s, fid).focus || { industry: 1, science: 1, credits: 1, defense: 0 });
@@ -466,7 +466,7 @@ export function yields(s, sys) {
   let ind = 0, sci = 0, cr = 0;
   if (c.kind === "colony") {
     ind = c.pop * w.ind * sys.rich + (has(s, fid, "automation") ? 1 : 0) + (c.capital ? 2 : 0);
-    sci = c.pop * 0.5 * w.sci + (B.lab ? 2 : 0) + (B.observatory ? 3 : 0) + (c.capital ? 1 : 0);
+    sci = c.pop * 0.5 * w.sci + (B.lab ? 2 : 0) + (B.observatory ? 3 : 0) + (c.capital ? 1 : 0) + Object.keys(B).filter((b) => B[b] && BUILDINGS[b] && BUILDINGS[b].hub).length * 2;   // a signature technology's hub
     cr = c.pop * 0.6 + (B.market ? 3 + (has(s, fid, "commerce") ? 2 : 0) : 0) + (has(s, fid, "commerce") ? 1 : 0) + (c.capital ? 2 : 0);
     if (B.factory) ind *= 1.5;
     if (B.lab) sci *= 1.5;
@@ -535,7 +535,7 @@ export function rush(s, sysId) {
 }
 
 // ---- research ----
-export function availableTechs(s, fid) { const done = faction(s, fid).research.done; return TECHS.filter((t) => !done.includes(t.id) && t.needs.every((n) => done.includes(n))); }
+export function availableTechs(s, fid) { const done = faction(s, fid).research.done; return TECHS.filter((t) => !done.includes(t.id) && (!t.only || t.only === fid) && t.needs.every((n) => done.includes(n))); }
 /** An advance as something to research: { id: "adv:<id>", name, cost, text, level (the one it gives), max, field }. */
 export function advanceItem(s, fid, id) {
   const a = ADVANCES.find((x) => x.id === id); if (!a) return null;
@@ -831,7 +831,7 @@ export function settle(s, fleetId, opts = {}) {
   if (fleetsAt(s, sys.at).some((o) => armed(o) && atWar(s, f.owner, o.owner))) return { error: "Hostile ships hold this system: clear them first." };
   if (ci >= 0 && canSettle(s, f.owner, sys, "colony")) {
     f.ships.splice(ci, 1);
-    sys.colony = { owner: f.owner, kind: "colony", founded: s.turn, pop: f.owner === "concord" ? 2 : 1, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+    sys.colony = { owner: f.owner, kind: "colony", founded: s.turn, pop: (f.owner === "concord" ? 2 : 1) + (has(s, f.owner, "frontierCharters") ? 1 : 0), growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
     log(s, f.owner, `${faction(s, f.owner).name} founded a colony on ${sys.name}, ${worldDesc(sys)}.`, "settle");
   } else if (oi >= 0 || ci >= 0) {
     if (oi < 0 && !canSettle(s, f.owner, sys, "outpost")) return { error: "Nothing here to settle with." };
@@ -857,11 +857,11 @@ export function tradeLinks(s, sys) {
   const c = sys.colony; if (!c || c.kind !== "colony" || blockaded(s, sys)) return [];
   const F = faction(s, c.owner), ok = (o) => o === c.owner || !!(F.relations[o] && F.relations[o].treaty);
   return Object.values(s.systems).filter((x) => x !== sys && x.colony && x.colony.kind === "colony" && ok(x.colony.owner)
-    && distance(x.at, sys.at) <= TRADE.range && !blockaded(s, x)).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at)).slice(0, TRADE.maxLinks);
+    && distance(x.at, sys.at) <= TRADE.range && !blockaded(s, x)).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at)).slice(0, TRADE.maxLinks + (has(s, sys.colony.owner, "creditNetworks") ? 1 : 0));
 }
 export function tradeIncome(s, sys) {
   const n = tradeLinks(s, sys).length; if (!n) return 0;
-  return n * TRADE.perLink * (sys.colony.buildings.market ? TRADE.exchange : 1);
+  return n * TRADE.perLink * (sys.colony.buildings.market ? TRADE.exchange : 1) * (has(s, sys.colony.owner, "creditNetworks") ? 1.5 : 1);
 }
 // ---- the exotics market ----
 export const marketPrice = (s) => Math.round(s.market ? s.market.price : MARKET.base);
@@ -894,7 +894,7 @@ export function invasionOdds(s, fleetId) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
   if (!sys || !sys.colony || sys.colony.owner === f.owner) return null;
   const troops = f.ships.filter((x) => x.type === "transport").reduce((t, x) => t + shipStats(s, f.owner, "transport").troops, 0);
-  const defense = (sys.colony.owner === "zhaq" ? 1.5 : 1) * (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0) + (sys.colony.buildings.battery ? BATTERY.garrison : 0) + (sys.colony.buildings.barracks ? 3 : 0)) * garrisonFactor(sys);
+  const defense = (sys.colony.owner === "zhaq" ? 1.5 : 1) * (sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0) + (sys.colony.buildings.battery ? BATTERY.garrison : 0) + (sys.colony.buildings.barracks ? 3 : 0) + (has(s, sys.colony.owner, "torporVaults") ? 2 : 0)) * garrisonFactor(sys);
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner), siege: sys.colony.siege || 0 };
 }
 /** An enemy at war with a world's owner has warships in its orbit. */
@@ -990,6 +990,13 @@ function capture(s, sys, by) {
   faction(s, by).stats.taken = (faction(s, by).stats.taken || 0) + 1;
   remember(s, was, by, `took ${sys.name} from us`, -15);
   sys.colony.owner = by; sys.colony.capital = false; sys.colony.queue = []; sys.colony.stock = 0;
+  // A signature technology's hub: whoever takes it learns the technology.
+  for (const [b, on] of Object.entries(sys.colony.buildings)) {
+    const tech = on && BUILDINGS[b] && BUILDINGS[b].hub; if (!tech || has(s, by, tech)) continue;
+    const B = faction(s, by), T = TECHS.find((x) => x.id === tech); B.research.done.push(tech);
+    log(s, by, `In the ${BUILDINGS[b].name} at ${sys.name}, ${B.name} found everything it needed: ${B.name} has learned ${T.name} (${T.text.split(" Unique")[0]}).`, "research");
+    if (was !== by) log(s, was, `${faction(s, was).name}'s ${T.name} is no longer theirs alone: ${B.name} took the ${BUILDINGS[b].name} at ${sys.name}.`, "war");
+  }
   if (sys.colony.kind === "colony") sys.colony.pop = Math.max(1, sys.colony.pop - 1);
   if (s.mode !== "open") delete sys.colony.buildings.engine;   // in an open game the Engine changes hands (checkEngine)
   if (wasCapital) {
@@ -1034,7 +1041,7 @@ function battles(s) {
     const units = [];
     for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type, sh) });
     const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.buildings.station || sys.colony.capital || sys.colony.aegis) && sys.colony.defense > 0;
-    if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat || sys.colony.buildings.station ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots : 1, name: bat ? "Orbital battery" : sys.colony.buildings.station ? "Orbital station" : "Orbital guns" } }); }
+    if (worldGuns) { const o = sys.colony.owner, bat = !!sys.colony.buildings.battery; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0) + (relicHeld(s, o, "aegis") ? 1 : 0), dmg: bat || sys.colony.buildings.station ? BATTERY.dmg : 1, shots: bat ? BATTERY.shots + (has(s, o, "skyhooks") ? 1 : 0) : 1, name: bat ? "Orbital battery" : sys.colony.buildings.station ? "Orbital station" : "Orbital guns" } }); }
     const stance = (u) => (u.fleet && u.fleet.withdraw ? STANCES.defensive : (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced);
     const leaving = (u) => !!(u.fleet && u.fleet.withdraw);
     // The Nodes the Heart raised around itself shield it (CRISIS.shieldRange); Nodes on burned worlds far off don't.
@@ -1333,7 +1340,7 @@ export function updateVision(s, F) {
   const vis = {};
   const charted = [];
   const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; if (!F.explored[k] && !F.ai && s.sysAt[k]) charted.push(s.systems[s.sysAt[k]]); F.explored[k] = 1; } };
-  const bonus = (has(s, F.id, "sensors") ? 1 : 0) + (F.id === "ylith" ? 2 : 0);
+  const bonus = (has(s, F.id, "sensors") ? 1 : 0) + (F.id === "ylith" ? 2 : 0) + (has(s, F.id, "resonanceArrays") ? 1 : 0);
   for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus + (sys.colony.buildings.station ? 2 : 0));
   for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type, x).sensors)));
   // Allies share what their worlds see.
@@ -1495,7 +1502,7 @@ function economy(s, F) {
       // Growth (nothing grows under siege).
       const max = maxPop(s, sys);
       if (blockaded(s, sys)) { /* the blockade: no growth */ }
-      else if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
+      else if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (has(s, F.id, "frontierCharters") ? 1.15 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
       else c.growth = 0;
     }
     const maxDef = gunsMax(s, c);
@@ -1506,7 +1513,7 @@ function economy(s, F) {
     if (blockaded(s, sys) && besiegerOf(s, sys)) {   // pirates and creatures blockade, but don't besiege a world into hunger
       c.siege = (c.siege || 0) + 1;
       const by = besiegerOf(s, sys);
-      if (c.kind === "colony" && c.siege % (SIEGE.starveEvery * (c.owner === "zhaq" ? 2 : 1)) === 0 && c.pop > 1) {
+      if (c.kind === "colony" && !has(s, c.owner, "torporVaults") && c.siege % (SIEGE.starveEvery * (c.owner === "zhaq" ? 2 : 1)) === 0 && c.pop > 1) {
         c.pop--; log(s, F.id, `${sys.name} is starving under the siege: its population falls to ${c.pop}.`, "war");
         if (by) log(s, by, `${sys.name} is starving under your siege: its population falls to ${c.pop}.`, "war");
       }
@@ -1530,7 +1537,7 @@ function economy(s, F) {
       if (early.length) { for (const x of early) refitShip(s, F.id, x, SHIPYARD_FIT); if (!f.ships.some((x) => missingFit(s, F.id, x).length)) f.refitTrip = false;
         if (!F.ai) log(s, F.id, `${early.length} ship${early.length === 1 ? "" : "s"} refitted at the shipyard at ${here.name} with the early systems${f.ships.some((x) => needsDrydock(s, F.id, x)) ? "; the rest needs a drydock" : ""}.`, "build"); }
     }
-    if (home || F.id === "vael" || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
+    if (home || F.id === "vael" || has(s, F.id, "bioticHulls") || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
   if (s.turn % SCIENCE.observatoryEvery === 0) for (const sys of coloniesOf(s, F.id)) {

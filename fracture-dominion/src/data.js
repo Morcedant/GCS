@@ -55,6 +55,15 @@ export const BUILDINGS = {
   refinery: { name: "Exotics refinery", cost: 90, upkeep: 1, needs: "refining", text: "+1 exotics if the system has a deposit." },
   engine: { name: "The Corridor Engine", cost: 1200, upkeep: 0, needs: "engine", exotics: 15, wonder: true,
     text: "Finish it and you open a corridor to everywhere at once: you win. In an open game, you hold the corridors instead: free corridor travel, a gate to any of your worlds, +2 credits on every colony, and score each turn, until someone takes or destroys it." },
+  // Signature technologies' hubs (TECHS with `only`): one at a world, and that world is a prize.
+  charterOffice: { name: "Charter Office", cost: 80, upkeep: 1, needs: "frontierCharters", hub: "frontierCharters", text: "The heart of frontier charters: +2 science here. Whoever takes this world learns frontier charters." },
+  clearingHouse: { name: "Clearing House", cost: 80, upkeep: 1, needs: "creditNetworks", hub: "creditNetworks", text: "The heart of credit networks: +2 science here. Whoever takes this world learns credit networks." },
+  broodHatchery: { name: "Brood Hatchery", cost: 80, upkeep: 1, needs: "broodYards", hub: "broodYards", text: "The heart of brood yards: +2 science here. Whoever takes this world learns brood yards." },
+  legionMuster: { name: "Legion Muster", cost: 80, upkeep: 1, needs: "dropLegions", hub: "dropLegions", text: "The heart of drop legions: +2 science here. Whoever takes this world learns drop legions." },
+  hullGarden: { name: "Hull Garden", cost: 80, upkeep: 1, needs: "bioticHulls", hub: "bioticHulls", text: "The heart of biotic hulls: +2 science here. Whoever takes this world learns biotic hulls." },
+  resonanceLab: { name: "Resonance Lab", cost: 80, upkeep: 1, needs: "resonanceArrays", hub: "resonanceArrays", text: "The heart of resonance arrays: +2 science here. Whoever takes this world learns resonance arrays." },
+  skyhookSpire: { name: "Skyhook Spire", cost: 80, upkeep: 1, needs: "skyhooks", hub: "skyhooks", text: "The heart of skyhook batteries: +2 science here. Whoever takes this world learns skyhook batteries." },
+  torporVault: { name: "Torpor Vault", cost: 80, upkeep: 1, needs: "torporVaults", hub: "torporVaults", text: "The heart of torpor vaults: +2 science here. Whoever takes this world learns torpor vaults." }
 };
 
 // Ships. skill: the 3d6 roll-under target to hit; dmg: hull a hit takes; hull: what it can take.
@@ -233,6 +242,15 @@ export const TECHS = [
   { id: "batteries", name: "Planetary defense", field: "Society", cost: 300, needs: ["xenology"], text: "Unlocks the Orbital battery." },
   { id: "domes", name: "Habitat domes", field: "Society", cost: 400, needs: ["xenology"], text: "Colonize barren worlds." },
   { id: "terraforming", name: "Terraforming", field: "Society", cost: 650, needs: ["domes", "commerce"], text: "+2 population on every world." },
+  // Each people's signature technology: only it can research it; anyone who takes a world with its hub learns it.
+  { id: "frontierCharters", name: "Frontier charters", field: "Society", cost: 350, needs: ["xenology"], only: "concord", hub: "charterOffice", text: "New colonies start with 1 more population, and grow 15% faster. Unique to this people: others learn it only by taking a world with its Charter Office." },
+  { id: "creditNetworks", name: "Credit networks", field: "Society", cost: 350, needs: ["commerce"], only: "tessan", hub: "clearingHouse", text: "Each colony trades with one more partner, and trade pays 50% more. Unique to this people: others learn it only by taking a world with its Clearing House." },
+  { id: "broodYards", name: "Brood yards", field: "Industry", cost: 350, needs: ["automation"], only: "kel", hub: "broodHatchery", text: "Frigates cost 25% less, and have 1 more hull. Unique to this people: others learn it only by taking a world with its Brood Hatchery." },
+  { id: "dropLegions", name: "Drop legions", field: "Industry", cost: 400, needs: ["heavyHulls"], only: "hegemony", hub: "legionMuster", text: "Troop transports land half again as many troops. Unique to this people: others learn it only by taking a world with its Legion Muster." },
+  { id: "bioticHulls", name: "Biotic hulls", field: "Physics", cost: 400, needs: ["sensors"], only: "vael", hub: "hullGarden", text: "Every ship mends 1 hull a turn, anywhere. Unique to this people: others learn it only by taking a world with its Hull Garden." },
+  { id: "resonanceArrays", name: "Resonance arrays", field: "Physics", cost: 350, needs: ["sensors"], only: "mirrun", hub: "resonanceLab", text: "Ships see 2 hexes farther, and worlds 1. Unique to this people: others learn it only by taking a world with its Resonance Lab." },
+  { id: "skyhooks", name: "Skyhook batteries", field: "Society", cost: 400, needs: ["batteries"], only: "ylith", hub: "skyhookSpire", text: "Orbital batteries fire one more shot a round. Unique to this people: others learn it only by taking a world with its Skyhook Spire." },
+  { id: "torporVaults", name: "Torpor vaults", field: "Society", cost: 350, needs: ["xenology"], only: "zhaq", hub: "torporVault", text: "Besieged worlds never starve, and their garrisons are 2 stronger. Unique to this people: others learn it only by taking a world with its Torpor Vault." },
 ];
 
 export const STAR_NAMES = ["Achernar", "Brannoc", "Calyx", "Draeven", "Esk", "Fennick", "Gallow", "Halvane", "Ixion", "Jhess", "Korvath", "Lumen", "Merrow", "Nadir",

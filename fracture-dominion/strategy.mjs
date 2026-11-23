@@ -109,6 +109,7 @@ const body = [
     "<b>Treat fuel as a budget.</b> Depots are what let you keep fleets moving through a long war. Build up the reserve in peacetime, and save burning hard for when speed decides the outcome.",
     "<b>Keep a scout or two all game.</b> When a corridor collapses, whoever charts the new route first gets research, and the route back.",
     "<b>Plan for new sectors.</b> In a long game the map grows, and you hear what kind of sector is coming before it opens. Have scouts and settlers ready, and be ready to defend what you claim: a new sector is a fresh race.",
+    "<b>Every people has a signature technology</b> no one else can research. Build its hub somewhere safe, deep inside your borders: whoever captures a world with that hub learns it. And look for your rivals' hubs: taking one is the only way to get their technology.",
     "<b>Relics are powerful</b>, and they stay with the world that keeps them. Guard yours; a rival's can be taken.",
     "<b>The galaxy may be bigger than it looks.</b> Be ready to move if new space opens.",
     "<b>Some space is sealed.</b> Getting into a sealed sector takes the right technology, or a beacon that opens it for everyone. Being first in is worth a lot; opening it for your rivals is a choice to make on purpose.",

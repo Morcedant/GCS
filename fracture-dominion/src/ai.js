@@ -44,6 +44,9 @@ function research(s, F) {
   const avail = availableTechs(s, F.id);
   // Every technology done (or nothing left worth more): an advance, the cheapest level first.
   if (!avail.length) { const adv = availableAdvances(s, F.id).sort((a, b) => a.cost - b.cost)[0]; if (adv) setResearch(s, F.id, adv.id); return; }
+  // Its own signature technology, once the basics are in.
+  const own = avail.find((t) => t.only === F.id);
+  if (own && F.research.done.length >= 4) { setResearch(s, F.id, own.id); return; }
   // A sealed sector out there (or announced): Rift drives, to get in first.
   const sealedNear = Object.values(s.hexes).some((h) => h.sealed) || !!(s.sectors && s.sectors.coming && SECTORS.kinds[s.sectors.coming].sealed);
   if (sealedNear && avail.some((t) => t.id === "riftDrives")) { setResearch(s, F.id, "riftDrives"); return; }
@@ -110,6 +113,8 @@ function relics(s, F) {
   const t = shardTargets(s, F.id, cap.id).filter((x) => mineIds.has(x.id)).sort((a, b) => distance(b.at, cap.at) - distance(a.at, cap.at))[0];
   if (t) useRelic(s, F.id, "shard", { from: cap.id, to: t.id });
 }
+/** A people's signature technology and its hub building: { tech, id } or null. */
+const hubOf = (fid) => { const t = TECHS.find((x) => x.only === fid); return t ? { tech: t.id, id: t.hub } : null; };
 /** Every few turns, while the Wardens are about: tell the powers it likes (and its allies) what it knows of them. */
 function shareWardenIntel(s, F) {
   if (!s.crisis || s.turn - (F.lastIntel || -99) < 4) return;
@@ -280,6 +285,8 @@ function production(s, F, diff) {
       t.net < 3 && !c.buildings.market ? ["building", "market"] : null,
       c.pop >= 4 && !c.buildings.lab ? ["building", "lab"] : null,
       c.pop >= 6 && !c.buildings.shipyard ? ["building", "shipyard"] : null,
+      // Its signature technology's hub, at the capital: the science, and (guarded there) the hardest place to take it from.
+      c.capital && hubOf(F.id) && has(s, F.id, hubOf(F.id).tech) && !coloniesOf(s, F.id).some((x) => x.colony.buildings[hubOf(F.id).id] || x.colony.queue.some((q) => q.id === hubOf(F.id).id)) ? ["building", hubOf(F.id).id] : null,
       enemies.length && has(s, F.id, "batteries") && !c.buildings.battery ? ["building", "battery"] : null,
       sys.exotics && has(s, F.id, "refining") && !c.buildings.refinery ? ["building", "refinery"] : null,
       c.capital && has(s, F.id, "engine") && !c.buildings.engine && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] ? ["building", "engine"] : null,
