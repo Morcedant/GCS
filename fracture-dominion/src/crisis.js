@@ -22,7 +22,7 @@ export function crisisState(s) {
   const heart = heartShip(s);
   return { stage: C.stage === "quiet" ? "signs" : C.stage, at: C.at, heart: C.heart, place: C.heart ? crPlace(s, C.heart) : null, hull: heart ? heart.hull : 0, max: C.heartMax || SHIPS.heart.hull,
     wave: C.wave || 0, nextWave: C.nextWave, ships: wardenFleets(s).reduce((t, f) => t + f.ships.length, 0), truce: !!C.truce, by: C.heartBy || null,
-    watchers: stationOf(s, "watcher").length, nodes: stationOf(s, "node").map((f) => ({ at: f.at, place: crPlace(s, f.at) })), regrowAt: C.regrowAt || null, returns: C.returns || 0 };
+    watchers: stationOf(s, "watcher").length, watcherList: stationOf(s, "watcher").map((f) => ({ at: f.at, place: crPlace(s, f.at) })), nodes: stationOf(s, "node").map((f) => ({ at: f.at, place: crPlace(s, f.at) })), regrowAt: C.regrowAt || null, returns: C.returns || 0 };
 }
 const wardenFleets = (s) => fleetsOf(s, WARDENS);
 /** The Wardens' machines that never move: Watchers (dormant) and Nodes (forges). */
@@ -54,6 +54,11 @@ const TRANSMISSIONS = [
   "Static on every band, then one word in a language dead a thousand years. The translators agree on it: \u201csoon\u201d.",
 ];
 /** The Signs: Watchers wake one by one by the rifts, and the transmissions grow. */
+/** Watchers and Nodes never move, and their signal gives them away: every power knows where they stand (their hexes
+ * charted), so the map shows them. */
+export function revealStations(s) {
+  for (const f of [...stationOf(s, "watcher"), ...stationOf(s, "node")]) for (const F of crAlive(s)) F.explored[f.at] = 1;
+}
 function signs(s, R) {
   const C = s.crisis; wardenPower(s);
   if (!C.signs) { C.signs = s.turn; C.nextWatcher = s.turn; }
@@ -68,8 +73,9 @@ function signs(s, R) {
     if (!pool.length) pool = Object.keys(s.hexes).filter((k) => open(k, 2)).sort();
     const k = pool[R.int(Math.max(1, pool.length))];
     if (k) { const f = spawnFleet(s, WARDENS, k, ["watcher"]); f.born = s.turn;
-      const near = cols.filter((c) => distance(c.at, k) <= 6).map((c) => c.colony.owner);
-      for (const fid of new Set(near)) log(s, fid, `A Warden Watcher has surfaced by the rift near ${crPlace(s, k)}. It doesn't move, but it's armed, and it's watching. Destroy it now, or it wakes as a Node when the Wardens do.`, "war"); }
+      const near = new Set(cols.filter((c) => distance(c.at, k) <= 6).map((c) => c.colony.owner));
+      // Its signal gives it away: every power learns where it is (near ones are warned it's close).
+      for (const F of crAlive(s)) log(s, F.id, `A Warden Watcher has surfaced by the rift near ${crPlace(s, k)}${near.has(F.id) ? ", close to your worlds" : ""}. It doesn't move, but it's armed, and it's watching. Destroy it now, or it wakes as a Node when the Wardens do.`, "war"); }
   }
   for (const f of stationOf(s, "watcher")) if (!underSiege(s, f)) for (const x of f.ships) x.hull = Math.min(shipStats(s, WARDENS, "watcher").hull, x.hull + C.mSigns);
   const i = Math.floor((s.turn - C.signs) / 7);
@@ -165,6 +171,7 @@ function heartShip(s) { for (const f of wardenFleets(s)) { const h = f.ships.fin
 export function crisisTurn(s) {
   if (s.crisisOff || s.winner) return;
   const C = s.crisis || (s.crisis = { stage: "quiet", at: Math.max(s.turn + CRISIS.warning + 2, CRISIS.earliest + makeRng("crisis:" + s.seed).int(CRISIS.spread)) });
+  revealStations(s);
   coalitionTurn(s);
   callsToArms(s);
   if (C.stage === "quiet") {

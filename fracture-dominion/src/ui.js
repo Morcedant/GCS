@@ -132,7 +132,7 @@ function bindMap() {
 function zoomBy(f) { view.zoom = Math.max(0.35, Math.min(2.6, view.zoom * f)); draw(); }
 function clickHex(hex) {
   const me = player(S).id;
-  const fl = fleetsAt(S, hex).filter((f) => seesFleet(S, player(S), f));
+  const fl = fleetsAt(S, hex).filter((f) => seesFleet(S, player(S), f) || (f.owner === "wardens" && f.ships.some((x) => x.type === "watcher" || x.type === "node" || (x.type === "heart" && player(S).explored[hex]))));
   const sid = S.sysAt[hex];
   // Click again on a hex with both: alternate between the fleet and the system.
   const mine = fl.filter((f) => f.owner === me);
@@ -417,7 +417,9 @@ function draw() {
   }
   // Fleets you can see.
   const byHex = {};
-  for (const f of Object.values(S.fleets)) if (seesFleet(S, me, f)) (byHex[f.at] = byHex[f.at] || []).push(f);
+  // Watchers and Nodes never move, and their signal gives them away: always shown (the Heart, once charted).
+  const fixedWarden = (f) => f.owner === "wardens" && f.ships.some((x) => x.type === "watcher" || x.type === "node" || (x.type === "heart" && me.explored[f.at]));
+  for (const f of Object.values(S.fleets)) if (seesFleet(S, me, f) || fixedWarden(f)) (byHex[f.at] = byHex[f.at] || []).push(f);
   for (const [hex, list] of Object.entries(byHex)) {
     const { x, y } = toPixel(hex, size);
     list.forEach((f, i) => {
@@ -431,6 +433,12 @@ function draw() {
       ctx.globalAlpha = 1;
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
+  }
+  // Watchers and Nodes: a dashed ring and their name, so they're easy to find.
+  for (const f of Object.values(S.fleets)) {
+    if (f.owner !== "wardens") continue; const kind = f.ships.find((x) => x.type === "watcher" || x.type === "node"); if (!kind) continue;
+    const { x, y } = toPixel(f.at, size); ctx.beginPath(); ctx.arc(x, y, size * 0.8, 0, Math.PI * 2); ctx.strokeStyle = colorOf("wardens"); ctx.lineWidth = 1.8; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+    if (view.zoom > 0.45) { ctx.fillStyle = colorOf("wardens"); ctx.font = "bold 9px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText(kind.type === "node" ? "NODE" : "WATCHER", x, y + size * 0.8 + 10); ctx.textAlign = "left"; }
   }
   // The Heart of the Wardens, once it's woken: a ring of their colour round its hex.
   const cr = S.crisis && S.crisis.stage === "awake" && S.crisis.heart;
@@ -447,6 +455,7 @@ function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); 
 /** Whether there's anything about the Wardens the player could tell anyone. */
 const intelAny = () => { const me = player(S); return S.factions.some((F) => F.alive && F.id !== me.id && me.met[F.id] && wardenIntel(S, me.id, F.id).length); };
 /** While the Wardens are about: a bar over the map, with what's attacking your worlds and the call to arms at hand. */
+let watcherIdx = -1;
 function renderWardenBar() {
   const el = $("warden-bar"); if (!el) return;
   const K = S && S.crisis, c = S && crisisState(S);
@@ -457,8 +466,10 @@ function renderWardenBar() {
     if (!probes.length && !c.watchers && c.stage === "signs") { el.hidden = true; return; }
     el.classList.add("calm");
     el.innerHTML = `<span class="pulse" aria-hidden="true"></span><span><b>${c.stage === "stirring" ? "The Wardens are stirring" : "The Signs"}.</b>${probes.length ? ` ${probes.length} Warden probe${probes.length === 1 ? "" : "s"} in sight${scanning.length ? `, scanning <b>${esc(scanning[0].name)}</b>` : ""}: only warships can catch them, and what they see, the Wardens will know.` : ""}${c.watchers ? ` ${c.watchers} Watcher${c.watchers === 1 ? "" : "s"} by the rifts.` : ""}${S.crisis.intel ? ` ${S.crisis.intel} probe${S.crisis.intel === 1 ? " has" : "s have"} got home.` : ""}</span>
-      ${probes.length ? `<button class="btn small primary" id="wb-probe">Show the probe</button>` : ""}${intelAny() ? `<button class="btn small" id="wb-intel">Share what you know</button>` : ""}<button class="btn small" id="wb-more">Details</button>`;
+      ${probes.length ? `<button class="btn small primary" id="wb-probe">Show the probe</button>` : ""}${intelAny() ? `<button class="btn small" id="wb-intel">Share what you know</button>` : ""}${c.watcherList && c.watcherList.length ? `<button class="btn small${probes.length ? "" : " primary"}" id="wb-watcher">Show the Watcher${c.watcherList.length > 1 ? "s" : ""}</button>` : ""}<button class="btn small" id="wb-more">Details</button>`;
     el.hidden = false;
+    // Each click shows the next Watcher.
+    if ($("wb-watcher")) $("wb-watcher").onclick = () => { const L = c.watcherList, i = (watcherIdx = (watcherIdx + 1) % L.length); centerOn(L[i].at); draw(); toast(`Watcher${L.length > 1 ? ` ${i + 1} of ${L.length}` : ""}: ${L[i].place}.`); };
     if ($("wb-probe")) $("wb-probe").onclick = () => { centerOn(probes[0].at); draw(); };
     if ($("wb-intel")) $("wb-intel").onclick = showIntelShare;
     $("wb-more").onclick = () => { tab = "objectives"; renderTabs(); renderPanel(); };
@@ -840,7 +851,7 @@ function crisisHTML() {
   const me = player(S);
   const nodeList = (c.nodes || []).map((n) => `<button class="linkish" data-center="${n.at}">${esc(n.place)}</button>`).join(", ");
   if (c.stage === "signs") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">The Signs</span></h3>
-    <p class="small">Something under the rifts is waking. ${c.watchers ? `${c.watchers} Warden Watcher${c.watchers === 1 ? " has" : "s have"} surfaced by the rifts: dormant, armed, and watching.` : "Transmissions on every band, louder each week."} When the Wardens wake, every Watcher still standing becomes a Node, a forge that sends out hunters.</p>
+    <p class="small">Something under the rifts is waking. ${c.watchers ? `${c.watchers} Warden Watcher${c.watchers === 1 ? " has" : "s have"} surfaced by the rifts: dormant, armed, and watching. Where: ${(c.watcherList || []).map((w) => `<button class="linkish" data-center="${w.at}">${esc(w.place)}</button>`).join(", ")}.` : "Transmissions on every band, louder each week."} When the Wardens wake, every Watcher still standing becomes a Node, a forge that sends out hunters.</p>
     <ol class="steps-list">${stepLi("now", "Destroy the Watchers while they're dormant: each is worth research, and one less Node later")}${stepLi("", "Put guns on your outer worlds, and build a fleet that can fight them")}</ol></div>`;
   if (c.stage === "stirring") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Stirring</span></h3>
     <p class="small">A signal is coming out of the rifts: the Wardens, war machines of the old empires, wake in about ${Math.max(1, c.at - S.turn)} turn${c.at - S.turn === 1 ? "" : "s"}. They'll burn any world they reach, whoever's it is. Build warships, and put guns on your outer worlds.</p></div>`;
