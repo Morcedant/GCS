@@ -6,6 +6,14 @@
     {
       "date": "2026-11-23",
       "kind": "site",
+      "title": "Dominion: the intro always plays the main theme",
+      "items": [
+        "The intro now always plays the main theme, Fracture Lines: Dominion, even when you watch it again from the Menu partway through a game, or while another track is playing. Once the intro ends, the theme plays to its end and the game's own music follows."
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "kind": "site",
       "title": "Dominion: officers removed",
       "items": [
         "Officers are gone: their effects overlapped home territory, scouts, tankers and admirals' powers, and they added a pool and slots to manage for little in return. Games in progress drop any officers they had."

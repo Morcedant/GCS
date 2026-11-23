@@ -235,7 +235,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-23 23:41 UTC";
+const BUILD = "2026-11-23 23:47 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -5682,9 +5682,15 @@ function playIntro() {
   try { const ip = JSON.parse(localStorage.getItem("dominion.intro.v1")) || {}; ip.seen = true; localStorage.setItem("dominion.intro.v1", JSON.stringify(ip)); } catch {}
   showIntro({
     peoples: FACTIONS.map((f) => ({ name: esc(f.people.replace(/ and .*/, "")), token: peopleArt(f.id, f.color, 84) })),
-    onStart: () => { music.themeDone = false; musicStart(); musicUpdate(); },
+    // The intro always plays the main theme, whatever was playing before (a game's mood track, a quiet pause).
+    onStart: () => {
+      music.intro = true; music.themeDone = false; musicStart();
+      const th = (music.tracks || []).find((t) => t.moodKey === "theme");
+      if (th && music.prefs.on && !music.gaveUp && !(music.current === th && music.audio && !music.audio.ended)) { music.mood = "theme"; playTrack(th); renderMusicNow(); }
+      else musicUpdate();   // (the list still loading: it picks the theme once it's in)
+    },
     onVideo: () => { music.hold = true; if (music.audio) { const a = music.audio; fade(a, 0, 600, () => a.pause()); } },
-    onDone: () => { if (music.hold) { music.hold = false; music.audio = null; music.themeDone = true; } musicUpdate(); },
+    onDone: () => { music.intro = false; if (music.hold) { music.hold = false; music.audio = null; music.themeDone = true; } musicUpdate(); },   // the theme plays on to its end
   });
 }
 function boot() {
@@ -5813,7 +5819,7 @@ const moodOf = (t) => { const m = String(t.mood || "").toLowerCase(), w = t.file
 function gameMood() {
   // The main theme, once a visit: at the start, while there's a theme to play.
   const hasTheme = (music.tracks || []).some((t) => t.moodKey === "theme");
-  if (hasTheme && !music.themeDone && (!S || S.turn <= 1 || document.getElementById("sg-first") || document.getElementById("ng-start"))) return "theme";
+  if (hasTheme && !music.themeDone && (music.intro || !S || S.turn <= 1 || document.getElementById("sg-first") || document.getElementById("ng-start"))) return "theme";   // and always with the intro
   if (!S) return "exploration";
   const c = crisisState(S); if (c && c.stage === "awake") return "crisis";
   const me = player(S);
