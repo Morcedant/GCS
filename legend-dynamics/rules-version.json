@@ -6,6 +6,18 @@
     {
       "date": "2026-11-23",
       "kind": "site",
+      "title": "Dominion: Warden probes, and the build-up to the war",
+      "items": [
+        "During the Signs, Warden probes come out of the rifts, at most three at a time, a new one every 5 turns. Small, quick and unarmed, they scan worlds from a hex away, beyond the reach of orbital guns, then go back to the rift. Only warships can catch them.",
+        "Every probe that gets home makes the Wardens wake stronger (4% each, up to 24%), and the worlds probes scanned are the waves' first targets. Destroying a probe pays 30 research.",
+        "Something is watching: when you first see a probe, choose to hunt them (double research per probe), warn the other powers (+6 standing, and an easier truce), or let them look and learn (+40 research each time one scans a world of yours, though those worlds are attacked first).",
+        "It speaks: later, a probe at one of your worlds speaks to you. Answer it and learn where and when the Heart will rise, though its first waves come for you. Or jam it to delay the waking 6 turns for everyone (60 credits). Or record and decode it for 120 research and +1 to hit the Wardens for the rest of the war.",
+        "The bar over the map now also shows the Signs: probes in sight, what they're scanning, the Watchers, and how many probes have got home. Computer players no longer chase Warden machines they can't see."
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "kind": "site",
       "title": "Dominion: the Wardens, front and centre",
       "items": [
         "While the Wardens are awake, a red bar over the map shows the Heart's state, how many machines are at your worlds and where, and any coalition under way. Its buttons call a coalition, show the attack, show the Heart, or open the details.",

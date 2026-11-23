@@ -77,6 +77,7 @@ export const SHIPS = {
   // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
   sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
   colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
+  probe: { name: "Warden probe", cost: 0, upkeep: 0, speed: 4, hull: 3, skill: 0, dmg: 0, sensors: 4, warden: true, evasive: 3, text: "A Warden scout out of the rifts: it maps worlds and their defences, then goes back with what it saw. Unarmed, small and quick (−3 to hit it): only warships can catch it." },
   watcher: { name: "Watcher", cost: 0, upkeep: 0, speed: 0, hull: 6, skill: 12, dmg: 2, sensors: 3, warden: true, text: "A Warden machine half-buried by a rift, dormant but watching. It fights whatever comes near. When the Wardens wake, it wakes as a Node." },
   node: { name: "Warden Node", cost: 0, upkeep: 0, speed: 0, hull: 10, skill: 12, dmg: 2, shots: 2, sensors: 3, warden: true, text: "A Warden forge, built on a world they've burned. It sends out hunters and holds the system. While one stands, a new Heart can grow." },
   heart: { name: "Heart", cost: 0, upkeep: 0, speed: 0, hull: 20, skill: 14, dmg: 3, sensors: 3, warden: true, text: "The Wardens' mind and forge. It never moves, mends itself, and sends out the waves. Break it and they go dark." },
@@ -99,6 +100,7 @@ export const SHIP_SHAPES = {
   swarm: "M0 -11 L3 -3 L11 -4 L5 2 L8 10 L0 5 L-8 10 L-5 2 L-11 -4 L-3 -3 Z",
   husk: "M0 -11 L9 -5 L9 5 L0 11 L-9 5 L-9 -5 Z M0 -5 L5 0 L0 5 L-5 0 Z M-9 -5 L-12 -9 M9 5 L11 10 M2 11 L3 13",
   leviathan: "M12 0 Q8 -8 -2 -7 Q-8 -6 -12 -10 Q-10 -3 -10 0 Q-10 3 -12 10 Q-8 6 -2 7 Q8 8 12 0 Z M6 -2 L4 -2 M-2 -7 Q0 0 -2 7",
+  probe: "M12 0 L2 -4 L-4 -2 L-9 -6 L-7 0 L-9 6 L-4 2 L2 4 Z M2 -1.5 L5 0 L2 1.5 Z",
   watcher: "M0 -10 L7 -4 L7 4 L0 10 L-7 4 L-7 -4 Z M0 -4 A4 4 0 1 0 0 4 A4 4 0 1 0 0 -4 M0 -1.5 A1.5 1.5 0 1 0 0 1.5 A1.5 1.5 0 1 0 0 -1.5",
   node: "M0 -11 L4 -4 L11 -4 L6 1 L8 9 L0 5 L-8 9 L-6 1 L-11 -4 L-4 -4 Z M0 -3 L3 0 L0 3 L-3 0 Z",
   heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
@@ -410,7 +412,11 @@ export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, hea
   signsLead: 35, watcherEvery: 6, watchers: { small: 2, medium: 3, large: 4, vast: 5 }, nodeEvery: 8, regrow: 30, regrowGain: 1.25,
   wakeNodes: { small: 2, medium: 3, large: 4, vast: 5 }, engineHunt: 0.5, perStrength: 300, maxStrength: 40,
   wear: { node: 0.25, heart: 0.2 }, shieldRange: 6, maxNodes: { small: 5, medium: 8, large: 10, vast: 12 }, huntersPerStrength: 10,
-  bounty: { watcher: 40, node: 80 },
+  bounty: { watcher: 40, node: 80, probe: 30 },
+  // Probes (the Signs): one out of the rifts every `every` turns (at most `max` out), each scanning up to `visits` worlds
+  // for `stay` turns, then home. Each that gets home makes the Wardens wake `intel` stronger (up to `intelMax`), and its
+  // scanned worlds are the waves' first targets. `study`: research a scan gives a power that chose to learn from them.
+  probes: { every: 5, max: 3, stay: 1, visits: 2, intel: 0.04, intelMax: 0.24, study: 40, contactLead: 18, jam: 60, jamDelay: 6 },
   // A coalition against the Wardens (a power calls it on a Node or the Heart): powers that like the caller at least
   // `free` come for nothing; those at `paid` or better for `price` credits (plus `perM` for each point of Warden
   // strength). Each member sends its strongest war fleets, up to `share` of its warships, and holds them on the target

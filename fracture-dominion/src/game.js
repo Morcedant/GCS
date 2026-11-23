@@ -1061,14 +1061,14 @@ function battles(s) {
         if (!u.st.skill || hp(u) <= 0) continue;
         // The Heart of the Wardens can't be fired on while its guard still stands, nor while its own Nodes do.
         // Pirates, crystal swarms and Warden husks don't fire on unarmed ships: colony ships, outposts, scouts, transports and tankers pass.
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && (u.ship.type === "swarm" || u.ship.type === "husk")))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)));
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && !SHIPS[v.ship.type].skill && (u.fid === "pirates" || (u.ship && (u.ship.type === "swarm" || u.ship.type === "husk")))) && !(v.ship && v.ship.type === "heart" && (live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0) || nodesUp)) && !(u.world && v.ship && v.ship.type === "probe"));   // a probe scans from high orbit: only warships can catch it
         if (!foes.length) continue;
         // A world's guns are laid by its gunnery officers: they finish off the most damaged ship in range. Ships pick at random.
         let t = foes[R.int(foes.length)];
         if (u.world) { const ships = foes.filter((v) => v.ship); if (ships.length) { const low = Math.min(...ships.map(hp)), weakest = ships.filter((v) => hp(v) === low); t = weakest[R.int(weakest.length)]; } }
         const dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
-        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
+        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) + (t.fid === "wardens" && s.crisis && s.crisis.decoded && s.crisis.decoded[u.fid] ? 1 : 0) - (t.ship && SHIPS[t.ship.type].evasive || 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
         if (landed) {
           const was = hp(t); hit(t, u.st.dmg);
           // A Warden machine destroyed counts for whoever destroyed it; the Heart, for everyone who fought it.
@@ -1078,7 +1078,7 @@ function battles(s) {
             K.stats.wardenPts = (K.stats.wardenPts || 0) + (SHIPS[t.ship.type].hull * SHIPS[t.ship.type].dmg / 3) / ((s.crisis && s.crisis.m) || 1) * (K.glory ? 2 : 1);
             if (t.ship.type === "heart" && s.crisis) { s.crisis.heartBy = u.fid; s.crisis.heartWith = list.filter((x) => x !== "wardens"); }
             // A Watcher or a Node: what it was built from teaches something (CRISIS.bounty, in research).
-            if (CRISIS.bounty[t.ship.type]) { K.research.progress += CRISIS.bounty[t.ship.type]; log(s, u.fid, `${K.name} destroyed a Warden ${SHIPS[t.ship.type].name.replace(/^Warden /, "")} at ${where}: +${CRISIS.bounty[t.ship.type]} research.`, "war"); }
+            if (CRISIS.bounty[t.ship.type]) { const bx = t.ship.type === "probe" && s.crisis && s.crisis.huntProbes && s.crisis.huntProbes[u.fid] ? 2 : 1; K.research.progress += CRISIS.bounty[t.ship.type] * bx; log(s, u.fid, `${K.name} destroyed a Warden ${SHIPS[t.ship.type].name.replace(/^Warden /, "")} at ${where}: +${CRISIS.bounty[t.ship.type] * bx} research.`, "war"); }
           }
           // A pirate or a creature destroyed: its bounty (credits), and what its wreck teaches (research), to whoever did it.
           if (was > 0 && hp(t) <= 0 && (t.fid === "pirates" || t.fid === "beasts") && !isWild(u.fid)) bounty(s, u.fid, t.ship.type, where);

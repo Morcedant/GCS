@@ -74,6 +74,68 @@ function signs(s, R) {
   for (const f of stationOf(s, "watcher")) if (!underSiege(s, f)) for (const x of f.ships) x.hull = Math.min(shipStats(s, WARDENS, "watcher").hull, x.hull + C.mSigns);
   const i = Math.floor((s.turn - C.signs) / 7);
   if ((s.turn - C.signs) % 7 === 0 && TRANSMISSIONS[i]) log(s, null, TRANSMISSIONS[i], "war");
+  probesTurn(s, R);
+}
+// ---- the probes: the Wardens' scouts, out of the rifts during the Signs ----
+const probes = (s) => wardenFleets(s).filter((f) => f.ships.some((x) => x.type === "probe"));
+/** Where the Heart will rise: beside a rift, in space, as far from every world as it can be. */
+function heartSite(s) {
+  const cols = Object.values(s.systems).filter((x) => x.colony);
+  const space = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && distance(k, "0,0") <= s.radius - 2 && !fleetsAt(s, k).some((f) => f.owner !== WARDENS));
+  const byRift = space.filter((k) => neighbors(k).some((n) => s.hexes[n] && s.hexes[n].terrain === "rift"));
+  const far = (k) => Math.min(99, ...cols.map((c) => distance(c.at, k)));
+  return (byRift.length ? byRift : space).sort((a, b) => far(b) - far(a) || (a < b ? -1 : 1))[0];
+}
+/** Probes: out of a rift, to a few worlds (lingering to scan each), then home with what they saw. */
+function probesTurn(s, R) {
+  const C = s.crisis, P = CRISIS.probes, me = crMe(s);
+  C.intel = C.intel || 0; C.nextProbe = C.nextProbe || s.turn;
+  if (s.turn >= C.nextProbe && probes(s).length < P.max) {
+    C.nextProbe = s.turn + P.every;
+    const cols = Object.values(s.systems).filter((x) => x.colony), gap = (k) => Math.min(99, ...cols.map((c) => distance(c.at, k)));
+    const rifty = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && !fleetsAt(s, k).length && gap(k) >= 4 && neighbors(k).some((n) => s.hexes[n] && s.hexes[n].terrain === "rift")).sort();
+    const k = rifty[R.int(Math.max(1, rifty.length))];
+    if (k) { const f = spawnFleet(s, WARDENS, k, ["probe"]); f.probe = { home: k, seen: [], stay: 0 }; }
+  }
+  for (const f of probes(s)) {
+    const p = f.probe || (f.probe = { home: f.at, seen: [], stay: 0 });
+    if (f.path.length) continue;
+    // Beside its target world (it scans from a hex away, out of the guns' and guard fleets' reach): scan it for a while.
+    const sys = p.target && s.systems[p.target] && distance(s.systems[p.target].at, f.at) <= 1 ? s.systems[p.target] : null;
+    if (sys && sys.colony && !p.seen.includes(sys.id)) {
+      p.stay++; sys.colony.scanned = s.turn;
+      if (p.stay === 1) {
+        const O = sys.colony.owner;
+        if (O === me.id) log(s, O, `A Warden probe is scanning ${sys.name}: it is mapping the world and its defences. Shoot it down before it gets back to the rift: what it sees, the Wardens will know.`, "war");
+        if (C.learn && C.learn[O]) { const F = faction(s, O); if (F) { F.research.progress += P.study; if (O === me.id) log(s, O, `Your scientists study the probe as it studies ${sys.name}: +${P.study} research.`, "research"); } }
+        if (O === me.id && C.contactDue && !C.contacted && !s.galEvent) { C.contacted = s.turn; C.contactAt = sys.id; s.galEvent = { id: "contact", ctx: { world: sys.id }, turn: s.turn }; }
+      }
+      if (p.stay >= P.stay) { p.seen.push(sys.id); p.stay = 0; }
+      continue;
+    }
+    // Home again with what it saw: the Wardens will wake knowing more.
+    if (p.seen.length >= P.visits || (f.at === p.home && p.seen.length)) {
+      if (f.at === p.home) {
+        delete s.fleets[f.id]; C.intel++;
+        const k = Math.min(P.intelMax, C.intel * P.intel);
+        log(s, null, `A Warden probe slipped back into the rift with what it saw. The Wardens will wake knowing more of the galaxy (${Math.round(k * 100)}% stronger, so far).`, "war");
+        continue;
+      }
+      if (setDestination(s, f.id, p.home).ok) continue;
+    }
+    // The next world: the most populous within reach it hasn't seen (capitals and big worlds first).
+    const next = Object.values(s.systems).filter((x) => x.colony && !p.seen.includes(x.id) && distance(x.at, f.at) <= 12)
+      .sort((a, b) => distance(a.at, f.at) - (a.colony.capital ? 3 : 0) - (distance(b.at, f.at) - (b.colony.capital ? 3 : 0)));   // the nearest, capitals a little first
+    // To a hex beside it, in open space with no warships there.
+    const beside = (x) => neighbors(x.at).filter((k) => s.hexes[k] && s.hexes[k].terrain !== "rift" && !s.sysAt[k] && !fleetsAt(s, k).length).sort((a, c) => distance(a, f.at) - distance(c, f.at));
+    let went = false;
+    for (const x of next.slice(0, 3)) { for (const k of beside(x)) if (setDestination(s, f.id, k).ok) { p.target = x.id; went = true; break; } if (went) break; }
+    if (!went) { p.seen.push("none"); setDestination(s, f.id, p.home); }
+  }
+  // The first probe the player sees: a choice about what to do with them.
+  if (!C.probeEvent && !s.galEvent && probes(s).some((f) => me.visible[f.at])) { C.probeEvent = s.turn; s.galEvent = { id: "probes", ctx: {}, turn: s.turn }; }
+  // Later, one of them will stop at a world of the player's and speak.
+  if (!C.contactDue && s.turn >= C.at - P.contactLead) C.contactDue = s.turn;
 }
 /** A world the Wardens burned to bare rock becomes a Node: a forge that holds the system and sends out hunters. */
 function newNode(s, hex) {
@@ -110,7 +172,7 @@ export function crisisTurn(s) {
     }
     return;
   }
-  if (C.stage === "stirring") { if (s.turn >= C.at && !s.galEvent) wake(s); return; }
+  if (C.stage === "stirring") { const R = rng(s); probesTurn(s, R); R.save(); if (s.turn >= C.at && !s.galEvent) wake(s); return; }
   if (C.stage === "dormant") { dormantTurn(s); return; }
   if (C.stage !== "awake") { if (C.queued && !s.galEvent) { s.galEvent = C.queued; C.queued = null; } return; }
   const heart = heartShip(s);
@@ -143,13 +205,14 @@ function wake(s) {
   const byRift = space.filter((k) => neighbors(k).some((n) => s.hexes[n] && s.hexes[n].terrain === "rift"));
   const far = (k) => Math.min(99, ...cols.map((c) => distance(c.at, k)));
   const pool = (byRift.length ? byRift : space).sort((a, b) => far(b) - far(a) || (a < b ? -1 : 1));
-  C.heart = pool[0];
+  C.heart = C.heartSite && s.hexes[C.heartSite] && !fleetsAt(s, C.heartSite).some((f) => f.owner !== WARDENS) ? C.heartSite : pool[0];
+  for (const f of probes(s)) delete s.fleets[f.id];   // the probes go home: the Wardens have what they came for
   wardenPower(s);
   // Every Watcher still standing wakes as a Node.
   for (const f of stationOf(s, "watcher")) { f.ships = [{ type: "node", hull: shipStats(s, WARDENS, "node").hull }]; f.born = s.turn; }
   // How hard they come: with the strength of the strongest power they wake among.
   const P = Math.max(0, ...crAlive(s).map((f) => militaryPower(s, f.id)));
-  C.m = wardenStrength(s);
+  C.m = Math.max(1, Math.round(wardenStrength(s) * (1 + Math.min(CRISIS.probes.intelMax, (C.intel || 0) * CRISIS.probes.intel))));   // what the probes saw
   C.heartMax = SHIPS.heart.hull * C.m - (C.studied ? CRISIS.studied * C.m : 0);
   const hf = spawnFleet(s, WARDENS, C.heart, []);
   hf.ships.push({ type: "heart", hull: C.heartMax });
@@ -192,7 +255,11 @@ function sendWave(s, R) {
 
 /** A wave picks one of the three nearest worlds of anyone's, and sets out. */
 function hunt(s, f, R) {
-  const near = Object.values(s.systems).filter((x) => x.colony).map((x) => ({ x, d: distance(f.at, x.at) - (x.colony.kind === "colony" ? x.colony.pop * 0.3 : 0) }))
+  const C = s.crisis;
+  // The power that answered the probe's call: the Wardens' first waves know its name.
+  if (C.answeredBy && (C.firstWaves || 0) < 2) { const w = coloniesOf(s, C.answeredBy).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0]; if (w && setDestination(s, f.id, w.at).ok) { C.firstWaves = (C.firstWaves || 0) + 1; return; } }
+  // Worlds the probes scanned come first: the Wardens know where to strike.
+  const near = Object.values(s.systems).filter((x) => x.colony).map((x) => ({ x, d: distance(f.at, x.at) - (x.colony.kind === "colony" ? x.colony.pop * 0.3 : 0) - (x.colony.scanned ? 4 : 0) }))
     .sort((a, b) => a.d - b.d).slice(0, 3);
   // They were left to guard the corridors: a power building the Corridor Engine draws them before anyone.
   const builders = crAlive(s).map((F) => s.systems[F.capital]).filter((c) => c && c.colony && c.colony.queue.some((q) => q.id === "engine"));
@@ -233,6 +300,24 @@ function breakHeart(s) {
 
 // ---- the three scenes: shown and chosen like galactic events (events.js looks here) ----
 export const CRISIS_EVENTS = {
+  probes: {
+    title: "Something is watching",
+    text: (s) => `It came out of the rift and went straight for the nearest world: a machine no bigger than a scout, silent, unarmed and quick. It hangs just off the world for a day, beyond the reach of its guns, sweeping every surface with something your instruments can't name, then moves on to the next. There are others. Your archivists have a name for them from the oldest records: the Wardens' eyes. Whatever sent them is still asleep. It won't be for long, and what these see, it will know.`,
+    options: [
+      { id: "hunt", label: "Shoot them down on sight", does: "Orbital guns can't reach them, so hunt them with warships: each one you destroy gives twice the research (60), and tells the Wardens nothing.", apply: (s) => { const C = s.crisis; (C.huntProbes = C.huntProbes || {})[crMe(s).id] = true; return "Orders go out to every fleet and battery: Warden probes are to be destroyed on sight. Each wreck is worth studying."; } },
+      { id: "alarm", label: "Warn the other powers", does: "+6 standing with every power you've met, and a truce will come easier when the Wardens wake.", apply: (s) => { const me = crMe(s); s.crisis.warned = true; const met = crAlive(s).filter((f) => f.id !== me.id && me.met[f.id]); for (const f of met) remember(s, f.id, me.id, "warned us about the Warden probes", 6); return met.length ? `You send word to ${met.map((f) => f.name).join(", ")}. They're listening.` : "There's no one to warn yet."; } },
+      { id: "learn", label: "Let them look, and learn from them", does: `Each time one scans a world of yours, your scientists study it back: +${CRISIS.probes.study} research. But the worlds they scan are the Wardens' first targets.`, apply: (s) => { const C = s.crisis; (C.learn = C.learn || {})[crMe(s).id] = true; return "Your observatories turn to the probes. Let them look. You'll be looking back."; } },
+    ],
+  },
+  contact: {
+    title: "It speaks",
+    text: (s, c) => `The probe over ${s.systems[c.world] ? s.systems[c.world].name : "your world"} stopped scanning, and turned to face the planet. Then it spoke: on every band at once, in a language dead a thousand years, and then, haltingly, in yours. It asked who rules here. It asked how many ships you have. It asked, last, whether you would answer when the others come. Then it waited.`,
+    options: [
+      { id: "answer", label: "Answer it", does: "You learn where the Heart will rise, and when (marked on your map now). But the Wardens will know your name: their first waves come for you.", apply: (s) => { const C = s.crisis, me = crMe(s); C.heartSite = heartSite(s); C.answeredBy = me.id; if (C.heartSite) for (const k of within(C.heartSite, 1)) if (s.hexes[k]) me.explored[k] = 1; return `You answer. The probe is silent for a long time. Then it sends a single point of light, deep by the rifts at ${crPlace(s, C.heartSite)}, and a count that ends on turn ${C.at}. It knows your name now.`; } },
+      { id: "jam", label: `Jam it (${CRISIS.probes.jam} credits)`, does: `Every band drowned out: the Wardens wake ${CRISIS.probes.jamDelay} turns later than they would have, for everyone.`, apply: (s) => { const C = s.crisis, me = crMe(s); if (me.credits < CRISIS.probes.jam) return "There's no money for the jammers. The probe goes on waiting, then leaves."; me.credits -= CRISIS.probes.jam; C.at += CRISIS.probes.jamDelay; return `Your jammers howl on every band. The probe falls silent, turns and goes. Somewhere under the rifts, something has lost its count: the Wardens will wake around turn ${C.at}.`; } },
+      { id: "decode", label: "Record it, and decode it", does: "+120 research, and your warships fire on the Wardens at +1 for the rest of the war: you've learned how they think.", apply: (s) => { const C = s.crisis, me = crMe(s); me.research.progress += 120; (C.decoded = C.decoded || {})[me.id] = true; return "You say nothing, and record everything. Your cryptographers work for weeks. What they find is how the machines think: their targeting, their patterns. Your gunners will know where to aim."; } },
+    ],
+  },
   stirring: {
     title: "Something stirs in the rifts",
     text: () => "Your listening posts on the rim of the rifts all report the same thing: a signal, one pattern repeated on every band, growing stronger each day. Your archivists know it. It's in the oldest records of the old empires: the call of the Wardens, the machines they built to guard the corridors and then could not stop. In six turns, perhaps less, they wake. They'll burn any world they can reach, yours and everyone's.",

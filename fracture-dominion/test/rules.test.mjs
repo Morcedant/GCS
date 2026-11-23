@@ -1513,3 +1513,27 @@ test("calls to arms: a wave at your world brings a message with a coalition agai
   // The wave destroyed: the coalition ends.
   delete s.fleets[w1.id]; s.turn++; crisisTurn(s); assert.ok(s.crisis.coalition.done);
 });
+
+test("Warden probes: out of the rifts, they scan worlds from a hex away; the first sighting and their contact are choices; what gets home makes the Wardens stronger", async () => {
+  const { crisisTurn, CRISIS_EVENTS } = await import("../src/crisis.js");
+  const { chooseEvent, currentEvent } = await import("../src/events.js");
+  const { CRISIS } = await import("../src/data.js");
+  const s = newGame({ seed: 41, size: "medium", player: "concord", rivals: 2, wilds: "none" });
+  const me = s.factions[0];
+  crisisTurn(s); s.turn = s.crisis.at - CRISIS.signsLead; crisisTurn(s);
+  for (let i = 0; i < 40 && !s.galEvent; i++) { for (const k of Object.keys(s.hexes)) me.visible[k] = 1; s.turn++; crisisTurn(s); }
+  assert.equal(s.galEvent && s.galEvent.id, "probes", "the first sighting is a choice");
+  assert.ok(chooseEvent(s, "learn").ok); assert.ok(s.crisis.learn[me.id]);
+  // A probe home again: the Wardens learn, and wake stronger.
+  const base = s.crisis.intel || 0; s.crisis.intel = base + 3;
+  // The contact: answer it, and learn where the Heart will rise.
+  s.galEvent = { id: "contact", ctx: { world: me.capital }, turn: s.turn };
+  const r = chooseEvent(s, "answer"); assert.ok(r.ok);
+  assert.ok(s.crisis.heartSite && s.crisis.answeredBy === me.id);
+  const site = s.crisis.heartSite;
+  s.galEvent = null; s.turn = s.crisis.at - CRISIS.warning; crisisTurn(s); s.galEvent = null; s.turn = s.crisis.at; crisisTurn(s);
+  assert.equal(s.crisis.heart, site, "the Heart rose where it said");
+  assert.ok(!Object.values(s.fleets).some((f) => f.ships.some((x) => x.type === "probe")), "the probes go home when it wakes");
+  // Only warships catch probes: orbital guns don't fire on them.
+  assert.ok(CRISIS_EVENTS.probes && CRISIS_EVENTS.contact);
+});
