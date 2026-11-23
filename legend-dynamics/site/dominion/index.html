@@ -236,7 +236,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-23 19:15 UTC";
+const BUILD = "2026-11-23 19:17 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -3835,6 +3835,39 @@ function sendHelp(s, fid, worldId) {
   return { error: "None of your war fleets is free to go (they're all moving, at the yards, or can't reach it)." };
 }
 
+// ---- Warden intelligence: what a power has learned, to share with others for their regard ----
+/** What `fid` knows that `to` doesn't yet: [{ id, name, text, regard }]. */
+function wardenIntel(s, fid, to) {
+  const C = s.crisis, F = faction(s, fid), T = faction(s, to); if (!C || !F || !T || !T.alive || to === fid || !F.met[to]) return [];
+  if (!["quiet", "stirring", "awake", "dormant"].includes(C.stage) || (C.stage === "quiet" && !C.signs)) return [];
+  const done = ((C.shared || {})[fid] || {})[to] || [], out = [];
+  const add = (id, name, text, regard) => { if (!done.includes(id)) out.push({ id, name, text, regard }); };
+  if (C.probeEvent || probes(s).some((f) => F.visible[f.at])) add("probes", "The probes", "What the probes are, and that only warships can catch them: they'll hunt them harder.", 5);
+  if (C.stage !== "quiet" || (C.signs && s.turn - C.signs >= 14)) add("signal", "The signal", `What the signal from the rifts means: the Wardens are waking${C.stage === "quiet" || C.stage === "stirring" ? `, around turn ${C.at}` : ""}. A truce will come easier.`, 5);
+  const scanned = coloniesOf(s, to).filter((x) => x.colony.scanned && F.explored[x.at]);
+  if (scanned.length && ["quiet", "stirring"].includes(C.stage)) add("scans", "Their scanned worlds", `That the probes scanned ${scanned.slice(0, 3).map((x) => x.name).join(", ")}${scanned.length > 3 ? "…" : ""}: the Wardens' first targets.`, Math.min(9, 3 * scanned.length));
+  if (C.heartSite && C.answeredBy === fid && ["quiet", "stirring"].includes(C.stage)) add("heart", "Where the Heart will rise", `The place by the rifts where the Heart will rise (${crPlace(s, C.heartSite)}), marked on their map.`, 8);
+  if (C.decoded && C.decoded[fid] && !(C.decoded[to])) add("decoded", "How the machines think", "Your decoded patterns: their warships hit the Wardens at +1, as yours do.", 10);
+  return out;
+}
+/** Share one piece of intelligence (or "all") with a power: their regard, and what it does for them. */
+function shareIntel(s, fid, to, id = "all") {
+  const C = s.crisis, F = faction(s, fid), T = faction(s, to);
+  const items = wardenIntel(s, fid, to).filter((x) => id === "all" || x.id === id); if (!items.length) return { error: "Nothing new to tell them." };
+  const sh = ((C.shared = C.shared || {})[fid] = C.shared[fid] || {}); sh[to] = sh[to] || [];
+  let regard = 0;
+  for (const x of items) {
+    sh[to].push(x.id); regard += x.regard;
+    if (x.id === "probes") (C.alerted2 = C.alerted2 || {})[to] = true;   // they'll go after probes harder
+    if (x.id === "signal") C.warned = true;
+    if (x.id === "heart" && C.heartSite) for (const k of within(C.heartSite, 1)) if (s.hexes[k]) T.explored[k] = 1;
+    if (x.id === "decoded") (C.decoded = C.decoded || {})[to] = true;
+  }
+  remember(s, to, fid, `shared what they knew of the Wardens (${items.map((x) => x.name.toLowerCase()).join(", ")})`, regard);
+  if (!F.ai) log(s, fid, `You told ${T.name} what you know of the Wardens: ${items.map((x) => x.name.toLowerCase()).join(", ")}. Their regard for you rises ${regard}.`, "diplo");
+  return { ok: true, items: items.length, regard };
+}
+
 // ---- wilds.js ----
 // The wild things: threats that belong to no power. Pirate havens appear in empty systems and send out raiders, who
 // hold the orbits of weak worlds (a blockade) and take their credits. Crystal swarms nest on the rich systems everyone
@@ -5084,7 +5117,7 @@ function huntWardens(s, F, f, reach) {
   const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
   // Only what it can see (or, for the machines that never move, has found): no chasing what's out of sight.
   // A probe (quick, and gone again) is worth chasing only if it's close by.
-  const known = (w) => (F.visible[w.at] || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > 2);
+  const known = (w) => (F.visible[w.at] || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > (s.crisis.alerted2 && s.crisis.alerted2[F.id] ? 5 : 2));   // warned of them: chase them farther
   const waves = fleetsOf(s, "wardens").filter(known).map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
   const heartAt = (waves.find((x) => x.heart) || {}).w;
   const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]
@@ -5652,6 +5685,8 @@ function draw() {
 
 // ---------- the bar and the panels ----------
 function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); renderCoach(); renderWardenBar(); }
+/** Whether there's anything about the Wardens the player could tell anyone. */
+const intelAny = () => { const me = player(S); return S.factions.some((F) => F.alive && F.id !== me.id && me.met[F.id] && wardenIntel(S, me.id, F.id).length); };
 /** While the Wardens are about: a bar over the map, with what's attacking your worlds and the call to arms at hand. */
 function renderWardenBar() {
   const el = $("warden-bar"); if (!el) return;
@@ -5663,9 +5698,10 @@ function renderWardenBar() {
     if (!probes.length && !c.watchers && c.stage === "signs") { el.hidden = true; return; }
     el.classList.add("calm");
     el.innerHTML = `<span class="pulse" aria-hidden="true"><\/span><span><b>${c.stage === "stirring" ? "The Wardens are stirring" : "The Signs"}.<\/b>${probes.length ? ` ${probes.length} Warden probe${probes.length === 1 ? "" : "s"} in sight${scanning.length ? `, scanning <b>${esc(scanning[0].name)}<\/b>` : ""}: only warships can catch them, and what they see, the Wardens will know.` : ""}${c.watchers ? ` ${c.watchers} Watcher${c.watchers === 1 ? "" : "s"} by the rifts.` : ""}${S.crisis.intel ? ` ${S.crisis.intel} probe${S.crisis.intel === 1 ? " has" : "s have"} got home.` : ""}<\/span>
-      ${probes.length ? `<button class="btn small primary" id="wb-probe">Show the probe<\/button>` : ""}<button class="btn small" id="wb-more">Details<\/button>`;
+      ${probes.length ? `<button class="btn small primary" id="wb-probe">Show the probe<\/button>` : ""}${intelAny() ? `<button class="btn small" id="wb-intel">Share what you know<\/button>` : ""}<button class="btn small" id="wb-more">Details<\/button>`;
     el.hidden = false;
     if ($("wb-probe")) $("wb-probe").onclick = () => { centerOn(probes[0].at); draw(); };
+    if ($("wb-intel")) $("wb-intel").onclick = showIntelShare;
     $("wb-more").onclick = () => { tab = "objectives"; renderTabs(); renderPanel(); };
     return;
   }
@@ -5674,12 +5710,13 @@ function renderWardenBar() {
   const near = threats.reduce((t, x) => t + x.n, 0), worlds = [...new Set(threats.map((x) => S.systems[x.world].name))];
   el.classList.toggle("calm", c.stage === "dormant" && !threats.length);
   el.innerHTML = `<span class="pulse" aria-hidden="true"><\/span><span>${c.stage === "dormant" ? `<b>The Heart is broken<\/b>, but ${c.nodes.length} Node${c.nodes.length === 1 ? "" : "s"} stand${c.nodes.length === 1 ? "s" : ""}` : `<b>The Wardens are awake.<\/b> The Heart: ${Math.round(c.hull)} of ${c.max} hull`}${near ? ` · <b>${near} machine${near === 1 ? "" : "s"} at ${esc(worlds.slice(0, 2).join(", "))}${worlds.length > 2 ? "…" : ""}<\/b>` : ""}${A ? ` · coalition against ${esc(A.name)} until turn ${A.until}` : ""}<\/span>
-    ${A ? "" : `<button class="btn small primary" id="wb-call">Call a coalition<\/button>`}${threats.length ? `<button class="btn small" id="wb-threat">Show the attack<\/button>` : ""}${c.heart ? `<button class="btn small" id="wb-heart">Show the Heart<\/button>` : ""}<button class="btn small" id="wb-more">Details<\/button>`;
+    ${A ? "" : `<button class="btn small primary" id="wb-call">Call a coalition<\/button>`}${threats.length ? `<button class="btn small" id="wb-threat">Show the attack<\/button>` : ""}${c.heart ? `<button class="btn small" id="wb-heart">Show the Heart<\/button>` : ""}${intelAny() ? `<button class="btn small" id="wb-intel">Share what you know<\/button>` : ""}<button class="btn small" id="wb-more">Details<\/button>`;
   el.hidden = false;
   if ($("wb-call")) $("wb-call").onclick = () => { modal(`<h1>Call a coalition<\/h1>${coalitionHTML() || `<p>There's nothing in sight to call them against.<\/p>`}<div class="btn-row"><button class="btn" id="wb-close">Close<\/button><\/div>`); $("wb-close").onclick = closeModal;
     for (const b of document.querySelectorAll("#modal-body [data-coalition]")) b.onclick = () => { const hex = ($("co-target") || {}).value, r = callCoalition(S, player(S).id, hex, b.dataset.coalition === "pay"); if (r.error) toast(r.error, true); else { toast(`The coalition is called: ${r.members} power${r.members === 1 ? "" : "s"} send ${r.ships} ships${r.cost ? `, for ${r.cost} credits` : ""}.`); closeModal(); save(); renderAll(); } }; };
   if ($("wb-threat")) $("wb-threat").onclick = () => { const f = S.fleets[threats[0].fleet]; if (f) { centerOn(f.at); draw(); } };
   if ($("wb-heart")) $("wb-heart").onclick = () => { centerOn(c.heart); draw(); };
+  if ($("wb-intel")) $("wb-intel").onclick = showIntelShare;
   $("wb-more").onclick = () => { tab = "objectives"; renderTabs(); renderPanel(); };
 }
 function renderBar() {
@@ -6198,6 +6235,22 @@ function researchHTML() {
     <li><b>Ruins<\/b>, and the wrecks of pirates and creatures you destroy (a crystal swarm ${WILDS.bounty.swarm.research}, a void leviathan ${WILDS.bounty.leviathan.research}, a pirate haven ${WILDS.bounty.haven.research}).<\/li><\/ul>`;
   return h;
 }
+/** What you know of the Wardens that this power doesn't: share it, piece by piece or all at once, for their regard. */
+function intelHTML(F) {
+  const me = player(S), items = wardenIntel(S, me.id, F.id); if (!items.length) return "";
+  return `<div class="intel small"><b>Warden intelligence to share<\/b> <span class="muted">(each raises their regard)<\/span><ul class="mem">${items.map((x) => `<li>${esc(x.name)}: ${esc(x.text)} <button class="linkish" data-intel="${F.id}:${x.id}">Tell them (+${x.regard})<\/button><\/li>`).join("")}<\/ul>${items.length > 1 ? `<button class="btn small" data-intel="${F.id}:all">Tell them everything (+${items.reduce((t, x) => t + x.regard, 0)})<\/button>` : ""}<\/div>`;
+}
+/** The bar's "Share what you know": every power you've met, and what you could tell each. */
+function showIntelShare() {
+  const me = player(S), rows = S.factions.filter((F) => F.alive && F.id !== me.id && me.met[F.id]).map((F) => ({ F, items: wardenIntel(S, me.id, F.id) })).filter((r) => r.items.length);
+  modal(`<h1>Share what you know<\/h1><p>Tell the other powers what you've learned of the Wardens. Each piece raises their regard for you, and helps them prepare.<\/p>
+    ${rows.length ? `<ul class="mem">${rows.map(({ F, items }) => `<li><b style="color:${F.color}">${esc(F.name)}<\/b>: ${items.map((x) => esc(x.name.toLowerCase())).join(", ")} <button class="btn small" data-intelall="${F.id}">Tell them (+${items.reduce((t, x) => t + x.regard, 0)})<\/button><\/li>`).join("")}<\/ul>
+      <div class="btn-row"><button class="btn primary" id="intel-everyone">Tell everyone everything<\/button><button class="btn" id="intel-close">Close<\/button><\/div>` : `<p class="muted">You've told everyone everything you know.<\/p><div class="btn-row"><button class="btn" id="intel-close">Close<\/button><\/div>`}`);
+  const done = (n, g) => { toast(`Shared with ${n} power${n === 1 ? "" : "s"}: their regard rises ${g} in all.`); save(); renderAll(); };
+  for (const b of document.querySelectorAll("#modal-body [data-intelall]")) b.onclick = () => { const r = shareIntel(S, me.id, b.dataset.intelall); if (!r.error) { done(1, r.regard); showIntelShare(); } };
+  if ($("intel-everyone")) $("intel-everyone").onclick = () => { let n = 0, g = 0; for (const { F } of rows) { const r = shareIntel(S, me.id, F.id); if (r.ok) { n++; g += r.regard; } } done(n, g); closeModal(); };
+  $("intel-close").onclick = closeModal;
+}
 /** Influence on demand: gifts, sweetened proposals, tribute, denouncing, and asking a power to join your war. */
 function influenceHTML(F) {
   const me = player(S), r = me.relations[F.id], price = marketPrice(S);
@@ -6240,7 +6293,7 @@ function diplomacyHTML() {
       <p class="small">${r.status === "war" ? `<b class="bad">At war<\/b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied<\/b>" : "<b>At peace<\/b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}<\/b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.<\/p>
       ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:<\/p><ul class="small mem">${mem.map((m) => { const i = (them.memory || []).indexOf(m), cost = F.alive ? amendsCost(S, me.id, F.id, i) : null;
         return `<li class="${m.d >= 0 ? "good" : "bad"}">${esc(m.text)} <span class="muted">(turn ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})<\/span>${m.forgiven ? ` <span class="good">· forgiven<\/span>` : cost !== null ? ` <button class="linkish" data-amends="${F.id}:${i}" ${me.credits < cost ? "disabled" : ""} title="Pay ${cost} credits to make up for it: +${Math.round(-m.d * INFLUENCE.amends.back)} regard">Make amends (${cost} credits)<\/button>` : ""}<\/li>`; }).join("")}<\/ul>` : ""}
-      ${F.alive ? influenceHTML(F) : ""}
+      ${F.alive ? intelHTML(F) + influenceHTML(F) : ""}
       ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace<\/button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}<\/button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}<\/button><button class="btn" data-dip="${F.id}:${r.patrol ? "endPatrol" : "patrol"}" title="Your warships guard each other's worlds from raiders, and you share pirate bounties">${r.patrol ? "End the pirate patrol pact" : "Propose a pirate patrol pact"}<\/button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}<\/button>`}<\/div>` : ""}<\/div>`;
   }
   return h;
@@ -6327,6 +6380,7 @@ function bindChrome() {
     else if (d.mergeall !== undefined) { const f = S.fleets[sel.id]; let n = 0; for (const o of fleetsAt(S, f.at).filter((o) => o.owner === me.id && o.id !== f.id)) if (!mergeFleets(S, f.id, o.id).error) n++; toast(`${n} fleet${n === 1 ? "" : "s"} joined this one.`); }
     else if (d.split) { const [t, n] = d.split.split(":"); const r = splitFleet(S, sel.id, t, n || 1); if (r.error) toast(r.error, true); else { toast(`${r.moved} ${SHIPS[t].name.toLowerCase()}${r.moved === 1 ? "" : "s"} split off into a new fleet.`); sel = { kind: "fleet", id: r.fleet }; } }
     else if (d.tech) setResearch(S, me.id, d.tech);
+    else if (d.intel) { const [fid, id] = d.intel.split(":"); const r = shareIntel(S, me.id, fid, id); if (r.error) toast(r.error, true); else toast(`Shared: their regard rises ${r.regard}.`); }
     else if (d.gift) { const [fid, c, x] = d.gift.split(":"); const r = giveGift(S, me.id, fid, { credits: +c, exotics: +x }); if (r.error) toast(r.error, true); else toast(`Gift sent: their regard rises ${r.regard}.`); }
     else if (d.amends) { const [fid, i] = d.amends.split(":"); const r = makeAmends(S, me.id, fid, +i); if (r.error) toast(r.error, true); else toast(`Amends made: +${r.regard} regard.`); }
     else if (d.sweet) { const [fid, what] = d.sweet.split(":"); const r = proposeSweetened(S, me.id, fid, what); if (r.error) toast(r.error, true); else toast(r.accepted ? "They accepted." : "They took the gift, but still said no.", !r.accepted); }
@@ -6738,7 +6792,7 @@ function showHelp(back) {
       <li><b>Refits:<\/b> research that improves ships goes into new ones; ships already in service get it at a Drydock (a Shipyard fits the early systems: sensors, drives, shields). A fleet's panel says when its ships need a refit.<\/li>
       <li><b>Pirate ransom and tribute:<\/b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts<\/b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.<\/li>
       <li><b>Traders:<\/b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot<\/b> to fill its tanks and cut the depot's supply.<\/li>
-      <li><b>The Wardens:<\/b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Probes come out of the rifts too: small, quick and unarmed, they scan your worlds from a hex away (beyond your guns), then go home with what they saw. Every probe that gets home makes the Wardens wake stronger, and the worlds they scanned are attacked first. Only warships can catch them. Along the way you choose how to meet them, and one of them will speak. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out. While they are about, a red bar over the map shows what they are attacking. To rally the others, <b>call a coalition<\/b> from that bar (or the Wardens card on the Objectives tab): pick the Heart or a Node, and every power that likes you sends its fleets to hold it with you (the lukewarm for credits). When they attack one of your worlds, a Call to arms offers a coalition against that wave on the spot, and friendly powers under attack ask you for help.<\/li>
+      <li><b>The Wardens:<\/b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Probes come out of the rifts too: small, quick and unarmed, they scan your worlds from a hex away (beyond your guns), then go home with what they saw. Every probe that gets home makes the Wardens wake stronger, and the worlds they scanned are attacked first. Only warships can catch them. Along the way you choose how to meet them, and one of them will speak. What you learn of them (the probes, the signal, scanned worlds, where the Heart will rise, how the machines think) can be shared with the other powers for their regard: on each power's Diplomacy card, or all at once from the bar's Share what you know. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out. While they are about, a red bar over the map shows what they are attacking. To rally the others, <b>call a coalition<\/b> from that bar (or the Wardens card on the Objectives tab): pick the Heart or a Node, and every power that likes you sends its fleets to hold it with you (the lukewarm for credits). When they attack one of your worlds, a Call to arms offers a coalition against that wave on the spot, and friendly powers under attack ask you for help.<\/li>
       <li><b>Pirates and creatures:<\/b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.<\/li>
       <li><b>New sectors:<\/b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.<\/li>
       <li><b>Corridor collapses:<\/b> now and then a corridor fails, with ${COLLAPSE.warn} turns' warning (it turns red on the map). It's rare, and it's always one that matters. Ships then go the long way, until a scout rests ${COLLAPSE.surveyTurns} turns within ${COLLAPSE.surveyRange} hexes of either end and charts a new corridor (worth ${COLLAPSE.research} research).<\/li>

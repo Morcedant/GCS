@@ -6,6 +6,15 @@
     {
       "date": "2026-11-23",
       "kind": "site",
+      "title": "Dominion: share what you know of the Wardens",
+      "items": [
+        "What you learn about the Wardens can now be shared with the other powers as diplomacy, raising their regard for you. Each power's Diplomacy card has a Warden intelligence section, and the Wardens bar over the map has Share what you know, to brief everyone at once.",
+        "What you can share: the probes (+5; they hunt probes harder), the signal (+5; an easier truce), their own scanned worlds (+3 each), where the Heart will rise if you answered the probe (+8; marked on their map), and how the machines think if you decoded it (+10; they hit the Wardens at +1 too). Each piece once per power."
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "kind": "site",
       "title": "Dominion: Warden probes, and the build-up to the war",
       "items": [
         "During the Signs, Warden probes come out of the rifts, at most three at a time, a new one every 5 turns. Small, quick and unarmed, they scan worlds from a hex away, beyond the reach of orbital guns, then go back to the rift. Only warships can catch them.",

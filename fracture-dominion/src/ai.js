@@ -420,7 +420,7 @@ function huntWardens(s, F, f, reach) {
   const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
   // Only what it can see (or, for the machines that never move, has found): no chasing what's out of sight.
   // A probe (quick, and gone again) is worth chasing only if it's close by.
-  const known = (w) => (F.visible[w.at] || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > 2);
+  const known = (w) => (F.visible[w.at] || (F.explored[w.at] && w.ships.some((x) => !SHIPS[x.type].speed))) && !(w.ships.some((x) => x.type === "probe") && distance(w.at, f.at) > (s.crisis.alerted2 && s.crisis.alerted2[F.id] ? 5 : 2));   // warned of them: chase them farther
   const waves = fleetsOf(s, "wardens").filter(known).map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
   const heartAt = (waves.find((x) => x.heart) || {}).w;
   const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]

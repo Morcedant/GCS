@@ -502,3 +502,36 @@ export function sendHelp(s, fid, worldId) {
   for (const f of fleets) { const r = setDestination(s, f.id, w.at); if (r.ok) return { ok: true, fleet: f.id, ships: f.ships.length, turns: r.turns }; }
   return { error: "None of your war fleets is free to go (they're all moving, at the yards, or can't reach it)." };
 }
+
+// ---- Warden intelligence: what a power has learned, to share with others for their regard ----
+/** What `fid` knows that `to` doesn't yet: [{ id, name, text, regard }]. */
+export function wardenIntel(s, fid, to) {
+  const C = s.crisis, F = faction(s, fid), T = faction(s, to); if (!C || !F || !T || !T.alive || to === fid || !F.met[to]) return [];
+  if (!["quiet", "stirring", "awake", "dormant"].includes(C.stage) || (C.stage === "quiet" && !C.signs)) return [];
+  const done = ((C.shared || {})[fid] || {})[to] || [], out = [];
+  const add = (id, name, text, regard) => { if (!done.includes(id)) out.push({ id, name, text, regard }); };
+  if (C.probeEvent || probes(s).some((f) => F.visible[f.at])) add("probes", "The probes", "What the probes are, and that only warships can catch them: they'll hunt them harder.", 5);
+  if (C.stage !== "quiet" || (C.signs && s.turn - C.signs >= 14)) add("signal", "The signal", `What the signal from the rifts means: the Wardens are waking${C.stage === "quiet" || C.stage === "stirring" ? `, around turn ${C.at}` : ""}. A truce will come easier.`, 5);
+  const scanned = coloniesOf(s, to).filter((x) => x.colony.scanned && F.explored[x.at]);
+  if (scanned.length && ["quiet", "stirring"].includes(C.stage)) add("scans", "Their scanned worlds", `That the probes scanned ${scanned.slice(0, 3).map((x) => x.name).join(", ")}${scanned.length > 3 ? "…" : ""}: the Wardens' first targets.`, Math.min(9, 3 * scanned.length));
+  if (C.heartSite && C.answeredBy === fid && ["quiet", "stirring"].includes(C.stage)) add("heart", "Where the Heart will rise", `The place by the rifts where the Heart will rise (${crPlace(s, C.heartSite)}), marked on their map.`, 8);
+  if (C.decoded && C.decoded[fid] && !(C.decoded[to])) add("decoded", "How the machines think", "Your decoded patterns: their warships hit the Wardens at +1, as yours do.", 10);
+  return out;
+}
+/** Share one piece of intelligence (or "all") with a power: their regard, and what it does for them. */
+export function shareIntel(s, fid, to, id = "all") {
+  const C = s.crisis, F = faction(s, fid), T = faction(s, to);
+  const items = wardenIntel(s, fid, to).filter((x) => id === "all" || x.id === id); if (!items.length) return { error: "Nothing new to tell them." };
+  const sh = ((C.shared = C.shared || {})[fid] = C.shared[fid] || {}); sh[to] = sh[to] || [];
+  let regard = 0;
+  for (const x of items) {
+    sh[to].push(x.id); regard += x.regard;
+    if (x.id === "probes") (C.alerted2 = C.alerted2 || {})[to] = true;   // they'll go after probes harder
+    if (x.id === "signal") C.warned = true;
+    if (x.id === "heart" && C.heartSite) for (const k of within(C.heartSite, 1)) if (s.hexes[k]) T.explored[k] = 1;
+    if (x.id === "decoded") (C.decoded = C.decoded || {})[to] = true;
+  }
+  remember(s, to, fid, `shared what they knew of the Wardens (${items.map((x) => x.name.toLowerCase()).join(", ")})`, regard);
+  if (!F.ai) log(s, fid, `You told ${T.name} what you know of the Wardens: ${items.map((x) => x.name.toLowerCase()).join(", ")}. Their regard for you rises ${regard}.`, "diplo");
+  return { ok: true, items: items.length, regard };
+}

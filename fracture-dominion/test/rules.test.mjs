@@ -1537,3 +1537,23 @@ test("Warden probes: out of the rifts, they scan worlds from a hex away; the fir
   // Only warships catch probes: orbital guns don't fire on them.
   assert.ok(CRISIS_EVENTS.probes && CRISIS_EVENTS.contact);
 });
+
+test("Warden intelligence: what you've learned can be shared with each power once, for their regard, and it helps them", async () => {
+  const { crisisTurn, wardenIntel, shareIntel } = await import("../src/crisis.js");
+  const { CRISIS } = await import("../src/data.js");
+  const s = newGame({ seed: 41, size: "medium", player: "concord", rivals: 2, wilds: "none" });
+  const me = s.factions[0], A = s.factions[1]; me.met[A.id] = A.met[me.id] = true;
+  crisisTurn(s); s.turn = s.crisis.at - CRISIS.signsLead; crisisTurn(s);
+  assert.equal(wardenIntel(s, me.id, A.id).length, 0, "nothing to tell yet");
+  s.crisis.probeEvent = s.turn; s.turn += 15;
+  const items = wardenIntel(s, me.id, A.id).map((x) => x.id);
+  assert.ok(items.includes("probes") && items.includes("signal"));
+  const r0 = A.relations[me.id].score, r = shareIntel(s, me.id, A.id, "probes");
+  assert.ok(r.ok && A.relations[me.id].score > r0);
+  assert.ok(!wardenIntel(s, me.id, A.id).some((x) => x.id === "probes"), "once");
+  assert.ok(shareIntel(s, me.id, A.id, "probes").error);
+  // What you decoded, they can use: +1 to hit the Wardens.
+  s.crisis.decoded = { [me.id]: true };
+  assert.ok(shareIntel(s, me.id, A.id).ok); assert.ok(s.crisis.decoded[A.id]);
+  assert.equal(wardenIntel(s, me.id, A.id).length, 0, "everything told");
+});
