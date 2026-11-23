@@ -485,7 +485,43 @@ export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, hea
   // `free` come for nothing; those at `paid` or better for `price` credits (plus `perM` for each point of Warden
   // strength). Each member sends its strongest war fleets, up to `share` of its warships, and holds them on the target
   // for `turns` turns or until it falls. One call every `every` turns. Fighting together: `regard` each way.
-  coalition: { free: 10, paid: -10, price: 60, perM: 5, share: 0.6, turns: 20, every: 10, regard: 6 } };
+  coalition: { free: 10, paid: -10, price: 60, perM: 5, share: 0.6, turns: 20, every: 10, regard: 6 },
+  // The assault on the Heart: when it breaks, this prize is shared among every power that did damage to it (or to the
+  // Nodes shielding it), by its share of the damage (a share under `min` gets nothing). The last blow adds `lastBlow` exotics.
+  assault: { credits: 300, research: 400, exotics: 12, min: 0.05, lastBlow: 2 } };
+
+// Home territory (the hexes round your worlds, as on the map): your fleets that start a turn there move HOME.speed
+// farther and mend HOME.mend hull a turn; a fleet fighting in an enemy's territory, out of its own supply, has
+// −HOME.deep to hit. The Kel's territory grows: their colonies reach a hex farther once HOME.kelAge turns old.
+export const HOME = { speed: 1, mend: 1, deep: 1, kelAge: 30 };
+
+// Admirals' powers: each admiral has one, used from the fleet's panel, then ready again `every` turns later.
+export const ADMIRAL_POWERS = {
+  jump: { name: "Emergency jump", every: 8, text: "This turn the fleet moves 2 farther, and can break away even when engaged." },
+  overcharge: { name: "Overcharge the guns", every: 8, text: "This turn, in any battle it fights, every ship of the fleet gets +2 to hit." },
+  rally: { name: "Damage-control drill", every: 10, text: "Every ship of the fleet mends 2 hull at once, wherever it is." },
+  ghost: { name: "Run silent", every: 10, text: "This turn the whole fleet is cloaked: unseen outside detection range, and it slips past enemy fleets." },
+};
+
+// Officers: specialists a fleet carries (up to `slots`), from anomalies, ruins, captured worlds and burned pirate havens.
+// Unassigned officers wait in the empire's pool; an officer is lost if the fleet is destroyed.
+export const OFFICERS = { slots: 2, odds: { anomaly: 0.35, ruins: 0.5 },
+  kinds: {
+    engineer: { name: "Chief engineer", text: "The fleet mends 1 hull a turn, anywhere." },
+    tactical: { name: "Tactical officer", text: "+1 to hit in the first exchange of every battle." },
+    science: { name: "Science officer", text: "+2 sensor range, and the fleet detects cloaked ships 2 hexes out." },
+    navigator: { name: "Navigator", text: "+3 turns of fuel in the tank, and burning hard costs half." },
+  },
+  names: ["Okafor", "Vasquez", "Tal", "Ishida", "Brann", "Moreau", "Quell", "Adeyemi", "Sorensen", "Ruiz", "Halloran", "Nakamura", "Ferro", "Lindqvist", "Abara", "Petrov", "Ochoa", "Reyes", "Ivanova", "Mbeki", "Castellan", "Dunmore", "Sato", "Varga"] };
+
+// Key sites: special systems worth fighting over. Whoever holds the system (a colony or an outpost) has the bonus, and
+// so do their allies. About one in `per` systems, at least `min`, away from the capitals.
+export const SITES = { per: 18, min: 2, fromCapital: 4, apart: 6,
+  kinds: {
+    shipyard: { name: "Ancient shipyard", text: "Its holder and their allies build ships for 10% less.", discount: 0.1 },
+    listening: { name: "Listening post", text: "Its holder and their allies see everything within 5 hexes of it, cloaked ships too.", range: 5 },
+    waystation: { name: "Old waystation", text: "Works as a fuel depot for its holder (supply around it), and makes 3 fuel a turn.", fuel: 2 },
+  } };
 /**
  * The Corridor Engine in an open game: not a victory but the galaxy's great prize. Only one can stand. Its holder's
  * fleets travel corridors for nothing and can jump through the gate from the Engine world to any of its worlds (every

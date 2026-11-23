@@ -295,7 +295,18 @@ function breakHeart(s) {
   for (const f of stationOf(s, "watcher")) delete s.fleets[f.id];
   const nodes = stationOf(s, "node").length;
   if (nodes) { C.stage = "dormant"; C.regrowAt = s.turn + CRISIS.regrow; } else { C.stage = "over"; C.over = s.turn; }
-  if (by) { by.stats.heart = true; by.exotics += 6; if (by.ai) crResearch(s, by, 150); }
+  if (by) { by.stats.heart = true; by.exotics += CRISIS.assault.lastBlow; }
+  // The assault's prize, shared by the damage each power did to the Heart and its shield of Nodes.
+  const A = C.assault || {}, P = CRISIS.assault, total = Object.values(A).reduce((t, n) => t + n, 0);
+  const shares = Object.entries(A).map(([fid, n]) => ({ F: faction(s, fid), sh: total ? n / total : 0 })).filter((x) => x.F && x.F.alive && x.sh >= P.min);
+  const kept = shares.reduce((t, x) => t + x.sh, 0);
+  C.assaultPaid = shares.map(({ F, sh }) => {
+    const k = sh / kept, cr = Math.round(P.credits * k), re = Math.round(P.research * k), ex = Math.round(P.exotics * k);
+    F.credits += cr; F.research.progress += re; F.exotics += ex;
+    log(s, F.id, `The assault on the Heart: ${F.name} did ${Math.round(sh * 100)}% of the damage, and takes that share of the prize: ${cr} credits, ${re} research, ${ex} exotics.`, "war");
+    return { fid: F.id, share: Math.round(sh * 100), credits: cr, research: re, exotics: ex };
+  });
+  C.assault = {};
   log(s, null, `The Heart of the Wardens is broken${by ? `, by ${by.name}` : ""}. ${left ? `The ${left} hunter${left === 1 ? "" : "s"} it sent out went dark at once.` : "Its hunters went dark."}${nodes ? ` But ${nodes} Node${nodes === 1 ? "" : "s"} still burn${nodes === 1 ? "s" : ""}: destroy ${nodes === 1 ? "it" : "them"} within ${CRISIS.regrow} turns, or a new Heart will grow.` : " Nothing of theirs is left: the Wardens are silent."}`, "victory");
   const ev = { id: with_.includes(me.id) ? "broken" : "brokenBy", ctx: { by: C.heartBy || null, nodes }, turn: s.turn };
   if (s.galEvent) C.queued = ev; else s.galEvent = ev;

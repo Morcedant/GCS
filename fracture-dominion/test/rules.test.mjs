@@ -1208,7 +1208,8 @@ test("fuel reserve: worlds and depots make it, moving and refuelling spend it, a
   assert.ok(left(b) < left(a) || !s.fleets[b.id], "the burning fleet got farther");
   assert.ok(fuelStock(s, me.id) < 30 + fuelIncome(s, me.id), "and it cost fuel");
   // An empty reserve: fleets in supply move slower.
-  const c = spawnFleet(s, me.id, cap.at, ["cruiser"]); setDestination(s, c.id, far);
+  const far2 = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "space" && distance(k, cap.at) === 7).sort()[0];   // beyond a turn even with the home-territory move
+  const c = spawnFleet(s, me.id, cap.at, ["cruiser"]); setDestination(s, c.id, far2);
   me.fuelStock = 0; const before = c.path.length; endTurn(s, null);
   assert.ok(s.fleets[c.id].dry === s.turn - 1 || s.fleets[c.id].dry === s.turn || before - (s.fleets[c.id].path.length) <= 2);
   assert.ok(!setBurn(s, c.id, true).error);
@@ -1659,4 +1660,64 @@ test("space mining: fields in open space; a parked mining ship mines them each t
   // Exotics, a whole one at a time.
   const cr = fields.find(([, f]) => f.kind === "crystal");
   if (cr) { spawnFleet(s, me.id, cr[0], ["miner", "miner"]); const e0 = me.exotics; endTurn(s); assert.equal(me.exotics - e0, 1, "two ships: an exotic a turn"); }
+});
+
+test("home territory: a turn begun at home goes a hex farther, ships mend there, and the Kel's old colonies reach farther", async () => {
+  const { territoryAt, turnStops, territoryOf } = await import("../src/game.js");
+  const { HOME } = await import("../src/data.js");
+  const s = newGame({ seed: 9, size: "medium", player: "concord", rivals: 2, wilds: "none" }), me = s.factions[0], cap = s.systems[me.capital];
+  assert.equal(territoryAt(s, cap.at), me.id);
+  const far = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && distance(k, cap.at) === 7).sort()[0];
+  const f = spawnFleet(s, me.id, cap.at, ["frigate"]); setDestination(s, f.id, far);
+  const g = spawnFleet(s, me.id, far, ["frigate"]); setDestination(s, g.id, cap.at);
+  const first = (x) => turnStops(s, x)[0] + 1;
+  assert.ok(first(f) > first(g) || first(f) >= 4, "from home it covers more of the way in the first turn");
+  const x = spawnFleet(s, me.id, neighbors(cap.at).find((k) => !s.sysAt[k]), ["cruiser"]); x.ships[0].hull = 1; endTurn(s);
+  assert.ok(s.fleets[x.id].ships[0].hull >= 1 + HOME.mend, "mended at home");
+  const k = newGame({ seed: 9, size: "medium", player: "kel", rivals: 2, wilds: "none" }), kc = k.systems[k.factions[0].capital];
+  const reach = () => Object.values(territoryOf(k)).filter((t) => t.owner === "kel").length;
+  const n0 = reach(); k.turn += HOME.kelAge + 1; kc.colony.founded = 0;
+  assert.ok(reach() >= n0, "the Kel's territory doesn't shrink as it ages");
+});
+
+test("admirals' powers: used from the fleet, then a wait; a drill mends, running silent cloaks", async () => {
+  const { useAdmiralPower, powerWait, powerOf, cloaked, makeAdmiral } = await import("../src/game.js");
+  const { ADMIRAL_POWERS } = await import("../src/data.js");
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0];
+  const f = spawnFleet(s, me.id, s.systems[me.capital].at, ["cruiser", "cruiser"]);
+  assert.ok(useAdmiralPower(s, f.id).error, "it takes an admiral");
+  f.admiral = makeAdmiral(s, me.id, { int: () => 0, next: () => 0 }); f.admiral.power = "rally";
+  f.ships[0].hull = 1; assert.ok(useAdmiralPower(s, f.id).ok); assert.equal(f.ships[0].hull, 3, "the drill mends 2");
+  assert.equal(powerWait(s, f), ADMIRAL_POWERS.rally.every); assert.ok(useAdmiralPower(s, f.id).error, "then waits");
+  s.turn += ADMIRAL_POWERS.rally.every; f.admiral.power = "ghost"; assert.ok(!cloaked(f, s)); assert.ok(useAdmiralPower(s, f.id).ok); assert.ok(cloaked(f, s), "running silent");
+  assert.ok(Object.keys(ADMIRAL_POWERS).includes(powerOf({ name: "Old Admiral" })), "an admiral from an older game gets one too");
+});
+
+test("officers: one to start; assigned to fleets (two at most), recalled, kept when fleets join; a navigator carries more fuel", async () => {
+  const { officerPool, assignOfficer, recallOfficer, officersOf, gainOfficer, mergeFleets } = await import("../src/game.js");
+  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0], at = s.systems[me.capital].at;
+  assert.equal(officerPool(s, me.id).length, 1, "a chief engineer to start");
+  const nav = gainOfficer(s, me.id, "for the test", null, "navigator"); gainOfficer(s, me.id, "for the test", null, "tactical");
+  const a = spawnFleet(s, me.id, at, ["frigate"]), b = spawnFleet(s, me.id, at, ["frigate"]);
+  const tank = fuelMax(s, a); assert.ok(assignOfficer(s, a.id, nav.id).ok); assert.equal(fuelMax(s, a), tank + 3, "a navigator: +3 fuel");
+  for (const o of [...officerPool(s, me.id)]) assignOfficer(s, b.id, o.id);
+  assert.equal(officersOf(b).length, 2); assert.equal(officerPool(s, me.id).length, 0);
+  assert.ok(mergeFleets(s, a.id, b.id).ok); assert.equal(officersOf(a).length, 2, "room for two"); assert.equal(officerPool(s, me.id).length, 1, "the third back to the pool");
+  assert.ok(recallOfficer(s, a.id, officersOf(a)[0].id).ok); assert.equal(officerPool(s, me.id).length, 2);
+});
+
+test("key sites: a few, away from capitals; their holder (and allies) get the bonus: cheaper ships, a waystation's supply and fuel", async () => {
+  const { siteSystems, sitesFor, fuelIncome } = await import("../src/game.js");
+  const { SITES } = await import("../src/data.js");
+  const s = newGame({ seed: 6, size: "medium", player: "concord", rivals: 2, wilds: "none" }), me = s.factions[0];
+  const sites = siteSystems(s); assert.ok(sites.length >= SITES.min);
+  for (const x of sites) for (const F of s.factions) assert.ok(distance(x.at, s.systems[F.capital].at) >= SITES.fromCapital);
+  const yard = sites.find((x) => x.site === "shipyard"), way = sites.find((x) => x.site === "waystation");
+  const c0 = shipStats(s, me.id, "cruiser").cost;
+  yard.colony = { owner: me.id, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+  assert.ok(shipStats(s, me.id, "cruiser").cost < c0, "the ancient shipyard: cheaper ships");
+  const ally = s.factions[1]; me.relations[ally.id].allied = ally.relations[me.id].allied = true;
+  assert.equal(sitesFor(s, ally.id, "shipyard").length, 1, "shared with an ally");
+  if (way) { const f0 = fuelIncome(s, me.id); way.colony = { owner: me.id, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
+    assert.ok(fuelIncome(s, me.id) >= f0 + 3, "a waystation: fuel"); assert.ok(inSupplyAt(s, me.id, way.at), "and supply"); }
 });

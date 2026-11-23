@@ -1,7 +1,7 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { MINING, COUNTER, ROLES, DETECT, countersOf, counteredBy, SECTORS, COLLAPSE, INFLUENCE, SUPPLY, YARDS, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE, CRISIS } from "./data.js";
-import { seesFleet, cloaked, miningYields, miningIncome, fieldAt, newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { HOME, ADMIRAL_POWERS, OFFICERS, SITES, MINING, COUNTER, ROLES, DETECT, countersOf, counteredBy, SECTORS, COLLAPSE, INFLUENCE, SUPPLY, YARDS, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE, CRISIS } from "./data.js";
+import { territoryOf, territoryAt, powerOf, powerOn, powerWait, useAdmiralPower, officersOf, officerPool, assignOfficer, recallOfficer, siteSystems, sitesFor, seesFleet, cloaked, miningYields, miningIncome, fieldAt, newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, turnStops, damagedShips, repairPlace, sendForRepairs, giftRegard, giveGift, amendsCost, makeAmends, acceptHint, proposeSweetened, exactTribute, denounce, joinWarPrice, askJoinWar, engaged, setWithdraw, detachShips, canCrossSealed, beaconSites, buildBeacon, usesReserve, fuelStock, fuelCap, fuelIncome, burnCost, setBurn, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
@@ -156,20 +156,7 @@ function orderMove(hex) {
   save(); renderPanel(); renderSteps(); draw(); renderCoach();
 }
 
-function territory() {
-  // Each hex within 2 of a world belongs to the nearest one (ties: the bigger world).
-  const own = {};
-  for (const sys of Object.values(S.systems)) {
-    if (!sys.colony) continue;
-    const reach = sys.colony.kind === "colony" ? 2 : 1;
-    for (const k of within(sys.at, reach)) {
-      if (!S.hexes[k]) continue;
-      const d = distance(k, sys.at), cur = own[k];
-      if (!cur || d < cur.d) own[k] = { d, owner: sys.colony.owner };
-    }
-  }
-  return own;
-}
+function territory() { return territoryOf(S); }   // game.js: within 2 of a colony, 1 of an outpost (the Kel's old colonies farther)
 // ---------- music: tracks from the table server's dominion/ folder, by mood ----------
 // The mood follows the game: exploration in peacetime, war while you're at war with a power, crisis once the
 // Wardens are awake. A track's mood is its tracks.json "mood", or the first word of its file name ("war - 01.mp3");
@@ -397,6 +384,8 @@ function draw() {
     if (engineHeld(S) && engineHeld(S).sys === sys.id) { ctx.strokeStyle = "#ffd36b"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 9, 0, Math.PI * 2); ctx.stroke(); if (view.zoom > 0.45) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ENGINE", x, y - r - 16); ctx.textAlign = "left"; } }
     if ((sys.relic && sys.relicLost && me.explored[sys.at]) || Object.values(S.relics || {}).some((r) => r.at === sys.id)) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 12px system-ui, sans-serif"; ctx.fillText("♦", x - r - 11, y - r - 2); }
     if (sys.anomaly) { ctx.fillStyle = "#9fd8ff"; ctx.font = "bold 12px system-ui, sans-serif"; ctx.fillText("✦", x + r + 2, y + r + 9); }
+    if (sys.site) { ctx.beginPath(); ctx.arc(x, y, r + 5, 0, Math.PI * 2); ctx.strokeStyle = "rgba(240,200,90,.85)"; ctx.lineWidth = 1.6; ctx.setLineDash([2, 3]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "#f0c85a"; ctx.font = "bold 11px system-ui, sans-serif"; ctx.fillText({ shipyard: "⚒", listening: "◉", waystation: "⛽" }[sys.site] || "★", x - r - 13, y - r - 1); }
     if (sys.ruins) { ctx.fillStyle = "#ffd36b"; ctx.font = "bold 11px system-ui, sans-serif"; ctx.fillText("?", x - r - 10, y + 4); }
     if (view.zoom > 0.55) {
       ctx.font = `${sel && sel.id === sys.id ? "bold " : ""}11px system-ui, sans-serif`; ctx.textAlign = "center";
@@ -437,7 +426,7 @@ function draw() {
       // The fleet's outline: its biggest ship, pointing where it's going.
       const ring = sel && sel.id === f.id ? "#fff6b0" : war ? "#ff6b5b" : null;
       const to = f.path.length ? toPixel(f.path[0].hex, size) : null, angle = to ? Math.atan2(to.y - y, to.x - x) : 0;
-      if (cloaked(f)) ctx.globalAlpha = 0.5;   // cloaked: shown faded (yours, or one you've detected)
+      if (cloaked(f, S)) ctx.globalAlpha = 0.5;   // cloaked: shown faded (yours, or one you've detected)
       drawShip(ctx, flagship(f), fx, fy, angle, 0.62, colorOf(f.owner), ring, f.owner);
       ctx.globalAlpha = 1;
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
@@ -537,6 +526,8 @@ function systemHTML() {
   if (S.hexes[sys.at].sealed) h += `<p class="small ${canCrossSealed(S, me.id) ? "good" : "bad"}"><b>Sealed.</b> ${canCrossSealed(S, me.id) ? "Your Rift drives carry your ships in; no one else's can cross until a Rift beacon opens it." : `No ship of yours can cross into this sector: research Rift drives, or light a Rift beacon on a world of yours within ${SECTORS.beacon.range} hexes of it.`}</p>`;
   if (mine && beaconSites(S, me.id).some((o) => o.sys.id === sys.id)) { const B = SECTORS.beacon, ok = me.credits >= B.credits && me.exotics >= B.exotics;
     h += `<h3>Rift beacon</h3><p class="small muted" style="margin-top:-4px">A sealed sector lies within ${B.range} hexes. A beacon opens it to every power, with a corridor from here into it. You'd be first there, but not alone.</p><button class="btn" data-beacon ${ok ? "" : "disabled"}>Light a Rift beacon (${B.credits} credits, ${B.exotics} exotics)</button>`; }
+  if (sys.site) { const K = SITES.kinds[sys.site], who = sys.colony ? sys.colony.owner : null;
+    h += `<h3>Key site: ${esc(K.name)}</h3><p class="small ${who === me.id ? "good" : "muted"}" style="margin-top:-4px">${esc(K.text)} ${who === me.id ? "<b>It's yours.</b>" : who ? `Held by ${esc(faction(S, who).name)}${sitesFor(S, me.id, sys.site).includes(sys) ? " (your ally: you share it)" : ": take it, or ally with them"}.` : "No one holds it yet: claim it with a colony or an outpost."}</p>`; }
   if (sys.relic && sys.relicLost && me.explored[sys.at]) h += `<p class="small gold"><b>${esc(RELICS[sys.relic].name)}</b> lies in the ruins here: the first fleet to end its turn here recovers it.</p>`;
   if (mine && relicHeld(S, me.id, "shard")) { const r = S.relics.shard, ready = !r.ready || S.turn >= r.ready, tg = shardTargets(S, me.id, sys.id).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at));
     h += `<h3>The Gate Shard</h3>` + (ready ? (tg.length ? `<p class="small muted" style="margin-top:-4px">Open a new corridor from ${esc(sys.name)} to:</p><div class="opts">${tg.slice(0, 10).map((x) => `<button class="opt" data-shard="${x.id}"><b>${esc(x.name)}</b> <small>${distance(x.at, sys.at)} hexes</small></button>`).join("")}</div>` : `<p class="small muted">No explored system within 8 hexes left to link.</p>`) : `<p class="small muted">Spent until turn ${r.ready}.</p>`); }
@@ -621,7 +612,7 @@ function fleetHTML() {
   // What its warships are built to beat, and what beats them.
   const roles = [...new Set(f.ships.map((x) => x.type))].filter((t) => countersOf(t).length || (SHIPS[t].skill && counteredBy(t).length));
   if (roles.length) h += `<p class="small muted">${roles.map((t) => `<b>${esc(SHIPS[t].name)}s</b>${countersOf(t).length ? ` beat ${esc(countersOf(t).join(", "))}` : ""}${counteredBy(t).length ? `${countersOf(t).length ? "; " : " "}weak against ${esc(counteredBy(t).map((u) => SHIPS[u].name.toLowerCase() + "s").join(", "))}` : ""}.`).join(" ")}</p>`;
-  if (cloaked(f)) h += `<p class="small ${mine ? "muted" : "bad"}"><b>Cloaked.</b> ${mine ? "Other powers see it only close up: a world within a hex or so, a scout within " + DETECT.scout + ", other ships only in its own hex. It slips past enemy fleets, and strikes first in battle." : "You've detected it: it's close to one of your worlds, or a scout of yours has it in range."}</p>`;
+  if (cloaked(f, S)) h += `<p class="small ${mine ? "muted" : "bad"}"><b>Cloaked.</b> ${mine ? "Other powers see it only close up: a world within a hex or so, a scout within " + DETECT.scout + ", other ships only in its own hex. It slips past enemy fleets, and strikes first in battle." : "You've detected it: it's close to one of your worlds, or a scout of yours has it in range."}</p>`;
   else if (mine && f.ships.some((x) => SHIPS[x.type].cloak)) h += `<p class="small muted">Its stealth corvettes are cloaked, but the rest of the fleet isn't, so it's seen as usual. Detach them to sail unseen.</p>`;
   if (mine && f.ships.some((x) => SHIPS[x.type].mine)) {
     const fd = fieldAt(S, f.at), y = miningYields(S, me.id).find((x) => x.hex === f.at);
@@ -637,6 +628,18 @@ function fleetHTML() {
     h += `<div class="kv"><span>Fuel aboard</span><b>${cg} / ${max}</b>${bar(cg, max, "#6fb3d9")}</div><p class="small ${cut ? "bad" : "muted"}" style="margin-top:-4px">${f.path.length ? "On the move: it tops up this fleet's tank when it runs dry." : cut ? "<b>Cut:</b> enemy warships here, so it gives no supply. Clear them, or move it." : cg ? `<b>Supply point:</b> parked, it keeps your fleets within ${FUEL.tankerRange} hexes in supply${fed ? ` (${fed} fleet${fed === 1 ? "" : "s"} near it now)` : ""}, a unit of fuel each a turn.` : "Empty: bring it back within reach of a colony or a fuel depot to fill up."} Unarmed: keep it escorted.</p>`; }
   if (f.admiral) h += admiralCard(f.admiral, mine);
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.</p>` : "");
+  // Home ground, or deep in enemy space.
+  { const tr = territoryAt(S, f.at);
+    if (tr === me.id) h += `<p class="small good">In your territory: +${HOME.speed} move when it starts a turn here, and it mends ${HOME.mend} hull a turn.</p>`;
+    else if (tr && atWar(S, me.id, tr)) h += `<p class="small ${inSupply(S, f) ? "muted" : "bad"}">In ${esc(faction(S, tr).name)}'s territory${inSupply(S, f) ? ", but in your supply: it fights as well as at home." : `, out of your supply: −${HOME.deep} to hit in battle here. A tanker or depot nearby puts it back in supply.`}</p>`; }
+  // The admiral's power.
+  if (f.admiral) { const P = ADMIRAL_POWERS[powerOf(f.admiral)], w = powerWait(S, f), on = powerOn(S, f, powerOf(f.admiral));
+    h += `<div class="card-sub"><p class="small"><b>${esc(P.name)}</b> (${esc(f.admiral.name)}'s power): ${esc(P.text)} <span class="muted">Ready again ${P.every} turns after use.</span></p>
+      <div class="btn-row"><button class="btn small ${w ? "" : "primary"}" data-power ${w || on ? "disabled" : ""}>${on ? "In use this turn" : w ? `Ready in ${w} turn${w === 1 ? "" : "s"}` : `Use: ${esc(P.name)}`}</button></div></div>`; }
+  // Officers aboard, and those waiting in the pool.
+  { const aboard = officersOf(f), pool = officerPool(S, me.id);
+    if (aboard.length || pool.length) h += `<h3>Officers (${aboard.length} of ${OFFICERS.slots})</h3><ul class="mem small">${aboard.map((o) => `<li><b>${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}:</b> ${esc(OFFICERS.kinds[o.kind].text)} <button class="linkish" data-recall="${o.id}">Recall to the pool</button></li>`).join("")}</ul>
+      ${aboard.length < OFFICERS.slots && pool.length ? `<p class="small muted" style="margin:4px 0">Waiting in your pool:</p>${pool.map((o) => `<button class="row" data-officer="${o.id}">${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}<span class="small muted"> · ${esc(OFFICERS.kinds[o.kind].text)}</span></button>`).join("")}` : ""}`; }
   const reserve = me.reserve || [];
   if (armed(f)) h += f.admiral ? `<div class="btn-row"><button class="btn small" data-relieve>Send ${esc(f.admiral.name)} to the reserve</button></div>`
     : reserve.length ? `<h3>Give it an admiral</h3>${reserve.map((a) => `<button class="row" data-assign="${a.id}">${esc(admTitle(a))}<span class="small muted"> · ${a.wins} win${a.wins === 1 ? "" : "s"}${a.traits.length ? " · " + a.traits.map((t) => ADMIRAL_TRAITS[t].name).join(", ") : ""}</span></button>`).join("")}`
@@ -802,6 +805,13 @@ function sectorsHTML() {
     ${!c.coming && c.next !== null ? `<p class="small muted">The map grows as the game goes on: the ${c.opened.length ? "next" : "first"} new sector opens around turn ${c.next}, and every power hears what kind ${SECTORS.warn} turns ahead.</p>` : ""}</div>`;
 }
 /** Call a coalition against the Wardens: the target, who would come (free, for credits, or not), and the call. */
+/** The assault on the Heart: each power's share of the damage so far, and so of the prize when it breaks. */
+function assaultHTML() {
+  const A = S.crisis && S.crisis.assault, P = CRISIS.assault, total = A ? Object.values(A).reduce((t, n) => t + n, 0) : 0;
+  const rows = total ? Object.entries(A).sort((a, b) => b[1] - a[1]) : [];
+  return `<div class="card-sub"><p class="small"><b>The assault on the Heart.</b> When it breaks, ${P.credits} credits, ${P.research} research and ${P.exotics} exotics are shared by every power that damaged it or the Nodes shielding it, by its share of the damage (under ${Math.round(P.min * 100)}% gets nothing). The last blow adds ${P.lastBlow} exotics.</p>
+    ${rows.length ? `<ul class="mem small">${rows.map(([fid, n]) => `<li><b style="color:${faction(S, fid).color}">${esc(faction(S, fid).name)}</b>: ${Math.round((n / total) * 100)}%</li>`).join("")}</ul>` : `<p class="small muted">No one has struck it yet.</p>`}</div>`;
+}
 function coalitionHTML() {
   const me = player(S), K = S.crisis, A = K && K.coalition, CO = CRISIS.coalition;
   if (A && !A.done && A.until > S.turn) {
@@ -845,7 +855,7 @@ function crisisHTML() {
     ${c.returns ? `<span>Returned</span><span class="bad">${c.returns} time${c.returns === 1 ? "" : "s"}: this Heart is stronger than the last</span>` : ""}
     <span>Truce</span><span>${c.truce ? "Holding: no power starts a new war while the Heart lives" : "None: wars go on"}</span></div>
     <ol class="steps-list">${stepLi("now", "Keep their waves off your worlds: a world with guns or warships in orbit can't be burned, only fought over")}${stepLi("", `Break the Heart: its guard must fall before it can be hit, it mends ${2 * (S.crisis.m || 1)} hull a turn, and it fires ${1 + (S.crisis.m || 1)} times a round`)}</ol>
-    ${coalitionHTML()}${table}
+    ${coalitionHTML()}${assaultHTML()}${table}
     <p class="small" style="margin-top:6px"><b class="good">Reward:</b> score for every machine destroyed; breaking the Heart is worth 30 more, and its wreck.</p></div>`;
 }
 /** The Mission tab: the directives under way (progress, deadline, reward), the backlog, and past directives. */
@@ -936,12 +946,26 @@ function relicsHTML() {
   if (lost.length) h += `<p class="small">${lost.map((x) => `${esc(RELICS[x.relic].name)} lies in the ruins of ${esc(x.name)}`).join("; ")}: the first fleet there recovers it.</p>`;
   return h;
 }
+/** Key sites: who holds each one you know of. */
+function sitesHTML() {
+  const me = player(S), list = siteSystems(S).filter((x) => me.explored[x.at]); if (!list.length) return "";
+  return `<h3>Key sites</h3><ul class="mem small">${list.map((x) => { const K = SITES.kinds[x.site], who = x.colony ? x.colony.owner : null, ours = sitesFor(S, me.id, x.site).includes(x);
+    return `<li><button class="linkish" data-selsys="${x.id}">${esc(x.name)}</button>: <b>${esc(K.name)}</b>, ${who ? (who === me.id ? "<span class=\"good\">yours</span>" : `held by ${esc(faction(S, who).name)}${ours ? " (shared with you)" : ""}`) : "unclaimed"}. <span class="muted">${esc(K.text)}</span></li>`; }).join("")}</ul>`;
+}
+/** Officers: aboard which fleets, and who's waiting in the pool. */
+function officersHTML() {
+  const me = player(S), pool = officerPool(S, me.id), aboard = fleetsOf(S, me.id).flatMap((f) => officersOf(f).map((o) => ({ o, f })));
+  if (!pool.length && !aboard.length) return "";
+  return `<h3>Officers</h3><p class="small muted" style="margin-top:-4px">Up to ${OFFICERS.slots} a fleet: assign them from a fleet's panel. New ones come from anomalies, ruins, captured worlds and burned pirate havens.</p><ul class="mem small">
+    ${aboard.map(({ o, f }) => `<li><b>${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}</b>, aboard <button class="linkish" data-selfleet="${f.id}">${esc(fleetName(f))}</button></li>`).join("")}
+    ${pool.map((o) => `<li><b>${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}</b>, <span class="muted">waiting in the pool: ${esc(OFFICERS.kinds[o.kind].text)}</span></li>`).join("")}</ul>`;
+}
 function empireHTML() {
   const me = player(S), t = totals(S, me.id);
   const cols = coloniesOf(S, me.id).sort((a, b) => (b.colony.pop || 0) - (a.colony.pop || 0));
   let h = `<h2>${esc(me.name)}</h2><p class="small muted">${esc(FACTIONS.find((f) => f.id === me.id).trait)}: ${esc(FACTIONS.find((f) => f.id === me.id).traitText)}</p>
     <div class="yields"><span>Income <b>${fmt(t.cr)}</b></span><span>Upkeep <b>${fmt(t.upkeep)}</b></span><span>Score <b>${score(S, me.id)}</b></span><span>Fleet power <b>${militaryPower(S, me.id)}</b></span></div>
-    ${focusHTML()}${relicsHTML()}${musterHTML()}${marketHTML()}${protosHTML()}
+    ${focusHTML()}${relicsHTML()}${sitesHTML()}${officersHTML()}${musterHTML()}${marketHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})</h3><table class="tbl"><tr><th>World</th><th>Pop</th><th>Ind</th><th>Sci</th><th>Building</th></tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)</i>" : ""}</td><td>${sys.colony.pop || "–"}</td><td>${fmt(y.ind)}</td><td>${fmt(y.sci)}</td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}</td></tr>`; }).join("")}</table>
     ${fleetListHTML(me)}
@@ -1133,6 +1157,9 @@ function bindChrome() {
     if (d.focus) { const r = setFocus(S, me.id, d.focus, +d.n); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.assign) { const r = assignAdmiral(S, sel.id, d.assign); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.relieve !== undefined) { relieveAdmiral(S, sel.id); save(); renderAll(); return; }
+    if (d.power !== undefined) { const r = useAdmiralPower(S, sel.id); if (r.error) toast(r.error, true); else toast(`${ADMIRAL_POWERS[r.id].name}: ${ADMIRAL_POWERS[r.id].text}`); save(); renderAll(); return; }
+    if (d.officer) { const r = assignOfficer(S, sel.id, d.officer); if (r.error) toast(r.error, true); save(); renderAll(); return; }
+    if (d.recall) { const r = recallOfficer(S, sel.id, d.recall); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
     if (d.center) { centerOn(d.center); draw(); return; }
@@ -1590,6 +1617,11 @@ function showHelp(back) {
       <li><b>Ship counters:</b> every warship is built to beat one kind of ship, and aims for it first with +${COUNTER.bonus} to hit. <b>Frigates</b> beat scouts, torpedo boats and stealth corvettes; <b>cruisers</b> beat frigates; <b>dreadnoughts</b> beat cruisers and orbital guns; <b>torpedo boats</b> (Heavy hulls) beat dreadnoughts and the biggest hulls, with double damage; <b>stealth corvettes</b> prey on unarmed ships. A mixed fleet covers its weaknesses. Hover a ship in a build queue to see what it beats and what beats it.</li>
       <li><b>Cloaking:</b> with Phase cloaks you can build <b>stealth corvettes</b>. A fleet of nothing but corvettes is invisible to other powers except within their detection range: ${DETECT.world} hex from their worlds (more with stations, Deep sensors or Resonance arrays), ${DETECT.scout} from their scouts, and only the same hex for other ships. It slips past enemy fleets without stopping, and gets +${DETECT.ambush} to hit on its first shot. <b>Warden probes are cloaked too:</b> keep scouts out to see them coming. Your own cloaked fleets show faded on the map.</li>
       <li><b>Space mining:</b> asteroid fields (credits), gas clouds (fuel) and crystal drifts (exotics) lie in open space between the systems. Build a <b>mining ship</b> and park it on one: it mines every turn it isn't moving and no enemy warships are there (up to ${MINING.perField} of your ships a field; half as much again with a deep-space station of yours within ${MINING.stationRange} hexes). Fields run dry. Click one for what's left. Pirates hunt mining ships, so guard them.</li>
+      <li><b>Home territory</b> (the tinted hexes round your worlds): a fleet that starts its turn there moves ${HOME.speed} farther, and ships there mend ${HOME.mend} hull a turn. Fighting in an enemy's territory, out of your own supply, costs −${HOME.deep} to hit: bring a tanker, or build a depot. The Kel's colonies reach a hex farther once they're ${HOME.kelAge} turns old.</li>
+      <li><b>Admirals' powers:</b> each admiral has one, used from the fleet's panel, then ready again some turns later: <b>Emergency jump</b> (2 farther this turn, even out of a battle), <b>Overcharge the guns</b> (+2 to hit this turn), <b>Damage-control drill</b> (every ship mends 2 at once) or <b>Run silent</b> (cloaked this turn).</li>
+      <li><b>Officers:</b> a fleet carries up to ${OFFICERS.slots}: a chief engineer (mends 1 a turn anywhere), a tactical officer (+1 to hit in the first exchange), a science officer (+2 sensors, finds cloaked ships 2 hexes out) or a navigator (+3 fuel, burning hard costs half). You start with one; more come from anomalies, ruins, captured worlds and burned pirate havens. Assign them from a fleet's panel; they're lost if the fleet is destroyed.</li>
+      <li><b>Key sites</b> (a gold dashed ring on the map): an <b>Ancient shipyard</b> (ships 10% cheaper), a <b>Listening post</b> (see everything within 5 hexes, cloaked ships too) or an <b>Old waystation</b> (a fuel depot and 3 fuel a turn). Whoever holds the system has it, and so do their allies. The Empire tab lists the ones you know.</li>
+      <li><b>The assault on the Heart:</b> when the Heart of the Wardens breaks, a prize of ${CRISIS.assault.credits} credits, ${CRISIS.assault.research} research and ${CRISIS.assault.exotics} exotics is shared by every power that damaged it (or the Nodes shielding it), by its share of the damage. The Wardens card shows the shares so far.</li>
       <li><b>Engaged:</b> a fleet sharing a hex with enemy warships (or an enemy world's guns) is engaged. It can't simply sail away. Press <b>Withdraw</b>: it fights the next battle's first exchange defensively, then pulls back toward your nearest world.</li>
       <li><b>Repairs:</b> a fleet with damaged ships shows where best to mend them (a drydock repairs everything at once, a station ${YARDS.station} hull a turn, any other world of yours 1) and how long it takes. <b>Send for repairs</b> splits off the damaged ships and sends them, withdrawing them from a battle first. <b>Repair, then rejoin this fleet</b> brings them back once they're whole.</li>
       <li><b>Detach and send:</b> on a fleet's panel, choose how many of each ship to take, then click where to send them (a world, or an enemy fleet). The soundest ships go and the admiral stays. In a battle you can detach some ships and withdraw just those. <b>Split off by type</b> does the same for one type at a time, most damaged first.</li>

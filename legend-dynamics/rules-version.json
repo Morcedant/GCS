@@ -6,6 +6,19 @@
     {
       "date": "2026-11-23",
       "kind": "site",
+      "title": "Dominion: home territory, admirals' powers, officers, key sites and the assault on the Heart",
+      "items": [
+        "Home territory: fleets that start a turn in your territory move 1 farther and mend 1 hull a turn; fighting in an enemy's territory out of your supply costs −1 to hit. The Kel's old colonies reach farther.",
+        "Admirals' powers: each admiral has one (Emergency jump, Overcharge the guns, Damage-control drill or Run silent), used from the fleet's panel, then ready again some turns later.",
+        "Officers: up to two a fleet (chief engineer, tactical, science, navigator), from anomalies, ruins, captured worlds and burned pirate havens.",
+        "Key sites: Ancient shipyards, Listening posts and Old waystations, whose holder and allies share the bonus.",
+        "The assault on the Heart: when it breaks, its prize is shared by every power that damaged it, by its share of the damage.",
+        "Computer players use their admirals' powers, assign officers, and go after key sites."
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "kind": "site",
       "title": "Dominion: ship counters, cloaking and space mining",
       "items": [
         "Ship counters: every warship is built to beat one kind of ship and aims for it first (+2 to hit). Frigates beat scouts, torpedo boats and stealth corvettes; cruisers beat frigates; dreadnoughts beat cruisers and orbital guns; the new torpedo boats (Heavy hulls) beat dreadnoughts with double damage.",

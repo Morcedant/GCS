@@ -2,8 +2,8 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors, hexLine, makeRng } from "./hex.js";
 import { wardenIntel, shareIntel } from "./crisis.js";
-import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE, ROLES, COUNTER, MINING } from "./data.js";
-import { seesFleet, cloaked, miningYields, findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE, ROLES, COUNTER, MINING, OFFICERS } from "./data.js";
+import { seesFleet, cloaked, miningYields, powerOf, powerWait, useAdmiralPower, officerPool, officersOf, assignOfficer, territoryAt, findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, sendForRepairs, repairPlace, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
 
 const PRIORITY = {
@@ -234,7 +234,7 @@ function settleTargets(s, F, kind) {
     .map((sys) => {
       const d = Math.min(...cols.map((c) => distance(c.at, sys.at)));
       const w = WORLDS[sys.world];
-      const value = kind === "colony" ? (w.pop + sys.size * 2) * sys.rich + (sys.exotics ? 3 : 0) : (sys.exotics ? 6 : 1) + (w.outpostOnly ? 1 : 0);
+      const value = (kind === "colony" ? (w.pop + sys.size * 2) * sys.rich + (sys.exotics ? 3 : 0) : (sys.exotics ? 6 : 1) + (w.outpostOnly ? 1 : 0)) + (sys.site ? 6 : 0);   // a key site is worth a detour
       return { sys, score: value / (1 + d / 3), d };
     }).filter((x) => x.d <= 14).sort((a, b) => b.score - a.score);
 }
@@ -348,6 +348,8 @@ function fleets(s, F) {
   }
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const cap = s.systems[F.capital];
+  // Officers in the pool join the biggest war fleets with room for them.
+  for (const o of [...officerPool(s, F.id)]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && officersOf(x).length < OFFICERS.slots).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignOfficer(s, f.id, o.id); }
   // Admirals in reserve take the biggest war fleets that have none.
   for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
@@ -356,6 +358,11 @@ function fleets(s, F) {
     // Answering a coalition against the Wardens: to the target, and hold there (no withdrawing) until it falls.
     const A = s.crisis && s.crisis.coalition;
     if (f.coalition && A && !A.done && A.from === f.coalition) { if (f.at !== A.at && (!f.path.length || f.dest !== A.at)) setDestination(s, f.id, A.at); continue; }
+    // An admiral's power, when it counts: overcharged guns in a battle, a damage-control drill when badly hurt.
+    if (f.admiral && powerWait(s, f) === 0) {
+      const p = powerOf(f.admiral), hurt = f.ships.reduce((t, x) => t + x.hull, 0) < f.ships.reduce((t, x) => t + shipStats(s, F.id, x.type, x).hull, 0) * 0.7;
+      if ((p === "overcharge" && engaged(s, f)) || (p === "rally" && hurt)) useAdmiralPower(s, f.id);
+    }
     // Engaged and clearly losing: withdraw (it fights the first exchange, then pulls back), rather than die there.
     if (engaged(s, f)) {
       const pw = (fl) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? x.hull * SHIPS[x.type].dmg * (SHIPS[x.type].shots || 1) : 0), 0);
@@ -436,7 +443,7 @@ function fleets(s, F) {
       const relief = coloniesOf(s, F.id).filter((sys) => besieged(s, sys)).map((sys) => ({ sys, d: distance(f.at, sys.at),
         foe: fleetsAt(s, sys.at).filter((g) => armed(g) && atWar(s, g.owner, F.id)).reduce((t, g) => t + g.ships.reduce((u, x) => u + (SHIPS[x.type].skill ? x.hull : 0), 0), 0) }))
         .filter((x) => x.foe <= mineHull * 1.2).sort((a, b) => a.d - b.d)[0];
-      if (relief) { if (relief.sys.at !== f.at && setDestination(s, f.id, relief.sys.at).ok && usesReserve(F.id) && fuelStock(s, F.id) > fuelCap(s, F.id) / 2) f.burn = true; continue; }   // burn hard to the rescue while the reserve allows
+      if (relief) { if (relief.sys.at !== f.at && setDestination(s, f.id, relief.sys.at).ok) { if (usesReserve(F.id) && fuelStock(s, F.id) > fuelCap(s, F.id) / 2) f.burn = true; if (f.admiral && powerWait(s, f) === 0 && powerOf(f.admiral) === "jump") useAdmiralPower(s, f.id); } continue; }   // burn hard to the rescue while the reserve allows
       // Badly damaged ships off for repairs (then back to this fleet), when a yard is near and nothing urgent is on.
       if (repairNow(s, F, f, enemies)) continue;
       // Out of date: to the nearest drydock, for a refit with what's been researched since these ships were built
@@ -451,7 +458,7 @@ function fleets(s, F) {
           .map((sys) => ({ sys, d: distance(f.at, sys.at), guard: fleetsAt(s, sys.at).filter((g) => g.owner === sys.colony.owner).reduce((t, g) => t + g.ships.length * 2, 0) + (sys.colony.defense || 0) }))
           .filter((x) => x.guard <= mine * (engineHeld(s) && engineHeld(s).sys === x.sys.id ? 2 : 1.3))
           // A rival's Corridor Engine (an open game) draws every war fleet: it counts as five hexes nearer.
-          .map((x) => (engineHeld(s) && engineHeld(s).sys === x.sys.id ? { ...x, d: x.d - 5 } : x))
+          .map((x) => (engineHeld(s) && engineHeld(s).sys === x.sys.id ? { ...x, d: x.d - 5 } : x.sys.site ? { ...x, d: x.d - 3 } : x))   // and a key site, three nearer
           // Within reach on its fuel: a target beyond supply no farther than its tank carries it.
           .filter((x) => inSupplyAt(s, F.id, x.sys.at) || fuelOf(s, f) === Infinity || Math.min(...supplySources(s, F.id).map((c) => distance(c.at, x.sys.at))) - supplyRange(s, F.id) <= fuelOf(s, f) * fleetSpeed(s, f))
           .sort((a, b) => a.d - b.d);
