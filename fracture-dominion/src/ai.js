@@ -1,6 +1,7 @@
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors, hexLine, makeRng } from "./hex.js";
+import { wardenIntel, shareIntel } from "./crisis.js";
 import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE } from "./data.js";
 import { findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, sendForRepairs, repairPlace, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
@@ -27,6 +28,7 @@ export function aiTurn(s, F) {
   outposts(s, F);
   diplomacy(s, F, diff);
   influence(s, F);
+  shareWardenIntel(s, F);
   production(s, F, diff);
   fleets(s, F);
 }
@@ -107,6 +109,15 @@ function relics(s, F) {
   const mineIds = new Set(coloniesOf(s, F.id).map((x) => x.id));
   const t = shardTargets(s, F.id, cap.id).filter((x) => mineIds.has(x.id)).sort((a, b) => distance(b.at, cap.at) - distance(a.at, cap.at))[0];
   if (t) useRelic(s, F.id, "shard", { from: cap.id, to: t.id });
+}
+/** Every few turns, while the Wardens are about: tell the powers it likes (and its allies) what it knows of them. */
+function shareWardenIntel(s, F) {
+  if (!s.crisis || s.turn - (F.lastIntel || -99) < 4) return;
+  for (const O of s.factions) {
+    if (!O.alive || O.id === F.id || !F.met[O.id] || atWar(s, F.id, O.id)) continue;
+    const r = F.relations[O.id]; if (!(r.allied || r.score >= 5)) continue;
+    if (wardenIntel(s, F.id, O.id).length && shareIntel(s, F.id, O.id).ok) F.lastIntel = s.turn;
+  }
 }
 /**
  * Influence (the "influence" option): at most one move every INFLUENCE.ai.every turns, by its people's leanings. A power

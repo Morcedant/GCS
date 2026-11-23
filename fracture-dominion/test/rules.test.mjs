@@ -1557,3 +1557,19 @@ test("Warden intelligence: what you've learned can be shared with each power onc
   assert.ok(shareIntel(s, me.id, A.id).ok); assert.ok(s.crisis.decoded[A.id]);
   assert.equal(wardenIntel(s, me.id, A.id).length, 0, "everything told");
 });
+
+test("computer players share what they know of the Wardens with the powers they like, the player included", async () => {
+  const { crisisTurn } = await import("../src/crisis.js");
+  const { aiTurn } = await import("../src/ai.js");
+  const { CRISIS } = await import("../src/data.js");
+  const s = newGame({ seed: 41, size: "medium", player: "concord", rivals: 2, wilds: "none" });
+  const me = s.factions[0], A = s.factions[1], B = s.factions[2];
+  for (const [x, y] of [[me, A], [me, B], [A, B]]) { x.met[y.id] = y.met[x.id] = true; }
+  crisisTurn(s); s.turn = s.crisis.at - CRISIS.signsLead; crisisTurn(s); s.turn += 15;
+  s.crisis.sawProbe = { [A.id]: s.turn };
+  A.relations[me.id].score = 20; A.relations[B.id].score = -20;   // likes us, not B
+  aiTurn(s, A);
+  assert.ok(s.log.some((l) => l.fid === me.id && /told you what they know of the Wardens/.test(l.text)), "it told us");
+  assert.ok(!(s.crisis.aiShares || []).some((x) => x.from === A.id && x.to === B.id), "not the one it dislikes");
+  assert.ok(me.relations[A.id] && (me.relations[A.id].memory || []).some((m) => /Wardens/.test(m.text)), "remembered");
+});

@@ -132,6 +132,9 @@ function probesTurn(s, R) {
     for (const x of next.slice(0, 3)) { for (const k of beside(x)) if (setDestination(s, f.id, k).ok) { p.target = x.id; went = true; break; } if (went) break; }
     if (!went) { p.seen.push("none"); setDestination(s, f.id, p.home); }
   }
+  // Who has seen a probe (what they can tell others).
+  C.sawProbe = C.sawProbe || {};
+  for (const F of crAlive(s)) if (!C.sawProbe[F.id] && probes(s).some((f) => F.visible[f.at])) C.sawProbe[F.id] = s.turn;
   // The first probe the player sees: a choice about what to do with them.
   if (!C.probeEvent && !s.galEvent && probes(s).some((f) => me.visible[f.at])) { C.probeEvent = s.turn; s.galEvent = { id: "probes", ctx: {}, turn: s.turn }; }
   // Later, one of them will stop at a world of the player's and speak.
@@ -510,7 +513,7 @@ export function wardenIntel(s, fid, to) {
   if (!["quiet", "stirring", "awake", "dormant"].includes(C.stage) || (C.stage === "quiet" && !C.signs)) return [];
   const done = ((C.shared || {})[fid] || {})[to] || [], out = [];
   const add = (id, name, text, regard) => { if (!done.includes(id)) out.push({ id, name, text, regard }); };
-  if (C.probeEvent || probes(s).some((f) => F.visible[f.at])) add("probes", "The probes", "What the probes are, and that only warships can catch them: they'll hunt them harder.", 5);
+  if ((C.sawProbe && C.sawProbe[fid]) || (fid === crMe(s).id && C.probeEvent) || probes(s).some((f) => F.visible[f.at])) add("probes", "The probes", "What the probes are, and that only warships can catch them: they'll hunt them harder.", 5);
   if (C.stage !== "quiet" || (C.signs && s.turn - C.signs >= 14)) add("signal", "The signal", `What the signal from the rifts means: the Wardens are waking${C.stage === "quiet" || C.stage === "stirring" ? `, around turn ${C.at}` : ""}. A truce will come easier.`, 5);
   const scanned = coloniesOf(s, to).filter((x) => x.colony.scanned && F.explored[x.at]);
   if (scanned.length && ["quiet", "stirring"].includes(C.stage)) add("scans", "Their scanned worlds", `That the probes scanned ${scanned.slice(0, 3).map((x) => x.name).join(", ")}${scanned.length > 3 ? "…" : ""}: the Wardens' first targets.`, Math.min(9, 3 * scanned.length));
@@ -533,5 +536,7 @@ export function shareIntel(s, fid, to, id = "all") {
   }
   remember(s, to, fid, `shared what they knew of the Wardens (${items.map((x) => x.name.toLowerCase()).join(", ")})`, regard);
   if (!F.ai) log(s, fid, `You told ${T.name} what you know of the Wardens: ${items.map((x) => x.name.toLowerCase()).join(", ")}. Their regard for you rises ${regard}.`, "diplo");
+  if (!T.ai) log(s, to, `${F.name} told you what they know of the Wardens: ${items.map((x) => x.name.toLowerCase()).join(", ")}.${items.some((x) => x.id === "decoded") ? " Your warships now hit the Wardens at +1." : ""}${items.some((x) => x.id === "heart") ? " Where the Heart will rise is marked on your map." : ""}`, "diplo");
+  if (F.ai && T.ai) (C.aiShares = C.aiShares || []).push({ turn: s.turn, from: fid, to, items: items.map((x) => x.id) });
   return { ok: true, items: items.length, regard };
 }
