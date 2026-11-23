@@ -236,7 +236,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-23 23:38 UTC";
+const BUILD = "2026-11-23 23:41 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -824,17 +824,6 @@ const ADMIRAL_POWERS = {
   ghost: { name: "Run silent", every: 10, text: "This turn the whole fleet is cloaked: unseen outside detection range, and it slips past enemy fleets." },
 };
 
-// Officers: specialists a fleet carries (up to `slots`), from anomalies, ruins, captured worlds and burned pirate havens.
-// Unassigned officers wait in the empire's pool; an officer is lost if the fleet is destroyed.
-const OFFICERS = { slots: 2, odds: { anomaly: 0.35, ruins: 0.5 },
-  kinds: {
-    engineer: { name: "Chief engineer", text: "The fleet mends 1 hull a turn, anywhere." },
-    tactical: { name: "Tactical officer", text: "+1 to hit in the first exchange of every battle." },
-    science: { name: "Science officer", text: "+2 sensor range, and the fleet detects cloaked ships 2 hexes out." },
-    navigator: { name: "Navigator", text: "+3 turns of fuel in the tank, and burning hard costs half." },
-  },
-  names: ["Okafor", "Vasquez", "Tal", "Ishida", "Brann", "Moreau", "Quell", "Adeyemi", "Sorensen", "Ruiz", "Halloran", "Nakamura", "Ferro", "Lindqvist", "Abara", "Petrov", "Ochoa", "Reyes", "Ivanova", "Mbeki", "Castellan", "Dunmore", "Sato", "Varga"] };
-
 // Key sites: special systems worth fighting over. Whoever holds the system (a colony or an outpost) has the bonus, and
 // so do their allies. About one in `per` systems, at least `min`, away from the capitals.
 const SITES = { per: 18, min: 2, fromCapital: 4, apart: 6,
@@ -1369,7 +1358,6 @@ function newGame(opts) {
   placeRelics(state);
   placeFields(state);
   placeSites(state);
-  for (const F of state.factions) gainOfficer(state, F.id, "on your staff from the start", null, "engineer");
   for (const f of state.factions) updateVision(state, f);
   log(state, null, "The corridors are open. Turn 1.");
   return state;
@@ -1553,7 +1541,7 @@ function drawCargo(f) {
 function inSupply(s, f) { return inSupplyAt(s, f.owner, f.at); }   // living hulls (the Vael) feed themselves
 // ---- fuel ----
 /** A fleet's fuel tank: its thirstiest ship's, in turns of travel beyond supply (living hulls and Warden machines need none). */
-const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) || f.owner === "traders" ? Infinity : Math.min(...f.ships.map((x) => (SHIPS[x.type].fuel || 99) + 2 * (fitOf(s, f.owner, x).tanks || 0))) + (hasOfficer(f, "navigator") ? 3 : 0));
+const fuelMax = (s, f) => (f.owner === "vael" || isWild(f.owner) || f.owner === "traders" ? Infinity : Math.min(...f.ships.map((x) => (SHIPS[x.type].fuel || 99) + 2 * (fitOf(s, f.owner, x).tanks || 0))));
 const fuelOf = (s, f) => Math.min(fuelMax(s, f), f.fuel ?? fuelMax(s, f));
 // ---- the fuel reserve ----
 /** Who keeps a fuel reserve: every power but the Vael (living hulls), the wild things and the traders. */
@@ -1592,7 +1580,7 @@ function refuel(s, f) {
   if (units < miss) f.dry = s.turn; else delete f.dry;
 }
 /** Burn hard: the fleet moves FUEL.burnSpeed farther each turn until it arrives, at a cost in fuel. */
-const burnCost = (s, f) => round1(f.ships.length * FUEL.burnPer * (hasOfficer(f, "navigator") ? 0.5 : 1));
+const burnCost = (s, f) => round1(f.ships.length * FUEL.burnPer);
 function setBurn(s, fleetId, on) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
   if (!usesReserve(f.owner)) return { error: "Living hulls swim at their own pace: they can't be pushed." };
@@ -1713,8 +1701,6 @@ function makeAdmiral(s, fid, R) {
 }
 /** Two fleets join: the more seasoned admiral commands; the other goes to the reserve. */
 function joinAdmirals(s, into, from) {
-  // Officers come aboard the joined fleet, as many as it has room for; the rest go back to the pool.
-  if (officersOf(from).length) { const all = [...officersOf(into), ...officersOf(from)]; into.officers = all.slice(0, OFFICERS.slots); officerPool(s, into.owner).push(...all.slice(OFFICERS.slots)); from.officers = []; }
   if (!from.admiral) return;
   if (!into.admiral) { into.admiral = from.admiral; return; }
   const [keep, spare] = into.admiral.wins >= from.admiral.wins ? [into.admiral, from.admiral] : [from.admiral, into.admiral];
@@ -1723,7 +1709,6 @@ function joinAdmirals(s, into, from) {
 /** A fleet that's no longer needed (used up, scrapped): its admiral goes to the reserve. */
 function dropFleet(s, f) {
   if (f.admiral) { const F = faction(s, f.owner); if (F) (F.reserve = F.reserve || []).push(f.admiral); }
-  if (officersOf(f).length && faction(s, f.owner)) officerPool(s, f.owner).push(...f.officers);
   delete s.fleets[f.id];
 }
 function assignAdmiral(s, fleetId, admId) {
@@ -1826,32 +1811,6 @@ function useAdmiralPower(s, fleetId) {
   if (id === "rally") for (const x of f.ships) x.hull = Math.min(shipStats(s, f.owner, x.type, x).hull, x.hull + 2);
   if (!faction(s, f.owner).ai) log(s, f.owner, `${admTitle(f.admiral)}: ${P.name}. ${P.text}`, "war");
   return { ok: true, id };
-}
-// ---- officers ----
-const officersOf = (f) => (f && f.officers) || [];
-const hasOfficer = (f, kind) => !!(f && f.officers && f.officers.some((o) => o.kind === kind));
-const officerPool = (s, fid) => { const F = faction(s, fid); return (F && (F.officers = F.officers || [])) || []; };
-/** A new officer joins a power's pool (why: "from the ruins at X", ...). kind: one of OFFICERS.kinds, or picked by R. */
-function gainOfficer(s, fid, why, R, kind) {
-  const F = faction(s, fid); if (!F || !s.factions.includes(F)) return null;
-  const kinds = Object.keys(OFFICERS.kinds), r = R || makeRng("officer:" + s.seed + ":" + s.turn + ":" + fid + ":" + (F.officersGot || 0));
-  kind = kind || kinds[r.int(kinds.length)];
-  const used = new Set([...officerPool(s, fid), ...fleetsOf(s, fid).flatMap(officersOf)].map((o) => o.name)), free = OFFICERS.names.filter((n) => !used.has(n));
-  const o = { id: "o" + s.nextId++, kind, name: free.length ? free[r.int(free.length)] : OFFICERS.names[r.int(OFFICERS.names.length)] };
-  F.officersGot = (F.officersGot || 0) + 1; officerPool(s, fid).push(o);
-  if (!F.ai) log(s, fid, `A new officer: ${OFFICERS.kinds[kind].name} ${o.name}, ${why}. ${OFFICERS.kinds[kind].text} Assign them to a fleet from its panel.`, "build");
-  return o;
-}
-function assignOfficer(s, fleetId, offId) {
-  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
-  const pool = officerPool(s, f.owner), i = pool.findIndex((o) => o.id === offId); if (i < 0) return { error: "No such officer in the pool." };
-  if (officersOf(f).length >= OFFICERS.slots) return { error: `A fleet has room for ${OFFICERS.slots} officers.` };
-  (f.officers = f.officers || []).push(pool.splice(i, 1)[0]); return { ok: true };
-}
-function recallOfficer(s, fleetId, offId) {
-  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
-  const i = officersOf(f).findIndex((o) => o.id === offId); if (i < 0) return { error: "No such officer aboard." };
-  officerPool(s, f.owner).push(f.officers.splice(i, 1)[0]); return { ok: true };
 }
 // ---- key sites ----
 /** Mark a few systems as key sites, away from the capitals and from each other. */
@@ -2475,7 +2434,6 @@ function capture(s, sys, by) {
   faction(s, by).stats.taken = (faction(s, by).stats.taken || 0) + 1;
   remember(s, was, by, `took ${sys.name} from us`, -15);
   sys.colony.owner = by; sys.colony.capital = false; sys.colony.queue = []; sys.colony.stock = 0;
-  if (sys.colony.kind === "colony") gainOfficer(s, by, `who came over to you when ${sys.name} fell`);
   // A signature technology's hub: whoever takes it learns the technology.
   for (const [b, on] of Object.entries(sys.colony.buildings)) {
     const tech = on && BUILDINGS[b] && BUILDINGS[b].hub; if (!tech || has(s, by, tech)) continue;
@@ -2568,7 +2526,7 @@ function battles(s) {
         const ctr = beats.includes(roleOf(t)) ? COUNTER.bonus : 0, ambush = round === 0 && u.ship && SHIPS[u.ship.type].cloak ? DETECT.ambush : 0;   // a cloaked ship strikes first from the dark
         const dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
-        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) + (t.fid === "wardens" && s.crisis && s.crisis.decoded && s.crisis.decoded[u.fid] ? 1 : 0) - (t.ship && SHIPS[t.ship.type].evasive || 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0) + ctr + ambush + (u.fleet && powerOn(s, u.fleet, "overcharge") ? 2 : 0) + (round === 0 && hasOfficer(u.fleet, "tactical") ? 1 : 0) - (u.fleet && deepIn(u.fid) ? HOME.deep : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
+        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0) + (t.fid === "wardens" && s.crisis && s.crisis.decoded && s.crisis.decoded[u.fid] ? 1 : 0) - (t.ship && SHIPS[t.ship.type].evasive || 0) - (u.fid === "wardens" && relicHeld(s, t.fid, "key") ? 2 : 0) + ctr + ambush + (u.fleet && powerOn(s, u.fleet, "overcharge") ? 2 : 0) - (u.fleet && deepIn(u.fid) ? HOME.deep : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
         const dmg = u.st.dmg + (ctr ? (COUNTER.dmg[ROLES[u.ship.type]] || 0) : 0);
         if (landed) {
           const was = hp(t); hit(t, dmg);
@@ -2597,7 +2555,7 @@ function battles(s) {
     const inBattle = [...new Set(units.filter((u) => u.fleet).map((u) => u.fleet))];
     const lost = {};
     for (const u of units) if (u.ship && u.ship.hull <= 0) { lost[u.fid] = (lost[u.fid] || 0) + 1; u.fleet.ships = u.fleet.ships.filter((x) => x !== u.ship); }
-    for (const f of fleetsAt(s, hex)) if (!f.ships.length) { if (officersOf(f).length && !faction(s, f.owner).ai) log(s, f.owner, `Lost with the fleet at ${where}: ${f.officers.map((o) => `${OFFICERS.kinds[o.kind].name} ${o.name}`).join(", ")}.`, "war"); delete s.fleets[f.id]; }
+    for (const f of fleetsAt(s, hex)) if (!f.ships.length) delete s.fleets[f.id];
     for (const [fid, n] of Object.entries(lost)) faction(s, fid).stats.lost += n;
     // A world's guns knocked out count in the reckoning like ships lost (by their strength): the orbit is the attacker's now.
     const gunUnit = units.find((u) => u.world), silenced = gunUnit && gunUnit.world.colony && gunUnit.world.colony.defense <= 0 ? gunUnit.fid : null;
@@ -2621,7 +2579,6 @@ function bounty(s, fid, type, where) {
   const b = WILDS.bounty[type], K = faction(s, fid); if (!b || !K) return;
   K.credits = round1(K.credits + (b.credits || 0)); K.research.progress += b.research || 0; K.exotics += b.exotics || 0;
   K.stats.wild = (K.stats.wild || 0) + 1;
-  if (type === "haven") gainOfficer(s, fid, `freed from the pirate haven at ${where}`);
   const got = [b.credits && `${b.credits} credits`, b.research && `${b.research} research`, b.exotics && `${b.exotics} exotics`].filter(Boolean).join(", ");
   // A pirate patrol pact: each partner gets a share of a pirate bounty.
   if (type === "raider" || type === "haven") for (const P of s.factions) if (P.alive && P.id !== fid && patrolling(s, fid, P.id)) {
@@ -2830,7 +2787,6 @@ const anomalyValue = (s) => Math.round(Math.min(SCIENCE.anomalyMax, SCIENCE.anom
 function studyAnomaly(s, F, sys, how, share = 1) {
   const n = Math.round(anomalyValue(s) * share), what = sys.anomaly;
   sys.anomaly = null; F.research.progress += n; F.stats.anomalies = (F.stats.anomalies || 0) + 1;
-  if (makeRng("anomaly-officer:" + s.seed + ":" + sys.id).next() < OFFICERS.odds.anomaly) gainOfficer(s, F.id, `who joined after studying ${what} at ${sys.name}`);
   const cur = researchItem(s, F.id);
   log(s, F.id, `${how} ${what} at ${sys.name}: +${n} research${cur ? ` toward ${cur.name}` : ", banked for your next research"}.`, "explore");
 }
@@ -2840,7 +2796,7 @@ function updateVision(s, F) {
   const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; if (!F.explored[k] && !F.ai && s.sysAt[k]) charted.push(s.systems[s.sysAt[k]]); F.explored[k] = 1; } };
   const bonus = (has(s, F.id, "sensors") ? 1 : 0) + (F.id === "ylith" ? 2 : 0) + (has(s, F.id, "resonanceArrays") ? 1 : 0);
   for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus + (sys.colony.buildings.station ? 2 : 0));
-  for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type, x).sensors)) + (hasOfficer(f, "science") ? 2 : 0));
+  for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type, x).sensors)));
   // Listening posts (key sites) held by this power or an ally: everything within range.
   for (const x of sitesFor(s, F.id, "listening")) see(x.at, SITES.kinds.listening.range);
   // Allies share what their worlds see.
@@ -2852,7 +2808,7 @@ function updateVision(s, F) {
   const det = {}, mark = (hex, n) => { for (const k of within(hex, n)) det[k] = 1; };
   const plus = (has(s, F.id, "sensors") ? DETECT.sensors : 0) + (has(s, F.id, "resonanceArrays") ? DETECT.resonance : 0) + (F.id === "ylith" ? DETECT.ylith : 0);
   for (const sys of coloniesOf(s, F.id)) mark(sys.at, DETECT.world + plus + (sys.colony.buildings.station ? DETECT.station : 0));
-  for (const f of fleetsOf(s, F.id)) mark(f.at, Math.max(f.ships.some((x) => x.type === "scout") ? DETECT.scout + plus : DETECT.ship, hasOfficer(f, "science") ? 2 : 0));
+  for (const f of fleetsOf(s, F.id)) mark(f.at, f.ships.some((x) => x.type === "scout") ? DETECT.scout + plus : DETECT.ship);
   for (const x of sitesFor(s, F.id, "listening")) mark(x.at, SITES.kinds.listening.range);
   F.detect = det;
   // Every system the player charts goes into the log, with what's there.
@@ -2881,7 +2837,6 @@ function updateVision(s, F) {
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
     sys.ruins = false; F.stats.ruins = (F.stats.ruins || 0) + 1;
-    if (makeRng("ruins-officer:" + s.seed + ":" + sys.id).next() < OFFICERS.odds.ruins) gainOfficer(s, F.id, `found among the survivors at the ruins of ${sys.name}`);
     // The player decides what to do with a ruin (a galactic event, events.js); the computer powers study it.
     if (!F.ai) { (s.ruinsFound = s.ruinsFound || []).push({ sys: sys.id, fleet: fleetsAt(s, sys.at).find((f) => f.owner === F.id).id, turn: s.turn }); log(s, F.id, `${F.name} found ruins of the old empires at ${sys.name}: what to do with them is yours to decide.`, "explore"); continue; }
     F.research.progress += 60;
@@ -2896,6 +2851,7 @@ function endTurn(s, aiTurn) {
   if (s.winner) return;
   if (!s.fields) placeFields(s);   // a game from before space mining
   if (!s.sitesPlaced) placeSites(s);   // ... or before key sites
+  if (!s.officersGone) { s.officersGone = true; for (const F of s.factions) { delete F.officers; delete F.officersGot; } for (const f of Object.values(s.fleets)) delete f.officers; }   // officers were taken out of the game
   for (const F of s.factions) if (F.ai && F.alive && aiTurn) aiTurn(s, F);
   // The standing order: idle fleets with out-of-date ships go to the nearest drydock (not ones told to hold).
   for (const F of s.factions) if (!F.ai && F.alive && F.autoRefit) for (const f of fleetsOf(s, F.id)) if (!f.path.length && !f.sentry && needsRefit(s, f)) sendToDrydock(s, f.id);
@@ -3052,7 +3008,7 @@ function economy(s, F) {
       if (early.length) { for (const x of early) refitShip(s, F.id, x, SHIPYARD_FIT); if (!f.ships.some((x) => missingFit(s, F.id, x).length)) f.refitTrip = false;
         if (!F.ai) log(s, F.id, `${early.length} ship${early.length === 1 ? "" : "s"} refitted at the shipyard at ${here.name} with the early systems${f.ships.some((x) => needsDrydock(s, F.id, x)) ? "; the rest needs a drydock" : ""}.`, "build"); }
     }
-    if (home || F.id === "vael" || has(s, F.id, "bioticHulls") || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel") || hasOfficer(f, "engineer") || territoryAt(s, f.at) === F.id) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
+    if (home || F.id === "vael" || has(s, F.id, "bioticHulls") || admTrait(f, "shipwright") || relicHeld(s, F.id, "keel") || territoryAt(s, f.at) === F.id) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type, x).hull, x.hull + (home ? step : 1));
   }
   // Observatories study a nearby anomaly every few turns, without a ship (half what a survey gives).
   if (s.turn % SCIENCE.observatoryEvery === 0) for (const sys of coloniesOf(s, F.id)) {
@@ -5418,8 +5374,6 @@ function fleets(s, F) {
     const host = fleetsOf(s, F.id).find((g) => g !== t && g.at === t.at && (armed(g) || g.ships.every((x) => x.type === "transport")) && !g.repairAt);
     if (host) mergeFleets(s, host.id, t.id);
   }
-  // Officers in the pool join the biggest war fleets with room for them.
-  for (const o of [...officerPool(s, F.id)]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && officersOf(x).length < OFFICERS.slots).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignOfficer(s, f.id, o.id); }
   // Admirals in reserve take the biggest war fleets that have none.
   for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
@@ -6334,10 +6288,6 @@ function fleetHTML() {
   if (f.admiral) { const P = ADMIRAL_POWERS[powerOf(f.admiral)], w = powerWait(S, f), on = powerOn(S, f, powerOf(f.admiral));
     h += `<div class="card-sub"><p class="small"><b>${esc(P.name)}<\/b> (${esc(f.admiral.name)}'s power): ${esc(P.text)} <span class="muted">Ready again ${P.every} turns after use.<\/span><\/p>
       <div class="btn-row"><button class="btn small ${w ? "" : "primary"}" data-power ${w || on ? "disabled" : ""}>${on ? "In use this turn" : w ? `Ready in ${w} turn${w === 1 ? "" : "s"}` : `Use: ${esc(P.name)}`}<\/button><\/div><\/div>`; }
-  // Officers aboard, and those waiting in the pool.
-  { const aboard = officersOf(f), pool = officerPool(S, me.id);
-    if (aboard.length || pool.length) h += `<h3>Officers (${aboard.length} of ${OFFICERS.slots})<\/h3><ul class="mem small">${aboard.map((o) => `<li><b>${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}:<\/b> ${esc(OFFICERS.kinds[o.kind].text)} <button class="linkish" data-recall="${o.id}">Recall to the pool<\/button><\/li>`).join("")}<\/ul>
-      ${aboard.length < OFFICERS.slots && pool.length ? `<p class="small muted" style="margin:4px 0">Waiting in your pool:<\/p>${pool.map((o) => `<button class="row" data-officer="${o.id}">${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}<span class="small muted"> · ${esc(OFFICERS.kinds[o.kind].text)}<\/span><\/button>`).join("")}` : ""}`; }
   const reserve = me.reserve || [];
   if (armed(f)) h += f.admiral ? `<div class="btn-row"><button class="btn small" data-relieve>Send ${esc(f.admiral.name)} to the reserve<\/button><\/div>`
     : reserve.length ? `<h3>Give it an admiral<\/h3>${reserve.map((a) => `<button class="row" data-assign="${a.id}">${esc(admTitle(a))}<span class="small muted"> · ${a.wins} win${a.wins === 1 ? "" : "s"}${a.traits.length ? " · " + a.traits.map((t) => ADMIRAL_TRAITS[t].name).join(", ") : ""}<\/span><\/button>`).join("")}`
@@ -6654,20 +6604,12 @@ function sitesHTML() {
   return `<h3>Key sites<\/h3><ul class="mem small">${list.map((x) => { const K = SITES.kinds[x.site], who = x.colony ? x.colony.owner : null, ours = sitesFor(S, me.id, x.site).includes(x);
     return `<li><button class="linkish" data-selsys="${x.id}">${esc(x.name)}<\/button>: <b>${esc(K.name)}<\/b>, ${who ? (who === me.id ? "<span class=\"good\">yours<\/span>" : `held by ${esc(faction(S, who).name)}${ours ? " (shared with you)" : ""}`) : "unclaimed"}. <span class="muted">${esc(K.text)}<\/span><\/li>`; }).join("")}<\/ul>`;
 }
-/** Officers: aboard which fleets, and who's waiting in the pool. */
-function officersHTML() {
-  const me = player(S), pool = officerPool(S, me.id), aboard = fleetsOf(S, me.id).flatMap((f) => officersOf(f).map((o) => ({ o, f })));
-  if (!pool.length && !aboard.length) return "";
-  return `<h3>Officers<\/h3><p class="small muted" style="margin-top:-4px">Up to ${OFFICERS.slots} a fleet: assign them from a fleet's panel. New ones come from anomalies, ruins, captured worlds and burned pirate havens.<\/p><ul class="mem small">
-    ${aboard.map(({ o, f }) => `<li><b>${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}<\/b>, aboard <button class="linkish" data-selfleet="${f.id}">${esc(fleetName(f))}<\/button><\/li>`).join("")}
-    ${pool.map((o) => `<li><b>${esc(OFFICERS.kinds[o.kind].name)} ${esc(o.name)}<\/b>, <span class="muted">waiting in the pool: ${esc(OFFICERS.kinds[o.kind].text)}<\/span><\/li>`).join("")}<\/ul>`;
-}
 function empireHTML() {
   const me = player(S), t = totals(S, me.id);
   const cols = coloniesOf(S, me.id).sort((a, b) => (b.colony.pop || 0) - (a.colony.pop || 0));
   let h = `<h2>${esc(me.name)}<\/h2><p class="small muted">${esc(FACTIONS.find((f) => f.id === me.id).trait)}: ${esc(FACTIONS.find((f) => f.id === me.id).traitText)}<\/p>
     <div class="yields"><span>Income <b>${fmt(t.cr)}<\/b><\/span><span>Upkeep <b>${fmt(t.upkeep)}<\/b><\/span><span>Score <b>${score(S, me.id)}<\/b><\/span><span>Fleet power <b>${militaryPower(S, me.id)}<\/b><\/span><\/div>
-    ${focusHTML()}${relicsHTML()}${sitesHTML()}${officersHTML()}${musterHTML()}${marketHTML()}${protosHTML()}
+    ${focusHTML()}${relicsHTML()}${sitesHTML()}${musterHTML()}${marketHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})<\/h3><table class="tbl"><tr><th>World<\/th><th>Pop<\/th><th>Ind<\/th><th>Sci<\/th><th>Building<\/th><\/tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)<\/i>" : ""}<\/td><td>${sys.colony.pop || "–"}<\/td><td>${fmt(y.ind)}<\/td><td>${fmt(y.sci)}<\/td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}<\/td><\/tr>`; }).join("")}<\/table>
     ${fleetListHTML(me)}
@@ -6860,8 +6802,6 @@ function bindChrome() {
     if (d.assign) { const r = assignAdmiral(S, sel.id, d.assign); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.relieve !== undefined) { relieveAdmiral(S, sel.id); save(); renderAll(); return; }
     if (d.power !== undefined) { const r = useAdmiralPower(S, sel.id); if (r.error) toast(r.error, true); else toast(`${ADMIRAL_POWERS[r.id].name}: ${ADMIRAL_POWERS[r.id].text}`); save(); renderAll(); return; }
-    if (d.officer) { const r = assignOfficer(S, sel.id, d.officer); if (r.error) toast(r.error, true); save(); renderAll(); return; }
-    if (d.recall) { const r = recallOfficer(S, sel.id, d.recall); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
     if (d.center) { centerOn(d.center); draw(); return; }
@@ -7321,7 +7261,6 @@ function showHelp(back) {
       <li><b>Space mining:<\/b> asteroid fields (credits), gas clouds (fuel) and crystal drifts (exotics) lie in open space between the systems. Build a <b>mining ship<\/b> and park it on one: it mines every turn it isn't moving and no enemy warships are there (up to ${MINING.perField} of your ships a field; half as much again with a deep-space station of yours within ${MINING.stationRange} hexes). Fields run dry. Click one for what's left. Pirates hunt mining ships, so guard them.<\/li>
       <li><b>Home territory<\/b> (the tinted hexes round your worlds): a fleet that starts its turn there moves ${HOME.speed} farther, and ships there mend ${HOME.mend} hull a turn. Fighting in an enemy's territory, out of your own supply, costs −${HOME.deep} to hit: bring a tanker, or build a depot. The Kel's colonies reach a hex farther once they're ${HOME.kelAge} turns old.<\/li>
       <li><b>Admirals' powers:<\/b> each admiral has one, used from the fleet's panel, then ready again some turns later: <b>Emergency jump<\/b> (2 farther this turn, even out of a battle), <b>Overcharge the guns<\/b> (+2 to hit this turn), <b>Damage-control drill<\/b> (every ship mends 2 at once) or <b>Run silent<\/b> (cloaked this turn).<\/li>
-      <li><b>Officers:<\/b> a fleet carries up to ${OFFICERS.slots}: a chief engineer (mends 1 a turn anywhere), a tactical officer (+1 to hit in the first exchange), a science officer (+2 sensors, finds cloaked ships 2 hexes out) or a navigator (+3 fuel, burning hard costs half). You start with one; more come from anomalies, ruins, captured worlds and burned pirate havens. Assign them from a fleet's panel; they're lost if the fleet is destroyed.<\/li>
       <li><b>Key sites<\/b> (a gold dashed ring on the map): an <b>Ancient shipyard<\/b> (ships 10% cheaper), a <b>Listening post<\/b> (see everything within 5 hexes, cloaked ships too) or an <b>Old waystation<\/b> (a fuel depot and 3 fuel a turn). Whoever holds the system has it, and so do their allies. The Empire tab lists the ones you know.<\/li>
       <li><b>The assault on the Heart:<\/b> when the Heart of the Wardens breaks, a prize of ${CRISIS.assault.credits} credits, ${CRISIS.assault.research} research and ${CRISIS.assault.exotics} exotics is shared by every power that damaged it (or the Nodes shielding it), by its share of the damage. The Wardens card shows the shares so far.<\/li>
       <li><b>Engaged:<\/b> a fleet sharing a hex with enemy warships (or an enemy world's guns) is engaged. It can't simply sail away. Press <b>Withdraw<\/b>: it fights the next battle's first exchange defensively, then pulls back toward your nearest world.<\/li>

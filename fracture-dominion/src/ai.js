@@ -2,8 +2,8 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors, hexLine, makeRng } from "./hex.js";
 import { wardenIntel, shareIntel } from "./crisis.js";
-import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE, ROLES, COUNTER, MINING, OFFICERS, AI_GOALS } from "./data.js";
-import { mergeFleets, engineStanding, engineCharge, seesFleet, cloaked, miningYields, powerOf, powerWait, useAdmiralPower, officerPool, officersOf, assignOfficer, territoryAt, findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE, ROLES, COUNTER, MINING, AI_GOALS } from "./data.js";
+import { mergeFleets, engineStanding, engineCharge, seesFleet, cloaked, miningYields, powerOf, powerWait, useAdmiralPower, territoryAt, findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, sendForRepairs, repairPlace, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
 
 const PRIORITY = {
@@ -366,8 +366,6 @@ function fleets(s, F) {
     const host = fleetsOf(s, F.id).find((g) => g !== t && g.at === t.at && (armed(g) || g.ships.every((x) => x.type === "transport")) && !g.repairAt);
     if (host) mergeFleets(s, host.id, t.id);
   }
-  // Officers in the pool join the biggest war fleets with room for them.
-  for (const o of [...officerPool(s, F.id)]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && officersOf(x).length < OFFICERS.slots).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignOfficer(s, f.id, o.id); }
   // Admirals in reserve take the biggest war fleets that have none.
   for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {

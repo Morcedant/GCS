@@ -1693,19 +1693,6 @@ test("admirals' powers: used from the fleet, then a wait; a drill mends, running
   assert.ok(Object.keys(ADMIRAL_POWERS).includes(powerOf({ name: "Old Admiral" })), "an admiral from an older game gets one too");
 });
 
-test("officers: one to start; assigned to fleets (two at most), recalled, kept when fleets join; a navigator carries more fuel", async () => {
-  const { officerPool, assignOfficer, recallOfficer, officersOf, gainOfficer, mergeFleets } = await import("../src/game.js");
-  const s = newGame({ seed: 4, size: "small", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0], at = s.systems[me.capital].at;
-  assert.equal(officerPool(s, me.id).length, 1, "a chief engineer to start");
-  const nav = gainOfficer(s, me.id, "for the test", null, "navigator"); gainOfficer(s, me.id, "for the test", null, "tactical");
-  const a = spawnFleet(s, me.id, at, ["frigate"]), b = spawnFleet(s, me.id, at, ["frigate"]);
-  const tank = fuelMax(s, a); assert.ok(assignOfficer(s, a.id, nav.id).ok); assert.equal(fuelMax(s, a), tank + 3, "a navigator: +3 fuel");
-  for (const o of [...officerPool(s, me.id)]) assignOfficer(s, b.id, o.id);
-  assert.equal(officersOf(b).length, 2); assert.equal(officerPool(s, me.id).length, 0);
-  assert.ok(mergeFleets(s, a.id, b.id).ok); assert.equal(officersOf(a).length, 2, "room for two"); assert.equal(officerPool(s, me.id).length, 1, "the third back to the pool");
-  assert.ok(recallOfficer(s, a.id, officersOf(a)[0].id).ok); assert.equal(officerPool(s, me.id).length, 2);
-});
-
 test("key sites: a few, away from capitals; their holder (and allies) get the bonus: cheaper ships, a waystation's supply and fuel", async () => {
   const { siteSystems, sitesFor, fuelIncome } = await import("../src/game.js");
   const { SITES } = await import("../src/data.js");

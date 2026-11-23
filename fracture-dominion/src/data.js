@@ -503,17 +503,6 @@ export const ADMIRAL_POWERS = {
   ghost: { name: "Run silent", every: 10, text: "This turn the whole fleet is cloaked: unseen outside detection range, and it slips past enemy fleets." },
 };
 
-// Officers: specialists a fleet carries (up to `slots`), from anomalies, ruins, captured worlds and burned pirate havens.
-// Unassigned officers wait in the empire's pool; an officer is lost if the fleet is destroyed.
-export const OFFICERS = { slots: 2, odds: { anomaly: 0.35, ruins: 0.5 },
-  kinds: {
-    engineer: { name: "Chief engineer", text: "The fleet mends 1 hull a turn, anywhere." },
-    tactical: { name: "Tactical officer", text: "+1 to hit in the first exchange of every battle." },
-    science: { name: "Science officer", text: "+2 sensor range, and the fleet detects cloaked ships 2 hexes out." },
-    navigator: { name: "Navigator", text: "+3 turns of fuel in the tank, and burning hard costs half." },
-  },
-  names: ["Okafor", "Vasquez", "Tal", "Ishida", "Brann", "Moreau", "Quell", "Adeyemi", "Sorensen", "Ruiz", "Halloran", "Nakamura", "Ferro", "Lindqvist", "Abara", "Petrov", "Ochoa", "Reyes", "Ivanova", "Mbeki", "Castellan", "Dunmore", "Sato", "Varga"] };
-
 // Key sites: special systems worth fighting over. Whoever holds the system (a colony or an outpost) has the bonus, and
 // so do their allies. About one in `per` systems, at least `min`, away from the capitals.
 export const SITES = { per: 18, min: 2, fromCapital: 4, apart: 6,

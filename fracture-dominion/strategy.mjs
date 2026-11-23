@@ -78,7 +78,6 @@ const body = [
     "<b>Build what beats theirs.</b> Every warship counters one kind: frigates beat torpedo boats, stealth corvettes and scouts; cruisers beat frigates; dreadnoughts beat cruisers and orbital guns; torpedo boats beat dreadnoughts. Look at what your enemy fields and build its counter, and keep your own fleet mixed so no single counter beats it.",
     "<b>Fight at home when you can.</b> In your own territory your fleets move farther and mend; deep in enemy territory, out of supply, they fight worse. Draw an attacker in, or bring tankers and depots when you go to them.",
     "<b>Time your admirals' powers.</b> Overcharged guns or a damage-control drill can turn a close battle; an emergency jump gets a fleet out of one, or to a besieged world in time.",
-    "<b>Give your best fleets officers.</b> A tactical officer and a chief engineer suit a battle fleet; a navigator, a long-range raid; a science officer, a fleet hunting cloaked ships or probes.",
     "<b>Fight for the key sites.</b> An Ancient shipyard, a Listening post or an Old waystation helps its holder and their allies all game. Claim them early with outposts, and expect rivals to come for them.",
     "<b>Join the assault on the Heart.</b> Its prize is shared by damage done: a power that holds back gets nothing.",
     "<b>Use cloaks to raid.</b> Stealth corvettes slip past fleets unseen and prey on transports, tankers and mining ships. Against them, keep scouts and frigates with what matters.",
