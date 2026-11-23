@@ -1721,3 +1721,22 @@ test("key sites: a few, away from capitals; their holder (and allies) get the bo
   if (way) { const f0 = fuelIncome(s, me.id); way.colony = { owner: me.id, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
     assert.ok(fuelIncome(s, me.id) >= f0 + 3, "a waystation: fuel"); assert.ok(inSupplyAt(s, me.id, way.at), "and supply"); }
 });
+
+test("the Corridor Engine charges: finishing it wakes the Wardens, it waits while they stand or its orbit is held, and wins after the countdown", async () => {
+  const { engineCharge } = await import("../src/game.js");
+  const { ENGINE, CRISIS } = await import("../src/data.js");
+  const s = newGame({ seed: 3, size: "small", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0], cap = s.systems[me.capital];
+  s.crisis = { stage: "quiet", at: 500 };
+  me.research.done.push("engine"); me.exotics = 40; cap.colony.queue = [{ kind: "building", id: "engine", cost: 1, progress: 0, exotics: 15 }]; cap.colony.stock = 50;
+  endTurn(s);
+  const E = engineCharge(s); assert.ok(E && E.owner === me.id, "finished: charging, not won"); assert.ok(!s.winner);
+  assert.ok(s.crisis.at <= s.turn + CRISIS.warning, "its first pulse wakes the Wardens");
+  endTurn(s); assert.equal(E.paused, "wardens"); const left = E.left;
+  s.crisis.stage = "over"; endTurn(s); assert.equal(E.left, left - 1, "the Wardens beaten: it charges");
+  const foe = s.factions[1]; declareWar(s, foe.id, me.id); s.fleets = Object.fromEntries(Object.entries(s.fleets).filter(([, f]) => f.at !== cap.at));
+  cap.colony.defense = 0; spawnFleet(s, foe.id, cap.at, ["dreadnought", "dreadnought", "dreadnought"]); endTurn(s);
+  assert.equal(E.paused, "siege", "enemy warships in its orbit: it waits");
+  for (const f of Object.values(s.fleets)) if (f.owner === foe.id) delete s.fleets[f.id];
+  for (let i = 0; i < ENGINE.charge + 2 && !s.winner; i++) endTurn(s);
+  assert.equal(s.winner, me.id); assert.equal(s.winReason, "engine");
+});

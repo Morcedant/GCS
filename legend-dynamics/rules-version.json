@@ -6,6 +6,18 @@
     {
       "date": "2026-11-23",
       "kind": "site",
+      "title": "Dominion: the Corridor Engine must charge, and the Wardens must fall first",
+      "items": [
+        "A finished Corridor Engine no longer wins at once. It must charge for 15 turns, and it only charges once the Wardens are beaten (finishing it wakes them if they haven't come yet) and while no enemy warships hold its orbit.",
+        "Every power not allied with the builder goes to war to stop it. Taking the Engine's world takes the Engine, and its charge starts again for the taker; a barrage from its orbit can destroy it.",
+        "Computer players now play for different goals: the Hegemony, the Zhaq and the Kel for conquest, the Tessan for score, the rest for the Engine. Conquerors go to war sooner and build the Engine late.",
+        "Computer players' troop transports now join their war fleets and land together, with enough troops for the world they're besieging, so wars take worlds.",
+        "Score counts 8 for each key site held and 2 for each battle won."
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "kind": "site",
       "title": "Dominion: home territory, admirals' powers, officers, key sites and the assault on the Heart",
       "items": [
         "Home territory: fleets that start a turn in your territory move 1 farther and mend 1 hull a turn; fighting in an enemy's territory out of your supply costs −1 to hit. The Kel's old colonies reach farther.",

@@ -236,7 +236,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-23 21:04 UTC";
+const BUILD = "2026-11-23 21:38 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -850,7 +850,15 @@ const SITES = { per: 18, min: 2, fromCapital: 4, apart: 6,
  * other powers' regard for the holder falls by `grudge` every grudgeEvery turns. While enemy warships hold its orbit, it
  * gives nothing. Capture the world and it's yours; a barrage destroys it, and the race to build it starts again.
  */
-const ENGINE = { gateEvery: 5, tradePerColony: 2, scorePerTurn: 2, grudgeEvery: 5, grudge: -3 };
+const ENGINE = { gateEvery: 5, tradePerColony: 2, scorePerTurn: 2, grudgeEvery: 5, grudge: -3,
+  // A standard game: a finished Engine must charge for `charge` turns, the Wardens beaten, before it wins. It pauses
+  // while the Wardens (or a Heart) stand, and while enemy warships hold its orbit; taken, it starts again for the taker.
+  charge: 15, grudgeCharge: -30 };
+/** What each computer power plays for. "engine": the Corridor Engine; "conquest": war (earlier, readier, and the Engine
+ * only late); "score": a wide, rich empire (the Engine late). */
+const AI_GOALS = { concord: "engine", vael: "engine", ylith: "engine", mirrun: "engine", hegemony: "conquest", zhaq: "conquest", kel: "conquest", tessan: "score" };
+/** Score for what the newer systems bring: each key site held, each battle won. */
+const SCORE_EXTRA = { site: 8, battle: 2 };
 /**
  * Relics of the old empires: one of each, hidden in ruins and anomalies (a few out in the Outer Reach, which only the
  * Star Chart opens). The first fleet to end its turn at a relic's site recovers it, and it goes to its finder's capital.
@@ -1985,7 +1993,7 @@ function buildOptions(s, sys) {
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (d.outpost || c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;   // a depot is for outposts (buildDepot)
     if (d.wonder && !c.capital) continue;
-    if (b === "engine" && engineHeld(s)) continue;   // an open game: only one can stand
+    if (b === "engine" && engineStanding(s)) continue;   // only one can stand (or charge) at a time
     out.push({ kind: "building", id: b, name: d.name, cost: d.cost, exotics: d.exotics || 0 });
   }
   return out;
@@ -2438,7 +2446,7 @@ function raidDepot(s, fleetId) {
 function barrageTargets(s, fleetId) {
   const f = s.fleets[fleetId], sys = f && s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
   if (!sys || !sys.colony || sys.colony.owner === f.owner || !armed(f) || !atWar(s, f.owner, sys.colony.owner) || guarded(s, sys, f.owner)) return [];
-  return Object.keys(sys.colony.buildings).filter((b) => sys.colony.buildings[b] && BUILDINGS[b] && (!BUILDINGS[b].wonder || (b === "engine" && s.mode === "open")));
+  return Object.keys(sys.colony.buildings).filter((b) => sys.colony.buildings[b] && BUILDINGS[b] && (!BUILDINGS[b].wonder || (b === "engine" && (s.mode === "open" || engineCharge(s)))));
 }
 function barrage(s, fleetId, building) {
   const f = s.fleets[fleetId];
@@ -2898,6 +2906,7 @@ function endTurn(s, aiTurn) {
   miningTurn(s);
   sitesTurn(s);
   checkEngine(s);
+  checkCharge(s);
   checkRelics(s);
   clearDeepSites(s);
   // The exotics market drifts back toward its usual price.
@@ -2963,13 +2972,13 @@ function economy(s, F) {
     if (c.kind === "colony") {
       c.stock += y.ind * strike;
       // While another Engine stands, one in the queue waits (its progress kept) at the back, and the rest goes ahead.
-      if (engineHeld(s) && c.queue[0] && c.queue[0].id === "engine" && c.queue.length > 1) c.queue.push(c.queue.shift());
+      if (engineStanding(s) && c.queue[0] && c.queue[0].id === "engine" && c.queue.length > 1) c.queue.push(c.queue.shift());
       // One thing finished a turn: what's left over goes into the next in line, ready to finish next turn.
       let finished = false;
       while (c.queue.length) {
         const q = c.queue[0];
         if (finished) { const put = Math.min(q.cost - q.progress, c.stock); if (put > 0) { q.progress += put; c.stock -= put; } break; }
-        if (q.id === "engine" && engineHeld(s)) { if (!q.held) log(s, F.id, `Work on the Corridor Engine at ${sys.name} stops: another stands. What's built is kept, ready for when it falls.`, "build"); q.held = true; break; }
+        if (q.id === "engine" && engineStanding(s)) { if (!q.held) log(s, F.id, `Work on the Corridor Engine at ${sys.name} stops: another stands. What's built is kept, ready for when it falls.`, "build"); q.held = true; break; }
         q.held = false;
         const need = q.cost - q.progress, put = Math.min(need, c.stock);
         q.progress += put; c.stock -= put;
@@ -2995,7 +3004,7 @@ function economy(s, F) {
           c.buildings[q.id] = true;
           if (q.id === "battery" || q.id === "station") c.defense = gunsMax(s, c);
           if (q.id === "engine" && s.mode === "open") claimEngine(s, sys, F);
-          else if (q.id === "engine") { s.winner = F.id; s.winReason = "engine"; log(s, F.id, `${F.name} finished the Corridor Engine.`, "victory"); }
+          else if (q.id === "engine") startCharge(s, sys, F);
         }
         if (!F.ai || q.kind === "building") {
           const what = (q.kind === "ship" ? SHIPS : BUILDINGS)[q.id];
@@ -3082,7 +3091,8 @@ function score(s, fid) {
   const cols = coloniesOf(s, fid);
   const F = faction(s, fid);
   return Math.round(cols.reduce((t, x) => t + (x.colony.kind === "colony" ? 5 + x.colony.pop * 2 : 2), 0) + F.research.done.length * 6 + militaryPower(s, fid) / 4
-    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0) + (F.stats.engineTurns || 0) * ENGINE.scorePerTurn + relicsOf(s, fid).length * RELIC_SCORE);
+    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0) + (F.stats.engineTurns || 0) * ENGINE.scorePerTurn + relicsOf(s, fid).length * RELIC_SCORE
+    + siteSystems(s).filter((x) => x.colony && x.colony.owner === fid).length * SCORE_EXTRA.site + (F.stats.won || 0) * SCORE_EXTRA.battle);
 }
 // ---- relics of the old empires ----
 /** Who holds a relic: the owner of the world it's kept at, or null (lost, or not yet found). */
@@ -3237,6 +3247,34 @@ function expandGalaxy(s, reader, P = {}) {
   s.radius = R1;
   if (reader) for (const k of fresh) reader.explored[k] = 1;
   return made;
+}
+// ---- the Corridor Engine's countdown (a standard game) ----
+/** The finished Engine charging toward victory: { sys, owner, built, left, paused: null | "wardens" | "siege" }. */
+const engineCharge = (s) => (s.mode !== "open" && s.charge ? s.charge : null);
+/** An Engine stands somewhere (an open game's, or a charging one): no other can be built. */
+const engineStanding = (s) => engineHeld(s) || engineCharge(s);
+/** The Wardens aren't beaten yet: still to wake, or their Heart stands. (A game without them: never.) */
+const wardensStand = (s) => !!(s.crisis && !s.crisisOff && ["quiet", "stirring", "awake"].includes(s.crisis.stage));
+function startCharge(s, sys, F) {
+  s.charge = { sys: sys.id, owner: F.id, built: s.turn, left: ENGINE.charge, paused: null };
+  // Its first pulse wakes the Wardens, if they're still to come.
+  const C = s.crisis; if (C && !s.crisisOff && (C.stage === "quiet" || C.stage === "stirring")) C.at = Math.min(C.at, s.turn + CRISIS.warning);
+  log(s, null, `${F.name} finished the Corridor Engine at ${sys.name}. It must charge for ${ENGINE.charge} turns, and it can't while the Wardens stand${C && !s.crisisOff && C.stage !== "over" && C.stage !== "dormant" ? ` (its first pulse has woken them, if they weren't already)` : ""}. Take ${sys.name}, or bring the Engine down from its orbit, before it's done.`, "victory");
+  for (const O of s.factions) if (O.alive && O.id !== F.id && O.ai && !allied(s, O.id, F.id)) remember(s, O.id, F.id, "finished the Corridor Engine", ENGINE.grudgeCharge);
+}
+/** Once a turn: the countdown runs on, pauses, changes hands with its world, or ends (destroyed, or won). */
+function checkCharge(s) {
+  const E = engineCharge(s); if (!E) return;
+  const sys = s.systems[E.sys];
+  if (!sys || !sys.colony || !sys.colony.buildings.engine) { s.charge = null; log(s, null, `The Corridor Engine at ${sys ? sys.name : "its world"} is destroyed before it could charge. The race is open again.`, "victory"); return; }
+  if (sys.colony.owner !== E.owner) { log(s, null, `${faction(s, sys.colony.owner).name} took the Corridor Engine at ${sys.name} from ${faction(s, E.owner).name}: its charge starts again, for them.`, "victory"); E.owner = sys.colony.owner; E.left = ENGINE.charge; }
+  const was = E.paused;
+  E.paused = wardensStand(s) ? "wardens" : besieged(s, sys) ? "siege" : null;
+  if (E.paused && E.paused !== was) log(s, null, `The Corridor Engine at ${sys.name} stops charging: ${E.paused === "wardens" ? "the Wardens stand, and it can't open the corridors while they do" : "enemy warships hold its orbit"}. ${E.left} turn${E.left === 1 ? "" : "s"} still to go.`, "victory");
+  if (E.paused) return;
+  E.left--;
+  if (E.left <= 0) { s.winner = E.owner; s.winReason = "engine"; log(s, E.owner, `${faction(s, E.owner).name}'s Corridor Engine is charged: the corridors answer to them now.`, "victory"); return; }
+  if (E.left <= 3 || was) log(s, null, `The Corridor Engine at ${sys.name} (${faction(s, E.owner).name}): ${E.left} turn${E.left === 1 ? "" : "s"} left to charge.`, "victory");
 }
 // ---- the Corridor Engine in an open game ----
 /** The Engine that stands (open games only), or null: { sys, owner, built, gate }. */
@@ -5064,7 +5102,7 @@ function research(s, F) {
   const pri = PRIORITY[F.id] || [];
   const want = pri.find((id) => avail.some((t) => t.id === id)) || [...avail].sort((a, b) => a.cost - b.cost)[0].id;
   // Late in the game, the Corridor Engine.
-  setResearch(s, F.id, avail.some((t) => t.id === "engine") && s.turn > 90 ? "engine" : want);
+  setResearch(s, F.id, avail.some((t) => t.id === "engine") && s.turn > (AI_GOALS[F.id] && AI_GOALS[F.id] !== "engine" ? 130 : 90) ? "engine" : want);
 }
 
 /** Relics: the Star Chart is read as soon as it's found (game.js); the Gate Shard links the capital to the farthest
@@ -5209,13 +5247,16 @@ function diplomacy(s, F, diff) {
         else if (!s.offers.some((o) => o.from === F.id)) { s.offers.push({ from: F.id, to: oid, what: "peace", turn: s.turn }); log(s, oid, `${F.name} offers peace.`, "diplo"); }
       }
     } else {
-      const angry = r.score < -18 / (AGGRESSION[F.id] || 1);
+      const conquest = AI_GOALS[F.id] === "conquest", angry = r.score < (conquest ? -8 : -18) / (AGGRESSION[F.id] || 1);
+      // A finished Engine charging toward victory: everyone not allied with its holder goes to war on it.
+      const EC = engineCharge(s);
+      if (EC && EC.owner === oid && !allied(s, F.id, oid) && !(s.crisis && s.crisis.stage === "awake" && s.crisis.truce) && mine > 3) { declareWar(s, F.id, oid); log(s, null, `${F.name} goes to war on ${O.name} to stop their Corridor Engine.`, "war"); continue; }
       // While the Heart of the Wardens lives and a truce holds, no one starts a war.
       if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
       if (allied(s, F.id, oid)) continue;
       const warFrom = AI_CALM.warFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"];   // no early wars of their own...
       const provoked = r.score <= AI_CALM.provoked || (r.memory || []).some((m) => m.d <= AI_CALM.graveOffence && s.turn - m.turn <= AI_CALM.graveTurns);   // ...unless provoked
-      if ((s.turn > warFrom || provoked) && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
+      if ((s.turn > warFrom - (conquest ? 15 : 0) || provoked) && angry && mine > 6 && mine >= theirs * (conquest ? 1.05 : 1.25) / diff) { declareWar(s, F.id, oid); continue; }
       // The holder of the Corridor Engine (an open game): after it's held a while, anyone strong enough comes for it.
       const E = engineHeld(s);
       // A coalition: everyone not allied with the holder, together, against it.
@@ -5279,6 +5320,13 @@ function minerTargets(s, F, from) {
     .map(([k, fd]) => ({ k, fd, d: from ? distance(from, k) : Math.min(...cols.map((c) => distance(c.at, k))), v: { credits: 1, fuel: 0.8, exotics: 1.3 }[MINING.kinds[fd.kind].res] }))
     .sort((a, b) => a.d / a.v - b.d / b.v);
 }
+/** Transports this power wants at war: enough for the strongest-held enemy world one of its war fleets is in orbit of
+ * (or a couple, if none), with one spare. */
+function troopsWanted(s, F) {
+  const per = shipStats(s, F.id, "transport").troops || 2, cap = AI_GOALS[F.id] === "conquest" ? 8 : 6;
+  const need = Math.max(0, ...fleetsOf(s, F.id).filter(armed).map((f) => { const o = invasionOdds(s, f.id); return o && atWar(s, F.id, s.systems[s.sysAt[f.at]].colony.owner) ? o.defense : 0; }));
+  return Math.min(cap, Math.max(2, Math.ceil(need / per) + 1));
+}
 function production(s, F, diff) {
   // In debt, or paying out more than it earns: scrap warships (frigates first) until the books balance.
   for (let n = 0; n < 6 && (F.credits < 0 || totals(s, F.id).net < -1) && totals(s, F.id).net < 1; n++) {
@@ -5319,7 +5367,8 @@ function production(s, F, diff) {
       // Mining ships: one for each good field nearby, a few at most, when the fleet's strong enough to spare the yards.
       ships && s.turn >= 6 && (!enemies.length || power >= wantPower * 0.8) && count(s, F, "miner") < Math.min(1 + Math.floor(cols.length / 2), 5) && minerTargets(s, F).length ? ["ship", "miner"] : null,
       ships && power < wantPower ? ["ship", warship(s, F, enemies)] : null,
-      ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
+      // Troops enough to take what its fleets are besieging (they land together, from the war fleet): up to 6 (8 for a conqueror).
+      ships && enemies.length && power >= wantPower * 0.6 && count(s, F, "transport") < troopsWanted(s, F) ? ["ship", "transport"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "tanker") < 1 ? ["ship", "tanker"] : null,
       ships && enemies.length && has(s, F.id, "phaseCloaks") && power >= wantPower * 0.7 && count(s, F, "stealth") < 2 ? ["ship", "stealth"] : null,   // raiders, for their transports and mining ships
       c.pop >= 3 && !c.buildings.factory ? ["building", "factory"] : null,
@@ -5330,7 +5379,7 @@ function production(s, F, diff) {
       c.capital && hubOf(F.id) && has(s, F.id, hubOf(F.id).tech) && !coloniesOf(s, F.id).some((x) => x.colony.buildings[hubOf(F.id).id] || x.colony.queue.some((q) => q.id === hubOf(F.id).id)) ? ["building", hubOf(F.id).id] : null,
       enemies.length && has(s, F.id, "batteries") && !c.buildings.battery ? ["building", "battery"] : null,
       sys.exotics && has(s, F.id, "refining") && !c.buildings.refinery ? ["building", "refinery"] : null,
-      c.capital && has(s, F.id, "engine") && !c.buildings.engine && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] ? ["building", "engine"] : null,
+      c.capital && has(s, F.id, "engine") && !c.buildings.engine && !engineStanding(s) && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] + (AI_GOALS[F.id] && AI_GOALS[F.id] !== "engine" ? 50 : 0) ? ["building", "engine"] : null,   // conquerors and traders build it late
       ships && t.net > 2 && power < wantPower * 1.6 ? ["ship", warship(s, F, enemies)] : null,
       !c.buildings.market ? ["building", "market"] : null,
     ]);
@@ -5359,6 +5408,13 @@ function fleets(s, F) {
   }
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const cap = s.systems[F.capital];
+  // Troop transports go into battle together: at war, any that reach a war fleet join it (it lands them all at once);
+  // the rest wait together, in one fleet.
+  if (enemies.length) for (const t of fleetsOf(s, F.id).filter((f) => !armed(f) && f.ships.every((x) => x.type === "transport"))) {
+    if (!s.fleets[t.id]) continue;
+    const host = fleetsOf(s, F.id).find((g) => g !== t && g.at === t.at && (armed(g) || g.ships.every((x) => x.type === "transport")) && !g.repairAt);
+    if (host) mergeFleets(s, host.id, t.id);
+  }
   // Officers in the pool join the biggest war fleets with room for them.
   for (const o of [...officerPool(s, F.id)]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && officersOf(x).length < OFFICERS.slots).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignOfficer(s, f.id, o.id); }
   // Admirals in reserve take the biggest war fleets that have none.
@@ -5467,9 +5523,9 @@ function fleets(s, F) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
           .map((sys) => ({ sys, d: distance(f.at, sys.at), guard: fleetsAt(s, sys.at).filter((g) => g.owner === sys.colony.owner).reduce((t, g) => t + g.ships.length * 2, 0) + (sys.colony.defense || 0) }))
-          .filter((x) => x.guard <= mine * (engineHeld(s) && engineHeld(s).sys === x.sys.id ? 2 : 1.3))
+          .filter((x) => x.guard <= mine * (engineStanding(s) && engineStanding(s).sys === x.sys.id ? 2 : 1.3))
           // A rival's Corridor Engine (an open game) draws every war fleet: it counts as five hexes nearer.
-          .map((x) => (engineHeld(s) && engineHeld(s).sys === x.sys.id ? { ...x, d: x.d - 5 } : x.sys.site ? { ...x, d: x.d - 3 } : x))   // and a key site, three nearer
+          .map((x) => (engineStanding(s) && engineStanding(s).sys === x.sys.id ? { ...x, d: x.d - 8 } : x.sys.site ? { ...x, d: x.d - 3 } : x))   // and a key site, three nearer
           // Within reach on its fuel: a target beyond supply no farther than its tank carries it.
           .filter((x) => inSupplyAt(s, F.id, x.sys.at) || fuelOf(s, f) === Infinity || Math.min(...supplySources(s, F.id).map((c) => distance(c.at, x.sys.at))) - supplyRange(s, F.id) <= fuelOf(s, f) * fleetSpeed(s, f))
           .sort((a, b) => a.d - b.d);
@@ -6380,7 +6436,8 @@ function objectivesHTML() {
   const q = cap && cap.colony ? cap.colony.queue.find((x) => x.id === "engine") : null, built = cap && cap.colony && cap.colony.buildings.engine;
   const techDone = chain.filter((t) => done.includes(t.id)).length;
   const EH = engineHeld(S);
-  const eBadge = EH ? (EH.owner === me.id ? ["You hold it", "good"] : ["A rival holds it", "bad"]) : S.winner === me.id && S.winReason === "engine" ? ["Won", "good"] : q ? ["Building", "good"] : done.includes("engine") ? ["Ready to build", "good"] : techDone ? ["Researching", ""] : ["Not started", ""];
+  const EC = engineCharge(S);
+  const eBadge = EH ? (EH.owner === me.id ? ["You hold it", "good"] : ["A rival holds it", "bad"]) : EC ? (EC.owner === me.id ? [EC.paused ? "Paused" : `Charging: ${EC.left}`, EC.paused ? "" : "good"] : ["A rival's is charging", "bad"]) : S.winner === me.id && S.winReason === "engine" ? ["Won", "good"] : q ? ["Building", "good"] : done.includes("engine") ? ["Ready to build", "good"] : techDone ? ["Researching", ""] : ["Not started", ""];
   let firstOpen = true;
   const step = (isDone, text) => { const st = isDone ? "done" : firstOpen ? (firstOpen = false, "now") : ""; return stepLi(st, text); };
   h += `<div class="card obj"><h3 class="obj-h">The Corridor Engine <span class="badge-status ${eBadge[1]}">${eBadge[0]}<\/span><\/h3>
@@ -6388,15 +6445,16 @@ function objectivesHTML() {
     <span>Exotics<\/span><span>${fmt(me.exotics)} of ${BUILDINGS.engine.exotics} it needs<\/span><\/div>
     <ol class="steps-list">${chain.map((t) => step(done.includes(t.id), `Research ${esc(t.name)}${me.research.current === t.id ? ` (now: ${Math.round((me.research.progress / t.cost) * 100)}%)` : ""}`)).join("")}
     ${step(!!q || !!built, `Queue the Corridor Engine at your capital${cap ? `, ${esc(cap.name)}` : ""} (${BUILDINGS.engine.cost} industry, ${BUILDINGS.engine.exotics} exotics)`)}
-    ${step(!!built, `Finish it${q ? `: ${Math.round((q.progress / q.cost) * 100)}% built` : ""}`)}<\/ol>
-    ${S.mode === "open" ? engineOpenHTML(me) : `<p class="small" style="margin-top:6px"><b class="good">Win:<\/b> finish the Corridor Engine at your capital. <b class="bad">Watch:<\/b> lose your capital and the work is lost.<\/p>`}<\/div>`;
+    ${step(!!built, `Finish it${q ? `: ${Math.round((q.progress / q.cost) * 100)}% built` : ""}`)}
+    ${S.mode === "open" ? "" : step(false, `Charge it for ${ENGINE.charge} turns, with the Wardens beaten and its orbit clear${EC && EC.owner === me.id ? `: <b>${EC.left} to go<\/b>${EC.paused ? ` (paused: ${EC.paused === "wardens" ? "the Wardens stand" : "enemy warships hold its orbit"})` : ""}` : ""}`)}<\/ol>
+    ${S.mode === "open" ? engineOpenHTML(me) : `<p class="small" style="margin-top:6px"><b class="good">Win:<\/b> finish the Corridor Engine at your capital, then keep it for ${ENGINE.charge} turns of charging. It only charges once the Wardens are beaten (finishing it wakes them), and not while enemy warships hold its orbit. <b class="bad">Watch:<\/b> every power not allied with you goes to war to stop it, and whoever takes its world takes the Engine.<\/p>`}<\/div>`;
   // 3. Score.
   const gap = lead.f.id === me.id ? (ranked[1] ? mine - ranked[1].sc : mine) : lead.sc - mine;
   const sBadge = lead.f.id === me.id ? ["Leading", "good"] : ["Behind", "bad"];
   h += `<div class="card obj"><h3 class="obj-h">Highest score at turn ${RULES.maxTurns} <span class="badge-status ${sBadge[1]}">${sBadge[0]}<\/span><\/h3>
     <div class="kv small"><span>Yours<\/span><span>${ibar(mine, Math.max(1, lead.sc), "var(--accent)")} ${mine}<\/span>
     <span>${lead.f.id === me.id ? "Next best" : "Leader"}<\/span><span>${lead.f.id === me.id ? (ranked[1] ? `${me.met[ranked[1].f.id] ? esc(ranked[1].f.name) : "An unmet rival"}: ${ranked[1].sc} (you lead by ${gap})` : "No one") : `${me.met[lead.f.id] ? esc(lead.f.name) : "An unmet rival"}: ${lead.sc} (${gap} ahead of you)`}<\/span><\/div>
-    <p class="small" style="margin-top:6px"><b class="good">Win:<\/b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.<\/p><\/div>`;
+    <p class="small" style="margin-top:6px"><b class="good">Win:<\/b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, 8 per key site held, 2 per battle won, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.<\/p><\/div>`;
   if (!live) h += crisisHTML();
   h += sectorsHTML();
   // The rivals' race.
@@ -6405,11 +6463,12 @@ function objectivesHTML() {
     const theirCap = S.systems[f.capital], tq = theirCap && theirCap.colony ? theirCap.colony.queue.find((x) => x.id === "engine") : null;
     if (tq) threats.push(`<li class="bad"><b>${esc(f.name)}<\/b> is building the Corridor Engine at ${esc(theirCap.name)}${me.met[f.id] ? `: ${Math.round((tq.progress / tq.cost) * 100)}% done` : ""}. Take or blockade it before it's finished.<\/li>`);
   }
+  if (EC && EC.owner !== me.id) threats.push(`<li class="bad"><b>${esc(faction(S, EC.owner).name)}<\/b>'s Corridor Engine at ${esc(S.systems[EC.sys].name)} is charging: <b>${EC.left} turn${EC.left === 1 ? "" : "s"} left<\/b>${EC.paused ? ` (paused: ${EC.paused === "wardens" ? "the Wardens stand" : "warships hold its orbit"})` : ""}. Take the world, hold its orbit, or barrage the Engine to stop it.<\/li>`);
   { const E = engineHeld(S); if (E && E.owner !== me.id && me.met[E.owner]) threats.push(`<li class="bad"><b>${esc(faction(S, E.owner).name)}<\/b> holds the Corridor Engine at ${esc(S.systems[E.sys].name)}: ${ENGINE.scorePerTurn} score a turn, and its fleets move freely. Take it or destroy it.<\/li>`); }
   if (rivals.length === 1) threats.push(`<li class="war">Only ${esc(rivals[0].name)} is left: one of you will win by conquest.<\/li>`);
   h += `<h3>Threats<\/h3>` + (threats.length ? `<ul class="log">${threats.join("")}<\/ul>` : `<p class="small muted">No rival is close to winning yet.<\/p>`);
   h += S.mode === "open" ? `<p class="small muted"><b>Open rule:<\/b> no end but the one you choose. Your last world falling still ends it.<\/p>`
-    : `<p class="small muted"><b>Defeat:<\/b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.<\/p>`;
+    : `<p class="small muted"><b>Defeat:<\/b> your last world falls; a rival's Corridor Engine finishes charging, or a rival stands alone; or a rival leads on score at turn ${RULES.maxTurns}.<\/p>`;
   return h;
 }
 /** An open game's Engine: who holds it and what it gives, or that the race is open. */

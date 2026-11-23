@@ -2,8 +2,8 @@
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
 import { distance, neighbors, hexLine, makeRng } from "./hex.js";
 import { wardenIntel, shareIntel } from "./crisis.js";
-import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE, ROLES, COUNTER, MINING, OFFICERS } from "./data.js";
-import { seesFleet, cloaked, miningYields, powerOf, powerWait, useAdmiralPower, officerPool, officersOf, assignOfficer, territoryAt, findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
+import { SHIPS, WORLDS, TECHS, FUEL, AI_STATIONS, AI_CALM, SECTORS, INFLUENCE, ROLES, COUNTER, MINING, OFFICERS, AI_GOALS } from "./data.js";
+import { mergeFleets, engineStanding, engineCharge, seesFleet, cloaked, miningYields, powerOf, powerWait, useAdmiralPower, officerPool, officersOf, assignOfficer, territoryAt, findPath, aiOpt, canFoundStation, foundStation, missingFit, refitPlace, outpostOptions, buildAtOutpost, patrolling, faction, engineHeld, relicHeld, useRelic, shardTargets, canRaidDepot, raidDepot, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, availableAdvances, setResearch, enqueue, rush, totals,
   setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, barrage, barrageTargets, besieged, tradeExotics, marketPrice, buildDepot, inSupplyAt, fuelOf, supplySources, supplyRange, fleetSpeed, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields, usesReserve, fuelStock, fuelCap, beaconSites, buildBeacon, canCrossSealed, engaged, setWithdraw, sendForRepairs, repairPlace, giveGift, amendsCost, makeAmends, joinWarPrice, askJoinWar, denounce, exactTribute, score } from "./game.js";
 
 const PRIORITY = {
@@ -53,7 +53,7 @@ function research(s, F) {
   const pri = PRIORITY[F.id] || [];
   const want = pri.find((id) => avail.some((t) => t.id === id)) || [...avail].sort((a, b) => a.cost - b.cost)[0].id;
   // Late in the game, the Corridor Engine.
-  setResearch(s, F.id, avail.some((t) => t.id === "engine") && s.turn > 90 ? "engine" : want);
+  setResearch(s, F.id, avail.some((t) => t.id === "engine") && s.turn > (AI_GOALS[F.id] && AI_GOALS[F.id] !== "engine" ? 130 : 90) ? "engine" : want);
 }
 
 /** Relics: the Star Chart is read as soon as it's found (game.js); the Gate Shard links the capital to the farthest
@@ -198,13 +198,16 @@ function diplomacy(s, F, diff) {
         else if (!s.offers.some((o) => o.from === F.id)) { s.offers.push({ from: F.id, to: oid, what: "peace", turn: s.turn }); log(s, oid, `${F.name} offers peace.`, "diplo"); }
       }
     } else {
-      const angry = r.score < -18 / (AGGRESSION[F.id] || 1);
+      const conquest = AI_GOALS[F.id] === "conquest", angry = r.score < (conquest ? -8 : -18) / (AGGRESSION[F.id] || 1);
+      // A finished Engine charging toward victory: everyone not allied with its holder goes to war on it.
+      const EC = engineCharge(s);
+      if (EC && EC.owner === oid && !allied(s, F.id, oid) && !(s.crisis && s.crisis.stage === "awake" && s.crisis.truce) && mine > 3) { declareWar(s, F.id, oid); log(s, null, `${F.name} goes to war on ${O.name} to stop their Corridor Engine.`, "war"); continue; }
       // While the Heart of the Wardens lives and a truce holds, no one starts a war.
       if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
       if (allied(s, F.id, oid)) continue;
       const warFrom = AI_CALM.warFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"];   // no early wars of their own...
       const provoked = r.score <= AI_CALM.provoked || (r.memory || []).some((m) => m.d <= AI_CALM.graveOffence && s.turn - m.turn <= AI_CALM.graveTurns);   // ...unless provoked
-      if ((s.turn > warFrom || provoked) && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
+      if ((s.turn > warFrom - (conquest ? 15 : 0) || provoked) && angry && mine > 6 && mine >= theirs * (conquest ? 1.05 : 1.25) / diff) { declareWar(s, F.id, oid); continue; }
       // The holder of the Corridor Engine (an open game): after it's held a while, anyone strong enough comes for it.
       const E = engineHeld(s);
       // A coalition: everyone not allied with the holder, together, against it.
@@ -268,6 +271,13 @@ function minerTargets(s, F, from) {
     .map(([k, fd]) => ({ k, fd, d: from ? distance(from, k) : Math.min(...cols.map((c) => distance(c.at, k))), v: { credits: 1, fuel: 0.8, exotics: 1.3 }[MINING.kinds[fd.kind].res] }))
     .sort((a, b) => a.d / a.v - b.d / b.v);
 }
+/** Transports this power wants at war: enough for the strongest-held enemy world one of its war fleets is in orbit of
+ * (or a couple, if none), with one spare. */
+function troopsWanted(s, F) {
+  const per = shipStats(s, F.id, "transport").troops || 2, cap = AI_GOALS[F.id] === "conquest" ? 8 : 6;
+  const need = Math.max(0, ...fleetsOf(s, F.id).filter(armed).map((f) => { const o = invasionOdds(s, f.id); return o && atWar(s, F.id, s.systems[s.sysAt[f.at]].colony.owner) ? o.defense : 0; }));
+  return Math.min(cap, Math.max(2, Math.ceil(need / per) + 1));
+}
 function production(s, F, diff) {
   // In debt, or paying out more than it earns: scrap warships (frigates first) until the books balance.
   for (let n = 0; n < 6 && (F.credits < 0 || totals(s, F.id).net < -1) && totals(s, F.id).net < 1; n++) {
@@ -308,7 +318,8 @@ function production(s, F, diff) {
       // Mining ships: one for each good field nearby, a few at most, when the fleet's strong enough to spare the yards.
       ships && s.turn >= 6 && (!enemies.length || power >= wantPower * 0.8) && count(s, F, "miner") < Math.min(1 + Math.floor(cols.length / 2), 5) && minerTargets(s, F).length ? ["ship", "miner"] : null,
       ships && power < wantPower ? ["ship", warship(s, F, enemies)] : null,
-      ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "transport") < 2 ? ["ship", "transport"] : null,
+      // Troops enough to take what its fleets are besieging (they land together, from the war fleet): up to 6 (8 for a conqueror).
+      ships && enemies.length && power >= wantPower * 0.6 && count(s, F, "transport") < troopsWanted(s, F) ? ["ship", "transport"] : null,
       ships && enemies.length && power >= wantPower * 0.8 && count(s, F, "tanker") < 1 ? ["ship", "tanker"] : null,
       ships && enemies.length && has(s, F.id, "phaseCloaks") && power >= wantPower * 0.7 && count(s, F, "stealth") < 2 ? ["ship", "stealth"] : null,   // raiders, for their transports and mining ships
       c.pop >= 3 && !c.buildings.factory ? ["building", "factory"] : null,
@@ -319,7 +330,7 @@ function production(s, F, diff) {
       c.capital && hubOf(F.id) && has(s, F.id, hubOf(F.id).tech) && !coloniesOf(s, F.id).some((x) => x.colony.buildings[hubOf(F.id).id] || x.colony.queue.some((q) => q.id === hubOf(F.id).id)) ? ["building", hubOf(F.id).id] : null,
       enemies.length && has(s, F.id, "batteries") && !c.buildings.battery ? ["building", "battery"] : null,
       sys.exotics && has(s, F.id, "refining") && !c.buildings.refinery ? ["building", "refinery"] : null,
-      c.capital && has(s, F.id, "engine") && !c.buildings.engine && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] ? ["building", "engine"] : null,
+      c.capital && has(s, F.id, "engine") && !c.buildings.engine && !engineStanding(s) && s.turn >= AI_CALM.engineFrom[diff >= 1.3 ? "fierce" : diff <= 0.8 ? "gentle" : "standard"] + (AI_GOALS[F.id] && AI_GOALS[F.id] !== "engine" ? 50 : 0) ? ["building", "engine"] : null,   // conquerors and traders build it late
       ships && t.net > 2 && power < wantPower * 1.6 ? ["ship", warship(s, F, enemies)] : null,
       !c.buildings.market ? ["building", "market"] : null,
     ]);
@@ -348,6 +359,13 @@ function fleets(s, F) {
   }
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const cap = s.systems[F.capital];
+  // Troop transports go into battle together: at war, any that reach a war fleet join it (it lands them all at once);
+  // the rest wait together, in one fleet.
+  if (enemies.length) for (const t of fleetsOf(s, F.id).filter((f) => !armed(f) && f.ships.every((x) => x.type === "transport"))) {
+    if (!s.fleets[t.id]) continue;
+    const host = fleetsOf(s, F.id).find((g) => g !== t && g.at === t.at && (armed(g) || g.ships.every((x) => x.type === "transport")) && !g.repairAt);
+    if (host) mergeFleets(s, host.id, t.id);
+  }
   // Officers in the pool join the biggest war fleets with room for them.
   for (const o of [...officerPool(s, F.id)]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && officersOf(x).length < OFFICERS.slots).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignOfficer(s, f.id, o.id); }
   // Admirals in reserve take the biggest war fleets that have none.
@@ -456,9 +474,9 @@ function fleets(s, F) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
           .map((sys) => ({ sys, d: distance(f.at, sys.at), guard: fleetsAt(s, sys.at).filter((g) => g.owner === sys.colony.owner).reduce((t, g) => t + g.ships.length * 2, 0) + (sys.colony.defense || 0) }))
-          .filter((x) => x.guard <= mine * (engineHeld(s) && engineHeld(s).sys === x.sys.id ? 2 : 1.3))
+          .filter((x) => x.guard <= mine * (engineStanding(s) && engineStanding(s).sys === x.sys.id ? 2 : 1.3))
           // A rival's Corridor Engine (an open game) draws every war fleet: it counts as five hexes nearer.
-          .map((x) => (engineHeld(s) && engineHeld(s).sys === x.sys.id ? { ...x, d: x.d - 5 } : x.sys.site ? { ...x, d: x.d - 3 } : x))   // and a key site, three nearer
+          .map((x) => (engineStanding(s) && engineStanding(s).sys === x.sys.id ? { ...x, d: x.d - 8 } : x.sys.site ? { ...x, d: x.d - 3 } : x))   // and a key site, three nearer
           // Within reach on its fuel: a target beyond supply no farther than its tank carries it.
           .filter((x) => inSupplyAt(s, F.id, x.sys.at) || fuelOf(s, f) === Infinity || Math.min(...supplySources(s, F.id).map((c) => distance(c.at, x.sys.at))) - supplyRange(s, F.id) <= fuelOf(s, f) * fleetSpeed(s, f))
           .sort((a, b) => a.d - b.d);

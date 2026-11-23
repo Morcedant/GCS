@@ -2,7 +2,7 @@
 // Dominion. General on purpose: no build orders or exact numbers to follow, so players find their own way to win.
 // Writes dist/strategy.html.   node strategy.mjs
 import { writeFileSync, mkdirSync } from "node:fs";
-import { FACTIONS, RULES } from "./src/data.js";
+import { FACTIONS, RULES, ENGINE } from "./src/data.js";
 
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const sec = (id, title, body) => `<section id="${id}"><h2>${esc(title)}</h2>${body}</section>`;
@@ -24,7 +24,7 @@ const toc = [["win", "Know how the game is won"], ["principles", "Principles"], 
 
 const body = [
   sec("win", "Know how the game is won", `
-<p>A standard game ends after ${RULES.maxTurns} turns. Before then, a power can win by finishing the <b>Corridor Engine</b>, or by <b>conquest</b>, being the last one standing. If neither happens, the highest <b>score</b> wins. The computer players are racing for these too.</p>
+<p>A standard game ends after ${RULES.maxTurns} turns. Before then, a power can win with the <b>Corridor Engine</b> (finish it, then keep it charging for ${ENGINE.charge} turns once the Wardens are beaten), or by <b>conquest</b>, being the last one standing. If neither happens, the highest <b>score</b> wins. The computer players are racing for these too.</p>
 <p>Keep an eye on the <b>Objectives</b> tab. It shows where you stand in each race, and its Threats list tells you when a rival is getting close. Being competitive means knowing, at every stage, which race you're in and who you have to beat.</p>`),
 
   sec("principles", "Principles", ul([
@@ -59,7 +59,7 @@ const body = [
 
   sec("paths", "Choosing a path to victory", `
 <h3>The Corridor Engine</h3>
-<p>A long research path, then a great work at your capital. It rewards a strong science economy, a well-developed capital and steady defense while you build. It's the path the computer players favour, so it's also the race you're most likely to have to win, or to stop.</p>
+<p>A long research path, a great work at your capital, and then the hardest part: keeping it. A finished Engine must charge for ${ENGINE.charge} turns, and it only charges once the Wardens are beaten (finishing it wakes them, if they haven't come yet) and while no enemy warships hold its orbit. Every power not allied with you goes to war to stop it, and whoever takes its world takes the Engine and starts the charge again. So plan it as a campaign: a strong fleet at home, guns and garrisons at your capital, allies if you can get them, and your share in breaking the Heart. Some computer players race for it; the conquerors (the Hegemony, the Zhaq, the Kel) and the Tessan come to it late.</p>
 <h3>Conquest</h3>
 <p>Taking worlds from others. It rewards a strong economy behind a modern fleet, careful preparation, and patience: a world's defenses must be overcome and its orbit held before it can be taken. Supply, fuel and refits decide how far you can reach. Each world you take adds to you and weakens a rival.</p>
 <h3>Score</h3>

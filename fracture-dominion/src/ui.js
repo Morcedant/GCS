@@ -1,7 +1,7 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
 import { HOME, ADMIRAL_POWERS, OFFICERS, SITES, MINING, COUNTER, ROLES, DETECT, countersOf, counteredBy, SECTORS, COLLAPSE, INFLUENCE, SUPPLY, YARDS, FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, shipShape, shipLabel, FLEET_STYLES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS, TRADE, SIEGE, BATTERY, MARKET, FUEL, OUTPOST_BUY, ADVANCES, SCIENCE, WILDS, ENGINE, RELICS, WILD_LEVELS, AI_OPTIONS, AI_PRESETS, DEPOT_RAID, TRADERS, OUTPOST_TRADE, CRISIS } from "./data.js";
-import { territoryOf, territoryAt, powerOf, powerOn, powerWait, useAdmiralPower, officersOf, officerPool, assignOfficer, recallOfficer, siteSystems, sitesFor, seesFleet, cloaked, miningYields, miningIncome, fieldAt, newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
+import { engineCharge, wardensStand, territoryOf, territoryAt, powerOf, powerOn, powerWait, useAdmiralPower, officersOf, officerPool, assignOfficer, recallOfficer, siteSystems, sitesFor, seesFleet, cloaked, miningYields, miningIncome, fieldAt, newGame, endTurn, difficultyLabel, sendAllTo, undoSendAll, gunsMax, gunsUp, missingFit, canFoundStation, foundStation, refitPlace, needsDrydock, needsRefit, sendToDrydock, sendAllToDrydock, outpostSales, outpostOptions, buildAtOutpost, canRaidDepot, raidDepot, relicsOf, relicOwner, relicHeld, useRelic, shardTargets, engineHeld, engineActive, gateTargets, engineGate, advanceItem, advLevel, pacts, anomalyValue, availableAdvances, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds, barrage, barrageTargets, setMuster, musterFor, MUSTER_KINDS, fuelMax, fuelOf, turnStops, damagedShips, repairPlace, sendForRepairs, giftRegard, giveGift, amendsCost, makeAmends, acceptHint, proposeSweetened, exactTribute, denounce, joinWarPrice, askJoinWar, engaged, setWithdraw, detachShips, canCrossSealed, beaconSites, buildBeacon, usesReserve, fuelStock, fuelCap, fuelIncome, burnCost, setBurn, buildDepot, inSupplyAt, cargoOf, tankerPoints, tradeLinks, tradeIncome, tradeExotics, marketPrice, sellPrice, garrisonFactor, besieged,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
@@ -753,7 +753,8 @@ function objectivesHTML() {
   const q = cap && cap.colony ? cap.colony.queue.find((x) => x.id === "engine") : null, built = cap && cap.colony && cap.colony.buildings.engine;
   const techDone = chain.filter((t) => done.includes(t.id)).length;
   const EH = engineHeld(S);
-  const eBadge = EH ? (EH.owner === me.id ? ["You hold it", "good"] : ["A rival holds it", "bad"]) : S.winner === me.id && S.winReason === "engine" ? ["Won", "good"] : q ? ["Building", "good"] : done.includes("engine") ? ["Ready to build", "good"] : techDone ? ["Researching", ""] : ["Not started", ""];
+  const EC = engineCharge(S);
+  const eBadge = EH ? (EH.owner === me.id ? ["You hold it", "good"] : ["A rival holds it", "bad"]) : EC ? (EC.owner === me.id ? [EC.paused ? "Paused" : `Charging: ${EC.left}`, EC.paused ? "" : "good"] : ["A rival's is charging", "bad"]) : S.winner === me.id && S.winReason === "engine" ? ["Won", "good"] : q ? ["Building", "good"] : done.includes("engine") ? ["Ready to build", "good"] : techDone ? ["Researching", ""] : ["Not started", ""];
   let firstOpen = true;
   const step = (isDone, text) => { const st = isDone ? "done" : firstOpen ? (firstOpen = false, "now") : ""; return stepLi(st, text); };
   h += `<div class="card obj"><h3 class="obj-h">The Corridor Engine <span class="badge-status ${eBadge[1]}">${eBadge[0]}</span></h3>
@@ -761,15 +762,16 @@ function objectivesHTML() {
     <span>Exotics</span><span>${fmt(me.exotics)} of ${BUILDINGS.engine.exotics} it needs</span></div>
     <ol class="steps-list">${chain.map((t) => step(done.includes(t.id), `Research ${esc(t.name)}${me.research.current === t.id ? ` (now: ${Math.round((me.research.progress / t.cost) * 100)}%)` : ""}`)).join("")}
     ${step(!!q || !!built, `Queue the Corridor Engine at your capital${cap ? `, ${esc(cap.name)}` : ""} (${BUILDINGS.engine.cost} industry, ${BUILDINGS.engine.exotics} exotics)`)}
-    ${step(!!built, `Finish it${q ? `: ${Math.round((q.progress / q.cost) * 100)}% built` : ""}`)}</ol>
-    ${S.mode === "open" ? engineOpenHTML(me) : `<p class="small" style="margin-top:6px"><b class="good">Win:</b> finish the Corridor Engine at your capital. <b class="bad">Watch:</b> lose your capital and the work is lost.</p>`}</div>`;
+    ${step(!!built, `Finish it${q ? `: ${Math.round((q.progress / q.cost) * 100)}% built` : ""}`)}
+    ${S.mode === "open" ? "" : step(false, `Charge it for ${ENGINE.charge} turns, with the Wardens beaten and its orbit clear${EC && EC.owner === me.id ? `: <b>${EC.left} to go</b>${EC.paused ? ` (paused: ${EC.paused === "wardens" ? "the Wardens stand" : "enemy warships hold its orbit"})` : ""}` : ""}`)}</ol>
+    ${S.mode === "open" ? engineOpenHTML(me) : `<p class="small" style="margin-top:6px"><b class="good">Win:</b> finish the Corridor Engine at your capital, then keep it for ${ENGINE.charge} turns of charging. It only charges once the Wardens are beaten (finishing it wakes them), and not while enemy warships hold its orbit. <b class="bad">Watch:</b> every power not allied with you goes to war to stop it, and whoever takes its world takes the Engine.</p>`}</div>`;
   // 3. Score.
   const gap = lead.f.id === me.id ? (ranked[1] ? mine - ranked[1].sc : mine) : lead.sc - mine;
   const sBadge = lead.f.id === me.id ? ["Leading", "good"] : ["Behind", "bad"];
   h += `<div class="card obj"><h3 class="obj-h">Highest score at turn ${RULES.maxTurns} <span class="badge-status ${sBadge[1]}">${sBadge[0]}</span></h3>
     <div class="kv small"><span>Yours</span><span>${ibar(mine, Math.max(1, lead.sc), "var(--accent)")} ${mine}</span>
     <span>${lead.f.id === me.id ? "Next best" : "Leader"}</span><span>${lead.f.id === me.id ? (ranked[1] ? `${me.met[ranked[1].f.id] ? esc(ranked[1].f.name) : "An unmet rival"}: ${ranked[1].sc} (you lead by ${gap})` : "No one") : `${me.met[lead.f.id] ? esc(lead.f.name) : "An unmet rival"}: ${lead.sc} (${gap} ahead of you)`}</span></div>
-    <p class="small" style="margin-top:6px"><b class="good">Win:</b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.</p></div>`;
+    <p class="small" style="margin-top:6px"><b class="good">Win:</b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, 8 per key site held, 2 per battle won, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.</p></div>`;
   if (!live) h += crisisHTML();
   h += sectorsHTML();
   // The rivals' race.
@@ -778,11 +780,12 @@ function objectivesHTML() {
     const theirCap = S.systems[f.capital], tq = theirCap && theirCap.colony ? theirCap.colony.queue.find((x) => x.id === "engine") : null;
     if (tq) threats.push(`<li class="bad"><b>${esc(f.name)}</b> is building the Corridor Engine at ${esc(theirCap.name)}${me.met[f.id] ? `: ${Math.round((tq.progress / tq.cost) * 100)}% done` : ""}. Take or blockade it before it's finished.</li>`);
   }
+  if (EC && EC.owner !== me.id) threats.push(`<li class="bad"><b>${esc(faction(S, EC.owner).name)}</b>'s Corridor Engine at ${esc(S.systems[EC.sys].name)} is charging: <b>${EC.left} turn${EC.left === 1 ? "" : "s"} left</b>${EC.paused ? ` (paused: ${EC.paused === "wardens" ? "the Wardens stand" : "warships hold its orbit"})` : ""}. Take the world, hold its orbit, or barrage the Engine to stop it.</li>`);
   { const E = engineHeld(S); if (E && E.owner !== me.id && me.met[E.owner]) threats.push(`<li class="bad"><b>${esc(faction(S, E.owner).name)}</b> holds the Corridor Engine at ${esc(S.systems[E.sys].name)}: ${ENGINE.scorePerTurn} score a turn, and its fleets move freely. Take it or destroy it.</li>`); }
   if (rivals.length === 1) threats.push(`<li class="war">Only ${esc(rivals[0].name)} is left: one of you will win by conquest.</li>`);
   h += `<h3>Threats</h3>` + (threats.length ? `<ul class="log">${threats.join("")}</ul>` : `<p class="small muted">No rival is close to winning yet.</p>`);
   h += S.mode === "open" ? `<p class="small muted"><b>Open rule:</b> no end but the one you choose. Your last world falling still ends it.</p>`
-    : `<p class="small muted"><b>Defeat:</b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.</p>`;
+    : `<p class="small muted"><b>Defeat:</b> your last world falls; a rival's Corridor Engine finishes charging, or a rival stands alone; or a rival leads on score at turn ${RULES.maxTurns}.</p>`;
   return h;
 }
 /** An open game's Engine: who holds it and what it gives, or that the race is open. */

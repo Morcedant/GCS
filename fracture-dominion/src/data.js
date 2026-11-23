@@ -529,7 +529,15 @@ export const SITES = { per: 18, min: 2, fromCapital: 4, apart: 6,
  * other powers' regard for the holder falls by `grudge` every grudgeEvery turns. While enemy warships hold its orbit, it
  * gives nothing. Capture the world and it's yours; a barrage destroys it, and the race to build it starts again.
  */
-export const ENGINE = { gateEvery: 5, tradePerColony: 2, scorePerTurn: 2, grudgeEvery: 5, grudge: -3 };
+export const ENGINE = { gateEvery: 5, tradePerColony: 2, scorePerTurn: 2, grudgeEvery: 5, grudge: -3,
+  // A standard game: a finished Engine must charge for `charge` turns, the Wardens beaten, before it wins. It pauses
+  // while the Wardens (or a Heart) stand, and while enemy warships hold its orbit; taken, it starts again for the taker.
+  charge: 15, grudgeCharge: -30 };
+/** What each computer power plays for. "engine": the Corridor Engine; "conquest": war (earlier, readier, and the Engine
+ * only late); "score": a wide, rich empire (the Engine late). */
+export const AI_GOALS = { concord: "engine", vael: "engine", ylith: "engine", mirrun: "engine", hegemony: "conquest", zhaq: "conquest", kel: "conquest", tessan: "score" };
+/** Score for what the newer systems bring: each key site held, each battle won. */
+export const SCORE_EXTRA = { site: 8, battle: 2 };
 /**
  * Relics of the old empires: one of each, hidden in ruins and anomalies (a few out in the Outer Reach, which only the
  * Star Chart opens). The first fleet to end its turn at a relic's site recovers it, and it goes to its finder's capital.

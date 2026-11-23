@@ -21,7 +21,8 @@ for (let i = 0; i < turns && !s.winner; i++) {
   if (process.env.CRISIS && s.crisis && s.crisis.stage === "awake" && s.turn % 5 === 0) { const c = crisisState(s); console.log(`  T${s.turn} heart ${c.hull}/${c.max} wave ${c.wave} warden ships ${c.ships}`); }
   if (s.turn % 25 === 0 || s.winner) console.log(`T${s.turn} ` + s.factions.map((F) => `${F.id}:${F.alive ? "" : "†"}c${coloniesOf(s, F.id).length} p${coloniesOf(s, F.id).reduce((t, x) => t + (x.colony.pop || 0), 0)} m${militaryPower(s, F.id)} t${F.research.done.length} $${Math.round(F.credits)} x${F.exotics} f${F.fuelStock ?? "-"}/${fuelCap(s, F.id)}+${fuelIncome(s, F.id)} dry${fleetsOf(s, F.id).filter((f) => f.dry === s.turn).length} s${score(s, F.id)}`).join(" | "));
 }
-const wars = s.log.filter((l) => /declared war/.test(l.text)).length, battles = s.log.filter((l) => /^Battle/.test(l.text)).length, taken = s.log.filter((l) => / took /.test(l.text)).length;
+const wars = s.factions.reduce((t, A) => t + Object.entries(A.relations).filter(([b, r]) => A.id < b && r.turnsAtWar > 0).length, 0),   // pairs that were ever at war (computer powers' declarations aren't logged)
+  battles = s.log.filter((l) => /^Battle/.test(l.text)).length, taken = s.log.filter((l) => / took /.test(l.text)).length;
 const C = s.directives; console.log(`campaigns: ${(C.past || []).map((p) => p.id + ":" + p.over).concat(C.campaign ? [C.campaign.id + ":" + (C.campaign.over || C.campaign.threads.length)] : []).join(" ")}; directives done ${C.history.filter((h) => h.result === "done").length}, lost ${C.history.filter((h) => h.result !== "done").length}; prototypes ${Object.keys(s.factions[0].protos || {}).join(",") || "-"}`);
 console.log(`events chosen: ${evs}; messages ${JSON.stringify(msgs)}`);
 console.log(`admirals: ${s.factions.map((F) => F.id + ":" + admiralsOf(s, F.id).map((x) => x.a.traits.length + "/" + x.a.wins).join(",") + " fallen " + (F.fallen || []).length).join(" | ")}`);
