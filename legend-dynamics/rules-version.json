@@ -4,6 +4,17 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-24",
+      "kind": "site",
+      "title": "Dominion: ships on standing orders no longer fly into enemy fleets",
+      "items": [
+        "New ships heading for a muster point, fleets going for a refit, and ships going for repairs (or back to their fleet) now take routes round enemy warships you can see, and change course if one turns up on the way. Your own move orders still go the shortest way.",
+        "If ships on a standing order do end up in a battle, the battle report says which ships they were and where they were going.",
+        "The Log no longer loses your battle and war messages: the computer powers' own research and charting news were filling it up and pushing everything else out.",
+        "Diplomacy shows how many of a power's worlds you've charted (\"Worlds 31 (10 charted by you)\"), with a link to one of them."
+      ]
+    },
+    {
       "date": "2026-11-23",
       "kind": "site",
       "title": "Dominion: the intro always plays the main theme",

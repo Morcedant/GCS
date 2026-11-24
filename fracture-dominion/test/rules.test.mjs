@@ -1737,3 +1737,26 @@ test("Watchers have to be found: off the map until a ship or world of yours sees
   const sc = spawnFleet(s, me.id, far, ["scout"]); updateVision(s, me); assert.ok(me.foundW[w.id], "a scout finds it");
   delete s.fleets[sc.id]; updateVision(s, me); assert.ok(!me.visible[far] && me.foundW[w.id], "out of sight again, but remembered");
 });
+
+test("standing orders steer round enemy fleets in sight (muster, refit, repairs); the player's own orders go straight", async () => {
+  const { updateVision } = await import("../src/game.js");
+  const s = newGame({ seed: 8, size: "medium", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0], foe = s.factions[1];
+  declareWar(s, me.id, foe.id);
+  const cap = s.systems[me.capital];
+  const far = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && distance(k, cap.at) === 6).sort()[0];
+  const direct = findPath(s, me.id, cap.at, far), mid = direct[2].hex;
+  spawnFleet(s, foe.id, mid, ["cruiser", "cruiser"]); me.visible[mid] = 1;
+  const a = spawnFleet(s, me.id, cap.at, ["frigate"]); setDestination(s, a.id, far, { auto: "muster" });
+  assert.ok(!a.path.some((x) => x.hex === mid), "a standing order goes round them");
+  const b = spawnFleet(s, me.id, cap.at, ["frigate"]); setDestination(s, b.id, far);
+  assert.ok(b.path.some((x) => x.hex === mid) && !b.auto, "the player's own order goes the shortest way");
+});
+
+test("the log keeps the player's news: the computer powers' own research and charting can't crowd it out", async () => {
+  const { log } = await import("../src/game.js");
+  const s = newGame({ seed: 8, size: "small", player: "concord", rivals: 1 }), ai = s.factions[1].id;
+  log(s, null, "Battle at Testworld.", "war");
+  for (let i = 0; i < 600; i++) log(s, ai, `They discovered thing ${i}.`, "research");
+  assert.ok(s.log.some((l) => l.text === "Battle at Testworld."), "the battle is still there");
+  assert.ok(s.log.length <= 400);
+});

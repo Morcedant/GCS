@@ -68,8 +68,15 @@ export const DISCOVERY = ["explore", "research", "contact"];
 export function log(s, fid, text, kind = "info") {
   s.logSeq = (s.logSeq || 0) + 1;   // each entry is numbered, so the page can show what one choice led to
   s.log.push({ id: s.logSeq, turn: s.turn, fid, text, kind });
-  let n = s.log.length - 400;
-  for (let i = 0; i < s.log.length && n > 0; ) { if (!DISCOVERY.includes(s.log[i].kind)) { s.log.splice(i, 1); n--; } else i++; }
+  let n = s.log.length - 400; if (n <= 0) return;
+  // Over the limit: first what only concerns the computer powers (their research and charting, which the player never
+  // sees), then anything but the player's discoveries, then the oldest. (The computer powers' discoveries used to be
+  // kept for ever, until they crowded out every battle and war message of the player's.)
+  const me = (s.factions.find((F) => !F.ai) || {}).id;
+  const drop = (keep) => { for (let i = 0; i < s.log.length && n > 0; ) { if (!keep(s.log[i])) { s.log.splice(i, 1); n--; } else i++; } };
+  drop((l) => !l.fid || l.fid === me || ["war", "victory", "diplo", "contact"].includes(l.kind));
+  drop((l) => DISCOVERY.includes(l.kind));
+  drop(() => false);
 }
 export function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 export function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
@@ -133,7 +140,7 @@ export function sendToDrydock(s, fleetId, onlyOld = false) {
     const fu = fuelOf(s, f); f.ships = f.ships.filter((x) => !old.includes(x));
     go = spawnFleet(s, f.owner, f.at, []); go.ships.push(...old); go.fuel = Math.min(fu, fuelMax(s, go)); if (f.stance) go.stance = f.stance;
   }
-  const r = setDestination(s, go.id, dock.at);
+  const r = setDestination(s, go.id, dock.at, { auto: "refit" });
   if (r.error) { if (go !== f) { f.ships.push(...go.ships); delete s.fleets[go.id]; } return { error: `No way to ${dock.name} from here.` }; }
   go.sentry = false; go.refitTrip = true;
   return { ok: true, fleet: go.id, dock: dock.name, turns: r.turns, ships: go.ships.length, split: go !== f };
@@ -713,10 +720,14 @@ export function buildBeacon(s, fid, sysId) {
   s.log[s.log.length - 1].sector = true;
   return { ok: true };
 }
-export function findPath(s, fid, from, to) {
+/** avoid: a standing order's route (muster, refit, repairs) steers round enemy warships at war that this power can see. */
+export function findPath(s, fid, from, to, avoid = false) {
   if (!s.hexes[to] || s.hexes[to].terrain === "rift") return null;
   if (s.hexes[to].sealed && !canCrossSealed(s, fid)) return null;
   const dist = { [from]: 0 }, prev = {}, open = [[0, from]], cc = corridorCost(s, fid), cross = canCrossSealed(s, fid);
+  const F = avoid && faction(s, fid), danger = {};
+  if (F) for (const o of Object.values(s.fleets)) if (o.owner !== fid && armed(o) && atWar(s, fid, o.owner) && seesFleet(s, F, o)) danger[o.at] = 1;
+  const hostileAt = (k) => !!danger[k];
   while (open.length) {
     open.sort((a, b) => a[0] - b[0]);
     const [d, k] = open.shift();
@@ -726,7 +737,7 @@ export function findPath(s, fid, from, to) {
     const sid = s.sysAt[k];
     if (sid) for (const o of s.adj[sid]) steps.push([s.systems[o].at, cc]);
     for (const [n, c] of steps) {
-      const nd = d + c;
+      const nd = d + c + (avoid && n !== to && hostileAt(n) ? 40 : 0);
       if (dist[n] === undefined || nd < dist[n] - 1e-9) { dist[n] = nd; prev[n] = k; open.push([nd, n]); }
     }
   }
@@ -764,10 +775,13 @@ export function turnStops(s, f, path = f.path, speed = fleetSpeed(s, f) + (f.bur
   }
   return stops;
 }
-export function setDestination(s, fleetId, hex) {
+/** opts.auto: a standing order sent it ("muster", "refit", "repair"): its route steers round enemy fleets in sight, and
+ * it's re-planned if one turns up on the way. A plain order (no auto) is the player's own and goes the shortest way. */
+export function setDestination(s, fleetId, hex, opts = {}) {
   const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  f.auto = opts.auto || null;
   if (hex === f.at) { f.path = []; f.dest = null; return { ok: true }; }
-  const path = findPath(s, f.owner, f.at, hex);
+  const path = findPath(s, f.owner, f.at, hex, !!opts.auto);
   if (!path && s.hexes[hex] && s.hexes[hex].sealed && !canCrossSealed(s, f.owner)) return { error: "That sector is sealed: it takes Rift drives, or a Rift beacon on a world near it, to get in." };
   if (!path) return { error: "No way there." };
   f.path = path; f.dest = hex; return { ok: true, turns: turnStops(s, f).length };
@@ -851,7 +865,7 @@ export function sendForRepairs(s, fleetId, rejoin = false, only = null) {
   go.repairAt = place.sys.id; go.rejoin = rejoin && go !== f ? f.id : null; go.sentry = false;
   const engagedNow = engaged(s, go);
   if (engagedNow) { const w = setWithdraw(s, go.id); if (w.error) return w; }
-  else if (go.at !== place.sys.at && setDestination(s, go.id, place.sys.at).error) return { error: `No way to ${place.sys.name} from here.` };
+  else if (go.at !== place.sys.at && setDestination(s, go.id, place.sys.at, { auto: "repair" }).error) return { error: `No way to ${place.sys.name} from here.` };
   return { ok: true, fleet: go.id, ships: hurt.length, to: place.sys.name, how: place.how, turns: place.turns, withdrawing: engagedNow, split: go !== f };
 }
 /** Each turn: ships sent for repairs that are mended go back to their fleet (if asked), following it if it moved. */
@@ -859,13 +873,13 @@ function repairsTurn(s) {
   for (const f of Object.values(s.fleets)) {
     if (!f.repairAt || f.withdraw) continue;
     const place = s.systems[f.repairAt], mended = !damagedShips(s, f).length;
-    if (!mended) { if (place && place.colony && place.colony.owner === f.owner && f.at !== place.at && !f.path.length) setDestination(s, f.id, place.at); continue; }
+    if (!mended) { if (place && place.colony && place.colony.owner === f.owner && f.at !== place.at && !f.path.length) setDestination(s, f.id, place.at, { auto: "repair" }); continue; }
     const back = f.rejoin && s.fleets[f.rejoin];
     if (!f.rejoined && !faction(s, f.owner).ai) log(s, f.owner, `Your ships at ${place ? place.name : "the yards"} are repaired${back ? ", and heading back to their fleet" : ""}.`, "build");
     f.rejoined = true;
     if (!back) { delete f.repairAt; delete f.rejoin; delete f.rejoined; continue; }
     if (back.at === f.at && !back.path.length) { back.ships.push(...f.ships); joinAdmirals(s, back, f); delete s.fleets[f.id]; continue; }
-    if (f.dest !== back.at) setDestination(s, f.id, back.at);
+    if (f.dest !== back.at) setDestination(s, f.id, back.at, { auto: "rejoin" });
   }
 }
 /** Detach ships from a fleet into a fleet of their own, to send somewhere: counts by type ({ cruiser: 3, frigate: 2 }).
@@ -912,6 +926,12 @@ function joinMustered(s) {
   }
 }
 function moveFleets(s) {
+  // A fleet on a standing order with enemy warships now in sight on its way: a new route round them.
+  for (const f of Object.values(s.fleets)) {
+    if (!f.auto || !f.dest || !f.path.length || isWild(f.owner)) continue;
+    const F = faction(s, f.owner);
+    if (F && f.path.some((st) => st.hex !== f.dest && fleetsAt(s, st.hex).some((o) => o.owner !== f.owner && armed(o) && atWar(s, f.owner, o.owner) && seesFleet(s, F, o)))) setDestination(s, f.id, f.dest, { auto: f.auto });
+  }
   for (const f of Object.values(s.fleets)) {
     if (f.withdraw) continue;   // it fights the first exchange, then pulls back (withdrawals)
     // Engaged: it can't just sail away from the battle; withdrawing is the way out.
@@ -1185,6 +1205,8 @@ function battles(s) {
     const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
     const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
       units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : shipLabel(u.fid, u.ship.type), hull: hp(u), max: u.world ? gunsMax(s, u.world.colony) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [],
+      // Ships of the player's that a standing order sent this way: say so, or the battle makes no sense to them.
+      why: [...new Set(units.filter((u) => u.fleet && u.fid === me && u.fleet.auto).map((u) => u.fleet))].map((f) => ({ n: f.ships.length, auto: f.auto, to: f.dest && s.sysAt[f.dest] ? s.systems[s.sysAt[f.dest]].name : null, types: [...new Set(f.ships.map((x) => x.type))] })),
       admirals: [...new Set(units.filter((u) => u.fleet && u.fleet.admiral).map((u) => u.fleet))].map((f) => ({ fid: f.owner, name: admTitle(f.admiral), traits: f.admiral.traits.map((t) => ADMIRAL_TRAITS[t].name) })) } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
@@ -1630,7 +1652,7 @@ function economy(s, F) {
         if (q.kind === "ship") {
           const warship = SHIPS[q.id].skill > 0, dest = musterFor(s, F.id, q.id);
           if (dest && dest !== sys) {   // a standing order: it leaves for the muster point as soon as it's built
-            const nf = spawnFleet(s, F.id, sys.at, [q.id]), r = setDestination(s, nf.id, dest.at);
+            const nf = spawnFleet(s, F.id, sys.at, [q.id]), r = setDestination(s, nf.id, dest.at, { auto: "muster" });
             if (r.error) log(s, F.id, `${q.name} built at ${sys.name} can't find a way to the muster point at ${dest.name}: it waits here.`, "build");
             else { nf.muster = musterKind(q.id); q.mustered = dest.name; }
           } else {
