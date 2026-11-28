@@ -6,7 +6,7 @@ import { engineCharge, wardensStand, territoryOf, territoryAt, powerOf, powerOn,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
-import { crisisTurn, crisisState, coalitionTargets, coalitionAnswers, callCoalition, wardenThreats, wardenIntel, shareIntel } from "./crisis.js";
+import { riftZones, sendScoutToRift, crisisTurn, crisisState, coalitionTargets, coalitionAnswers, callCoalition, wardenThreats, wardenIntel, shareIntel } from "./crisis.js";
 import { wildsTurn, wildsState, wildsLevel, setWildsLevel, protectedFrom } from "./wilds.js";
 import { tradersTurn, convoyValue } from "./traders.js";
 import { sectorsTurn, sectorsState, corridorsTurn, collapseState } from "./sectors.js";
@@ -440,6 +440,15 @@ function draw() {
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
   }
+  // Rifts with a Watcher's signal from them that you haven't traced yet: outlined, explored or not, and labelled.
+  { const c = S.crisis && ["quiet", "stirring"].includes(S.crisis.stage) ? crisisState(S) : null;
+    const zs = c ? [...new Map((c.watcherList || []).filter((w) => !(me.foundW || {})[w.id] && w.rift).map((w) => [w.rift.id, w.rift.id])).values()] : [];
+    for (const z of riftZones(S).filter((x) => zs.includes(x.id))) {
+      ctx.strokeStyle = "rgba(255,190,90,.9)"; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+      for (const k of z.hexes) { const { x, y } = toPixel(k, size); hexPath(ctx, x, y, size - 2); if (!me.explored[k]) { ctx.fillStyle = "rgba(150,30,30,.35)"; ctx.fill(); } ctx.stroke(); }
+      ctx.setLineDash([]);
+      if (view.zoom > 0.4) { const { x, y } = toPixel(z.center, size); ctx.fillStyle = "#ffbe5a"; ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("SIGNAL", x, y - size * 0.95); ctx.textAlign = "left"; }
+    } }
   // Watchers and Nodes: a dashed ring and their name, so they're easy to find.
   for (const f of Object.values(S.fleets)) {
     if (f.owner !== "wardens" || !(seesFleet(S, me, f) || (me.foundW || {})[f.id])) continue; const kind = f.ships.find((x) => x.type === "watcher" || x.type === "node"); if (!kind) continue;
@@ -461,7 +470,17 @@ function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); 
 /** Whether there's anything about the Wardens the player could tell anyone. */
 const intelAny = () => { const me = player(S); return S.factions.some((F) => F.alive && F.id !== me.id && me.met[F.id] && wardenIntel(S, me.id, F.id).length); };
 /** While the Wardens are about: a bar over the map, with what's attacking your worlds and the call to arms at hand. */
-let watcherIdx = -1;
+let watcherIdx = -1, riftIdx = -1;
+/** Send a scout to each rift with an unfound Watcher's signal that none of yours is already searching. */
+function scoutTheRifts(rifts) {
+  const me = player(S), busy = new Set(fleetsOf(S, me.id).filter((f) => f.riftSearch !== undefined && f.path.length).map((f) => f.riftSearch));
+  const todo = rifts.filter((z) => !busy.has(z.id)); if (!todo.length) { toast("Your scouts are already on their way to every rift with a signal."); return; }
+  const sent = [], err = [];
+  for (const z of todo) { const r = sendScoutToRift(S, me.id, z.id); if (r.ok) sent.push(`${z.name} (${turnStops(S, S.fleets[r.fleet]).length} turns)`); else err.push(r.error); }
+  if (sent.length) { toast(`Scout${sent.length > 1 ? "s" : ""} sent to the rift${sent.length > 1 ? "s" : ""} near ${sent.join(", ")}.`); const f = fleetsOf(S, me.id).find((x) => x.riftSearch === todo[0].id); if (f) { select({ kind: "fleet", id: f.id }); centerOn(f.at); } }
+  else toast(err[0], true);
+  save(); renderAll();
+}
 function renderWardenBar() {
   const el = $("warden-bar"); if (!el) return;
   const K = S && S.crisis, c = S && crisisState(S);
@@ -469,13 +488,16 @@ function renderWardenBar() {
     // The Signs: the probes in sight (and what they're scanning), the Watchers, and how long the warnings have run.
     const me = player(S), probes = Object.values(S.fleets).filter((f) => f.owner === "wardens" && seesFleet(S, me, f) && f.ships.some((x) => x.type === "probe"));
     const foundW = (c.watcherList || []).filter((w) => (me.foundW || {})[w.id]);   // only the ones found
+    const lostR = [...new Map((c.watcherList || []).filter((w) => !(me.foundW || {})[w.id] && w.rift).map((w) => [w.rift.id, w.rift])).values()];   // the rifts the others' signals come from
     const scanning = probes.map((f) => f.probe && f.probe.target && S.systems[f.probe.target]).filter((x) => x && x.colony && x.colony.owner === me.id && distance(x.at, probes[0].at) <= 3);
     if (!probes.length && !c.watchers && c.stage === "signs") { el.hidden = true; return; }
     el.classList.add("calm");
-    el.innerHTML = `<span class="pulse" aria-hidden="true"></span><span><b>${c.stage === "stirring" ? "The Wardens are stirring" : "The Signs"}.</b>${probes.length ? ` ${probes.length} Warden probe${probes.length === 1 ? "" : "s"} in sight${scanning.length ? `, scanning <b>${esc(scanning[0].name)}</b>` : ""}: only warships can catch them, and what they see, the Wardens will know.` : ""}${c.watchers ? ` ${c.watchers} Watcher${c.watchers === 1 ? "" : "s"} by the rifts${foundW.length < c.watchers ? (foundW.length ? ` (${foundW.length} found)` : ", not yet found: send scouts along the rifts") : ""}.` : ""}${S.crisis.intel ? ` ${S.crisis.intel} probe${S.crisis.intel === 1 ? " has" : "s have"} got home.` : ""}</span>
-      ${probes.length ? `<button class="btn small primary" id="wb-probe">Show the probe</button>` : ""}${intelAny() ? `<button class="btn small" id="wb-intel">Share what you know</button>` : ""}${foundW.length ? `<button class="btn small${probes.length ? "" : " primary"}" id="wb-watcher">Show the Watcher${foundW.length > 1 ? "s" : ""}</button>` : ""}<button class="btn small" id="wb-more">Details</button>`;
+    el.innerHTML = `<span class="pulse" aria-hidden="true"></span><span><b>${c.stage === "stirring" ? "The Wardens are stirring" : "The Signs"}.</b>${probes.length ? ` ${probes.length} Warden probe${probes.length === 1 ? "" : "s"} in sight${scanning.length ? `, scanning <b>${esc(scanning[0].name)}</b>` : ""}: only warships can catch them, and what they see, the Wardens will know.` : ""}${c.watchers ? ` ${c.watchers} Watcher${c.watchers === 1 ? "" : "s"}${foundW.length ? ` (${foundW.length} found)` : ""}.` : ""}${lostR.length ? ` Signal${lostR.length === 1 ? "" : "s"} from the rift${lostR.length === 1 ? "" : "s"} near <b>${lostR.map((z) => esc(z.name)).join(", ")}</b>: send a scout to find ${c.watchers - foundW.length === 1 ? "it" : "them"}.` : ""}${S.crisis.intel ? ` ${S.crisis.intel} probe${S.crisis.intel === 1 ? " has" : "s have"} got home.` : ""}</span>
+      ${probes.length ? `<button class="btn small primary" id="wb-probe">Show the probe</button>` : ""}${intelAny() ? `<button class="btn small" id="wb-intel">Share what you know</button>` : ""}${lostR.length ? `<button class="btn small primary" id="wb-scout">Send a scout</button><button class="btn small" id="wb-rift">Show the rift${lostR.length > 1 ? "s" : ""}</button>` : ""}${foundW.length ? `<button class="btn small${probes.length || lostR.length ? "" : " primary"}" id="wb-watcher">Show the Watcher${foundW.length > 1 ? "s" : ""}</button>` : ""}<button class="btn small" id="wb-more">Details</button>`;
     el.hidden = false;
     // Each click shows the next Watcher.
+    if ($("wb-rift")) $("wb-rift").onclick = () => { const i = (riftIdx = (riftIdx + 1) % lostR.length); centerOn(lostR[i].center); draw(); toast(`The rift near ${lostR[i].name}: a Watcher's signal comes from somewhere along it.`); };
+    if ($("wb-scout")) $("wb-scout").onclick = () => scoutTheRifts(lostR);
     if ($("wb-watcher")) $("wb-watcher").onclick = () => { const L = foundW, i = (watcherIdx = (watcherIdx + 1) % L.length); centerOn(L[i].at); draw(); toast(`Watcher${L.length > 1 ? ` ${i + 1} of ${L.length}` : ""}: ${L[i].place}.`); };
     if ($("wb-probe")) $("wb-probe").onclick = () => { centerOn(probes[0].at); draw(); };
     if ($("wb-intel")) $("wb-intel").onclick = showIntelShare;
@@ -535,6 +557,16 @@ function siegeHTML(sys, mine) {
     : `It surrenders after ${SIEGE.surrenderAfter} turns.`;
   return `<p class="small ${mine ? "bad" : "good"}"><b>Under siege${n ? ` for ${n} turn${n === 1 ? "" : "s"}` : ""}.</b> ${mine ? "Enemy warships hold the orbit: break them, or it" : "Your warships hold the orbit: it"} makes half its industry and credits, grows nothing, trades with no one, can't repair its guns or launch what it builds${c.kind === "colony" ? `, and starves: the next population lost in ${nextHunger} turn${nextHunger === 1 ? "" : "s"}` : ""}. Its garrison is at ${Math.round(garrisonFactor(sys) * 100)}%. ${fall}</p>`;
 }
+/** A section that folds away: its <h3> becomes the summary line. Which ones are open is remembered (openFolds). */
+const openFolds = new Set();
+/** The short names the build chips use (the full name is in the chip's tooltip). */
+const CHIP_NAMES = { colony: "Colony ship", outpost: "Outpost ship", transport: "Transport", tanker: "Tanker", torpedo: "Torpedo boat", stealth: "Stealth", miner: "Miner" };
+const chipName = (o) => (o.kind === "ship" ? CHIP_NAMES[o.id] || SHIPS[o.id].name : BUILDINGS[o.id].name.replace(/^(Orbital|Deep-space|Planetary) /, "").replace(/^./, (c) => c.toUpperCase()));
+function fold(key, html) {
+  if (!html) return "";
+  const m = html.match(/^\s*<h3>([\s\S]*?)<\/h3>/); if (!m) return html;
+  return `<details class="fold" data-fold="${key}"${openFolds.has(key) ? " open" : ""}><summary>${m[1]}</summary>${html.slice(m[0].length)}</details>`;
+}
 function systemHTML() {
   const sys = S.systems[sel.id], me = player(S), w = WORLDS[sys.world], c = sys.colony;
   const mine = c && c.owner === me.id, seen = me.visible[sys.at];
@@ -548,7 +580,7 @@ function systemHTML() {
     h += `<h3>Key site: ${esc(K.name)}</h3><p class="small ${who === me.id ? "good" : "muted"}" style="margin-top:-4px">${esc(K.text)} ${who === me.id ? "<b>It's yours.</b>" : who ? `Held by ${esc(faction(S, who).name)}${sitesFor(S, me.id, sys.site).includes(sys) ? " (your ally: you share it)" : ": take it, or ally with them"}.` : "No one holds it yet: claim it with a colony or an outpost."}</p>`; }
   if (sys.relic && sys.relicLost && me.explored[sys.at]) h += `<p class="small gold"><b>${esc(RELICS[sys.relic].name)}</b> lies in the ruins here: the first fleet to end its turn here recovers it.</p>`;
   if (mine && relicHeld(S, me.id, "shard")) { const r = S.relics.shard, ready = !r.ready || S.turn >= r.ready, tg = shardTargets(S, me.id, sys.id).sort((a, b) => distance(a.at, sys.at) - distance(b.at, sys.at));
-    h += `<h3>The Gate Shard</h3>` + (ready ? (tg.length ? `<p class="small muted" style="margin-top:-4px">Open a new corridor from ${esc(sys.name)} to:</p><div class="opts">${tg.slice(0, 10).map((x) => `<button class="opt" data-shard="${x.id}"><b>${esc(x.name)}</b> <small>${distance(x.at, sys.at)} hexes</small></button>`).join("")}</div>` : `<p class="small muted">No explored system within 8 hexes left to link.</p>`) : `<p class="small muted">Spent until turn ${r.ready}.</p>`); }
+    h += fold("shard", `<h3>The Gate Shard</h3>` + (ready ? (tg.length ? `<p class="small muted" style="margin-top:-4px">Open a new corridor from ${esc(sys.name)} to:</p><div class="opts">${tg.slice(0, 10).map((x) => `<button class="opt" data-shard="${x.id}"><b>${esc(x.name)}</b> <small>${distance(x.at, sys.at)} hexes</small></button>`).join("")}</div>` : `<p class="small muted">No explored system within 8 hexes left to link.</p>`) : `<p class="small muted">Spent until turn ${r.ready}.</p>`)); }
   { const E = engineHeld(S); if (E && E.sys === sys.id) h += `<p class="small gold"><b>The Corridor Engine stands here</b>, held by ${esc(faction(S, E.owner).name)} since turn ${E.built}${engineActive(S, E.owner) ? "" : " (its orbit is held: it gives nothing)"}. Take the world to take it; hold its orbit with its guns down and a barrage destroys it.</p>`; }
   if (!c) h += `<p>${w.outpostOnly ? "No one can live here, but an outpost can claim it." : w.needs && !has(S, me.id, w.needs) ? `Needs <b>${esc(TECHS.find((t) => t.id === w.needs).name)}</b> to settle; an outpost can claim it now.` : "Unclaimed. A colony ship can settle it."}</p>`;
   else if (!mine) h += `<p>Held by <b style="color:${faction(S, c.owner).color}">${esc(faction(S, c.owner).name)}</b>${c.kind === "outpost" ? " (outpost)" : seen ? `, population ${c.pop}${c.capital ? ", their capital" : ""}` : ""}.${seen && gunsMax(S, c) ? ` Orbital guns: ${c.defense} / ${gunsMax(S, c)} hull${c.buildings.battery ? `, an Orbital battery (${BATTERY.shots} shots of ${BATTERY.dmg} a round)` : ""}.` : ""}${seen ? siegeHTML(sys, false) : ""}</p>`;
@@ -571,14 +603,19 @@ function systemHTML() {
       ${siegeHTML(sys, true)}
       <h3>Building</h3>`;
     if (!c.queue.length) h += `<p class="small muted">Nothing. Industry stockpiles (up to 40). Pick something below.</p>`;
-    h += `<ol class="queue">${c.queue.map((q, i) => `<li><span>${esc(q.name)}${q.exotics ? ` <i class="exo">${q.exotics}◆</i>` : ""}</span>${bar(q.progress, q.cost)}<span class="small">${Math.floor(q.progress)}/${q.cost}${i === 0 ? ` · ${y.ind ? Math.max(1, Math.ceil((q.cost - q.progress) / y.ind)) + "t" : "—"}` : ""}</span><button class="x" data-deq="${i}" title="Remove">×</button></li>`).join("")}</ol>`;
+    // The item being built gets its progress bar; the ones waiting behind it are single slim lines.
+    h += `<ol class="queue">${c.queue.map((q, i) => `<li class="${i === 0 || q.progress > 0 ? "" : "wait"}"><span>${i ? `<i class="qn">${i + 1}</i>` : ""}${esc(q.name)}${q.exotics ? ` <i class="exo">${q.exotics}◆</i>` : ""}</span>${i === 0 || q.progress > 0 ? bar(q.progress, q.cost) : ""}<span class="small">${Math.floor(q.progress)}/${q.cost}${i === 0 ? ` · ${y.ind ? Math.max(1, Math.ceil((q.cost - q.progress) / y.ind)) + "t" : "—"}` : ""}</span><button class="x" data-deq="${i}" title="Remove">×</button></li>`).join("")}</ol>`;
     if (c.queue.length) { const rc = rushCost(S, sys.id); h += `<button class="btn small" data-rush ${me.credits < rc ? "disabled" : ""}>Rush ${esc(c.queue[0].name)} for ${rc} credits</button>`; }
     const opts = buildOptions(S, sys);
-    h += `<h3>Add to the queue</h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text + (countersOf(o.id).length ? ` Strong against ${countersOf(o.id).join(", ")}.` : "") + (SHIPS[o.id].skill && counteredBy(o.id).length ? ` Weak against ${counteredBy(o.id).map((u) => SHIPS[u].name.toLowerCase() + "s").join(", ")}.` : "") : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18, player(S).id) + " " : ""}${esc(o.name)}</b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></button>`).join("")}</div>`;
+    // Compact chips, ships then buildings: the short name and the cost (the full description is the chip's tooltip).
+    const tip = (o) => (o.kind === "ship" ? `${shipLabel(me.id, o.id)}: ${SHIPS[o.id].text}` + (countersOf(o.id).length ? ` Strong against ${countersOf(o.id).join(", ")}.` : "") + (SHIPS[o.id].skill && counteredBy(o.id).length ? ` Weak against ${counteredBy(o.id).map((u) => SHIPS[u].name.toLowerCase() + "s").join(", ")}.` : "") : `${BUILDINGS[o.id].name}: ${BUILDINGS[o.id].text}`);
+    const chip = (o) => `<button class="chip" data-build="${o.kind}:${o.id}" title="${esc(tip(o))}">${o.kind === "ship" ? shipSVG(o.id, me.color, 15, me.id) : ""}<span class="tx"><span class="nm">${esc(chipName(o))}</span><span class="co">${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></span></button>`;
+    const ships = opts.filter((o) => o.kind === "ship"), blds = opts.filter((o) => o.kind !== "ship");
+    h += `<h3>Add to the queue</h3>${ships.length ? `<p class="chips-h">Ships</p><div class="chips">${ships.map(chip).join("")}</div>` : ""}${blds.length ? `<p class="chips-h">Buildings</p><div class="chips">${blds.map(chip).join("")}</div>` : ""}`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.</p>`;
   }
-  if (me.explored[sys.at]) h += rallyHTML(sys);
-  if (mine) h += musterHereHTML(sys);
+  if (me.explored[sys.at]) h += fold("rally", rallyHTML(sys));
+  if (mine) h += fold("muster", musterHereHTML(sys));
   const fl = fleetsAt(S, sys.at).filter((f) => f.owner === me.id || seen);
   if (fl.length) h += `<h3>In orbit</h3>` + fl.map((f) => `<button class="row" data-selfleet="${f.id}"><span class="dot" style="background:${faction(S, f.owner).color}"></span>${esc(fleetName(f))}</button>`).join("");
   return h;
@@ -855,7 +892,8 @@ function crisisHTML() {
   const nodeList = (c.nodes || []).map((n) => `<button class="linkish" data-center="${n.at}">${esc(n.place)}</button>`).join(", ");
   if (c.stage === "signs") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">The Signs</span></h3>
     <p class="small">Something under the rifts is waking. ${c.watchers ? `${c.watchers} Warden Watcher${c.watchers === 1 ? " has" : "s have"} surfaced by the rifts: dormant, armed, and watching. ${(() => { const fw = (c.watcherList || []).filter((w) => (me.foundW || {})[w.id]), left = c.watchers - fw.length;
-      return `${fw.length ? `Found: ${fw.map((w) => `<button class="linkish" data-center="${w.at}">${esc(w.place)}</button>`).join(", ")}. ` : ""}${left ? `${left} not yet found: send scouts along the rifts (the red, jagged hexes).` : ""}`; })()}` : "Transmissions on every band, louder each week."} When the Wardens wake, every Watcher still standing becomes a Node, a forge that sends out hunters.</p>
+      return `${fw.length ? `Found: ${fw.map((w) => `<button class="linkish" data-center="${w.at}">${esc(w.place)}</button>`).join(", ")}. ` : ""}${left ? (() => { const rs = [...new Map((c.watcherList || []).filter((w) => !(me.foundW || {})[w.id] && w.rift).map((w) => [w.rift.id, w.rift])).values()];
+        return `${left} not yet found. Their signal${rs.length === 1 ? " comes" : "s come"} from ${rs.map((z) => `the rift near <button class="linkish" data-center="${z.center}">${esc(z.name)}</button> <button class="linkish" data-riftscout="${z.id}">(send a scout)</button>`).join(", ") || "the rifts"}.`; })() : ""}`; })()}` : "Transmissions on every band, louder each week."} When the Wardens wake, every Watcher still standing becomes a Node, a forge that sends out hunters.</p>
     <ol class="steps-list">${stepLi("now", "Destroy the Watchers while they're dormant: each is worth research, and one less Node later")}${stepLi("", "Put guns on your outer worlds, and build a fleet that can fight them")}</ol></div>`;
   if (c.stage === "stirring") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Stirring</span></h3>
     <p class="small">A signal is coming out of the rifts: the Wardens, war machines of the old empires, wake in about ${Math.max(1, c.at - S.turn)} turn${c.at - S.turn === 1 ? "" : "s"}. They'll burn any world they reach, whoever's it is. Build warships, and put guns on your outer worlds.</p></div>`;
@@ -1160,6 +1198,7 @@ function bindChrome() {
     const r = setMuster(S, player(S).id, el.dataset.musterset, el.value || null);
     if (r.error) toast(r.error, true); else { toast(el.value ? `New ${el.dataset.musterset === "all" ? "ships" : MUSTER_KINDS[el.dataset.musterset].toLowerCase()} will head for ${S.systems[el.value].name}.` : "Muster point cleared."); save(); renderAll(); }
   });
+  $("panel").addEventListener("toggle", (e) => { const d = e.target; if (d.dataset && d.dataset.fold) { if (d.open) openFolds.add(d.dataset.fold); else openFolds.delete(d.dataset.fold); } }, true);
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button, tr[data-selsys]"); if (!b || !S) return;
     const d = b.dataset, me = player(S);
@@ -1167,6 +1206,7 @@ function bindChrome() {
     if (d.focus) { const r = setFocus(S, me.id, d.focus, +d.n); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.assign) { const r = assignAdmiral(S, sel.id, d.assign); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.relieve !== undefined) { relieveAdmiral(S, sel.id); save(); renderAll(); return; }
+    if (d.riftscout !== undefined) { const z = riftZones(S).find((x) => x.id === +d.riftscout); if (z) scoutTheRifts([z]); return; }
     if (d.power !== undefined) { const r = useAdmiralPower(S, sel.id); if (r.error) toast(r.error, true); else toast(`${ADMIRAL_POWERS[r.id].name}: ${ADMIRAL_POWERS[r.id].text}`); save(); renderAll(); return; }
     if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
@@ -1639,6 +1679,7 @@ function showHelp(back) {
       <li><b>Refits:</b> research that improves ships goes into new ones; ships already in service get it at a Drydock (a Shipyard fits the early systems: sensors, drives, shields). A fleet's panel says when its ships need a refit.</li>
       <li><b>Pirate ransom and tribute:</b> pay and that haven's raiders leave your worlds alone for 20 turns. <b>Patrol pacts</b> (Diplomacy): partners guard each other's worlds from raiders and share pirate bounties.</li>
       <li><b>Traders:</b> merchant convoys run between Exchanges and pay both ends; keep warships beside them where pirates roam. At war, a fleet can <b>raid an enemy fuel depot</b> to fill its tanks and cut the depot's supply.</li>
+      <li><b>Watchers' signals:</b> when a Watcher surfaces, its signal tells you which rift it's by (outlined in amber on the map, marked SIGNAL), but not where along it. Press <b>Send a scout</b> on the Signs bar (or the link in Objectives) and your nearest scout heads for that rift; once a ship or world of yours sees the Watcher, it stays on your map.</li>
       <li><b>The Wardens:</b> long before they wake, Watchers surface by the rifts: destroy them while they sleep. Probes come out of the rifts too: small, quick and unarmed, they scan your worlds from a hex away (beyond your guns), then go home with what they saw. Every probe that gets home makes the Wardens wake stronger, and the worlds they scanned are attacked first. Only warships can catch them. Along the way you choose how to meet them, and one of them will speak. What you learn of them (the probes, the signal, scanned worlds, where the Heart will rise, how the machines think) can be shared with the other powers for their regard: on each power's Diplomacy card, or all at once from the bar's Share what you know. Awake, every world they burn becomes a Node; the Heart's own Nodes shield it, and any Node left when the Heart falls grows a new one. Burn them all out. While they are about, a red bar over the map shows what they are attacking. To rally the others, <b>call a coalition</b> from that bar (or the Wardens card on the Objectives tab): pick the Heart or a Node, and every power that likes you sends its fleets to hold it with you (the lukewarm for credits). When they attack one of your worlds, a Call to arms offers a coalition against that wave on the spot, and friendly powers under attack ask you for help.</li>
       <li><b>Pirates and creatures:</b> pirate havens send raiders to blockade and rob worlds with no guns or warships; crystal swarms hold rich systems; void leviathans feed on unguarded worlds. Destroy them for a bounty of credits and research.</li>
       <li><b>New sectors:</b> from turn ${SECTORS.first} the map grows: rings of new space open beyond the rim, and an open game keeps growing every ${SECTORS.every} turns. Each sector has a character: ${Object.values(SECTORS.kinds).map((k) => esc(k.name)).join(", ")}. Every power hears ${SECTORS.warn} turns ahead which one is coming. The Dead Zone and the Warden Graveyard open sealed: getting in takes the Rift drives technology, or a Rift beacon (${SECTORS.beacon.credits} credits, ${SECTORS.beacon.exotics} exotics) on a world within ${SECTORS.beacon.range} hexes, which opens it to everyone. The Objectives tab tracks them.</li>

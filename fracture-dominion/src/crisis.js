@@ -16,13 +16,53 @@ const crAlive = (s) => s.factions.filter((f) => f.alive);
 const crResearch = (s, F, n) => { F.research.progress += n; const cur = researchItem(s, F.id); return `+${n} research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}`; };
 const crPlace = (s, hex) => (s.sysAt[hex] ? s.systems[s.sysAt[hex]].name : (() => { const n = Object.values(s.systems).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0]; return n ? `deep space near ${n.name}` : "deep space"; })());
 
+// ---- the rifts: where the Watchers' signals come from ----
+let riftCache = null;
+/** Each rift: a connected patch of rift hexes, named for the system nearest it. [{ id, hexes, center, name }] */
+export function riftZones(s) {
+  const all = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "rift").sort();
+  const sig = all.length + ":" + all[0] + ":" + all[all.length - 1];
+  if (riftCache && riftCache.s === s && riftCache.sig === sig) return riftCache.zones;
+  const set = new Set(all), seen = new Set(), zones = [];
+  const sysList = Object.values(s.systems).filter((x) => !x.deep);
+  for (const k of all) {
+    if (seen.has(k)) continue;
+    const hexes = [], st = [k]; seen.add(k);
+    while (st.length) { const h = st.pop(); hexes.push(h); for (const n of neighbors(h)) if (set.has(n) && !seen.has(n)) { seen.add(n); st.push(n); } }
+    // Its middle: the rift hex with the least total distance to the rest.
+    const center = hexes.reduce((b, h) => { const d = hexes.reduce((t, x) => t + distance(h, x), 0); return !b || d < b.d ? { h, d } : b; }, null).h;
+    const near = sysList.reduce((b, x) => (!b || distance(x.at, center) < distance(b.at, center) ? x : b), null);
+    zones.push({ id: zones.length, hexes, center, name: near ? near.name : "deep space" });
+  }
+  riftCache = { s, sig, zones };
+  return zones;
+}
+/** The rift a hex lies by (the one with a rift hex nearest it), or null. */
+export function riftBy(s, hex) {
+  let best = null;
+  for (const z of riftZones(s)) for (const h of z.hexes) { const d = distance(h, hex); if (!best || d < best.d) best = { z, d }; }
+  return best && best.d <= 2 ? best.z : null;
+}
+/** Send this power's nearest scout (an idle one if it can) to the edge of a rift, to look for a Watcher there. */
+export function sendScoutToRift(s, fid, zoneId) {
+  const z = riftZones(s).find((x) => x.id === zoneId); if (!z) return { error: "No such rift." };
+  const scouts = fleetsOf(s, fid).filter((f) => f.ships.length && f.ships.every((x) => x.type === "scout"));
+  if (!scouts.length) return { error: "You have no scouts: build one at a shipyard." };
+  const edge = [...new Set(z.hexes.flatMap((h) => neighbors(h)))].filter((k) => s.hexes[k] && s.hexes[k].terrain !== "rift" && !s.hexes[k].sealed);
+  const pick = scouts.map((f) => ({ f, idle: !f.path.length, d: distance(f.at, z.center) })).sort((a, b) => (b.idle - a.idle) || a.d - b.d);
+  for (const { f } of pick) {
+    const to = edge.slice().sort((a, b) => distance(a, f.at) - distance(b, f.at)).find((k) => setDestination(s, f.id, k).ok);
+    if (to) { f.riftSearch = zoneId; return { ok: true, fleet: f.id, to, turns: f.path.length ? undefined : 0, name: z.name }; }
+  }
+  return { error: `None of your scouts can reach the rift near ${z.name}.` };
+}
 /** Where things stand, for the panels: null before the warning. */
 export function crisisState(s) {
   const C = s.crisis; if (!C || (C.stage === "quiet" && !C.signs)) return null;
   const heart = heartShip(s);
   return { stage: C.stage === "quiet" ? "signs" : C.stage, at: C.at, heart: C.heart, place: C.heart ? crPlace(s, C.heart) : null, hull: heart ? heart.hull : 0, max: C.heartMax || SHIPS.heart.hull,
     wave: C.wave || 0, nextWave: C.nextWave, ships: wardenFleets(s).reduce((t, f) => t + f.ships.length, 0), truce: !!C.truce, by: C.heartBy || null,
-    watchers: stationOf(s, "watcher").length, watcherList: stationOf(s, "watcher").map((f) => ({ id: f.id, at: f.at, place: crPlace(s, f.at) })), nodes: stationOf(s, "node").map((f) => ({ at: f.at, place: crPlace(s, f.at) })), regrowAt: C.regrowAt || null, returns: C.returns || 0 };
+    watchers: stationOf(s, "watcher").length, watcherList: stationOf(s, "watcher").map((f) => { const z = riftBy(s, f.at); return { id: f.id, at: f.at, place: crPlace(s, f.at), rift: z ? { id: z.id, name: z.name, center: z.center } : null }; }), nodes: stationOf(s, "node").map((f) => ({ at: f.at, place: crPlace(s, f.at) })), regrowAt: C.regrowAt || null, returns: C.returns || 0 };
 }
 const wardenFleets = (s) => fleetsOf(s, WARDENS);
 /** The Wardens' machines that never move: Watchers (dormant) and Nodes (forges). */
@@ -70,7 +110,8 @@ function signs(s, R) {
     if (k) { const f = spawnFleet(s, WARDENS, k, ["watcher"]); f.born = s.turn;
       // Every power hears its signal, but not where it is: it has to be found (seen by a ship or a world) before it's on the map.
       const near = new Set(cols.filter((c) => distance(c.at, k) <= 6).map((c) => c.colony.owner));
-      for (const F of crAlive(s)) log(s, F.id, `A Warden Watcher has surfaced somewhere by the rifts${near.has(F.id) ? ", and the signal is strong: it's not far from your worlds" : ""}. It doesn't move, but it's armed, and it's watching. Send scouts along the rifts to find it, then destroy it, or it wakes as a Node when the Wardens do.`, "war"); }
+      const z = riftBy(s, k), where = z ? `by the rift near ${z.name}` : "somewhere in open space";
+      for (const F of crAlive(s)) log(s, F.id, `A Warden Watcher's signal: it has surfaced ${where}${near.has(F.id) ? ", not far from your worlds" : ""}. It doesn't move, but it's armed, and it's watching. Send a scout along that rift to find it, then destroy it, or it wakes as a Node when the Wardens do.`, "war"); }
   }
   for (const f of stationOf(s, "watcher")) if (!underSiege(s, f)) for (const x of f.ships) x.hull = Math.min(shipStats(s, WARDENS, "watcher").hull, x.hull + C.mSigns);
   const i = Math.floor((s.turn - C.signs) / 7);

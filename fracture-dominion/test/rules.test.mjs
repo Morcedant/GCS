@@ -1760,3 +1760,19 @@ test("the log keeps the player's news: the computer powers' own research and cha
   assert.ok(s.log.some((l) => l.text === "Battle at Testworld."), "the battle is still there");
   assert.ok(s.log.length <= 400);
 });
+
+test("rifts: the Watchers' signals name the rift they come from, and a scout can be sent to search it", async () => {
+  const { riftZones, riftBy, sendScoutToRift, crisisState } = await import("../src/crisis.js");
+  const s = newGame({ seed: 5, size: "medium", player: "concord", rivals: 1, wilds: "none" }), me = s.factions[0];
+  const zones = riftZones(s); assert.ok(zones.length >= 1, "rifts on the map");
+  for (const z of zones) assert.ok(z.hexes.includes(z.center) && z.name);
+  const z = zones[0], spot = neighbors(z.hexes[0]).find((k) => s.hexes[k] && s.hexes[k].terrain !== "rift" && !s.sysAt[k]);
+  const w = spawnFleet(s, "wardens", spot, ["watcher"]); s.crisis = { stage: "quiet", signs: true, at: 999 };
+  assert.equal(riftBy(s, w.at).id, z.id, "the Watcher is by that rift");
+  const c = crisisState(s); assert.equal(c.watcherList[0].rift.name, z.name, "and the signal names it");
+  for (const f of fleetsOf(s, me.id)) if (!f.ships.every((x) => x.type === "scout")) delete s.fleets[f.id];
+  const r = sendScoutToRift(s, me.id, z.id); assert.ok(r.ok, r.error);
+  const sc = s.fleets[r.fleet]; assert.ok(z.hexes.some((h) => distance(h, sc.dest) === 1), "it heads for the rift's edge");
+  for (const f of Object.values(s.fleets)) if (f.owner === me.id) delete s.fleets[f.id];
+  assert.ok(sendScoutToRift(s, me.id, z.id).error, "no scouts: it says so");
+});

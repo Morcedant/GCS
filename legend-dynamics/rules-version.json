@@ -4,6 +4,16 @@
   "rulesUpdated": "2026-11-13",
   "changes": [
     {
+      "date": "2026-11-28",
+      "kind": "site",
+      "title": "Dominion: a compact build queue, and signals that name their rift",
+      "items": [
+        "A world's panel is about half as long: what you can build is a grid of compact chips (ships, then buildings) with the cost under each name; items waiting in the queue are slim numbered lines (only the one being built has a progress bar); and the Gate Shard, Send your ships here and Muster point fold away until you open them.",
+        "A Watcher's signal now says which rift it came from (\"by the rift near Lodestar\"). That rift is outlined in amber on the map and marked SIGNAL, explored or not, until you find the Watcher.",
+        "The Signs bar has Send a scout (your nearest scout heads for that rift) and Show the rift; the Objectives tab has the same, for each rift with a signal."
+      ]
+    },
+    {
       "date": "2026-11-24",
       "kind": "site",
       "title": "Dominion: ships on standing orders no longer fly into enemy fleets",
